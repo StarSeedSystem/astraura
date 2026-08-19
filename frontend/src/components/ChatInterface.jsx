@@ -93,9 +93,9 @@ export default function ChatInterface({
   const [duplexLiveTranscript, setDuplexLiveTranscript] = useState('');
   const [activeSpeakingPersona, setActiveSpeakingPersona] = useState(null);
 
-  // Active Multi-Personality Selection (for group dialogues & coral synthesis)
+  // Active Multi-Personality Selection (Default: Aurora)
   const [selectedPersonaIds, setSelectedPersonaIds] = useState(() => {
-    return [activePersona?.id || 'astraura_prime'];
+    return [activePersona?.id || 'aurora'];
   });
   const [multiResponseMode, setMultiResponseMode] = useState('auto'); // 'single' | 'multi_dialogue' | 'coral_synthesis' | 'auto'
 
@@ -773,6 +773,7 @@ export default function ChatInterface({
               <div className="hidden lg:flex items-center gap-1 border-l border-white/10 pl-1.5">
                 <span className="text-[9px] text-slate-500 uppercase">Sumar al chat:</span>
                 {[
+                  { id: 'aurora', name: '@Aurora', label: '🌸 Aurora' },
                   { id: 'hephaestus', name: '@Hephaestus', label: '⚡ Hephaestus' },
                   { id: 'hermione', name: '@Hermione', label: '💻 Hermione' },
                   { id: 'atenea', name: '@Atenea', label: '🛡️ Atenea' },

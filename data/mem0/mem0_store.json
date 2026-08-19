@@ -1,6 +1,38 @@
 {
   "memories": [
     {
+      "id": "mem0_1787103126956",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Astraura Prime (Zenith): Hola hola es la red -> Síntesis: ¡Hola! ¿Cómo puedo asistirte hoy?",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787103126.956543,
+      "updated_at": 1787103126.956543,
+      "metadata": {
+        "timestamp": 1787103126.9563122,
+        "style": "analytical",
+        "persona": "astraura_prime"
+      }
+    },
+    {
+      "id": "mem0_1787103116397",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Astraura Prime (Zenith): Hola Explícame cómo funciona tu sistema de voz ya hazme una demostración -> Síntesis: ¡Hola! Sí, estoy aquí para ayudarte. Te mostraré cómo funciona mi sistema de voz y luego podrás probarlo a través de un ejemplo.\n\n### Sistema de Voz de StarSeed OS\n\nEl sistema de voz de StarSeed OS se",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787103116.397032,
+      "updated_at": 1787103116.397032,
+      "metadata": {
+        "timestamp": 1787103116.395535,
+        "style": "analytical",
+        "persona": "astraura_prime"
+      }
+    },
+    {
       "id": "mem0_1787102256384",
       "user_id": "alex",
       "agent_id": "*",
@@ -375,6 +407,20 @@
   ],
   "history": [
     {
+      "id": "hist_1787103126956",
+      "memory_id": "mem0_1787103126956",
+      "action": "created",
+      "timestamp": 1787103126.9565482,
+      "text": "Usuario consultó a Astraura Prime (Zenith): Hola hola es la red -> Síntesis: ¡Hola! ¿Cómo puedo asistirte hoy?"
+    },
+    {
+      "id": "hist_1787103116397",
+      "memory_id": "mem0_1787103116397",
+      "action": "created",
+      "timestamp": 1787103116.3970518,
+      "text": "Usuario consultó a Astraura Prime (Zenith): Hola Explícame cómo funciona tu sistema de voz ya hazme una demostración -> Síntesis: ¡Hola! Sí, estoy aquí para ayudarte. Te mostraré cómo funciona mi sistema de voz y luego podrás probarlo a través de un ejemplo.\n\n### Sistema de Voz de StarSeed OS\n\nEl sistema de voz de StarSeed OS se"
+    },
+    {
       "id": "hist_1787102256384",
       "memory_id": "mem0_1787102256384",
       "action": "created",
@@ -522,5 +568,5 @@
       "text": "El usuario Alex Bordón Garrigós es el creador de StarSeed OS y Astraura 1.58-Bit. Trabaja en un Apple Silicon M1 con 8 núcleos y memoria unificada."
     }
   ],
-  "updated_at": 1787102256.385001
+  "updated_at": 1787103126.9565709
 }

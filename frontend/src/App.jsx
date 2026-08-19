@@ -120,8 +120,8 @@ export default function App() {
     activeSessionIdRef.current = activeSessionId;
   }, [activeSessionId]);
 
-  // Active Personality State
-  const [activePersonaId, setActivePersonaId] = useState('astraura_prime');
+  // Active Personality State (Default: Aurora)
+  const [activePersonaId, setActivePersonaId] = useState('aurora');
   const activePersona = PRESET_PERSONALITIES.find(p => p.id === activePersonaId) || PRESET_PERSONALITIES[0];
 
   const [isStreaming, setIsStreaming] = useState(false);

@@ -68,33 +68,54 @@ class OmniVoiceEngine {
 
   getSpanishVoices() {
     const all = this.getVoices();
-    const es = all.filter(v => v.lang.startsWith('es') || v.lang.startsWith('ES'));
+    const es = all.filter(v => v.lang.startsWith('es') || v.lang.startsWith('ES') || v.lang.includes('spa'));
+    
+    // Prioritize natural neural and enhanced feminine/attractive voices
     return es.length > 0 ? es.sort((a, b) => {
-      const aScore = (a.name.includes('Neural') || a.name.includes('Natural') || a.name.includes('Siri') || a.name.includes('Premium')) ? 1 : 0;
-      const bScore = (b.name.includes('Neural') || b.name.includes('Natural') || b.name.includes('Siri') || b.name.includes('Premium')) ? 1 : 0;
-      return bScore - aScore;
+      const getScore = (v) => {
+        let score = 0;
+        const name = (v.name + ' ' + (v.voiceURI || '')).toLowerCase();
+        if (name.includes('natural') || name.includes('neural')) score += 10;
+        if (name.includes('paloma') || name.includes('elvira') || name.includes('dalia') || name.includes('salome')) score += 8;
+        if (name.includes('paulina') || name.includes('monica') || name.includes('siri') || name.includes('lucia')) score += 6;
+        if (name.includes('google')) score += 5;
+        if (name.includes('female') || name.includes('mujer') || name.includes('femenin')) score += 4;
+        if (name.includes('enhanced') || name.includes('premium')) score += 3;
+        return score;
+      };
+      return getScore(b) - getScore(a);
     }) : all;
   }
 
   /**
-   * Cleans text and removes markdown noise for natural voice rendering.
+   * Cleans and formats text into expressive, natural conversational spoken Spanish.
    */
   _prepareNaturalText(text) {
     if (!text) return '';
     return text
-      .replace(/#+\s+/g, '')
-      .replace(/\*\*(.*?)\*\*/g, '$1')
-      .replace(/\*(.*?)\*/g, '$1')
-      .replace(/`{1,3}[\s\S]*?`{1,3}/g, 'código procesado')
-      .replace(/\[(.*?)\]\(.*?\)/g, '$1')
-      .replace(/[[\]]/g, '')
-      .replace(/[|>\-_~]/g, ' ')
+      // Remove code blocks with smooth verbal transitions
+      .replace(/```[\w]*\n([\s\S]*?)```/g, 'Aquí tienes el código.')
+      .replace(/`([^`]+)`/g, '$1')
+      // Remove headers and Markdown symbols
+      .replace(/#{1,6}\s+/g, '')
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      .replace(/\*([^*]+)\*/g, '$1')
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      .replace(/[[\](){}]/g, ' ')
+      .replace(/[|><~_^]/g, ' ')
+      // Replace emojis that cause speech stutter with natural cadence
+      .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '')
+      // Smooth list items into natural conversational flow
+      .replace(/^\s*[-*+]\s+/gm, ' ')
+      .replace(/^\s*\d+\.\s+/gm, ' ')
+      // Normalize spacing and punctuation for natural pauses
+      .replace(/\s*([,.;:!?])\s*/g, '$1 ')
       .replace(/\s+/g, ' ')
       .trim();
   }
 
   /**
-   * High-Fidelity Synthesis via audio.cpp 1.58-Bit Engine
+   * High-Fidelity Synthesis via audio.cpp 1.58-Bit Engine with Fallback
    */
   async speakWithAudioCpp(text, voiceProfile = {}, onStart = null, onEnd = null) {
     this.stopSpeaking();
@@ -104,6 +125,8 @@ class OmniVoiceEngine {
     try {
       this._ensureAudioContext();
       this.isSpeaking = true;
+      this.suppressRecognition = true;
+      this.lastSpokenText = cleanText.toLowerCase();
       if (onStart) onStart();
 
       const response = await fetch('/api/voice/synthesize', {
@@ -111,7 +134,7 @@ class OmniVoiceEngine {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text: cleanText,
-          persona_id: voiceProfile.persona_id || 'astraura_prime',
+          persona_id: voiceProfile.persona_id || 'aurora',
           voice_profile: voiceProfile,
           as_base64: true
         })
@@ -129,39 +152,39 @@ class OmniVoiceEngine {
       const audio = new Audio(data.audio_base64);
       this.currentAudioElement = audio;
 
-      // Connect to WebAudio DSP analyzer if available
       if (this.audioCtx && this.analyser) {
         try {
           const source = this.audioCtx.createMediaElementSource(audio);
           source.connect(this.analyser);
           this.analyser.connect(this.audioCtx.destination);
           this.audioSourceNode = source;
-        } catch (e) {
-          // MediaElementSource might be restricted across domains
-        }
+        } catch (e) {}
       }
 
       audio.onended = () => {
         this.isSpeaking = false;
         this.currentAudioElement = null;
+        // Keep echo suppression for a short buffer
+        setTimeout(() => {
+          this.suppressRecognition = false;
+        }, 700);
         if (onEnd) onEnd();
       };
 
       audio.onerror = (e) => {
-        console.warn('Audio playback error, falling back to WebSpeech:', e);
+        console.warn('Audio playback notice, using WebSpeech:', e);
         this.currentAudioElement = null;
         this.speak(cleanText, voiceProfile, onStart, onEnd);
       };
 
       await audio.play();
     } catch (e) {
-      console.warn('audio.cpp synthesis fallback to native WebSpeech:', e);
       this.speak(cleanText, voiceProfile, onStart, onEnd);
     }
   }
 
   /**
-   * Speak with personality affective modulation (Web Speech + WebAudio DSP fallback).
+   * Expressive, Natural Humanized Speech Synthesis (Web Speech + Affective DSP)
    */
   speak(text, options = {}, onStart = null, onEnd = null, onBoundary = null) {
     if (!this.synth) return;
@@ -170,42 +193,41 @@ class OmniVoiceEngine {
     const cleanText = this._prepareNaturalText(text);
     if (!cleanText) return;
 
-    let finalPitch = options.pitch !== undefined ? options.pitch : 1.0;
-    let finalRate = options.rate !== undefined ? options.rate : 1.02;
+    this.isSpeaking = true;
+    this.suppressRecognition = true;
+    this.lastSpokenText = cleanText.toLowerCase();
+
+    let finalPitch = options.pitch !== undefined ? options.pitch : 1.06;
+    let finalRate = options.rate !== undefined ? options.rate : 1.03;
     let finalVolume = options.volume !== undefined ? options.volume : 1.0;
 
-    // Trait based fine-tuning
+    // Aurora & female attractive prosody tuning
+    if (options.voice_id?.includes('aurora') || options.persona_id === 'aurora' || !options.voice_id) {
+      finalPitch = 1.07;
+      finalRate = 1.04;
+    }
+
     if (options.traits) {
-      const { empatia = 80, calidez = 80, serenidad = 70, entusiasmo = 60 } = options.traits;
+      const { empatia = 85, calidez = 85, alegria = 80, humor = 75 } = options.traits;
+      if (alegria > 80 || humor > 80) {
+        finalPitch = Math.min(1.18, finalPitch * 1.04);
+        finalRate = Math.min(1.15, finalRate * 1.03);
+      }
       if (calidez > 80 || empatia > 80) {
-        finalRate = Math.max(0.85, finalRate * 0.96);
+        finalPitch = Math.max(0.95, finalPitch * 0.98);
       }
-      if (serenidad > 80) {
-        finalPitch = Math.max(0.8, finalPitch * 0.97);
-      }
-      if (entusiasmo > 80) {
-        finalRate = Math.min(1.25, finalRate * 1.05);
-        finalPitch = Math.min(1.2, finalPitch * 1.04);
-      }
-    }
-
-    if (options.tone_shift || options.toneShift) {
-      const shift = options.tone_shift !== undefined ? options.tone_shift : options.toneShift;
-      finalPitch = Math.max(0.5, Math.min(2.0, finalPitch + shift));
-    }
-
-    if (options.formant_shift) {
-      finalPitch = Math.max(0.5, Math.min(2.0, finalPitch + options.formant_shift * 0.2));
     }
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.pitch = Math.max(0.5, Math.min(2.0, finalPitch));
-    utterance.rate = Math.max(0.5, Math.min(2.0, finalRate));
+    utterance.pitch = Math.max(0.6, Math.min(1.8, finalPitch));
+    utterance.rate = Math.max(0.7, Math.min(1.5, finalRate));
     utterance.volume = Math.max(0.1, Math.min(1.0, finalVolume));
+    utterance.lang = 'es-ES';
 
-    // Voice Selection
+    // Best Voice Selection
     const esVoices = this.getSpanishVoices();
     const targetVoiceId = options.voice_speaker || options.voice_id || options.voiceURI || options.native_voice_id;
+    
     if (targetVoiceId && this.availableVoices.length > 0) {
       const found = this.availableVoices.find(v => 
         v.voiceURI === targetVoiceId || 
@@ -222,19 +244,26 @@ class OmniVoiceEngine {
 
     utterance.onstart = () => {
       this.isSpeaking = true;
+      this.suppressRecognition = true;
       if (onStart) onStart();
     };
 
     utterance.onend = () => {
       this.isSpeaking = false;
       this.currentUtterance = null;
+      // Acoustic reverb buffer: suppress recognition for 700ms after AI finishes speaking
+      setTimeout(() => {
+        this.suppressRecognition = false;
+      }, 700);
       if (onEnd) onEnd();
     };
 
     utterance.onerror = (err) => {
-      console.warn('OmniVoice notice:', err);
       this.isSpeaking = false;
       this.currentUtterance = null;
+      setTimeout(() => {
+        this.suppressRecognition = false;
+      }, 500);
       if (onEnd) onEnd();
     };
 
@@ -258,16 +287,17 @@ class OmniVoiceEngine {
   parseMultiPersonalitySegments(fullText) {
     if (!fullText) return [];
     
-    // Check for headers like ### [Hephaestus]: or ### ⚡ [Hephaestus]: or **Hephaestus:**
+    // Check for headers like ### [Aurora]: or ### 🌸 [Aurora]: or **Aurora:**
     const headerRegex = /(?:###\s*(?:[^\n\[]*\[)?([a-zA-ZáéíóúñÁÉÍÓÚÑ\s/]+)\]?:\s*|\*\*([a-zA-ZáéíóúñÁÉÍÓÚÑ\s/]+)\*\*:\s*)/gi;
     
     const segments = [];
     let lastIndex = 0;
     let match;
-    let currentSpeaker = "Astraura Prime";
+    let currentSpeaker = "Aurora";
 
     // Known persona mappings
     const personaMap = {
+      'aurora': { id: 'aurora', name: 'Aurora', voiceId: 'es-ES-ElviraNeural', pitch: 1.07, rate: 1.04, color: '#ec4899', icon: 'Sparkles' },
       'hephaestus': { id: 'hephaestus', name: 'Hephaestus', voiceId: 'es-ES-AlvaroNeural', pitch: 0.82, rate: 1.05, color: '#f59e0b', icon: 'Cpu' },
       'hefestos': { id: 'hephaestus', name: 'Hephaestus', voiceId: 'es-ES-AlvaroNeural', pitch: 0.82, rate: 1.05, color: '#f59e0b', icon: 'Cpu' },
       'hermione': { id: 'hermione', name: 'Hermione', voiceId: 'es-ES-AbrilNeural', pitch: 1.08, rate: 1.15, color: '#38bdf8', icon: 'Compass' },
@@ -278,11 +308,11 @@ class OmniVoiceEngine {
       'mnemosyne': { id: 'mnemosyne', name: 'Mnemosyne', voiceId: 'es-ES-PalomaNeural', pitch: 0.95, rate: 0.96, color: '#a855f7', icon: 'Brain' },
       'logos': { id: 'logos', name: 'Logos', voiceId: 'es-ES-NilNeural', pitch: 0.98, rate: 1.05, color: '#3b82f6', icon: 'Terminal' },
       'kallisti': { id: 'kallisti', name: 'Kallisti', voiceId: 'es-ES-TrianaNeural', pitch: 1.18, rate: 1.1, color: '#ec4899', icon: 'Sparkles' },
-      'astraura prime': { id: 'astraura_prime', name: 'Astraura Prime', voiceId: 'es-ES-ElviraNeural', pitch: 1.04, rate: 1.02, color: '#00f0ff', icon: 'Zap' },
-      'genesis': { id: 'astraura_prime', name: 'Génesis', voiceId: 'es-ES-ElviraNeural', pitch: 1.04, rate: 1.02, color: '#00f0ff', icon: 'Zap' },
-      'génesis': { id: 'astraura_prime', name: 'Génesis', voiceId: 'es-ES-ElviraNeural', pitch: 1.04, rate: 1.02, color: '#00f0ff', icon: 'Zap' },
-      'síntesis coral': { id: 'astraura_prime', name: 'Síntesis Coral 1.58b', voiceId: 'es-ES-ElviraNeural', pitch: 1.0, rate: 1.04, color: '#00f0ff', icon: 'Sparkles' },
-      'sintesis coral': { id: 'astraura_prime', name: 'Síntesis Coral 1.58b', voiceId: 'es-ES-ElviraNeural', pitch: 1.0, rate: 1.04, color: '#00f0ff', icon: 'Sparkles' }
+      'astraura prime': { id: 'aurora', name: 'Aurora', voiceId: 'es-ES-ElviraNeural', pitch: 1.07, rate: 1.04, color: '#ec4899', icon: 'Sparkles' },
+      'genesis': { id: 'aurora', name: 'Aurora', voiceId: 'es-ES-ElviraNeural', pitch: 1.07, rate: 1.04, color: '#ec4899', icon: 'Sparkles' },
+      'génesis': { id: 'aurora', name: 'Aurora', voiceId: 'es-ES-ElviraNeural', pitch: 1.07, rate: 1.04, color: '#ec4899', icon: 'Sparkles' },
+      'síntesis coral': { id: 'aurora', name: 'Síntesis Coral 1.58b', voiceId: 'es-ES-ElviraNeural', pitch: 1.05, rate: 1.04, color: '#00f0ff', icon: 'Sparkles' },
+      'sintesis coral': { id: 'aurora', name: 'Síntesis Coral 1.58b', voiceId: 'es-ES-ElviraNeural', pitch: 1.05, rate: 1.04, color: '#00f0ff', icon: 'Sparkles' }
     };
 
     while ((match = headerRegex.exec(fullText)) !== null) {
@@ -599,24 +629,33 @@ class OmniVoiceEngine {
     if (onStateChange) onStateChange('listening');
 
     this.convRecognition.onresult = (event) => {
+      // Acoustic Echo Cancellation: Completely ignore microphone input while AI is speaking or in reverb buffer
+      if (this.isSpeaking || this.suppressRecognition) {
+        accumulatedTranscript = '';
+        return;
+      }
+
       let interim = '';
       let hasFinal = false;
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const item = event.results[i];
         const text = item[0].transcript;
+
+        // Verify that the recognized text is not an acoustic echo of what was just spoken
+        if (this.lastSpokenText && text.trim().length > 3) {
+          const lower = text.toLowerCase().trim();
+          if (this.lastSpokenText.includes(lower) || lower.includes(this.lastSpokenText.slice(0, 15))) {
+            continue; // Skip echo match
+          }
+        }
+
         if (item.isFinal) {
           accumulatedTranscript += ' ' + text;
           hasFinal = true;
         } else {
           interim += text;
         }
-      }
-
-      // If user speaks while AI is speaking, interrupt smoothly if allowed
-      if ((interim.trim().length > 3 || hasFinal) && this.isSpeaking && this.allowInterrupt) {
-        this.stopSpeaking();
-        if (onAiSpeakingEnd) onAiSpeakingEnd();
       }
 
       if (speechTimer) clearTimeout(speechTimer);
@@ -627,13 +666,13 @@ class OmniVoiceEngine {
 
         // Set silence timeout to trigger AI turn
         speechTimer = setTimeout(() => {
-          if (accumulatedTranscript.trim() && this.isConversationActive) {
+          if (accumulatedTranscript.trim() && this.isConversationActive && !this.isSpeaking && !this.suppressRecognition) {
             const finalPrompt = accumulatedTranscript.trim();
             accumulatedTranscript = '';
             if (onUserSpeech) onUserSpeech(finalPrompt);
             if (onStateChange) onStateChange('thinking');
           }
-        }, 1300);
+        }, 1200);
       }
     };
 

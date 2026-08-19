@@ -40,10 +40,11 @@ class AstrauraOrchestrator:
         persona_map = {p["id"]: p for p in all_profiles}
         # Common aliases
         alias_map = {
-            "genesis": "astraura_prime",
-            "génesis": "astraura_prime",
-            "prime": "astraura_prime",
-            "astraura": "astraura_prime",
+            "aurora": "aurora",
+            "genesis": "aurora",
+            "génesis": "aurora",
+            "prime": "aurora",
+            "astraura": "aurora",
             "hermione": "hermione",
             "hephaestus": "hephaestus",
             "hefestos": "hephaestus",
@@ -52,7 +53,8 @@ class AstrauraOrchestrator:
             "athena": "atenea",
             "oneiros": "oneiros",
             "mnemosyne": "mnemosyne",
-            "logos": "logos"
+            "logos": "logos",
+            "kallisti": "kallisti"
         }
 
         selected_ids = set()
@@ -63,7 +65,7 @@ class AstrauraOrchestrator:
                 if pid in persona_map:
                     selected_ids.add(pid)
 
-        # 2. From @Mentions in Prompt (e.g. @Hephaestus @Atenea)
+        # 2. From @Mentions in Prompt (e.g. @Aurora @Hephaestus @Atenea)
         mentions = re.findall(r'@([a-zA-Z0-9_áéíóúñ]+)', prompt)
         for m in mentions:
             m_clean = m.lower()
@@ -72,7 +74,7 @@ class AstrauraOrchestrator:
             elif m_clean in persona_map:
                 selected_ids.add(m_clean)
 
-        # 3. From Natural Phrases (e.g. "Génesis y Hermes respondan", "Atenea y Hephaestus analicen...")
+        # 3. From Natural Phrases (e.g. "Aurora y Hermes respondan", "Atenea y Hephaestus analicen...")
         for alias, pid in alias_map.items():
             if re.search(r'\b' + re.escape(alias) + r'\b', p_lower):
                 selected_ids.add(pid)
@@ -82,13 +84,13 @@ class AstrauraOrchestrator:
             for p in all_profiles[:6]:
                 selected_ids.add(p["id"])
 
-        # Fallback to active persona or default
+        # Fallback to active persona or default Aurora
         if not selected_ids:
-            active_id = prefs.get("personaId") or personality_engine.active_personality_id or "astraura_prime"
+            active_id = prefs.get("personaId") or personality_engine.active_personality_id or "aurora"
             if active_id in persona_map:
                 selected_ids.add(active_id)
             else:
-                selected_ids.add("astraura_prime")
+                selected_ids.add("aurora")
 
         return [persona_map[pid] for pid in selected_ids if pid in persona_map]
 
