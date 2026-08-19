@@ -123,19 +123,19 @@ class AstrauraOrchestrator:
         active_personas = self.detect_requested_personalities(user_prompt, prefs)
         is_multi = len(active_personas) > 1
 
-        # 1. Execute Quantum Multi-Agent Parallel Swarm Cycle
-        cycle = await self.execute_thought_cycle(user_prompt, preferences=prefs)
-        
-        # 2. Emit Dynamic Branching Plan to UI
-        if "branching_plan" in cycle:
-            yield {
-                "type": "branching_plan",
-                "plan": cycle["branching_plan"],
-                "elapsed_seconds": cycle.get("elapsed_seconds", 0.25),
-                "active_personalities": [p["name"] for p in active_personas]
-            }
+        # 1. Analyze and Emit Branching Plan Immediately to UI (Zero-Latency Rendering)
+        initial_plan = parallel_branching_engine.analyze_query_branches(user_prompt, prefs)
+        yield {
+            "type": "branching_plan",
+            "plan": initial_plan,
+            "elapsed_seconds": 0.02,
+            "active_personalities": [p["name"] for p in active_personas]
+        }
 
-        # 3. Emit Agent Thought traces to UI
+        # 2. Execute Fast Quantum Multi-Agent Parallel Swarm Cycle
+        cycle = await self.execute_thought_cycle(user_prompt, preferences=prefs)
+
+        # 3. Emit Final Synchronized Agent Thought traces to UI
         yield {
             "type": "agent_traces",
             "traces": cycle["agent_traces"],

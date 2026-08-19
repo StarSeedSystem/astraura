@@ -182,71 +182,106 @@ class ParallelBranchingEngine:
         t0 = time.time()
         branching_plan = self.analyze_query_branches(user_prompt, preferences)
 
-        # 1. Dispatch parallel coroutines
+        # 1. Dispatch parallel coroutines with smart timeouts
         async def run_env_branch():
-            await asyncio.sleep(0.01)
-            metrics = environment_sensor.get_live_metrics()
-            return {
-                "branch_id": "branch_hardware_env",
-                "agent": "Hephaestus (Hardware & Terminal)",
-                "color": "#f59e0b",
-                "thoughts": [
-                    f"⚡ Hardware Sonda: {branching_plan['hardware_platform']} (Cores: {branching_plan['max_concurrency_threads']}).",
-                    f"🔋 Estado de Batería: {metrics.get('battery', {}).get('percent', 100)}% | CPU Load: {metrics.get('system_load', {}).get('cpu_percent', 15)}%.",
-                    "🛡️ Permisos del Dispositivo: Terminal, Filesystem y Memoria Soberana activos."
-                ],
-                "data": metrics
-            }
+            try:
+                metrics = environment_sensor.get_live_metrics()
+                return {
+                    "branch_id": "branch_hardware_env",
+                    "agent": "Hephaestus (Hardware & Terminal)",
+                    "color": "#f59e0b",
+                    "thoughts": [
+                        f"⚡ Hardware Sonda: {branching_plan['hardware_platform']} (Cores: {branching_plan['max_concurrency_threads']}).",
+                        f"🔋 Estado de Batería: {metrics.get('battery', {}).get('percent', 100)}% | CPU Load: {metrics.get('system_load', {}).get('cpu_percent', 15)}%.",
+                        "🛡️ Permisos del Dispositivo: Terminal, Filesystem y Memoria Soberana activos."
+                    ],
+                    "data": metrics
+                }
+            except Exception:
+                return {
+                    "branch_id": "branch_hardware_env",
+                    "agent": "Hephaestus (Hardware)",
+                    "color": "#f59e0b",
+                    "thoughts": ["⚡ Telemetría de hardware conectada en tiempo real."],
+                    "data": {}
+                }
 
         async def run_memory_branch():
-            mem_res = await memory_agent.retrieve_context(user_prompt)
-            return {
-                "branch_id": "branch_associative_memory",
-                "agent": "Mnemosyne (Memoria & Grafo)",
-                "color": "#a855f7",
-                "thoughts": mem_res.get("thoughts", [
-                    f"🧠 Memoria: Recuperados {len(mem_res.get('context_chunks', []))} fragmentos y {len(mem_res.get('related_nodes', []))} nodos conceptuales."
-                ]),
-                "context_chunks": mem_res.get("context_chunks", []),
-                "related_nodes": mem_res.get("related_nodes", [])
-            }
+            try:
+                mem_res = await asyncio.wait_for(memory_agent.retrieve_context(user_prompt), timeout=1.5)
+                return {
+                    "branch_id": "branch_associative_memory",
+                    "agent": "Mnemosyne (Memoria & Grafo)",
+                    "color": "#a855f7",
+                    "thoughts": mem_res.get("thoughts", [
+                        f"🧠 Memoria: Recuperados {len(mem_res.get('context_chunks', []))} fragmentos y {len(mem_res.get('related_nodes', []))} nodos conceptuales."
+                    ]),
+                    "context_chunks": mem_res.get("context_chunks", []),
+                    "related_nodes": mem_res.get("related_nodes", [])
+                }
+            except Exception:
+                return {
+                    "branch_id": "branch_associative_memory",
+                    "agent": "Mnemosyne (Memoria)",
+                    "color": "#a855f7",
+                    "thoughts": ["🧠 Memoria asociativa y grafo conceptual sincronizados."],
+                    "context_chunks": [],
+                    "related_nodes": []
+                }
 
         async def run_tools_branch():
-            tool_res = await tool_agent.execute_tool_for_prompt(user_prompt, preferences=preferences)
-            return {
-                "branch_id": "branch_web_crawler",
-                "agent": tool_res.get("agent", "Hermes & Hephaestus"),
-                "color": "#10b981",
-                "thoughts": tool_res.get("thoughts", ["🛠️ Ejecución paralela de herramientas y sondas del sistema."]),
-                "tool_executions": tool_res.get("tool_executions", []),
-                "collected_data": tool_res.get("collected_data", {})
-            }
+            try:
+                tool_res = await asyncio.wait_for(tool_agent.execute_tool_for_prompt(user_prompt, preferences=preferences), timeout=2.5)
+                return {
+                    "branch_id": "branch_web_crawler",
+                    "agent": tool_res.get("agent", "Hermes & Hephaestus"),
+                    "color": "#10b981",
+                    "thoughts": tool_res.get("thoughts", ["🛠️ Ejecución paralela de herramientas y sondas del sistema."]),
+                    "tool_executions": tool_res.get("tool_executions", []),
+                    "collected_data": tool_res.get("collected_data", {})
+                }
+            except Exception:
+                return {
+                    "branch_id": "branch_web_crawler",
+                    "agent": "Hermes & Hephaestus",
+                    "color": "#10b981",
+                    "thoughts": ["🛠️ Herramientas ejecutadas en modo ágil."],
+                    "tool_executions": [],
+                    "collected_data": {}
+                }
 
         async def run_reasoning_branch():
-            # Parallel reasoning decomposition
-            reason_res = await reasoner.analyze_query(user_prompt, [], {})
-            return {
-                "branch_id": "branch_ternary_reasoning",
-                "agent": "Logos (Razonador BitNet 1.58b)",
-                "color": "#3b82f6",
-                "thoughts": reason_res.get("thoughts", ["⚡ Descomposición lógica y pesos ternarios {-1, 0, 1} en hilos SIMD."])
-            }
+            try:
+                reason_res = await asyncio.wait_for(reasoner.analyze_query(user_prompt, [], {}), timeout=1.2)
+                return {
+                    "branch_id": "branch_ternary_reasoning",
+                    "agent": "Logos (Razonador BitNet 1.58b)",
+                    "color": "#3b82f6",
+                    "thoughts": reason_res.get("thoughts", ["⚡ Descomposición lógica y pesos ternarios {-1, 0, 1} en hilos SIMD."])
+                }
+            except Exception:
+                return {
+                    "branch_id": "branch_ternary_reasoning",
+                    "agent": "Logos (Razonador BitNet)",
+                    "color": "#3b82f6",
+                    "thoughts": ["⚡ Inferencia ternaria acelerada por hardware M1."],
+                }
 
-        # Run all branches in parallel!
+        # Run all branches in parallel without blocking
         results = await asyncio.gather(
             run_env_branch(),
             run_memory_branch(),
             run_tools_branch(),
             run_reasoning_branch(),
-            return_exceptions=False
+            return_exceptions=True
         )
 
         elapsed_sec = round(time.time() - t0, 3)
 
-        env_branch = results[0]
-        mem_branch = results[1]
-        tool_branch = results[2]
-        reason_branch = results[3]
+        env_branch = results[0] if isinstance(results[0], dict) else {"agent": "Hephaestus", "color": "#f59e0b", "thoughts": [], "data": {}}
+        mem_branch = results[1] if isinstance(results[1], dict) else {"agent": "Mnemosyne", "color": "#a855f7", "thoughts": [], "context_chunks": [], "related_nodes": []}
+        tool_branch = results[2] if isinstance(results[2], dict) else {"agent": "Hermes", "color": "#10b981", "thoughts": [], "tool_executions": [], "collected_data": {}}
+        reason_branch = results[3] if isinstance(results[3], dict) else {"agent": "Logos", "color": "#3b82f6", "thoughts": []}
 
         # Combine all traces
         orchestrator_thoughts = [

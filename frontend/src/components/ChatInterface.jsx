@@ -213,7 +213,21 @@ export default function ChatInterface({
   }, [isStreaming, isFullDuplexVoiceActive, messages]);
 
   useEffect(() => {
+    const unsubState = omniVoice.on('state_change', (st) => {
+      if (st === 'speaking') {
+        setDuplexVoiceStatus('speaking');
+      } else if (st === 'idle' && isFullDuplexVoiceActive) {
+        setDuplexVoiceStatus('listening');
+      }
+    });
+
+    const unsubDuplex = omniVoice.on('duplex_state', (st) => {
+      setDuplexVoiceStatus(st);
+    });
+
     return () => {
+      unsubState();
+      unsubDuplex();
       if (isFullDuplexVoiceActive) {
         omniVoice.stopFullDuplexConversation();
       }

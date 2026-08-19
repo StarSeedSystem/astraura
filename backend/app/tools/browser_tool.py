@@ -183,7 +183,35 @@ class AstrauraBrowserAgent:
         if not url.startswith("http://") and not url.startswith("https://"):
             url = f"https://{url}"
 
-        # 1. Try Playwright with interactive actions
+        # 1. Fast Semantic Extractor (sub-250ms latency for reading URLs/GitHub/Docs without heavy Chromium startup)
+        if not actions and not take_screenshot:
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+            }
+            try:
+                async with httpx.AsyncClient(timeout=4.0, follow_redirects=True) as client:
+                    res = await client.get(url, headers=headers)
+                    if res.status_code == 200:
+                        soup = BeautifulSoup(res.text, "html.parser")
+                        for s in soup(["script", "style", "nav", "footer", "iframe", "noscript", "svg"]):
+                            s.decompose()
+                        title = soup.title.string.strip() if soup.title else url
+                        text = " ".join(soup.stripped_strings)
+                        return {
+                            "success": True,
+                            "url": url,
+                            "title": title,
+                            "content": text[:8000],
+                            "length": len(text),
+                            "dom": {"links": [], "buttons": [], "headings": []},
+                            "screenshot_b64": None,
+                            "engine": "Astraura Fast Web Extractor (1.58b Core)"
+                        }
+            except Exception as e:
+                pass
+
+        # 2. Try Playwright with interactive actions or screenshot capture
         if self.is_playwright_available:
             try:
                 from playwright.async_api import async_playwright
@@ -194,8 +222,8 @@ class AstrauraBrowserAgent:
                         viewport={"width": 1280, "height": 800}
                     )
                     page = await context.new_page()
-                    await page.goto(url, wait_until="domcontentloaded", timeout=25000)
-                    await page.wait_for_timeout(1000)
+                    await page.goto(url, wait_until="domcontentloaded", timeout=6000)
+                    await page.wait_for_timeout(300)
 
                     # Execute interactive Browser-Use actions if provided
                     if actions:
@@ -205,12 +233,12 @@ class AstrauraBrowserAgent:
                             val = act.get("value", "")
                             try:
                                 if atype == "click" and target:
-                                    await page.click(target, timeout=3000)
+                                    await page.click(target, timeout=2000)
                                 elif atype == "type" and target:
-                                    await page.fill(target, val, timeout=3000)
+                                    await page.fill(target, val, timeout=2000)
                                 elif atype == "scroll":
                                     await page.evaluate("window.scrollBy(0, 500)")
-                                await page.wait_for_timeout(500)
+                                await page.wait_for_timeout(300)
                             except Exception as act_err:
                                 print(f"[BrowserAgent] Action {atype} notice: {act_err}")
 
@@ -268,7 +296,7 @@ class AstrauraBrowserAgent:
             except Exception as e:
                 print(f"[BrowserAgent] Playwright navigation fallback: {e}")
 
-        # 2. Resilient Fast Semantic Extractor
+        # 3. Resilient Fast Semantic Extractor Fallback
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
