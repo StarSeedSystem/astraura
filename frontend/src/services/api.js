@@ -596,6 +596,62 @@ export async function deletePersonality(personaId) {
   });
 }
 
+// ================= Personality Sovereign APIs & Server Synchronization =================
+
+export async function fetchPersonalityApiKeys() {
+  return apiFetch('/personalities/api_keys');
+}
+
+export async function fetchPersonalityApiDetail(personaId) {
+  return apiFetch(`/personalities/${personaId}/api_status`);
+}
+
+export async function regeneratePersonalityApiKey(personaId) {
+  return apiFetch(`/personalities/${personaId}/generate_key`, {
+    method: 'POST'
+  });
+}
+
+export async function revokePersonalityApiKey(personaId) {
+  return apiFetch(`/personalities/${personaId}/revoke_key`, {
+    method: 'POST'
+  });
+}
+
+export async function restorePersonalityApiKey(personaId) {
+  return apiFetch(`/personalities/${personaId}/restore_key`, {
+    method: 'POST'
+  });
+}
+
+export async function updatePersonalityApiPermissions(personaId, permissions) {
+  return apiFetch(`/personalities/${personaId}/update_permissions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ permissions })
+  });
+}
+
+export async function savePersonalitySyncServer(personaId, serverConfig) {
+  return apiFetch(`/personalities/${personaId}/sync_server`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ server_config: serverConfig })
+  });
+}
+
+export async function deletePersonalitySyncServer(personaId, serverId) {
+  return apiFetch(`/personalities/${personaId}/sync_server/${serverId}`, {
+    method: 'DELETE'
+  });
+}
+
+export async function triggerPersonalityServerSync(personaId, serverId) {
+  return apiFetch(`/personalities/${personaId}/trigger_sync/${serverId}`, {
+    method: 'POST'
+  });
+}
+
 // ================= Autonomous Browser & Search APIs =================
 
 export async function navigateBrowser(url, takeScreenshot = true) {

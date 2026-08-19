@@ -44,8 +44,11 @@ import {
   Power,
   ToggleLeft,
   ToggleRight,
-  Ear
+  Ear,
+  Key,
+  Server
 } from 'lucide-react';
+import PersonalityApiManagerModal from './PersonalityApiManagerModal';
 import { 
   fetchPersonalities, 
   activatePersonality, 
@@ -644,7 +647,8 @@ export const PRESET_PERSONALITIES = [
 
 export default function PersonalitiesView({ onSelectPersonality, activePersonalityId }) {
   const [personalities, setPersonalities] = useState(PRESET_PERSONALITIES);
-  const [activePersonaId, setActivePersonaId] = useState(activePersonalityId || "astraura_prime");
+  const [activePersonaId, setActivePersonaId] = useState(activePersonalityId || "aurora");
+  const [selectedApiPersona, setSelectedApiPersona] = useState(null);
   const [mainViewMode, setMainViewMode] = useState('arquetipos'); // 'arquetipos' | 'estudio_voz'
   const [isEditingModal, setIsEditingModal] = useState(false);
   const [editedPersona, setEditedPersona] = useState(null);
@@ -1061,13 +1065,28 @@ export default function PersonalitiesView({ onSelectPersonality, activePersonali
           </div>
 
           {mainViewMode === 'arquetipos' && (
-            <button
-              onClick={handleOpenNewModal}
-              className="px-3.5 py-1.5 rounded-xl bg-purple-500 hover:bg-purple-400 text-black text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-purple-500/20 cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Crear Arquetipo</span>
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => {
+                  const currentP = personalities.find(p => p.id === activePersonaId) || personalities[0];
+                  setSelectedApiPersona(currentP);
+                }}
+                className="px-3.5 py-1.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/40 text-cyan-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-md"
+                title="Gestor Soberano de Claves de API, Permisos y Servidores"
+              >
+                <Key className="w-3.5 h-3.5 text-cyan-400" />
+                <span>🔑 APIs & Servidores</span>
+              </button>
+
+              <button
+                onClick={handleOpenNewModal}
+                className="px-3.5 py-1.5 rounded-xl bg-purple-500 hover:bg-purple-400 text-black text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-purple-500/20 cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Crear Arquetipo</span>
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -1759,6 +1778,17 @@ export default function PersonalitiesView({ onSelectPersonality, activePersonali
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
+                        setSelectedApiPersona(p);
+                      }}
+                      className="p-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 transition-colors cursor-pointer"
+                      title="Gestionar Clave de API, Permisos de Acceso y Servidores Sincronizados"
+                    >
+                      <Key className="w-3.5 h-3.5" />
+                    </button>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
                         handleAudioCppSynthesis(p.id, p.voice_profile?.phrase_sample);
                       }}
                       className="p-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-amber-300 hover:text-amber-200 transition-colors cursor-pointer"
@@ -2346,6 +2376,13 @@ export default function PersonalitiesView({ onSelectPersonality, activePersonali
           </div>
         </div>
       )}
+
+      {/* Sovereign Personality API & Server Synchronization Modal */}
+      <PersonalityApiManagerModal
+        isOpen={!!selectedApiPersona}
+        onClose={() => setSelectedApiPersona(null)}
+        persona={selectedApiPersona}
+      />
     </div>
   );
 }

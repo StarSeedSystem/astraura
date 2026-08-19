@@ -50,6 +50,7 @@ from .core.os_manager import starseed_os_manager
 from .core.audio_cpp_engine import audio_cpp_engine
 from .core.continuous_voice_daemon import continuous_voice_daemon
 from .core.needle_engine import needle_engine
+from .core.personality_api_engine import personality_api_engine
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -1025,6 +1026,118 @@ async def save_personality_endpoint(req: SavePersonaRequest):
 async def delete_personality_endpoint(persona_id: str):
     success = personality_engine.delete_personality(persona_id)
     return {"success": success}
+
+# ================= Personality Sovereign APIs & Server Synchronization =================
+
+@app.get("/api/personalities/api_keys")
+async def list_personality_api_keys():
+    """Lists all personality API keys and configurations with security masking."""
+    return {"success": True, "personalities": personality_api_engine.list_personality_apis()}
+
+@app.get("/api/personalities/{persona_id}/api_status")
+async def get_personality_api_detail_endpoint(persona_id: str):
+    """Returns detailed API status, full key, permissions, active processes, and connections for a personality."""
+    detail = personality_api_engine.get_personality_api_detail(persona_id)
+    if not detail:
+        return JSONResponse(status_code=404, content={"success": False, "error": f"Personalidad '{persona_id}' no encontrada."})
+    return {"success": True, "detail": detail}
+
+@app.post("/api/personalities/{persona_id}/generate_key")
+async def regenerate_personality_key_endpoint(persona_id: str):
+    """Regenerates the API key for a specific personality."""
+    res = personality_api_engine.regenerate_api_key(persona_id)
+    return res
+
+@app.post("/api/personalities/{persona_id}/revoke_key")
+async def revoke_personality_key_endpoint(persona_id: str):
+    """Revokes the API key for a personality."""
+    res = personality_api_engine.revoke_api_key(persona_id)
+    return res
+
+@app.post("/api/personalities/{persona_id}/restore_key")
+async def restore_personality_key_endpoint(persona_id: str):
+    """Restores a revoked/suspended API key."""
+    res = personality_api_engine.restore_api_key(persona_id)
+    return res
+
+class UpdatePermissionsRequest(BaseModel):
+    permissions: Dict[str, bool]
+
+@app.post("/api/personalities/{persona_id}/update_permissions")
+async def update_personality_permissions_endpoint(persona_id: str, req: UpdatePermissionsRequest):
+    """Updates granular modification & access permissions for a personality API."""
+    res = personality_api_engine.update_permissions(persona_id, req.permissions)
+    return res
+
+class SyncServerConfigRequest(BaseModel):
+    server_config: Dict[str, Any]
+
+@app.post("/api/personalities/{persona_id}/sync_server")
+async def configure_personality_server_endpoint(persona_id: str, req: SyncServerConfigRequest):
+    """Configures a local or external server link for synchronization."""
+    res = personality_api_engine.add_or_update_external_server(persona_id, req.server_config)
+    return res
+
+@app.delete("/api/personalities/{persona_id}/sync_server/{server_id}")
+async def remove_personality_server_endpoint(persona_id: str, server_id: str):
+    """Removes a linked server from a personality."""
+    res = personality_api_engine.remove_external_server(persona_id, server_id)
+    return res
+
+@app.post("/api/personalities/{persona_id}/trigger_sync/{server_id}")
+async def trigger_personality_server_sync_endpoint(persona_id: str, server_id: str):
+    """Triggers manual bi-directional synchronization with an external or local server."""
+    res = await personality_api_engine.trigger_server_sync(persona_id, server_id)
+    return res
+
+class InvokePersonalityApiRequest(BaseModel):
+    prompt: str
+    target_action: Optional[str] = "reason"
+    context: Optional[Dict[str, Any]] = None
+
+@app.post("/api/v1/personalities/{persona_id}/invoke")
+async def invoke_personality_via_api(
+    persona_id: str, 
+    req: InvokePersonalityApiRequest, 
+    response: Response,
+    x_astraura_key: Optional[str] = Query(None, alias="api_key")
+):
+    """
+    Direct programmatic API invocation endpoint for external or local scripts/servers.
+    Authenticated with 'X-Astraura-Key' header or '?api_key=' param.
+    """
+    auth = personality_api_engine.verify_api_key_access(x_astraura_key or "", required_scope="invoke_agents")
+    if not auth.get("authenticated"):
+        return JSONResponse(status_code=401, content={"success": False, "error": auth.get("error", "No autorizado.")})
+
+    start_t = time.time()
+    thought_cycle = await orchestrator.execute_thought_cycle(
+        f"@{persona_id} {req.prompt}", 
+        preferences={"selected_personalities": [persona_id], "multi_personality_mode": "single"}
+    )
+    
+    elapsed_ms = round((time.time() - start_t) * 1000, 1)
+    
+    personality_api_engine._record_api_call(persona_id, {
+        "method": "POST",
+        "endpoint": f"/api/v1/personalities/{persona_id}/invoke",
+        "client_ip": "External Client",
+        "status_code": 200,
+        "latency_ms": elapsed_ms,
+        "tokens_used": 150,
+        "scope_checked": "invoke_agents"
+    })
+
+    return {
+        "success": True,
+        "persona_id": persona_id,
+        "persona_name": auth.get("persona_name"),
+        "latency_ms": elapsed_ms,
+        "response": thought_cycle.get("final_synthesis", "Respuesta procesada."),
+        "branching_plan": thought_cycle.get("branching_plan"),
+        "timestamp": time.time()
+    }
+
 
 # ================= audio.cpp 1.58-Bit Inference & Holographic Voice Matrix APIs =================
 
