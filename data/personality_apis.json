@@ -1,6 +1,6 @@
 {
   "version": "1.58.0",
-  "updated_at": 1787103942.680558,
+  "updated_at": 1787104035.5292401,
   "personalities": {
     "aurora": {
       "persona_id": "aurora",
@@ -10,7 +10,7 @@
       "key_hash": "c2905ce5695086892a5643530828fe3e7763b8331d8a4fe43c47d060c1217d3d",
       "created_at": 1787103938.387091,
       "created_at_formatted": "2026-08-18 19:45:38",
-      "last_used_at": null,
+      "last_used_at": 1787104035.529236,
       "status": "active",
       "permissions": {
         "read_memory": true,
@@ -25,7 +25,7 @@
         "modify_personality_profile": false
       },
       "rate_limit_rpm": 120,
-      "total_requests": 0,
+      "total_requests": 1,
       "total_tokens_consumed": 0,
       "external_servers": [
         {

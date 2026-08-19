@@ -174,7 +174,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (cuales son las capacidades de este ...)",
       "strength": 1.0,
-      "updated_at": 1787103121.858825
+      "updated_at": 1787104378.134968
     },
     "Bits": {
       "id": "Bits",
@@ -677,8 +677,8 @@
       "label": "Cómo",
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (desarrolla una historia dramatica s...)",
-      "strength": 0.9999999999999999,
-      "updated_at": 1787103137.530404
+      "strength": 1.0,
+      "updated_at": 1787104378.129559
     },
     "Todos": {
       "id": "Todos",
@@ -750,7 +750,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (quien soy yo, como me llamo y que s...)",
       "strength": 1.0,
-      "updated_at": 1787103137.523284
+      "updated_at": 1787104378.143133
     },
     "Podría": {
       "id": "Podría",
@@ -1141,8 +1141,8 @@
       "label": "Estás",
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (Hola Explícame cómo funciona tu sis...)",
-      "strength": 0.7,
-      "updated_at": 1787103121.868814
+      "strength": 0.7999999999999999,
+      "updated_at": 1787104378.146624
     },
     "Estoy": {
       "id": "Estoy",
@@ -1501,8 +1501,8 @@
       "label": "Ejemplo",
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (hazme una demostracion visual de va...)",
-      "strength": 0.7,
-      "updated_at": 1787103121.872229
+      "strength": 0.7999999999999999,
+      "updated_at": 1787104378.153085
     },
     "Lunes": {
       "id": "Lunes",
@@ -2053,8 +2053,8 @@
       "label": "Frase",
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (Hola Explícame cómo funciona tu sis...)",
-      "strength": 0.6,
-      "updated_at": 1787103121.862415
+      "strength": 0.7,
+      "updated_at": 1787104378.1391811
     },
     "Asistirte": {
       "id": "Asistirte",
@@ -4902,31 +4902,31 @@
       "source": "Cómo",
       "target": "Sistema",
       "relation": "asociado_con",
-      "weight": 0.65
+      "weight": 0.75
     },
     {
       "source": "Sistema",
       "target": "Frase",
       "relation": "asociado_con",
-      "weight": 0.65
+      "weight": 0.75
     },
     {
       "source": "Frase",
       "target": "Hola",
       "relation": "asociado_con",
-      "weight": 0.65
+      "weight": 0.75
     },
     {
       "source": "Hola",
       "target": "Estás",
       "relation": "asociado_con",
-      "weight": 0.65
+      "weight": 0.75
     },
     {
       "source": "Estás",
       "target": "Ejemplo",
       "relation": "asociado_con",
-      "weight": 0.65
+      "weight": 0.75
     },
     {
       "source": "Hola",

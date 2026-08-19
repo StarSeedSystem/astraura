@@ -184,7 +184,37 @@ class OmniVoiceEngine {
   }
 
   /**
-   * Expressive, Natural Humanized Speech Synthesis (Web Speech + Affective DSP)
+   * Splits text into rhythmic human conversational clauses (breath phrases) with punctuation context.
+   */
+  _splitIntoExpressiveClauses(text) {
+    if (!text) return [];
+    // Match clauses by sentence endings and natural clause pauses
+    const rawClauses = text.match(/[^,.;:!?\n—]+[,.;:!?\n—]*/g) || [text];
+    const clauses = [];
+
+    for (let c of rawClauses) {
+      const trimmed = c.trim();
+      if (!trimmed) continue;
+      
+      let type = 'statement';
+      if (trimmed.endsWith('?')) type = 'question';
+      else if (trimmed.endsWith('!')) type = 'exclamation';
+      else if (trimmed.endsWith('...') || trimmed.endsWith('—')) type = 'pause';
+      else if (trimmed.endsWith(',')) type = 'comma';
+
+      clauses.push({
+        text: trimmed,
+        type: type,
+        hasQuestion: trimmed.includes('?'),
+        hasExclamation: trimmed.includes('!')
+      });
+    }
+
+    return clauses.length > 0 ? clauses : [{ text: text, type: 'statement' }];
+  }
+
+  /**
+   * Expressive, Natural Humanized Speech Synthesis with Clause-by-Clause Prosody Shaping
    */
   speak(text, options = {}, onStart = null, onEnd = null, onBoundary = null) {
     if (!this.synth) return;
@@ -197,87 +227,120 @@ class OmniVoiceEngine {
     this.suppressRecognition = true;
     this.lastSpokenText = cleanText.toLowerCase();
 
-    let finalPitch = options.pitch !== undefined ? options.pitch : 1.06;
-    let finalRate = options.rate !== undefined ? options.rate : 1.03;
-    let finalVolume = options.volume !== undefined ? options.volume : 1.0;
-
-    // Aurora & female attractive prosody tuning
-    if (options.voice_id?.includes('aurora') || options.persona_id === 'aurora' || !options.voice_id) {
-      finalPitch = 1.07;
-      finalRate = 1.04;
+    const clauses = this._splitIntoExpressiveClauses(cleanText);
+    if (clauses.length === 0) {
+      if (onEnd) onEnd();
+      return;
     }
 
-    if (options.traits) {
-      const { empatia = 85, calidez = 85, alegria = 80, humor = 75 } = options.traits;
-      if (alegria > 80 || humor > 80) {
-        finalPitch = Math.min(1.18, finalPitch * 1.04);
-        finalRate = Math.min(1.15, finalRate * 1.03);
-      }
-      if (calidez > 80 || empatia > 80) {
-        finalPitch = Math.max(0.95, finalPitch * 0.98);
-      }
-    }
-
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.pitch = Math.max(0.6, Math.min(1.8, finalPitch));
-    utterance.rate = Math.max(0.7, Math.min(1.5, finalRate));
-    utterance.volume = Math.max(0.1, Math.min(1.0, finalVolume));
-    utterance.lang = 'es-ES';
-
-    // Best Voice Selection
+    // Base voice and prosody configuration
     const esVoices = this.getSpanishVoices();
     const targetVoiceId = options.voice_speaker || options.voice_id || options.voiceURI || options.native_voice_id;
-    
+    let selectedVoice = esVoices.length > 0 ? esVoices[0] : null;
+
     if (targetVoiceId && this.availableVoices.length > 0) {
       const found = this.availableVoices.find(v => 
         v.voiceURI === targetVoiceId || 
         v.name.toLowerCase().includes(targetVoiceId.toLowerCase())
       );
-      if (found) {
-        utterance.voice = found;
-      } else if (esVoices.length > 0) {
-        utterance.voice = esVoices[0];
+      if (found) selectedVoice = found;
+    }
+
+    let basePitch = options.pitch !== undefined ? options.pitch : 1.07;
+    let baseRate = options.rate !== undefined ? options.rate : 1.04;
+    let baseVolume = options.volume !== undefined ? options.volume : 1.0;
+
+    // Aurora & female attractive prosody tuning
+    if (options.voice_id?.includes('aurora') || options.persona_id === 'aurora' || !options.voice_id) {
+      basePitch = 1.07;
+      baseRate = 1.04;
+    }
+
+    if (options.traits) {
+      const { empatia = 85, calidez = 85, alegria = 80, humor = 75 } = options.traits;
+      if (alegria > 80 || humor > 80) {
+        basePitch = Math.min(1.18, basePitch * 1.03);
+        baseRate = Math.min(1.15, baseRate * 1.02);
       }
-    } else if (esVoices.length > 0) {
-      utterance.voice = esVoices[0];
+      if (calidez > 80 || empatia > 80) {
+        basePitch = Math.max(0.96, basePitch * 0.99);
+      }
     }
 
-    utterance.onstart = () => {
-      this.isSpeaking = true;
-      this.suppressRecognition = true;
-      if (onStart) onStart();
+    let currentClauseIdx = 0;
+    if (onStart) onStart();
+
+    const speakNextClause = () => {
+      if (!this.isSpeaking || currentClauseIdx >= clauses.length) {
+        this.isSpeaking = false;
+        this.currentUtterance = null;
+        // Acoustic reverb buffer: suppress recognition for 600ms after speech ends
+        setTimeout(() => {
+          this.suppressRecognition = false;
+        }, 600);
+        if (onEnd) onEnd();
+        return;
+      }
+
+      const clause = clauses[currentClauseIdx];
+      currentClauseIdx++;
+
+      let clausePitch = basePitch;
+      let clauseRate = baseRate;
+
+      // Dynamic prosody inflection by clause type
+      if (clause.type === 'question' || clause.hasQuestion) {
+        clausePitch = Math.min(1.22, basePitch * 1.07); // Upward pitch curve for questions
+        clauseRate = baseRate * 1.02;
+      } else if (clause.type === 'exclamation' || clause.hasExclamation) {
+        clausePitch = Math.min(1.20, basePitch * 1.05); // Lively bright pitch for excitement
+        clauseRate = Math.min(1.18, baseRate * 1.04);
+      } else if (clause.type === 'pause') {
+        clausePitch = Math.max(0.94, basePitch * 0.97); // Reflective intimate drop
+        clauseRate = Math.max(0.85, baseRate * 0.94);
+      } else if (clause.type === 'comma') {
+        clausePitch = basePitch * 1.01;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(clause.text);
+      utterance.voice = selectedVoice;
+      utterance.pitch = Math.max(0.6, Math.min(1.8, clausePitch));
+      utterance.rate = Math.max(0.7, Math.min(1.5, clauseRate));
+      utterance.volume = Math.max(0.1, Math.min(1.0, baseVolume));
+      utterance.lang = 'es-ES';
+
+      utterance.onend = () => {
+        // Natural human breathing pause between clauses (50ms - 90ms)
+        const pauseDelay = clause.type === 'comma' ? 60 : (clause.type === 'pause' ? 140 : 80);
+        setTimeout(() => {
+          speakNextClause();
+        }, pauseDelay);
+      };
+
+      utterance.onerror = (err) => {
+        console.warn('Clause utterance error:', err);
+        speakNextClause();
+      };
+
+      if (onBoundary) {
+        utterance.onboundary = (e) => onBoundary(e);
+      }
+
+      this.currentUtterance = utterance;
+      try {
+        this.synth.speak(utterance);
+      } catch (e) {
+        console.warn('SpeechSynthesis speak notice:', e);
+        speakNextClause();
+      }
     };
 
-    utterance.onend = () => {
-      this.isSpeaking = false;
-      this.currentUtterance = null;
-      // Acoustic reverb buffer: suppress recognition for 700ms after AI finishes speaking
-      setTimeout(() => {
-        this.suppressRecognition = false;
-      }, 700);
-      if (onEnd) onEnd();
-    };
-
-    utterance.onerror = (err) => {
-      this.isSpeaking = false;
-      this.currentUtterance = null;
-      setTimeout(() => {
-        this.suppressRecognition = false;
-      }, 500);
-      if (onEnd) onEnd();
-    };
-
-    if (onBoundary) {
-      utterance.onboundary = (e) => onBoundary(e);
-    }
-
-    this.currentUtterance = utterance;
     try {
       this.synth.cancel();
       this.synth.resume();
-      this.synth.speak(utterance);
+      speakNextClause();
     } catch (e) {
-      console.warn('Speech synthesis trigger notice:', e);
+      console.warn('Speech synthesis start notice:', e);
     }
   }
 
@@ -664,15 +727,18 @@ class OmniVoiceEngine {
       if (currentSpeech.length > 2) {
         if (onStateChange) onStateChange('user_speaking');
 
-        // Set silence timeout to trigger AI turn
+        // Adaptive Ultra-Low-Latency Turn Detection (450ms for completed sentences/questions, 700ms for pauses)
+        const isCompleteSentence = hasFinal || /[.?!]$/.test(currentSpeech);
+        const dynamicTimeout = isCompleteSentence ? 450 : 700;
+
         speechTimer = setTimeout(() => {
-          if (accumulatedTranscript.trim() && this.isConversationActive && !this.isSpeaking && !this.suppressRecognition) {
-            const finalPrompt = accumulatedTranscript.trim();
+          const finalPrompt = (accumulatedTranscript + (hasFinal ? '' : ' ' + interim)).trim();
+          if (finalPrompt.length > 2 && this.isConversationActive && !this.isSpeaking && !this.suppressRecognition) {
             accumulatedTranscript = '';
             if (onUserSpeech) onUserSpeech(finalPrompt);
             if (onStateChange) onStateChange('thinking');
           }
-        }, 1200);
+        }, dynamicTimeout);
       }
     };
 

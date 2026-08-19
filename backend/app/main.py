@@ -6,7 +6,7 @@ from pathlib import Path
 from contextlib import asynccontextmanager
 from typing import Dict, Any, List, Optional
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File, Form, BackgroundTasks, Query, Response
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File, Form, BackgroundTasks, Query, Header, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
@@ -1100,13 +1100,19 @@ async def invoke_personality_via_api(
     persona_id: str, 
     req: InvokePersonalityApiRequest, 
     response: Response,
-    x_astraura_key: Optional[str] = Query(None, alias="api_key")
+    x_astraura_key: Optional[str] = Header(None, alias="X-Astraura-Key"),
+    authorization: Optional[str] = Header(None, alias="Authorization"),
+    api_key_query: Optional[str] = Query(None, alias="api_key")
 ):
     """
     Direct programmatic API invocation endpoint for external or local scripts/servers.
-    Authenticated with 'X-Astraura-Key' header or '?api_key=' param.
+    Authenticated with 'X-Astraura-Key' header, 'Authorization: Bearer <key>', or '?api_key=' param.
     """
-    auth = personality_api_engine.verify_api_key_access(x_astraura_key or "", required_scope="invoke_agents")
+    raw_key = x_astraura_key or api_key_query or ""
+    if not raw_key and authorization:
+        raw_key = authorization.replace("Bearer ", "").replace("bearer ", "").strip()
+
+    auth = personality_api_engine.verify_api_key_access(raw_key, required_scope="invoke_agents")
     if not auth.get("authenticated"):
         return JSONResponse(status_code=401, content={"success": False, "error": auth.get("error", "No autorizado.")})
 
