@@ -47,6 +47,14 @@ SWARM_AREAS = [
         "lead_name": "Athena-Sentinel",
         "description": "Supervisión continua de sensores físicos (GPS, acústica dB, clima), balance térmico M1 y resguardo soberano de datos.",
         "color": "#00f0ff"
+    },
+    {
+        "id": "area_project_management",
+        "name": "🏗️ Daedalus, Arquitectura & Enrutamiento de Proyectos",
+        "lead_agent": "daedalus",
+        "lead_name": "Daedalus-Architect",
+        "description": "Administra, acomoda y organiza creaciones desarrolladas, alineando los propósitos de procesos automáticos y enrutándolos a proyectos.",
+        "color": "#10b981"
     }
 ]
 
@@ -91,6 +99,21 @@ class AdaptiveMultiAreaSwarmEngine:
                     {"id": "brain_genesis", "name": "Cerebro Génesis", "color": "#00f0ff"},
                     {"id": "brain_athena", "name": "Cerebro Atenea", "color": "#10b981"}
                 ]
+            },
+            "daedalus": {
+                "id": "daedalus",
+                "name": "Daedalus (Arquitecto de Proyectos)",
+                "area_id": "area_project_management",
+                "role": "Organización estructural, categorización de creaciones y enrutamiento inteligente de propósitos en grafo.",
+                "status": "active",
+                "concurrency": 2,
+                "current_task": "Supervisando topología de proyectos y enrutando nuevas creaciones.",
+                "progress": 100,
+                "color": "#10b981",
+                "subagents_spawned": 1,
+                "completed_tasks": 32,
+                "used_personalities": [],
+                "linked_cerebros": []
             },
             "hephaestus": {
                 "id": "hephaestus",

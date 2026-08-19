@@ -1,6 +1,30 @@
 {
   "notifications": [
     {
+      "id": "notif_1787172465",
+      "title": "✨ Auto-Mejora Aplicada: Sueño REM Cognitivo (Consolidación Sináptica)",
+      "message": "Se aplicó automáticamente: 'Consolidación de Memoria Sináptica en Bóveda Soberana'. Todos los subsistemas sincronizados.",
+      "category": "Imaginación Intuitiva",
+      "severity": "success",
+      "timestamp": 1787172465.141579,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787171863",
+      "title": "✨ Auto-Mejora Aplicada: Simulación Predictiva & Tendencias",
+      "message": "Se aplicó automáticamente: 'Simulación Predictiva & Contexto Sensorial en Cuernavaca, México'. Todos los subsistemas sincronizados.",
+      "category": "Imaginación Intuitiva",
+      "severity": "success",
+      "timestamp": 1787171863.6145651,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
       "id": "notif_1787171260",
       "title": "✨ Auto-Mejora Aplicada: Sueño Lúcido Ciberdélico (UI, Arte & 3D)",
       "message": "Se aplicó automáticamente: 'Shader Ciberdélico y Geometría Sagrada para Cuernavaca'. Todos los subsistemas sincronizados.",
@@ -599,26 +623,6 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787167956.262311,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787167951",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 5 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787167951.2511811,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787167946",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 5 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787167946.2379909,
       "read": false,
       "action_type": null
     }

@@ -439,15 +439,17 @@ class AstrauraDreamEngine:
                 }
                 c = creations_manager.add_or_update_creation(creation_data)
                 
-                # Auto Assign to Project
+                # Auto Assign to Project via Daedalus-Architect
                 tags = [b.get("process_type", "Proceso")]
-                proj_id = projects_manager.auto_assign_to_project(c["id"], "creation", b["theme"], tags)
+                decision_log = projects_manager.auto_assign_to_project(c["id"], "creation", b["theme"], tags)
+                proj_id = decision_log.get("project_id", "")
                 
                 # Update creation with project_id
                 c["project_id"] = proj_id
                 creations_manager.add_or_update_creation(c)
                 
-                return {"success": True, "message": f"Rama '{b['theme']}' aplicada con éxito en el exocórtex y vinculada al proyecto {proj_id}.", "branch": b}
+                msg = f"Rama '{b['theme']}' aplicada. " + decision_log.get("message", "")
+                return {"success": True, "message": msg, "branch": b, "decision_log": decision_log}
         return {"success": False, "message": "Rama no encontrada"}
 
     def discard_branch(self, branch_id: str) -> Dict[str, Any]:

@@ -1,7 +1,7 @@
 {
   "capacity_mode": "auto",
-  "relative_capacity_percent": 50,
-  "allocated_cores": 4,
+  "relative_capacity_percent": 30,
+  "allocated_cores": 2,
   "schedules": [
     {
       "id": "sched_code_audit",
@@ -11,9 +11,9 @@
       "frequency_minutes": 20,
       "trigger_type": "interval",
       "is_enabled": true,
-      "next_run_timestamp": 1787172358.962935,
-      "last_run_timestamp": 1787171158.962935,
-      "last_result": "Ciclo ejecutado a las 14:25:58. Todo nominal."
+      "next_run_timestamp": 1787173563.739646,
+      "last_run_timestamp": 1787172363.739646,
+      "last_result": "Ciclo ejecutado a las 14:46:03. Todo nominal."
     },
     {
       "id": "sched_synaptic_sync",
@@ -23,9 +23,9 @@
       "frequency_minutes": 10,
       "trigger_type": "interval",
       "is_enabled": true,
-      "next_run_timestamp": 1787172367.2611,
-      "last_run_timestamp": 1787171767.2611,
-      "last_result": "Ciclo ejecutado a las 14:36:07. Todo nominal."
+      "next_run_timestamp": 1787172968.749283,
+      "last_run_timestamp": 1787172368.749283,
+      "last_result": "Ciclo ejecutado a las 14:46:08. Todo nominal."
     },
     {
       "id": "sched_web_intel",
@@ -35,9 +35,9 @@
       "frequency_minutes": 30,
       "trigger_type": "interval",
       "is_enabled": true,
-      "next_run_timestamp": 1787172361.304063,
-      "last_run_timestamp": 1787170561.304063,
-      "last_result": "Ciclo ejecutado a las 14:16:01. Todo nominal."
+      "next_run_timestamp": 1787174163.739646,
+      "last_run_timestamp": 1787172363.739646,
+      "last_result": "Ciclo ejecutado a las 14:46:03. Todo nominal."
     },
     {
       "id": "sched_sensory_sentinel",
@@ -47,9 +47,9 @@
       "frequency_minutes": 5,
       "trigger_type": "interval",
       "is_enabled": true,
-      "next_run_timestamp": 1787172067.2611,
-      "last_run_timestamp": 1787171767.2611,
-      "last_result": "Ciclo ejecutado a las 14:36:07. Todo nominal."
+      "next_run_timestamp": 1787172970.203031,
+      "last_run_timestamp": 1787172670.203031,
+      "last_result": "Ciclo ejecutado a las 14:51:10. Todo nominal."
     },
     {
       "id": "sched_creative_burst",
@@ -59,14 +59,14 @@
       "frequency_minutes": 15,
       "trigger_type": "interval",
       "is_enabled": true,
-      "next_run_timestamp": 1787172436.070951,
-      "last_run_timestamp": 1787171536.070951,
-      "last_result": "Ciclo ejecutado a las 14:32:16. Todo nominal."
+      "next_run_timestamp": 1787173338.772506,
+      "last_run_timestamp": 1787172438.772506,
+      "last_result": "Ciclo ejecutado a las 14:47:18. Todo nominal."
     }
   ],
   "active_tasks": [
     {
-      "id": "task_1787171767_79",
+      "id": "task_1787172670_41",
       "title": "Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
       "prompt": "Ejecución autónoma programada",
       "area_id": "area_sentinel_privacy",
@@ -76,11 +76,144 @@
       "status": "running",
       "progress": 10,
       "allocated_cpu_percent": 5,
-      "started_at": 1787171767.267748,
+      "started_at": 1787172670.203372,
       "logs": [
         "Iniciando tarea en 🛡️ Sentinel, Telemetría 360° & Privacidad...",
         "Agente Athena (Sentinel & Privacidad 360°) asignado con cuota adaptativa de CPU."
       ]
+    },
+    {
+      "id": "task_1787172438_49",
+      "title": "Auto-Reactivación: Forja de Shaders & Prototipos Visuales",
+      "prompt": "Ejecución autónoma programada",
+      "area_id": "area_creative_synthesis",
+      "area_name": "🎨 Síntesis Creativa, UI & Shaders 3D",
+      "agent_id": "oneiros",
+      "agent_name": "Oneiros (Síntesis Creativa & 3D)",
+      "status": "completed",
+      "progress": 100,
+      "allocated_cpu_percent": 5,
+      "started_at": 1787172438.7727659,
+      "logs": [
+        "Iniciando tarea en 🎨 Síntesis Creativa, UI & Shaders 3D...",
+        "Agente Oneiros (Síntesis Creativa & 3D) asignado con cuota adaptativa de CPU.",
+        "✅ Tarea completada exitosamente."
+      ],
+      "completed_at": 1787172490.153263
+    },
+    {
+      "id": "task_1787172368_59",
+      "title": "Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
+      "prompt": "Ejecución autónoma programada",
+      "area_id": "area_sentinel_privacy",
+      "area_name": "🛡️ Sentinel, Telemetría 360° & Privacidad",
+      "agent_id": "athena",
+      "agent_name": "Athena (Sentinel & Privacidad 360°)",
+      "status": "completed",
+      "progress": 100,
+      "allocated_cpu_percent": 5,
+      "started_at": 1787172368.7540429,
+      "logs": [
+        "Iniciando tarea en 🛡️ Sentinel, Telemetría 360° & Privacidad...",
+        "Agente Athena (Sentinel & Privacidad 360°) asignado con cuota adaptativa de CPU.",
+        "✅ Tarea completada exitosamente."
+      ],
+      "completed_at": 1787172428.770553
+    },
+    {
+      "id": "task_1787172368_34",
+      "title": "Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
+      "prompt": "Ejecución autónoma programada",
+      "area_id": "area_synaptic_memory",
+      "area_name": "🌌 Gobernanza Sináptica & Exocórtex",
+      "agent_id": "mnemosyne",
+      "agent_name": "Mnemosyne (Memoria & Exocórtex)",
+      "status": "completed",
+      "progress": 100,
+      "allocated_cpu_percent": 5,
+      "started_at": 1787172368.749405,
+      "logs": [
+        "Iniciando tarea en 🌌 Gobernanza Sináptica & Exocórtex...",
+        "Agente Mnemosyne (Memoria & Exocórtex) asignado con cuota adaptativa de CPU.",
+        "✅ Tarea completada exitosamente."
+      ],
+      "completed_at": 1787172433.7712169
+    },
+    {
+      "id": "task_1787172363_65",
+      "title": "Auto-Reactivación: Rastreo de Tendencias & Preprints de IA 1.58b",
+      "prompt": "Ejecución autónoma programada",
+      "area_id": "area_web_intel",
+      "area_name": "🌐 Inteligencia Web & Búsqueda",
+      "agent_id": "hermes",
+      "agent_name": "Hermes (Navegación & Web Intel)",
+      "status": "completed",
+      "progress": 100,
+      "allocated_cpu_percent": 5,
+      "started_at": 1787172363.7452369,
+      "logs": [
+        "Iniciando tarea en 🌐 Inteligencia Web & Búsqueda...",
+        "Agente Hermes (Navegación & Web Intel) asignado con cuota adaptativa de CPU.",
+        "✅ Tarea completada exitosamente."
+      ],
+      "completed_at": 1787172418.76937
+    },
+    {
+      "id": "task_1787172363_65",
+      "title": "Auto-Reactivación: Auditoría de Código & Archivos Locales",
+      "prompt": "Ejecución autónoma programada",
+      "area_id": "area_engineering",
+      "area_name": "🛠️ Ingeniería, Arquitectura & Código",
+      "agent_id": "hephaestus",
+      "agent_name": "Hephaestus (Ingeniería & Código)",
+      "status": "completed",
+      "progress": 100,
+      "allocated_cpu_percent": 5,
+      "started_at": 1787172363.739883,
+      "logs": [
+        "Iniciando tarea en 🛠️ Ingeniería, Arquitectura & Código...",
+        "Agente Hephaestus (Ingeniería & Código) asignado con cuota adaptativa de CPU.",
+        "✅ Tarea completada exitosamente."
+      ],
+      "completed_at": 1787172433.7712169
+    },
+    {
+      "id": "task_1787172068_61",
+      "title": "Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
+      "prompt": "Ejecución autónoma programada",
+      "area_id": "area_sentinel_privacy",
+      "area_name": "🛡️ Sentinel, Telemetría 360° & Privacidad",
+      "agent_id": "athena",
+      "agent_name": "Athena (Sentinel & Privacidad 360°)",
+      "status": "completed",
+      "progress": 100,
+      "allocated_cpu_percent": 5,
+      "started_at": 1787172068.6571069,
+      "logs": [
+        "Iniciando tarea en 🛡️ Sentinel, Telemetría 360° & Privacidad...",
+        "Agente Athena (Sentinel & Privacidad 360°) asignado con cuota adaptativa de CPU.",
+        "✅ Tarea completada exitosamente."
+      ],
+      "completed_at": 1787172133.696754
+    },
+    {
+      "id": "task_1787171767_79",
+      "title": "Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
+      "prompt": "Ejecución autónoma programada",
+      "area_id": "area_sentinel_privacy",
+      "area_name": "🛡️ Sentinel, Telemetría 360° & Privacidad",
+      "agent_id": "athena",
+      "agent_name": "Athena (Sentinel & Privacidad 360°)",
+      "status": "completed",
+      "progress": 100,
+      "allocated_cpu_percent": 5,
+      "started_at": 1787171767.267748,
+      "logs": [
+        "Iniciando tarea en 🛡️ Sentinel, Telemetría 360° & Privacidad...",
+        "Agente Athena (Sentinel & Privacidad 360°) asignado con cuota adaptativa de CPU.",
+        "✅ Tarea completada exitosamente."
+      ],
+      "completed_at": 1787171827.285577
     },
     {
       "id": "task_1787171767_58",
@@ -90,14 +223,16 @@
       "area_name": "🌌 Gobernanza Sináptica & Exocórtex",
       "agent_id": "mnemosyne",
       "agent_name": "Mnemosyne (Memoria & Exocórtex)",
-      "status": "running",
-      "progress": 10,
+      "status": "completed",
+      "progress": 100,
       "allocated_cpu_percent": 5,
       "started_at": 1787171767.261327,
       "logs": [
         "Iniciando tarea en 🌌 Gobernanza Sináptica & Exocórtex...",
-        "Agente Mnemosyne (Memoria & Exocórtex) asignado con cuota adaptativa de CPU."
-      ]
+        "Agente Mnemosyne (Memoria & Exocórtex) asignado con cuota adaptativa de CPU.",
+        "✅ Tarea completada exitosamente."
+      ],
+      "completed_at": 1787171817.283262
     },
     {
       "id": "task_1787171536_74",
@@ -497,139 +632,6 @@
         "✅ Tarea completada exitosamente."
       ],
       "completed_at": 1787168819.182435
-    },
-    {
-      "id": "task_1787168752_18",
-      "title": "Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
-      "prompt": "Ejecución autónoma programada",
-      "area_id": "area_sentinel_privacy",
-      "area_name": "🛡️ Sentinel, Telemetría 360° & Privacidad",
-      "agent_id": "athena",
-      "agent_name": "Athena (Sentinel & Privacidad 360°)",
-      "status": "completed",
-      "progress": 100,
-      "allocated_cpu_percent": 5,
-      "started_at": 1787168752.502055,
-      "logs": [
-        "Iniciando tarea en 🛡️ Sentinel, Telemetría 360° & Privacidad...",
-        "Agente Athena (Sentinel & Privacidad 360°) asignado con cuota adaptativa de CPU.",
-        "✅ Tarea completada exitosamente."
-      ],
-      "completed_at": 1787168829.213572
-    },
-    {
-      "id": "task_1787168752_32",
-      "title": "Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
-      "prompt": "Ejecución autónoma programada",
-      "area_id": "area_synaptic_memory",
-      "area_name": "🌌 Gobernanza Sináptica & Exocórtex",
-      "agent_id": "mnemosyne",
-      "agent_name": "Mnemosyne (Memoria & Exocórtex)",
-      "status": "completed",
-      "progress": 100,
-      "allocated_cpu_percent": 5,
-      "started_at": 1787168752.485086,
-      "logs": [
-        "Iniciando tarea en 🌌 Gobernanza Sináptica & Exocórtex...",
-        "Agente Mnemosyne (Memoria & Exocórtex) asignado con cuota adaptativa de CPU.",
-        "✅ Tarea completada exitosamente."
-      ],
-      "completed_at": 1787168804.093587
-    },
-    {
-      "id": "task_1787168752_40",
-      "title": "Auto-Reactivación: Auditoría de Código & Archivos Locales",
-      "prompt": "Ejecución autónoma programada",
-      "area_id": "area_engineering",
-      "area_name": "🛠️ Ingeniería, Arquitectura & Código",
-      "agent_id": "hephaestus",
-      "agent_name": "Hephaestus (Ingeniería & Código)",
-      "status": "completed",
-      "progress": 100,
-      "allocated_cpu_percent": 5,
-      "started_at": 1787168752.2065122,
-      "logs": [
-        "Iniciando tarea en 🛠️ Ingeniería, Arquitectura & Código...",
-        "Agente Hephaestus (Ingeniería & Código) asignado con cuota adaptativa de CPU.",
-        "✅ Tarea completada exitosamente."
-      ],
-      "completed_at": 1787168809.1077518
-    },
-    {
-      "id": "task_1787167926_53",
-      "title": "Auto-Reactivación: Forja de Shaders & Prototipos Visuales",
-      "prompt": "Ejecución autónoma programada",
-      "area_id": "area_creative_synthesis",
-      "area_name": "🎨 Síntesis Creativa, UI & Shaders 3D",
-      "agent_id": "oneiros",
-      "agent_name": "Oneiros (Síntesis Creativa & 3D)",
-      "status": "completed",
-      "progress": 100,
-      "allocated_cpu_percent": 5,
-      "started_at": 1787167926.213907,
-      "logs": [
-        "Iniciando tarea en 🎨 Síntesis Creativa, UI & Shaders 3D...",
-        "Agente Oneiros (Síntesis Creativa & 3D) asignado con cuota adaptativa de CPU.",
-        "✅ Tarea completada exitosamente."
-      ],
-      "completed_at": 1787168763.993618
-    },
-    {
-      "id": "task_1787167926_67",
-      "title": "Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
-      "prompt": "Ejecución autónoma programada",
-      "area_id": "area_sentinel_privacy",
-      "area_name": "🛡️ Sentinel, Telemetría 360° & Privacidad",
-      "agent_id": "athena",
-      "agent_name": "Athena (Sentinel & Privacidad 360°)",
-      "status": "completed",
-      "progress": 100,
-      "allocated_cpu_percent": 5,
-      "started_at": 1787167926.2100759,
-      "logs": [
-        "Iniciando tarea en 🛡️ Sentinel, Telemetría 360° & Privacidad...",
-        "Agente Athena (Sentinel & Privacidad 360°) asignado con cuota adaptativa de CPU.",
-        "✅ Tarea completada exitosamente."
-      ],
-      "completed_at": 1787168768.996345
-    },
-    {
-      "id": "task_1787167926_58",
-      "title": "Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
-      "prompt": "Ejecución autónoma programada",
-      "area_id": "area_synaptic_memory",
-      "area_name": "🌌 Gobernanza Sináptica & Exocórtex",
-      "agent_id": "mnemosyne",
-      "agent_name": "Mnemosyne (Memoria & Exocórtex)",
-      "status": "completed",
-      "progress": 100,
-      "allocated_cpu_percent": 5,
-      "started_at": 1787167926.193277,
-      "logs": [
-        "Iniciando tarea en 🌌 Gobernanza Sináptica & Exocórtex...",
-        "Agente Mnemosyne (Memoria & Exocórtex) asignado con cuota adaptativa de CPU.",
-        "✅ Tarea completada exitosamente."
-      ],
-      "completed_at": 1787168758.941816
-    },
-    {
-      "id": "task_1787166953_80",
-      "title": "Auto-Reactivación: Forja de Shaders & Prototipos Visuales",
-      "prompt": "Ejecución autónoma programada",
-      "area_id": "area_creative_synthesis",
-      "area_name": "🎨 Síntesis Creativa, UI & Shaders 3D",
-      "agent_id": "oneiros",
-      "agent_name": "Oneiros (Síntesis Creativa & 3D)",
-      "status": "completed",
-      "progress": 100,
-      "allocated_cpu_percent": 5,
-      "started_at": 1787166953.455373,
-      "logs": [
-        "Iniciando tarea en 🎨 Síntesis Creativa, UI & Shaders 3D...",
-        "Agente Oneiros (Síntesis Creativa & 3D) asignado con cuota adaptativa de CPU.",
-        "✅ Tarea completada exitosamente."
-      ],
-      "completed_at": 1787167946.25102
     }
   ]
 }

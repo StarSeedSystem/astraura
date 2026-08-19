@@ -10,7 +10,10 @@ import {
   MoreVertical,
   Terminal,
   Zap,
-  Box
+  Box,
+  BrainCircuit,
+  Network,
+  Users
 } from 'lucide-react';
 import { fetchProjects, createProject, updateProject } from '../services/api';
 
@@ -148,7 +151,7 @@ export default function ProjectsView() {
           }`}
         >
           <FolderSync className="w-3.5 h-3.5" />
-          <span>Proyectos Automáticos (IA)</span>
+          <span>Proyectos Daedalus (IA)</span>
         </button>
       </div>
 
@@ -175,13 +178,24 @@ export default function ProjectsView() {
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <div className="flex items-center gap-2">
                     {project.type === 'automatic' ? (
-                      <FolderSync className="w-5 h-5 text-purple-400" />
+                      <div className="p-1.5 rounded-lg bg-emerald-500/20 border border-emerald-500/30">
+                        <FolderSync className="w-4 h-4 text-emerald-400" />
+                      </div>
                     ) : (
-                      <FolderOpen className="w-5 h-5 text-cyan-400" />
+                      <div className="p-1.5 rounded-lg bg-cyan-500/20 border border-cyan-500/30">
+                        <FolderOpen className="w-4 h-4 text-cyan-400" />
+                      </div>
                     )}
-                    <h3 className="font-display font-bold text-sm text-white leading-snug break-words max-w-[200px]">
-                      {project.name}
-                    </h3>
+                    <div>
+                      <h3 className="font-display font-bold text-sm text-white leading-snug break-words max-w-[200px]">
+                        {project.name}
+                      </h3>
+                      {project.type === 'automatic' && (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-sm bg-emerald-500/20 text-emerald-300 font-mono font-bold mt-0.5 inline-block border border-emerald-500/20">
+                          Gestionado por Daedalus
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <button className="text-slate-500 hover:text-white p-1">
                     <MoreVertical className="w-4 h-4" />
@@ -199,11 +213,34 @@ export default function ProjectsView() {
                   </div>
                   <div className="flex items-center justify-between text-slate-400">
                     <span className="flex items-center gap-1"><Activity className="w-3 h-3" /> Procesos:</span>
-                    <span className="text-purple-300 font-bold">{project.linked_processs?.length || 0}</span>
+                    <span className="text-purple-300 font-bold">{project.linked_processes?.length || 0}</span>
                   </div>
-                  <div className="flex items-center justify-between text-slate-400">
-                    <span className="flex items-center gap-1"><GitBranch className="w-3 h-3" /> Actualizado:</span>
-                    <span className="text-slate-300">
+                  
+                  {/* Context Links */}
+                  <div className="flex items-center justify-between text-slate-400 border-t border-white/5 pt-1.5 mt-1.5">
+                    <span className="flex items-center gap-1"><Network className="w-3 h-3" /> Interconexiones:</span>
+                    <div className="flex gap-1">
+                      {project.linked_projects?.length > 0 && (
+                        <span className="px-1.5 py-0.5 rounded-sm bg-blue-500/20 text-blue-300 text-[9px] border border-blue-500/30" title="Proyectos Vinculados">
+                          P: {project.linked_projects.length}
+                        </span>
+                      )}
+                      {project.linked_cerebros?.length > 0 && (
+                        <span className="px-1.5 py-0.5 rounded-sm bg-fuchsia-500/20 text-fuchsia-300 text-[9px] border border-fuchsia-500/30" title="Cerebros">
+                          <BrainCircuit className="w-3 h-3 inline mr-0.5"/> {project.linked_cerebros.length}
+                        </span>
+                      )}
+                      {project.linked_agents?.length > 0 && (
+                        <span className="px-1.5 py-0.5 rounded-sm bg-amber-500/20 text-amber-300 text-[9px] border border-amber-500/30" title="Agentes">
+                          <Users className="w-3 h-3 inline mr-0.5"/> {project.linked_agents.length}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-slate-500 mt-1">
+                    <span className="flex items-center gap-1"><GitBranch className="w-3 h-3" /> Modificado:</span>
+                    <span className="text-slate-400">
                       {project.updated_at ? new Date(project.updated_at * 1000).toLocaleDateString() : 'N/A'}
                     </span>
                   </div>
