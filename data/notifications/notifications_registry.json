@@ -1,13 +1,33 @@
 {
   "notifications": [
     {
+      "id": "notif_1787132847",
+      "title": "✅ Permisos Concedidos: 2 Solicitudes Aplicadas",
+      "message": "Se autorizaron y aplicaron exitosamente todas las 2 solicitudes pendientes en segundo plano.",
+      "category": "Autorización Soberana",
+      "severity": "success",
+      "timestamp": 1787132847.528435,
+      "read": true,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787132628",
+      "title": "✨ Auto-Mejora Aplicada: Sueño Lúcido Ciberdélico (UI, Arte & 3D)",
+      "message": "Se aplicó automáticamente: 'Shader Ciberdélico y Geometría Sagrada para Cuernavaca'. Todos los subsistemas sincronizados.",
+      "category": "Imaginación Intuitiva",
+      "severity": "success",
+      "timestamp": 1787132628.987066,
+      "read": true,
+      "action_type": null
+    },
+    {
       "id": "notif_1787132027",
       "title": "⚠️ Solicitud de Aprobación de Mejora: Auto-Reflexión & Optimización de Código ARM NEON",
       "message": "Propuesta 'Auto-Optimización de Código: Cuantización vs. Offloading en IA.pdf' clasificada como [HIGH]. Esperando tu confirmación en la pestaña de Propuestas.",
       "category": "Solicitud de Autorización",
       "severity": "warning",
       "timestamp": 1787132027.491866,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -577,26 +597,6 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787126969.280482,
-      "read": true,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787126964",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787126964.264143,
-      "read": true,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787126959",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787126959.250541,
       "read": true,
       "action_type": null
     }
