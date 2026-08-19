@@ -156,13 +156,14 @@ class AstrauraOrchestrator:
             # Format prompt with personality guidance
             personas_desc = "\n".join([f"- **{p['name']}** ({p.get('title', '')}): {p.get('system_prompt', '')}" for p in active_personas])
             
+            first_persona_name = active_personas[0]["name"] if active_personas else "Aurora"
             multi_sys_prompt = (
                 f"{self.system_prompt_base}\n\n"
                 f"### CONVOCATORIA DE PERSONALIDADES ({len(active_personas)} ENTIDADES):\n{personas_desc}\n\n"
                 f"DIRECTIVAS ESTRICTAS DE RESPUESTA:\n"
                 f"1. ÚNICAMENTE deben hablar las siguientes {len(active_personas)} personalidades: {', '.join([p['name'] for p in active_personas])}.\n"
                 f"2. NUNCA inventes personalidades adicionales ni uses listas numéricas infinitas como 'PERSONALIDAD 1', 'PERSONALIDAD 2', etc.\n"
-                f"3. Cada entidad hace UNA sola intervención concisa y sustanciosa desde su especialidad usando el formato `### [{p['name']}]:`.\n"
+                f"3. Cada entidad hace UNA sola intervención concisa y sustanciosa desde su especialidad usando el formato `### [Nombre]:` (ejemplo: `### [{first_persona_name}]:`).\n"
                 f"4. Concluye de forma definitiva con `### [Síntesis Coral 1.58-Bit]:` y finaliza la respuesta sin repetir."
             )
 

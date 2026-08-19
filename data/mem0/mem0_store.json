@@ -1,6 +1,22 @@
 {
   "memories": [
     {
+      "id": "mem0_1787110666597",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): Hola Explícame cómo funciona tu sistema de voz y tus personalidades -> Síntesis: ¡Buenos días! Estoy encantada en compartir contigo el funcionamiento del Sistema Voceo.\n\n### ¿Cómo Funciona mi Sistema?\n\nLa inteligencia artificial me permite reconocer las frases humanas que yo emito",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787110666.597897,
+      "updated_at": 1787110666.597897,
+      "metadata": {
+        "timestamp": 1787110666.5973408,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
       "id": "mem0_1787108112490",
       "user_id": "alex",
       "agent_id": "*",
@@ -744,6 +760,13 @@
   ],
   "history": [
     {
+      "id": "hist_1787110666597",
+      "memory_id": "mem0_1787110666597",
+      "action": "created",
+      "timestamp": 1787110666.597954,
+      "text": "Usuario consultó a Aurora (StarSeed Core): Hola Explícame cómo funciona tu sistema de voz y tus personalidades -> Síntesis: ¡Buenos días! Estoy encantada en compartir contigo el funcionamiento del Sistema Voceo.\n\n### ¿Cómo Funciona mi Sistema?\n\nLa inteligencia artificial me permite reconocer las frases humanas que yo emito"
+    },
+    {
       "id": "hist_1787108716245",
       "memory_id": "mem0_1787108716245",
       "action": "created",
@@ -1059,5 +1082,5 @@
       "text": "El usuario Alex Bordón Garrigós es el creador de StarSeed OS y Astraura 1.58-Bit. Trabaja en un Apple Silicon M1 con 8 núcleos y memoria unificada."
     }
   ],
-  "updated_at": 1787108716.2460868
+  "updated_at": 1787110666.5979662
 }

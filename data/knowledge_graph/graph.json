@@ -174,7 +174,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (cuales son las capacidades de este ...)",
       "strength": 1.0,
-      "updated_at": 1787108114.940696
+      "updated_at": 1787110682.069006
     },
     "Bits": {
       "id": "Bits",
@@ -374,7 +374,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (de hecho Alex Bordón Garrigós era m...)",
       "strength": 1.0,
-      "updated_at": 1787108082.478394
+      "updated_at": 1787110682.080999
     },
     "Bordón": {
       "id": "Bordón",
@@ -678,7 +678,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (desarrolla una historia dramatica s...)",
       "strength": 1.0,
-      "updated_at": 1787108730.811987
+      "updated_at": 1787110682.060342
     },
     "Todos": {
       "id": "Todos",
@@ -750,7 +750,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (quien soy yo, como me llamo y que s...)",
       "strength": 1.0,
-      "updated_at": 1787108098.431796
+      "updated_at": 1787110682.073195
     },
     "Podría": {
       "id": "Podría",
@@ -1150,7 +1150,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (actualmente Cuántas personalidades ...)",
       "strength": 1.0,
-      "updated_at": 1787108114.263537
+      "updated_at": 1787110682.076889
     },
     "Perfectamente": {
       "id": "Perfectamente",
@@ -2279,6 +2279,14 @@
       "description": "Concepto destilado de interacción (demuéstrame cómo funciona tu sistem...)",
       "strength": 0.6,
       "updated_at": 1787108730.807976
+    },
+    "Través": {
+      "id": "Través",
+      "label": "Través",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Hola Explícame cómo funciona tu sis...)",
+      "strength": 0.6,
+      "updated_at": 1787110682.085024
     }
   },
   "edges": [
@@ -4284,7 +4292,7 @@
       "source": "Hola",
       "target": "Estoy",
       "relation": "asociado_con",
-      "weight": 0.85
+      "weight": 0.95
     },
     {
       "source": "Estoy",
@@ -5118,7 +5126,7 @@
       "source": "Cómo",
       "target": "Sistema",
       "relation": "asociado_con",
-      "weight": 0.85
+      "weight": 0.95
     },
     {
       "source": "Sistema",
@@ -5184,7 +5192,7 @@
       "source": "Sistema",
       "target": "Hola",
       "relation": "asociado_con",
-      "weight": 0.65
+      "weight": 0.75
     },
     {
       "source": "Hola",
@@ -5633,6 +5641,18 @@
     {
       "source": "Continuación",
       "target": "Cómo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Estoy",
+      "target": "Alex",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Alex",
+      "target": "Través",
       "relation": "asociado_con",
       "weight": 0.65
     }
