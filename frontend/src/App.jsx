@@ -41,6 +41,7 @@ import Memory3DGraphView from './components/Memory3DGraphView';
 import SystemDiagnostics from './components/SystemDiagnostics';
 import WorkspaceFiles from './components/WorkspaceFiles';
 import EnvironmentWidget from './components/EnvironmentWidget';
+import QuantumVoiceOrbWidget from './components/QuantumVoiceOrbWidget';
 import ComputerFileExplorer from './components/ComputerFileExplorer';
 import StarSeedLibrary from './components/StarSeedLibrary';
 import TerminalConsole from './components/TerminalConsole';
@@ -596,8 +597,16 @@ export default function App() {
           })}
         </nav>
 
-        {/* Sensory Footer */}
-        <div className="pt-2 border-t border-white/10 shrink-0">
+        {/* Sensory & Voice Footer */}
+        <div className="pt-2 border-t border-white/10 shrink-0 space-y-2">
+          {/* Quantum Holographic Siri-Style Voice Orb & Controls */}
+          <QuantumVoiceOrbWidget
+            activePersona={activePersona}
+            onSelectPersona={(p) => setActivePersona(p)}
+            personalities={personalities}
+            onDirectConversationSpeech={(text) => handleSendMessage(text)}
+          />
+
           <EnvironmentWidget 
             envData={envData} 
             activeBrainId={activeBrainId} 

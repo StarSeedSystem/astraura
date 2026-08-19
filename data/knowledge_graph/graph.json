@@ -174,7 +174,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (cuales son las capacidades de este ...)",
       "strength": 1.0,
-      "updated_at": 1787104378.134968
+      "updated_at": 1787106463.964878
     },
     "Bits": {
       "id": "Bits",
@@ -678,7 +678,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (desarrolla una historia dramatica s...)",
       "strength": 1.0,
-      "updated_at": 1787104378.129559
+      "updated_at": 1787106463.954069
     },
     "Todos": {
       "id": "Todos",
@@ -750,7 +750,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (quien soy yo, como me llamo y que s...)",
       "strength": 1.0,
-      "updated_at": 1787104378.143133
+      "updated_at": 1787106463.968401
     },
     "Podría": {
       "id": "Podría",
@@ -909,8 +909,8 @@
       "label": "Funciona",
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (cuanto pesa este sistema de 1.5 bit...)",
-      "strength": 0.7999999999999999,
-      "updated_at": 1786967198.318657
+      "strength": 0.8999999999999999,
+      "updated_at": 1787106463.961531
     },
     "Segundo": {
       "id": "Segundo",
@@ -942,7 +942,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (aprendes en segundo plano o funcion...)",
       "strength": 1.0,
-      "updated_at": 1787103137.5334132
+      "updated_at": 1787106463.9715672
     },
     "Redes": {
       "id": "Redes",
@@ -2063,6 +2063,14 @@
       "description": "Concepto destilado de interacción (Hola hola es la red...)",
       "strength": 0.6,
       "updated_at": 1787103137.536447
+    },
+    "Demuéstrame": {
+      "id": "Demuéstrame",
+      "label": "Demuéstrame",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (demuéstrame cómo funciona tu sistem...)",
+      "strength": 0.6,
+      "updated_at": 1787106463.958039
     }
   },
   "edges": [
@@ -4943,6 +4951,36 @@
     {
       "source": "Puedo",
       "target": "Asistirte",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cómo",
+      "target": "Demuéstrame",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Demuéstrame",
+      "target": "Funciona",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Funciona",
+      "target": "Sistema",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistema",
+      "target": "Hola",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Hola",
+      "target": "Puedo",
       "relation": "asociado_con",
       "weight": 0.65
     }

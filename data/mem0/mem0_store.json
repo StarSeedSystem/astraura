@@ -1,6 +1,22 @@
 {
   "memories": [
     {
+      "id": "mem0_1787106458922",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): demuéstrame cómo funciona tu sistema de voz y -> Síntesis: ¡Hola! ¿Cómo puedo ayudarte hoy?",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787106458.922826,
+      "updated_at": 1787106458.922826,
+      "metadata": {
+        "timestamp": 1787106458.9224699,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
       "id": "mem0_1787104377018",
       "user_id": "alex",
       "agent_id": "*",
@@ -423,6 +439,13 @@
   ],
   "history": [
     {
+      "id": "hist_1787106458922",
+      "memory_id": "mem0_1787106458922",
+      "action": "created",
+      "timestamp": 1787106458.922828,
+      "text": "Usuario consultó a Aurora (StarSeed Core): demuéstrame cómo funciona tu sistema de voz y -> Síntesis: ¡Hola! ¿Cómo puedo ayudarte hoy?"
+    },
+    {
       "id": "hist_1787104377018",
       "memory_id": "mem0_1787104377018",
       "action": "created",
@@ -591,5 +614,5 @@
       "text": "El usuario Alex Bordón Garrigós es el creador de StarSeed OS y Astraura 1.58-Bit. Trabaja en un Apple Silicon M1 con 8 núcleos y memoria unificada."
     }
   ],
-  "updated_at": 1787104377.0187771
+  "updated_at": 1787106458.92283
 }
