@@ -15,7 +15,7 @@
     "brain_hermes"
   ],
   "auto_recycle_memories": true,
-  "cycles_completed": 297,
+  "cycles_completed": 302,
   "active_process_types": [
     "rem_synaptic_consolidation",
     "counterfactual_quantum_imagination",
@@ -78,11 +78,35 @@
       "id": "rem_synaptic_consolidation",
       "status": "active",
       "allocated_resource_percent": 20,
-      "last_activated_at": 1787124403.757853,
-      "last_activated_formatted": "19/08/2026 01:26:43",
-      "cycles_count": 68,
+      "last_activated_at": 1787130220.883295,
+      "last_activated_formatted": "19/08/2026 03:03:40",
+      "cycles_count": 70,
       "quantum_entropy": 0.75,
       "history": [
+        {
+          "run_id": "run_1787130220",
+          "timestamp": 1787130220.883295,
+          "formatted_time": "19/08/2026 03:03:40",
+          "theme": "Consolidación de Memoria Sináptica en Bóveda Soberana",
+          "hypothesis": "Indexando 8 archivos del proyecto con los cerebros Génesis, Hephaestus y Hermes.",
+          "importance_level": "medium",
+          "requires_user_approval": false,
+          "branch_id": "branch_1787130220",
+          "creation_id": null,
+          "entropy": 0.75
+        },
+        {
+          "run_id": "run_1787128410",
+          "timestamp": 1787128410.16431,
+          "formatted_time": "19/08/2026 02:33:30",
+          "theme": "Consolidación de Memoria Sináptica en Bóveda Soberana",
+          "hypothesis": "Indexando 8 archivos del proyecto con los cerebros Génesis, Hephaestus y Hermes.",
+          "importance_level": "medium",
+          "requires_user_approval": false,
+          "branch_id": "branch_1787128410",
+          "creation_id": null,
+          "entropy": 0.75
+        },
         {
           "run_id": "run_1787124403",
           "timestamp": 1787124403.757853,
@@ -356,30 +380,6 @@
           "importance_level": "medium",
           "requires_user_approval": false,
           "branch_id": "branch_1787102081",
-          "creation_id": null,
-          "entropy": 0.75
-        },
-        {
-          "run_id": "run_1787096006",
-          "timestamp": 1787096006.675136,
-          "formatted_time": "18/08/2026 17:33:26",
-          "theme": "Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.backup.json, README.md, vercel.json, package-lock.json",
-          "hypothesis": "Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.backup.json, README.md, vercel.json, package-lock.json' con la memoria sináptica y el entorno físico en Guadalajara, México (24.5°C, Parcialmente Nublado).",
-          "importance_level": "medium",
-          "requires_user_approval": false,
-          "branch_id": "branch_1787096006",
-          "creation_id": null,
-          "entropy": 0.75
-        },
-        {
-          "run_id": "run_1787095946",
-          "timestamp": 1787095946.6747699,
-          "formatted_time": "18/08/2026 17:32:26",
-          "theme": "Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.backup.json, README.md, vercel.json, package-lock.json",
-          "hypothesis": "Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.backup.json, README.md, vercel.json, package-lock.json' con la memoria sináptica y el entorno físico en Ubicación Soberana, México (24.0°C, Despejado).",
-          "importance_level": "medium",
-          "requires_user_approval": false,
-          "branch_id": "branch_1787095946",
           "creation_id": null,
           "entropy": 0.75
         }
@@ -1011,11 +1011,23 @@
       "id": "code_self_reflection_opt",
       "status": "active",
       "allocated_resource_percent": 20,
-      "last_activated_at": 1787124403.038212,
-      "last_activated_formatted": "19/08/2026 01:26:43",
-      "cycles_count": 55,
+      "last_activated_at": 1787129011.603352,
+      "last_activated_formatted": "19/08/2026 02:43:31",
+      "cycles_count": 56,
       "quantum_entropy": 0.75,
       "history": [
+        {
+          "run_id": "run_1787129011",
+          "timestamp": 1787129011.603352,
+          "formatted_time": "19/08/2026 02:43:31",
+          "theme": "Auto-Optimización de Código: install_and_run.sh",
+          "hypothesis": "Reestructurar bucles SIMD en 'install_and_run.sh' para aprovechar los registros vectoriales ARM64 NEON de 128 bits.",
+          "importance_level": "medium",
+          "requires_user_approval": false,
+          "branch_id": "branch_1787129011",
+          "creation_id": "creation_1787129011",
+          "entropy": 0.75
+        },
         {
           "run_id": "run_1787124403",
           "timestamp": 1787124403.038212,
@@ -1303,18 +1315,6 @@
           "branch_id": "branch_1787096005",
           "creation_id": "creation_1787096005",
           "entropy": 0.75
-        },
-        {
-          "run_id": "run_1787095945",
-          "timestamp": 1787095945.816374,
-          "formatted_time": "18/08/2026 17:32:25",
-          "theme": "Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.backup.json, README.md, vercel.json, package-lock.json",
-          "hypothesis": "Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.backup.json, README.md, vercel.json, package-lock.json' con la memoria sináptica y el entorno físico en Ubicación Soberana, México (24.0°C, Despejado).",
-          "importance_level": "medium",
-          "requires_user_approval": false,
-          "branch_id": "branch_1787095945",
-          "creation_id": "creation_1787095945",
-          "entropy": 0.75
         }
       ]
     },
@@ -1322,11 +1322,35 @@
       "id": "predictive_future_simulation",
       "status": "active",
       "allocated_resource_percent": 10,
-      "last_activated_at": 1787124405.197394,
-      "last_activated_formatted": "19/08/2026 01:26:45",
-      "cycles_count": 62,
+      "last_activated_at": 1787130822.8745852,
+      "last_activated_formatted": "19/08/2026 03:13:42",
+      "cycles_count": 64,
       "quantum_entropy": 0.75,
       "history": [
+        {
+          "run_id": "run_1787130822",
+          "timestamp": 1787130822.8745852,
+          "formatted_time": "19/08/2026 03:13:42",
+          "theme": "Simulación Predictiva & Contexto Sensorial en Guadalajara, México",
+          "hypothesis": "Proyectando la evolución cognitiva de Astraura ante fluctuaciones ambientales (24.5°C, Parcialmente Nublado).",
+          "importance_level": "low",
+          "requires_user_approval": false,
+          "branch_id": "branch_1787130822",
+          "creation_id": null,
+          "entropy": 0.75
+        },
+        {
+          "run_id": "run_1787129613",
+          "timestamp": 1787129613.074869,
+          "formatted_time": "19/08/2026 02:53:33",
+          "theme": "Simulación Predictiva & Contexto Sensorial en Guadalajara, México",
+          "hypothesis": "Proyectando la evolución cognitiva de Astraura ante fluctuaciones ambientales (24.5°C, Parcialmente Nublado).",
+          "importance_level": "low",
+          "requires_user_approval": false,
+          "branch_id": "branch_1787129613",
+          "creation_id": null,
+          "entropy": 0.75
+        },
         {
           "run_id": "run_1787124405",
           "timestamp": 1787124405.197394,
@@ -1602,30 +1626,6 @@
           "branch_id": "branch_1787096008",
           "creation_id": null,
           "entropy": 0.75
-        },
-        {
-          "run_id": "run_1787095948",
-          "timestamp": 1787095948.350914,
-          "formatted_time": "18/08/2026 17:32:28",
-          "theme": "Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ",
-          "hypothesis": "Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Ubicación Soberana, México (24.0°C, Despejado).",
-          "importance_level": "low",
-          "requires_user_approval": false,
-          "branch_id": "branch_1787095948",
-          "creation_id": null,
-          "entropy": 0.75
-        },
-        {
-          "run_id": "run_1787094218",
-          "timestamp": 1787094218.309223,
-          "formatted_time": "18/08/2026 17:03:38",
-          "theme": "Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ",
-          "hypothesis": "Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Ubicación Soberana, México (24.0°C, Despejado).",
-          "importance_level": "medium",
-          "requires_user_approval": true,
-          "branch_id": "branch_1787094218",
-          "creation_id": null,
-          "entropy": 0.75
         }
       ]
     },
@@ -1811,6 +1811,111 @@
   },
   "branches": [
     {
+      "id": "branch_1787130822",
+      "theme": "Simulación Predictiva & Contexto Sensorial en Guadalajara, México",
+      "hypothesis": "Proyectando la evolución cognitiva de Astraura ante fluctuaciones ambientales (24.5°C, Parcialmente Nublado).",
+      "insights": "Garantiza que el presupuesto de recursos M1 (35%) mantenga los agentes secundarios en equilibrio.",
+      "process_type": "predictive_future_simulation",
+      "process_name": "Simulación Predictiva & Tendencias",
+      "importance_level": "low",
+      "requires_user_approval": false,
+      "permission_policy_applied": "auto_apply_minor",
+      "status": "applied",
+      "applied_by": "auto_sync_agent",
+      "timestamp": 1787130822.8745852,
+      "formatted_time": "19/08/2026 03:13:42",
+      "context_snapshot": {
+        "location": "Guadalajara, México",
+        "weather": "24.5°C, Parcialmente Nublado",
+        "entropy": 0.75,
+        "allocated_cores": 3
+      }
+    },
+    {
+      "id": "branch_1787130220",
+      "theme": "Consolidación de Memoria Sináptica en Bóveda Soberana",
+      "hypothesis": "Indexando 8 archivos del proyecto con los cerebros Génesis, Hephaestus y Hermes.",
+      "insights": "Refuerzo de enlaces semánticos y compactación de memoria para acelerar la inferencia en 1.58 bits.",
+      "process_type": "rem_synaptic_consolidation",
+      "process_name": "Sueño REM Cognitivo (Consolidación Sináptica)",
+      "importance_level": "medium",
+      "requires_user_approval": false,
+      "permission_policy_applied": "auto_apply_safe",
+      "status": "applied",
+      "applied_by": "auto_sync_agent",
+      "timestamp": 1787130220.883295,
+      "formatted_time": "19/08/2026 03:03:40",
+      "context_snapshot": {
+        "location": "Guadalajara, México",
+        "weather": "24.5°C, Parcialmente Nublado",
+        "entropy": 0.75,
+        "allocated_cores": 3
+      }
+    },
+    {
+      "id": "branch_1787129613",
+      "theme": "Simulación Predictiva & Contexto Sensorial en Guadalajara, México",
+      "hypothesis": "Proyectando la evolución cognitiva de Astraura ante fluctuaciones ambientales (24.5°C, Parcialmente Nublado).",
+      "insights": "Garantiza que el presupuesto de recursos M1 (35%) mantenga los agentes secundarios en equilibrio.",
+      "process_type": "predictive_future_simulation",
+      "process_name": "Simulación Predictiva & Tendencias",
+      "importance_level": "low",
+      "requires_user_approval": false,
+      "permission_policy_applied": "auto_apply_minor",
+      "status": "applied",
+      "applied_by": "auto_sync_agent",
+      "timestamp": 1787129613.074869,
+      "formatted_time": "19/08/2026 02:53:33",
+      "context_snapshot": {
+        "location": "Guadalajara, México",
+        "weather": "24.5°C, Parcialmente Nublado",
+        "entropy": 0.75,
+        "allocated_cores": 3
+      }
+    },
+    {
+      "id": "branch_1787129011",
+      "theme": "Auto-Optimización de Código: install_and_run.sh",
+      "hypothesis": "Reestructurar bucles SIMD en 'install_and_run.sh' para aprovechar los registros vectoriales ARM64 NEON de 128 bits.",
+      "insights": "Elimina 18 operaciones matriciales redundantes, reduciendo el consumo térmico del M1 a 100% de batería.",
+      "process_type": "code_self_reflection_opt",
+      "process_name": "Auto-Reflexión & Optimización de Código ARM NEON",
+      "importance_level": "medium",
+      "requires_user_approval": false,
+      "permission_policy_applied": "auto_apply_safe",
+      "status": "applied",
+      "applied_by": "auto_sync_agent",
+      "timestamp": 1787129011.603352,
+      "formatted_time": "19/08/2026 02:43:31",
+      "context_snapshot": {
+        "location": "Guadalajara, México",
+        "weather": "24.5°C, Parcialmente Nublado",
+        "entropy": 0.75,
+        "allocated_cores": 3
+      }
+    },
+    {
+      "id": "branch_1787128410",
+      "theme": "Consolidación de Memoria Sináptica en Bóveda Soberana",
+      "hypothesis": "Indexando 8 archivos del proyecto con los cerebros Génesis, Hephaestus y Hermes.",
+      "insights": "Refuerzo de enlaces semánticos y compactación de memoria para acelerar la inferencia en 1.58 bits.",
+      "process_type": "rem_synaptic_consolidation",
+      "process_name": "Sueño REM Cognitivo (Consolidación Sináptica)",
+      "importance_level": "medium",
+      "requires_user_approval": false,
+      "permission_policy_applied": "auto_apply_safe",
+      "status": "applied",
+      "applied_by": "auto_sync_agent",
+      "timestamp": 1787128410.16431,
+      "formatted_time": "19/08/2026 02:33:30",
+      "context_snapshot": {
+        "location": "Guadalajara, México",
+        "weather": "24.5°C, Parcialmente Nublado",
+        "entropy": 0.75,
+        "allocated_cores": 3
+      }
+    },
+    {
       "id": "branch_1787127802",
       "theme": "Mutación Sináptica Inter-Cerebros: Génesis ✕ Hephaestus",
       "hypothesis": "Fusión de las habilidades de razonamiento ontológico con la generación de código de bajo nivel.",
@@ -1818,10 +1923,10 @@
       "process_type": "inter_brain_evolutionary_mutation",
       "process_name": "Mutación Evolutiva Inter-Cerebros",
       "importance_level": "high",
-      "requires_user_approval": true,
+      "requires_user_approval": false,
       "permission_policy_applied": "always_ask",
-      "status": "pending_approval",
-      "applied_by": null,
+      "status": "applied",
+      "applied_by": "human_authorized",
       "timestamp": 1787127802.4325068,
       "formatted_time": "19/08/2026 02:23:22",
       "context_snapshot": {
@@ -1829,7 +1934,8 @@
         "weather": "24.5°C, Parcialmente Nublado",
         "entropy": 0.75,
         "allocated_cores": 3
-      }
+      },
+      "applied_at": 1787130807.828279
     },
     {
       "id": "branch_1787127199",
@@ -1839,10 +1945,10 @@
       "process_type": "counterfactual_quantum_imagination",
       "process_name": "Imaginación Contrafáctica / Cuántica",
       "importance_level": "low",
-      "requires_user_approval": true,
+      "requires_user_approval": false,
       "permission_policy_applied": "always_ask",
-      "status": "pending_approval",
-      "applied_by": null,
+      "status": "applied",
+      "applied_by": "human_authorized",
       "timestamp": 1787127199.77858,
       "formatted_time": "19/08/2026 02:13:19",
       "context_snapshot": {
@@ -1850,7 +1956,8 @@
         "weather": "24.5°C, Parcialmente Nublado",
         "entropy": 0.75,
         "allocated_cores": 3
-      }
+      },
+      "applied_at": 1787130807.828279
     },
     {
       "id": "branch_1787124405",
@@ -2767,115 +2874,26 @@
         "entropy": 0.75,
         "allocated_cores": 3
       }
-    },
-    {
-      "id": "branch_1787119126",
-      "theme": "Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ",
-      "hypothesis": "Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Guadalajara, México (24.5°C, Parcialmente Nublado).",
-      "insights": "Forjando axiomas bajo entropía cuántica de 0.75 con optimización de 1.58 bits.",
-      "process_type": "predictive_future_simulation",
-      "process_name": "Simulación Predictiva & Tendencias",
-      "importance_level": "low",
-      "requires_user_approval": false,
-      "permission_policy_applied": "auto_apply_minor",
-      "status": "applied",
-      "applied_by": "auto_sync_agent",
-      "timestamp": 1787119126.029732,
-      "formatted_time": "18/08/2026 23:58:46",
-      "context_snapshot": {
-        "location": "Guadalajara, México",
-        "weather": "24.5°C, Parcialmente Nublado",
-        "entropy": 0.75,
-        "allocated_cores": 2
-      }
-    },
-    {
-      "id": "branch_1787119125",
-      "theme": "Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ",
-      "hypothesis": "Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Guadalajara, México (24.5°C, Parcialmente Nublado).",
-      "insights": "Forjando axiomas bajo entropía cuántica de 0.75 con optimización de 1.58 bits.",
-      "process_type": "counterfactual_quantum_imagination",
-      "process_name": "Imaginación Contrafáctica / Cuántica",
-      "importance_level": "medium",
-      "requires_user_approval": false,
-      "permission_policy_applied": "always_ask",
-      "status": "applied",
-      "applied_by": "human_authorized",
-      "timestamp": 1787119125.4306078,
-      "formatted_time": "18/08/2026 23:58:45",
-      "context_snapshot": {
-        "location": "Guadalajara, México",
-        "weather": "24.5°C, Parcialmente Nublado",
-        "entropy": 0.75,
-        "allocated_cores": 2
-      },
-      "applied_at": 1787127195.698368
-    },
-    {
-      "id": "branch_1787119124",
-      "theme": "Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.backup.json, README.md, Cuantización vs. Offloading en IA.pdf, Potencial y Desafíos del 1.58 Bits.pdf",
-      "hypothesis": "Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.backup.json, README.md, Cuantización vs. Offloading en IA.pdf, Potencial y Desafíos del 1.58 Bits.pdf' con la memoria sináptica y el entorno físico en Guadalajara, México (24.5°C, Parcialmente Nublado).",
-      "insights": "Forjando axiomas bajo entropía cuántica de 0.75 con optimización de 1.58 bits.",
-      "process_type": "rem_synaptic_consolidation",
-      "process_name": "Sueño REM Cognitivo (Consolidación Sináptica)",
-      "importance_level": "medium",
-      "requires_user_approval": false,
-      "permission_policy_applied": "auto_apply_safe",
-      "status": "applied",
-      "applied_by": "auto_sync_agent",
-      "timestamp": 1787119124.8048158,
-      "formatted_time": "18/08/2026 23:58:44",
-      "context_snapshot": {
-        "location": "Guadalajara, México",
-        "weather": "24.5°C, Parcialmente Nublado",
-        "entropy": 0.75,
-        "allocated_cores": 3
-      }
-    },
-    {
-      "id": "branch_1787119124",
-      "theme": "Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.backup.json, README.md, Cuantización vs. Offloading en IA.pdf, Potencial y Desafíos del 1.58 Bits.pdf",
-      "hypothesis": "Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.backup.json, README.md, Cuantización vs. Offloading en IA.pdf, Potencial y Desafíos del 1.58 Bits.pdf' con la memoria sináptica y el entorno físico en Guadalajara, México (24.5°C, Parcialmente Nublado).",
-      "insights": "Forjando axiomas bajo entropía cuántica de 0.75 con optimización de 1.58 bits.",
-      "process_type": "code_self_reflection_opt",
-      "process_name": "Auto-Reflexión & Optimización de Código ARM NEON",
-      "importance_level": "medium",
-      "requires_user_approval": false,
-      "permission_policy_applied": "auto_apply_safe",
-      "status": "applied",
-      "applied_by": "auto_sync_agent",
-      "timestamp": 1787119124.158387,
-      "formatted_time": "18/08/2026 23:58:44",
-      "context_snapshot": {
-        "location": "Guadalajara, México",
-        "weather": "24.5°C, Parcialmente Nublado",
-        "entropy": 0.75,
-        "allocated_cores": 3
-      }
-    },
-    {
-      "id": "branch_1787117626",
-      "theme": "Exploración Intuitiva: Ingesta Automática de Carpeta de Shaders & Assets 3D: ",
-      "hypothesis": "Integrando la semilla 'Ingesta Automática de Carpeta de Shaders & Assets 3D: ' con la memoria sináptica y el entorno físico en Guadalajara, México (24.5°C, Parcialmente Nublado).",
-      "insights": "Forjando axiomas bajo entropía cuántica de 0.75 con optimización de 1.58 bits.",
-      "process_type": "lucid_cyberdelic_creativity",
-      "process_name": "Sueño Lúcido Ciberdélico (UI, Arte & 3D)",
-      "importance_level": "low",
-      "requires_user_approval": false,
-      "permission_policy_applied": "autonomous_sovereign",
-      "status": "applied",
-      "applied_by": "auto_sync_agent",
-      "timestamp": 1787117626.785113,
-      "formatted_time": "18/08/2026 23:33:46",
-      "context_snapshot": {
-        "location": "Guadalajara, México",
-        "weather": "24.5°C, Parcialmente Nublado",
-        "entropy": 0.75,
-        "allocated_cores": 3
-      }
     }
   ],
   "creations": [
+    {
+      "id": "creation_1787129011",
+      "title": "Optimización ARM NEON para install_and_run.sh",
+      "type": "C++ / Metal Shading Language",
+      "content": "// Auto-generado por Proceso Onírico Auto-Reflexión & Optimización de Código ARM NEON\n// Asignación de recursos M1: 35% (3 núcleos)\ninline void compute_ternary_fast(const int8_t* weights, const float* inputs, float* output) {\n    // BitNet 1.58b Vectorized Accumulator\n}",
+      "tags": [
+        "M1-Silicon",
+        "ARM-NEON",
+        "Ternary",
+        "Optimized"
+      ],
+      "origin_branch": "branch_1787129011",
+      "importance_level": "medium",
+      "requires_user_approval": false,
+      "status": "applied",
+      "timestamp": 1787129011.603352
+    },
     {
       "id": "creation_1787127802",
       "title": "Esquema de Agente Mutado: Hephaestus-NEON",
@@ -3707,23 +3725,6 @@
       "requires_user_approval": false,
       "status": "applied",
       "timestamp": 1787095967.7437901
-    },
-    {
-      "id": "creation_1787095945",
-      "title": "Optimización ARM NEON para vercel.backup.json, README.md, vercel.json, package-lock.json",
-      "type": "C++ / Metal Shading Language",
-      "content": "// Auto-generado por Proceso Onírico Auto-Reflexión & Optimización de Código ARM NEON\n// Asignación de recursos M1: 35% (3 núcleos)\ninline void compute_ternary_fast(const int8_t* weights, const float* inputs, float* output) {\n    // BitNet 1.58b Vectorized Accumulator\n}",
-      "tags": [
-        "M1-Silicon",
-        "ARM-NEON",
-        "Ternary",
-        "Optimized"
-      ],
-      "origin_branch": "branch_1787095945",
-      "importance_level": "medium",
-      "requires_user_approval": false,
-      "status": "applied",
-      "timestamp": 1787095945.816374
     }
   ],
   "insights": [
@@ -3812,6 +3813,20 @@
     }
   ],
   "recycle_history": [
+    {
+      "timestamp": 1787130215.879356,
+      "time_formatted": "2026-08-19 03:03:35",
+      "items_compacted": 38,
+      "space_freed_kb": 2.97,
+      "target_vault": "local_vault"
+    },
+    {
+      "timestamp": 1787129614.3430789,
+      "time_formatted": "2026-08-19 02:53:34",
+      "items_compacted": 38,
+      "space_freed_kb": 3.43,
+      "target_vault": "local_vault"
+    },
     {
       "timestamp": 1787124337.531899,
       "time_formatted": "2026-08-19 01:25:37",
@@ -3936,20 +3951,6 @@
       "time_formatted": "2026-08-19 01:24:12",
       "items_compacted": 35,
       "space_freed_kb": 3.23,
-      "target_vault": "local_vault"
-    },
-    {
-      "timestamp": 1787124247.276928,
-      "time_formatted": "2026-08-19 01:24:07",
-      "items_compacted": 35,
-      "space_freed_kb": 2.66,
-      "target_vault": "local_vault"
-    },
-    {
-      "timestamp": 1787124242.2605262,
-      "time_formatted": "2026-08-19 01:24:02",
-      "items_compacted": 35,
-      "space_freed_kb": 1.82,
       "target_vault": "local_vault"
     }
   ]

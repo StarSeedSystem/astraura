@@ -1,13 +1,73 @@
 {
   "notifications": [
     {
+      "id": "notif_1787130824",
+      "title": "✨ Auto-Mejora Aplicada: Simulación Predictiva & Tendencias",
+      "message": "Se aplicó automáticamente: 'Simulación Predictiva & Contexto Sensorial en Guadalajara, México'. Todos los subsistemas sincronizados.",
+      "category": "Imaginación Intuitiva",
+      "severity": "success",
+      "timestamp": 1787130824.310109,
+      "read": true,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787130807",
+      "title": "✅ Permisos Concedidos: 2 Solicitudes Aplicadas",
+      "message": "Se autorizaron y aplicaron exitosamente todas las 2 solicitudes pendientes en segundo plano.",
+      "category": "Autorización Soberana",
+      "severity": "success",
+      "timestamp": 1787130807.858906,
+      "read": true,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787130222",
+      "title": "✨ Auto-Mejora Aplicada: Sueño REM Cognitivo (Consolidación Sináptica)",
+      "message": "Se aplicó automáticamente: 'Consolidación de Memoria Sináptica en Bóveda Soberana'. Todos los subsistemas sincronizados.",
+      "category": "Imaginación Intuitiva",
+      "severity": "success",
+      "timestamp": 1787130222.061743,
+      "read": true,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787129614",
+      "title": "✨ Auto-Mejora Aplicada: Simulación Predictiva & Tendencias",
+      "message": "Se aplicó automáticamente: 'Simulación Predictiva & Contexto Sensorial en Guadalajara, México'. Todos los subsistemas sincronizados.",
+      "category": "Imaginación Intuitiva",
+      "severity": "success",
+      "timestamp": 1787129614.3392708,
+      "read": true,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787129012",
+      "title": "✨ Auto-Mejora Aplicada: Auto-Reflexión & Optimización de Código ARM NEON",
+      "message": "Se aplicó automáticamente: 'Auto-Optimización de Código: install_and_run.sh'. Todos los subsistemas sincronizados.",
+      "category": "Imaginación Intuitiva",
+      "severity": "success",
+      "timestamp": 1787129012.8687959,
+      "read": true,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787128411",
+      "title": "✨ Auto-Mejora Aplicada: Sueño REM Cognitivo (Consolidación Sináptica)",
+      "message": "Se aplicó automáticamente: 'Consolidación de Memoria Sináptica en Bóveda Soberana'. Todos los subsistemas sincronizados.",
+      "category": "Imaginación Intuitiva",
+      "severity": "success",
+      "timestamp": 1787128411.3798752,
+      "read": true,
+      "action_type": null
+    },
+    {
       "id": "notif_1787127803",
       "title": "⚠️ Solicitud de Aprobación de Mejora: Mutación Evolutiva Inter-Cerebros",
       "message": "Propuesta 'Mutación Sináptica Inter-Cerebros: Génesis ✕ Hephaestus' clasificada como [HIGH]. Esperando tu confirmación en la pestaña de Propuestas.",
       "category": "Solicitud de Autorización",
       "severity": "warning",
       "timestamp": 1787127803.680732,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -17,7 +77,7 @@
       "category": "Solicitud de Autorización",
       "severity": "warning",
       "timestamp": 1787127201.2544022,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -27,7 +87,7 @@
       "category": "Autorización Soberana",
       "severity": "success",
       "timestamp": 1787127195.895148,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -37,7 +97,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127194.766449,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -47,7 +107,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127189.754057,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -57,7 +117,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127184.742321,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -67,7 +127,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127179.730826,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -77,7 +137,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127174.718635,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -87,7 +147,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127169.706431,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -97,7 +157,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127164.6952581,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -107,7 +167,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127159.685237,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -117,7 +177,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127154.6725771,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -127,7 +187,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127149.6601331,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -137,7 +197,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127144.647913,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -147,7 +207,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127139.640938,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -157,7 +217,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127134.63593,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -167,7 +227,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127129.622227,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -177,7 +237,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127124.617413,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -187,7 +247,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127119.612279,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -197,7 +257,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127114.5978172,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -207,7 +267,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127109.5849001,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -217,7 +277,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127104.570637,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -227,7 +287,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127099.561079,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -237,7 +297,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127094.5534909,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -247,7 +307,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127089.546087,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -257,7 +317,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127084.5368042,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -267,7 +327,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127079.527076,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -277,7 +337,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127074.5174851,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -287,7 +347,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127069.505311,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -297,7 +357,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127064.4999208,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -307,7 +367,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127059.4881449,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -317,7 +377,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127054.476644,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -327,7 +387,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127049.4678621,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -337,7 +397,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127044.459247,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -347,7 +407,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127039.4502242,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -357,7 +417,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127034.436427,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -367,7 +427,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127029.422736,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -377,7 +437,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127024.412746,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -387,7 +447,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127019.406045,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -397,7 +457,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127014.394272,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -407,7 +467,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127009.3817768,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -417,7 +477,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787127004.3686578,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -427,7 +487,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787126999.355816,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -437,7 +497,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787126994.340224,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -447,7 +507,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787126989.329591,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -457,7 +517,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787126984.315904,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -467,7 +527,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787126979.302075,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -477,7 +537,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787126974.288571,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -487,7 +547,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787126969.280482,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -497,7 +557,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787126964.264143,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -507,7 +567,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787126959.250541,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -517,7 +577,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787126954.237849,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -527,7 +587,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787126949.225395,
-      "read": false,
+      "read": true,
       "action_type": null
     },
     {
@@ -537,67 +597,7 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787126944.214118,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787126939",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787126939.200959,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787126934",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787126934.151752,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787126929",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787126929.136516,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787126924",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787126924.1216798,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787126919",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787126919.107858,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787126914",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787126914.09307,
-      "read": false,
+      "read": true,
       "action_type": null
     }
   ],
