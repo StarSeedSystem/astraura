@@ -1,6 +1,236 @@
 {
   "notifications": [
     {
+      "id": "notif_1787107523",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107523.838086,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107518",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107518.8252008,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107513",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107513.811808,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107508",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107508.79257,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107503",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107503.7783659,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107498",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107498.771945,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107493",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107493.766431,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107488",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107488.759776,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107483",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107483.744444,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107478",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107478.724307,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107473",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107473.710413,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107468",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107468.695861,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107463",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107463.683153,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107458",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107458.67006,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107453",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107453.6568818,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107448",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107448.643391,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107443",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107443.6258838,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107438",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107438.6102242,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107433",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107433.6007302,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107428",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107428.590057,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107423",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107423.5806432,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107418",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107418.570119,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787107413",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787107413.558509,
+      "read": false,
+      "action_type": null
+    },
+    {
       "id": "notif_1787107408",
       "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
       "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
@@ -367,236 +597,6 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787107228.128535,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107223",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107223.1144938,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107218",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107218.098389,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107213",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107213.084766,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107208",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107208.070573,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107203",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107203.056164,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107198",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107198.0417159,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107193",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107193.0269282,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107188",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107188.010313,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107182",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107182.994426,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107177",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107177.9804459,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107172",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107172.96669,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107167",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107167.950069,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107162",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107162.935188,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107157",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107157.923724,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107152",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107152.909732,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107147",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107147.8936179,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107142",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107142.8809311,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107137",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107137.866139,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107132",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107132.852226,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107127",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107127.839486,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107122",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107122.825658,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107117",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107117.811323,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787107112",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 15 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787107112.795535,
       "read": false,
       "action_type": null
     }

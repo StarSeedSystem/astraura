@@ -602,8 +602,8 @@ export default function App() {
           {/* Quantum Holographic Siri-Style Voice Orb & Controls */}
           <QuantumVoiceOrbWidget
             activePersona={activePersona}
-            onSelectPersona={(p) => setActivePersona(p)}
-            personalities={personalities}
+            onSelectPersona={(p) => setActivePersonaId(p?.id || p)}
+            personalities={PRESET_PERSONALITIES}
             onDirectConversationSpeech={(text) => handleSendMessage(text)}
           />
 
