@@ -1817,6 +1817,7 @@ async def simulate_storage_connection(rule_id: str):
 
 @app.get("/api/notifications")
 async def get_system_notifications():
+    system_notifications_engine.sync_with_imagination(intuitive_imagination_engine.branches)
     return system_notifications_engine.get_all()
 
 class MarkReadRequest(BaseModel):
@@ -1832,17 +1833,57 @@ class NotificationActionRequest(BaseModel):
 
 @app.post("/api/notifications/apply")
 async def apply_single_notification_endpoint(req: NotificationActionRequest):
-    # Also if imagination engine has a matching request, grant it
-    intuitive_imagination_engine.grant_and_apply_all_requests()
-    return system_notifications_engine.apply_notification(req.notif_id)
+    # Find if it is linked to a branch
+    target_notif = next((n for n in system_notifications_engine.notifications if n["id"] == req.notif_id), None)
+    b_id = None
+    if target_notif:
+        b_id = target_notif.get("branch_id")
+    if not b_id and req.notif_id.startswith("notif_req_"):
+        b_id = req.notif_id.replace("notif_req_", "")
+
+    if b_id:
+        intuitive_imagination_engine.grant_and_apply_request(b_id)
+    else:
+        intuitive_imagination_engine.grant_and_apply_all_requests()
+
+    res = system_notifications_engine.apply_notification(req.notif_id)
+
+    # Check threshold reactivation
+    pending_left = len([b for b in intuitive_imagination_engine.branches if b.get("status") == "pending_approval" or b.get("requires_user_approval")])
+    if pending_left < intuitive_imagination_engine.max_accumulated_requests_threshold:
+        intuitive_imagination_engine.is_paused_due_to_threshold = False
+        intuitive_imagination_engine._save_state()
+
+    return res
 
 @app.post("/api/notifications/delete")
 async def delete_notification_endpoint(req: NotificationActionRequest):
-    return system_notifications_engine.delete_notification(req.notif_id)
+    target_notif = next((n for n in system_notifications_engine.notifications if n["id"] == req.notif_id), None)
+    b_id = None
+    if target_notif:
+        b_id = target_notif.get("branch_id")
+    if not b_id and req.notif_id.startswith("notif_req_"):
+        b_id = req.notif_id.replace("notif_req_", "")
+
+    if b_id:
+        intuitive_imagination_engine.delete_branch(b_id)
+
+    res = system_notifications_engine.delete_notification(req.notif_id)
+
+    pending_left = len([b for b in intuitive_imagination_engine.branches if b.get("status") == "pending_approval" or b.get("requires_user_approval")])
+    if pending_left < intuitive_imagination_engine.max_accumulated_requests_threshold:
+        intuitive_imagination_engine.is_paused_due_to_threshold = False
+        intuitive_imagination_engine._save_state()
+
+    return res
 
 @app.post("/api/notifications/clear")
 async def clear_all_notifications_endpoint():
-    return system_notifications_engine.clear_all()
+    res = system_notifications_engine.clear_all()
+    intuitive_imagination_engine.grant_and_apply_all_requests()
+    intuitive_imagination_engine.is_paused_due_to_threshold = False
+    intuitive_imagination_engine._save_state()
+    return res
 
 # ================= Sovereign Privacy & Sensor Permissions Control APIs =================
 

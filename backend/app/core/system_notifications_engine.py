@@ -105,19 +105,71 @@ class SystemNotificationsEngine:
 
     def add_notification(self, notif: Dict[str, Any]):
         n_id = notif.get("id") or f"notif_{int(time.time())}"
+        # If notification already exists with same id, update it
+        existing = next((n for n in self.notifications if n["id"] == n_id), None)
+        if existing:
+            existing.update(notif)
+            self._save()
+            return existing
+
         record = {
             "id": n_id,
             "title": notif.get("title", "Aviso del Sistema"),
             "message": notif.get("message", ""),
             "category": notif.get("category", "General"),
             "severity": notif.get("severity", "info"), # "info" | "suggestion" | "warning" | "success"
-            "timestamp": time.time(),
-            "read": False,
-            "action_type": notif.get("action_type", None)
+            "timestamp": notif.get("timestamp", time.time()),
+            "read": notif.get("read", False),
+            "action_type": notif.get("action_type", None),
+            "branch_id": notif.get("branch_id", None),
+            "status": notif.get("status", "pending")
         }
         self.notifications.insert(0, record)
         self._save()
         return record
+
+    def sync_with_imagination(self, branches: List[Dict[str, Any]]):
+        """
+        Sincroniza bidireccionalmente las propuestas pendientes de Imaginación Intuitiva con Notificaciones.
+        Garantiza que ambas listas sean 100% idénticas.
+        """
+        pending_branches = [b for b in branches if b.get("status") == "pending_approval" or b.get("requires_user_approval")]
+        existing_branch_ids = set()
+
+        for n in self.notifications:
+            b_id = n.get("branch_id")
+            if not b_id and n.get("id", "").startswith("notif_req_"):
+                b_id = n["id"].replace("notif_req_", "")
+                n["branch_id"] = b_id
+
+            if b_id:
+                existing_branch_ids.add(b_id)
+                matching = next((b for b in branches if b.get("id") == b_id), None)
+                if matching:
+                    if matching.get("status") == "applied" or not matching.get("requires_user_approval"):
+                        n["status"] = "applied"
+                        n["read"] = True
+                else:
+                    # If branch was deleted, mark notification resolved/applied
+                    n["status"] = "applied"
+                    n["read"] = True
+
+        for b in pending_branches:
+            b_id = b.get("id")
+            if b_id and b_id not in existing_branch_ids:
+                self.notifications.insert(0, {
+                    "id": f"notif_req_{b_id}",
+                    "title": f"⚠️ Solicitud de Autorización: {b.get('process_name', 'Imaginación')}",
+                    "message": f"Propuesta '{b.get('theme', 'Auto-mejora')}'. Hipótesis: {b.get('hypothesis', '')}",
+                    "category": "Solicitud de Autorización",
+                    "severity": "warning",
+                    "timestamp": b.get("timestamp", time.time()),
+                    "read": False,
+                    "branch_id": b_id,
+                    "status": "pending",
+                    "action_type": "grant_authorization"
+                })
+        self._save()
 
     def add_branching_log(self, log_entry: Dict[str, Any]):
         self.branching_logs.insert(0, log_entry)
