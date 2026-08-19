@@ -27,7 +27,14 @@ class EnvironmentSensor:
             secs_left = -1
             
         # 2. CPU & Memory Utilization
-        cpu_percent = psutil.cpu_percent(interval=None)
+        cpu_percent = psutil.cpu_percent(interval=0.06)
+        if cpu_percent <= 0.0 and hasattr(os, "getloadavg"):
+            try:
+                load1, _, _ = os.getloadavg()
+                cores = psutil.cpu_count(logical=True) or 8
+                cpu_percent = min(100.0, max(2.5, round((load1 / cores) * 100.0, 1)))
+            except Exception:
+                cpu_percent = 4.5
         mem = psutil.virtual_memory()
         
         # 3. Workspace File & Storage Context

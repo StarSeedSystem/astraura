@@ -32,7 +32,9 @@ import {
   ShieldCheck,
   Server,
   Palette,
-  Headphones
+  Headphones,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 
 import ChatInterface from './components/ChatInterface';
@@ -43,6 +45,7 @@ import SystemDiagnostics from './components/SystemDiagnostics';
 import WorkspaceFiles from './components/WorkspaceFiles';
 import EnvironmentWidget from './components/EnvironmentWidget';
 import QuantumVoiceOrbWidget from './components/QuantumVoiceOrbWidget';
+import FloatingQuantumVoiceOrb from './components/FloatingQuantumVoiceOrb';
 import ComputerFileExplorer from './components/ComputerFileExplorer';
 import StarSeedLibrary from './components/StarSeedLibrary';
 import TerminalConsole from './components/TerminalConsole';
@@ -74,6 +77,24 @@ import { omniVoice } from './services/omniVoice';
 export default function App() {
   const [activeTab, setActiveTab] = useState('chat');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSidebarVisible, setIsSidebarVisible] = useState(() => {
+    if (typeof localStorage !== 'undefined') {
+      const saved = localStorage.getItem('astraura_sidebar_visible');
+      if (saved !== null) return saved === 'true';
+    }
+    return true;
+  });
+
+  const toggleSidebar = () => {
+    setIsSidebarVisible((prev) => {
+      const next = !prev;
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('astraura_sidebar_visible', String(next));
+      }
+      return next;
+    });
+  };
+
   const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
   const [isGatewayModalOpen, setIsGatewayModalOpen] = useState(false);
   const [isUniversalPermsModalOpen, setIsUniversalPermsModalOpen] = useState(false);
@@ -548,7 +569,7 @@ export default function App() {
       <div className="fixed bottom-[-10%] right-[-10%] w-[45%] h-[45%] bg-purple-600/10 rounded-full blur-[150px] pointer-events-none" />
 
       {/* Hermes Left Navigation Sidebar (Desktop & Tablet) */}
-      <aside className="w-80 h-full bg-[#0a0d15]/95 border-r border-white/10 flex flex-col p-3 space-y-2.5 z-20 hidden lg:flex shrink-0">
+      <aside className={`w-80 h-full bg-[#0a0d15]/95 border-r border-white/10 flex flex-col p-3 space-y-2.5 z-20 shrink-0 transition-all duration-300 ${isSidebarVisible ? 'hidden lg:flex' : 'hidden'}`}>
         {/* Brand Header */}
         <div className="flex items-center justify-between px-1.5 py-1 border-b border-white/5 pb-2">
           <div className="flex items-center gap-2.5 min-w-0">
@@ -582,12 +603,11 @@ export default function App() {
             </button>
 
             <button
-              onClick={() => setIsGatewayModalOpen(true)}
-              className="px-2 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[10px] font-mono flex items-center gap-1 shadow-sm cursor-pointer transition-all"
-              title="Configurar Puente de Conexión Mac M1 / Gateway HTTPS"
+              onClick={toggleSidebar}
+              className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/10 transition-colors cursor-pointer"
+              title="Ocultar menú lateral (Guardar estado)"
             >
-              <Server className="w-3.5 h-3.5" />
-              <span className="font-bold">M1</span>
+              <PanelLeftClose className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
@@ -643,17 +663,28 @@ export default function App() {
       </aside>
 
       {/* Main Content Workspace */}
-      <main className="flex-1 flex flex-col h-full overflow-hidden p-2 sm:p-4 relative z-10 min-w-0">
+      <main className="flex-1 flex flex-col h-full overflow-hidden p-2 sm:p-4 pb-16 lg:pb-4 relative z-10 min-w-0">
         {/* Top Header */}
-        <header className="mb-2 sm:mb-3 p-2.5 sm:p-3 bg-[#0d1017]/90 backdrop-blur-md rounded-2xl border border-white/10 flex items-center justify-between gap-2 sm:gap-3 shadow-lg shrink-0">
-          {/* Left: Mobile Toggle & Core Badges */}
+        <header className="mb-2 sm:mb-3 p-2 sm:p-2.5 bg-[#0d1017]/90 backdrop-blur-md rounded-2xl border border-white/10 flex items-center justify-between gap-1.5 sm:gap-3 shadow-lg shrink-0">
+          {/* Left: Mobile & Desktop Menu Toggle & Core Badges */}
           <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto custom-scrollbar min-w-0 text-xs font-mono">
+            {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="lg:hidden p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 shrink-0 cursor-pointer"
-              title="Abrir Menú"
+              title="Abrir Menú Móvil"
             >
               {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            </button>
+
+            {/* Desktop Sidebar Toggle Button (Guardar / Mostrar Menú) */}
+            <button
+              onClick={toggleSidebar}
+              className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-cyan-300 text-xs font-mono transition-all cursor-pointer shrink-0 shadow-sm"
+              title={isSidebarVisible ? "Ocultar menú lateral (Guardar vista)" : "Mostrar menú lateral"}
+            >
+              {isSidebarVisible ? <PanelLeftClose className="w-3.5 h-3.5" /> : <PanelLeftOpen className="w-3.5 h-3.5 text-cyan-400" />}
+              <span className="hidden xl:inline">{isSidebarVisible ? 'Ocultar Menú' : 'Mostrar Menú'}</span>
             </button>
 
             <span className="px-2 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 flex items-center gap-1.5 whitespace-nowrap shrink-0">
@@ -664,17 +695,17 @@ export default function App() {
 
             <span className="px-2 py-1 rounded-lg bg-purple-500/10 border border-purple-500/30 text-purple-300 flex items-center gap-1.5 whitespace-nowrap shrink-0">
               <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-              <span className="font-bold truncate max-w-[120px] sm:max-w-[180px]">{activePersona.name}</span>
+              <span className="font-bold truncate max-w-[100px] sm:max-w-[160px]">{activePersona.name}</span>
             </span>
           </div>
 
           {/* Right: Actions, Unified Themes & System Status */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 overflow-x-auto custom-scrollbar">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0 overflow-x-auto custom-scrollbar">
             {/* Single Unified Theme & Style Button */}
             <button
               onClick={() => setIsThemeModalOpen(true)}
               className="text-xs px-2.5 py-1 rounded-lg bg-gradient-to-r from-purple-500/20 to-cyan-500/20 hover:from-purple-500/30 hover:to-cyan-500/30 border border-purple-500/40 text-purple-200 font-mono transition-all flex items-center gap-1.5 cursor-pointer font-bold shadow-sm whitespace-nowrap"
-              title="Galería de Estilos & Temas de Diseño"
+              title="Galería de Estilos & Diseñador de Temas"
             >
               <Palette className="w-3.5 h-3.5 text-purple-300 shrink-0" />
               <span className="hidden sm:inline">Estilos & Temas</span>
@@ -925,6 +956,13 @@ export default function App() {
           <span>Más</span>
         </button>
       </div>
+
+      {/* Persistent Universal Floating Quantum Voice Orb (Accessible Everywhere on Mobile & Desktop) */}
+      <FloatingQuantumVoiceOrb
+        activePersona={activePersona}
+        onSelectPersona={(id) => setActivePersonaId(id)}
+        onDirectConversationSpeech={(text) => handleSendMessage(text)}
+      />
     </div>
   );
 }

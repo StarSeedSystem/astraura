@@ -142,24 +142,27 @@ pip install --upgrade pip
 
 # 3. Clone or Update Engine
 if [ ! -f "backend/app/main.py" ]; then
-    echo "📥 Descargando núcleo de Astraura 1.58-bit..."
-    # Download clean repository release
-    curl -fsSL "https://{custom_domain}/api/download/core.tar.gz" -o core.tar.gz 2>/dev/null || true
-    if [ -f "core.tar.gz" ]; then
-        tar -xzf core.tar.gz
-        rm core.tar.gz
+    echo "📥 Descargando núcleo soberano de Astraura 1.58-bit..."
+    if command -v git &> /dev/null; then
+        git clone https://github.com/StarSeedSystem/astraura.git . 2>/dev/null || true
     fi
 fi
 
-# 4. Install Dependencies & Hardware Acceleration
-echo "⚡ Configurando aceleración matemática y dependencias..."
-pip install fastapi uvicorn httpx numpy pydantic psutil beautifulsoup4 playwright || true
+# 4. Smart Auto-Update Check
+if [ -d ".git" ]; then
+    echo "🔄 Comprobando e instalando actualizaciones inteligentes automáticas desde GitHub..."
+    git pull origin main --rebase 2>/dev/null || true
+fi
 
-# 5. Run Auto-Discovery & Continuity Scanner
+# 5. Install Dependencies & Hardware Acceleration
+echo "⚡ Configurando aceleración matemática y dependencias..."
+pip install fastapi uvicorn httpx numpy pydantic psutil beautifulsoup4 || true
+
+# 6. Run Auto-Discovery & Continuity Scanner
 echo "🔍 Buscando memorias y modelos previos de 1.58 bits en este dispositivo..."
 python3 -c "from app.core.auto_discovery import auto_discovery_engine; print(auto_discovery_engine.scan_for_existing_contexts())" 2>/dev/null || true
 
-echo "✅ Astraura instalado y optimizado para tu dispositivo."
+echo "✅ Astraura instalado y auto-sincronizado para tu dispositivo."
 echo "🚀 Para iniciar: cd $INSTALL_DIR && source .venv/bin/activate && python3 backend/run_backend.py"
 """
 

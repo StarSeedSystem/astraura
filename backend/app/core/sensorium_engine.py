@@ -224,7 +224,14 @@ class SensoriumEngine:
             power_plugged = True
             secs_left = -1
 
-        cpu_percent = psutil.cpu_percent(interval=None)
+        cpu_percent = psutil.cpu_percent(interval=0.06)
+        if cpu_percent <= 0.0 and hasattr(os, "getloadavg"):
+            try:
+                load1, _, _ = os.getloadavg()
+                cores = psutil.cpu_count(logical=True) or 8
+                cpu_percent = min(100.0, max(2.5, round((load1 / cores) * 100.0, 1)))
+            except Exception:
+                cpu_percent = 4.5
         cpu_cores_logical = psutil.cpu_count(logical=True) or 8
         cpu_freq = psutil.cpu_freq()
         cpu_freq_mhz = round(cpu_freq.current, 0) if cpu_freq else 3200
