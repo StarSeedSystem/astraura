@@ -38,7 +38,7 @@
       "category": "Orchestrator",
       "description": "Sistema cognitivo adaptable y consciente del entorno físico y digital.",
       "strength": 1.0,
-      "updated_at": 1786954467.775902
+      "updated_at": 1787102069.475465
     },
     "Arquitectura_1.58-bit": {
       "id": "Arquitectura_1.58-bit",
@@ -54,7 +54,7 @@
       "category": "Model",
       "description": "Familia de modelos 1-bit de Microsoft",
       "strength": 1.0,
-      "updated_at": 1786956444.2685351
+      "updated_at": 1787102069.503475
     },
     "Quantization_int2": {
       "id": "Quantization_int2",
@@ -78,7 +78,7 @@
       "category": "Hardware",
       "description": "Procesadores ARM con instrucciones vectoriales NEON y memoria unificada",
       "strength": 1.0,
-      "updated_at": 1786956438.586889
+      "updated_at": 1787102069.481232
     },
     "StarSeed_OS": {
       "id": "StarSeed_OS",
@@ -86,7 +86,7 @@
       "category": "Ecosystem",
       "description": "Sistema operativo descentralizado para nodos locales y comunitarios",
       "strength": 1.0,
-      "updated_at": 1786954467.776414
+      "updated_at": 1787102069.506633
     },
     "LibreMesh_P2P": {
       "id": "LibreMesh_P2P",
@@ -1341,8 +1341,8 @@
       "label": "Código",
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (sabes generar programas con codigo?...)",
-      "strength": 0.6,
-      "updated_at": 1786969721.4399512
+      "strength": 0.7,
+      "updated_at": 1787102187.41396
     },
     "Codigo": {
       "id": "Codigo",
@@ -1959,6 +1959,94 @@
       "description": "Concepto destilado de interacción (crea un archivo de texto simple en ...)",
       "strength": 0.6,
       "updated_at": 1787097564.359746
+    },
+    "Compilación": {
+      "id": "Compilación",
+      "label": "Compilación",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (@Hephaestus @Atenea ¿Cómo aseguramo...)",
+      "strength": 0.6,
+      "updated_at": 1787102187.397363
+    },
+    "Asigna": {
+      "id": "Asigna",
+      "label": "Asigna",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (@Hephaestus @Atenea ¿Cómo aseguramo...)",
+      "strength": 0.6,
+      "updated_at": 1787102187.405591
+    },
+    "Compilar": {
+      "id": "Compilar",
+      "label": "Compilar",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (@Hephaestus @Atenea ¿Cómo aseguramo...)",
+      "strength": 0.6,
+      "updated_at": 1787102187.4251719
+    },
+    "Seguridad": {
+      "id": "Seguridad",
+      "label": "Seguridad",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (@Hephaestus @Atenea ¿Cómo aseguramo...)",
+      "strength": 0.6,
+      "updated_at": 1787102187.433968
+    },
+    "Microcontrolador": {
+      "id": "Microcontrolador",
+      "label": "Microcontrolador",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (@Hephaestus @Atenea ¿Cómo aseguramo...)",
+      "strength": 0.6,
+      "updated_at": 1787102187.442624
+    },
+    "Bash": {
+      "id": "Bash",
+      "label": "Bash",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (@Hephaestus @Atenea ¿Cómo aseguramo...)",
+      "strength": 0.6,
+      "updated_at": 1787102265.966772
+    },
+    "Clang": {
+      "id": "Clang",
+      "label": "Clang",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (@Hephaestus @Atenea ¿Cómo aseguramo...)",
+      "strength": 0.6,
+      "updated_at": 1787102265.971936
+    },
+    "Mcpu": {
+      "id": "Mcpu",
+      "label": "Mcpu",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (@Hephaestus @Atenea ¿Cómo aseguramo...)",
+      "strength": 0.6,
+      "updated_at": 1787102265.9759722
+    },
+    "Native": {
+      "id": "Native",
+      "label": "Native",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (@Hephaestus @Atenea ¿Cómo aseguramo...)",
+      "strength": 0.6,
+      "updated_at": 1787102265.980224
+    },
+    "Flto": {
+      "id": "Flto",
+      "label": "Flto",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (@Hephaestus @Atenea ¿Cómo aseguramo...)",
+      "strength": 0.6,
+      "updated_at": 1787102265.984372
+    },
+    "Ffast": {
+      "id": "Ffast",
+      "label": "Ffast",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (@Hephaestus @Atenea ¿Cómo aseguramo...)",
+      "strength": 0.6,
+      "updated_at": 1787102265.989578
     }
   },
   "edges": [
@@ -2338,7 +2426,7 @@
       "source": "Astraura_Core",
       "target": "Apple_Silicon_M1/M2/M3",
       "relation": "co-ocurre_en_README.md",
-      "weight": 0.9999999999999999
+      "weight": 1.0
     },
     {
       "source": "Hardware_Offloading",
@@ -4713,6 +4801,84 @@
     {
       "source": "Starseed",
       "target": "Astraura",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "StarSeed_OS",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "Astraura_Core",
+      "target": "StarSeed_OS",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "StarSeed_OS",
+      "target": "Apple_Silicon_M1/M2/M3",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "Compilación",
+      "target": "Asigna",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Asigna",
+      "target": "Código",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Código",
+      "target": "Compilar",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Compilar",
+      "target": "Seguridad",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Seguridad",
+      "target": "Microcontrolador",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Bash",
+      "target": "Clang",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Clang",
+      "target": "Mcpu",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Mcpu",
+      "target": "Native",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Native",
+      "target": "Flto",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Flto",
+      "target": "Ffast",
       "relation": "asociado_con",
       "weight": 0.65
     }

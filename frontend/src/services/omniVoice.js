@@ -206,12 +206,16 @@ class OmniVoiceEngine {
     // Voice Selection
     const esVoices = this.getSpanishVoices();
     const targetVoiceId = options.voice_speaker || options.voice_id || options.voiceURI || options.native_voice_id;
-    if (targetVoiceId) {
+    if (targetVoiceId && this.availableVoices.length > 0) {
       const found = this.availableVoices.find(v => 
         v.voiceURI === targetVoiceId || 
         v.name.toLowerCase().includes(targetVoiceId.toLowerCase())
       );
-      if (found) utterance.voice = found;
+      if (found) {
+        utterance.voice = found;
+      } else if (esVoices.length > 0) {
+        utterance.voice = esVoices[0];
+      }
     } else if (esVoices.length > 0) {
       utterance.voice = esVoices[0];
     }
@@ -239,7 +243,141 @@ class OmniVoiceEngine {
     }
 
     this.currentUtterance = utterance;
-    this.synth.speak(utterance);
+    try {
+      this.synth.cancel();
+      this.synth.resume();
+      this.synth.speak(utterance);
+    } catch (e) {
+      console.warn('Speech synthesis trigger notice:', e);
+    }
+  }
+
+  /**
+   * Parses multi-personality responses into distinct speaker blocks.
+   */
+  parseMultiPersonalitySegments(fullText) {
+    if (!fullText) return [];
+    
+    // Check for headers like ### [Hephaestus]: or ### ⚡ [Hephaestus]: or **Hephaestus:**
+    const headerRegex = /(?:###\s*(?:[^\n\[]*\[)?([a-zA-ZáéíóúñÁÉÍÓÚÑ\s/]+)\]?:\s*|\*\*([a-zA-ZáéíóúñÁÉÍÓÚÑ\s/]+)\*\*:\s*)/gi;
+    
+    const segments = [];
+    let lastIndex = 0;
+    let match;
+    let currentSpeaker = "Astraura Prime";
+
+    // Known persona mappings
+    const personaMap = {
+      'hephaestus': { id: 'hephaestus', name: 'Hephaestus', voiceId: 'es-ES-AlvaroNeural', pitch: 0.82, rate: 1.05, color: '#f59e0b', icon: 'Cpu' },
+      'hefestos': { id: 'hephaestus', name: 'Hephaestus', voiceId: 'es-ES-AlvaroNeural', pitch: 0.82, rate: 1.05, color: '#f59e0b', icon: 'Cpu' },
+      'hermione': { id: 'hermione', name: 'Hermione', voiceId: 'es-ES-AbrilNeural', pitch: 1.08, rate: 1.15, color: '#38bdf8', icon: 'Compass' },
+      'atenea': { id: 'atenea', name: 'Atenea', voiceId: 'es-ES-RaquelNeural', pitch: 1.12, rate: 1.02, color: '#8b5cf6', icon: 'Shield' },
+      'athena': { id: 'atenea', name: 'Atenea', voiceId: 'es-ES-RaquelNeural', pitch: 1.12, rate: 1.02, color: '#8b5cf6', icon: 'Shield' },
+      'hermes': { id: 'hermes', name: 'Hermes', voiceId: 'es-ES-JorgeNeural', pitch: 1.15, rate: 1.18, color: '#10b981', icon: 'Globe' },
+      'oneiros': { id: 'oneiros', name: 'Oneiros', voiceId: 'es-ES-ArnauNeural', pitch: 0.92, rate: 0.95, color: '#ec4899', icon: 'Flame' },
+      'mnemosyne': { id: 'mnemosyne', name: 'Mnemosyne', voiceId: 'es-ES-PalomaNeural', pitch: 0.95, rate: 0.96, color: '#a855f7', icon: 'Brain' },
+      'logos': { id: 'logos', name: 'Logos', voiceId: 'es-ES-NilNeural', pitch: 0.98, rate: 1.05, color: '#3b82f6', icon: 'Terminal' },
+      'kallisti': { id: 'kallisti', name: 'Kallisti', voiceId: 'es-ES-TrianaNeural', pitch: 1.18, rate: 1.1, color: '#ec4899', icon: 'Sparkles' },
+      'astraura prime': { id: 'astraura_prime', name: 'Astraura Prime', voiceId: 'es-ES-ElviraNeural', pitch: 1.04, rate: 1.02, color: '#00f0ff', icon: 'Zap' },
+      'genesis': { id: 'astraura_prime', name: 'Génesis', voiceId: 'es-ES-ElviraNeural', pitch: 1.04, rate: 1.02, color: '#00f0ff', icon: 'Zap' },
+      'génesis': { id: 'astraura_prime', name: 'Génesis', voiceId: 'es-ES-ElviraNeural', pitch: 1.04, rate: 1.02, color: '#00f0ff', icon: 'Zap' },
+      'síntesis coral': { id: 'astraura_prime', name: 'Síntesis Coral 1.58b', voiceId: 'es-ES-ElviraNeural', pitch: 1.0, rate: 1.04, color: '#00f0ff', icon: 'Sparkles' },
+      'sintesis coral': { id: 'astraura_prime', name: 'Síntesis Coral 1.58b', voiceId: 'es-ES-ElviraNeural', pitch: 1.0, rate: 1.04, color: '#00f0ff', icon: 'Sparkles' }
+    };
+
+    while ((match = headerRegex.exec(fullText)) !== null) {
+      if (match.index > lastIndex) {
+        const chunkText = fullText.slice(lastIndex, match.index).trim();
+        if (chunkText.length > 0) {
+          const rawSpeakerKey = currentSpeaker.toLowerCase().trim();
+          let matchedPersona = personaMap['astraura prime'];
+          for (const [k, p] of Object.entries(personaMap)) {
+            if (rawSpeakerKey.includes(k)) {
+              matchedPersona = p;
+              break;
+            }
+          }
+          segments.push({
+            speaker: currentSpeaker,
+            persona: matchedPersona,
+            text: chunkText
+          });
+        }
+      }
+      currentSpeaker = (match[1] || match[2] || "").trim();
+      lastIndex = headerRegex.lastIndex;
+    }
+
+    if (lastIndex < fullText.length) {
+      const remainingText = fullText.slice(lastIndex).trim();
+      if (remainingText.length > 0) {
+        const rawSpeakerKey = currentSpeaker.toLowerCase().trim();
+        let matchedPersona = personaMap['astraura prime'];
+        for (const [k, p] of Object.entries(personaMap)) {
+          if (rawSpeakerKey.includes(k)) {
+            matchedPersona = p;
+            break;
+          }
+        }
+        segments.push({
+          speaker: currentSpeaker,
+          persona: matchedPersona,
+          text: remainingText
+        });
+      }
+    }
+
+    return segments.length > 0 ? segments : [{
+      speaker: 'Astraura Prime',
+      persona: personaMap['astraura prime'],
+      text: fullText
+    }];
+  }
+
+  /**
+   * Sequentially speaks a multi-personality response with each persona's unique voice profile!
+   */
+  speakMultiPersonalityDialogue(fullText, onSegmentStart = null, onSegmentEnd = null, onAllEnd = null) {
+    this.stopSpeaking();
+    const segments = this.parseMultiPersonalitySegments(fullText);
+    if (!segments || segments.length === 0) {
+      if (onAllEnd) onAllEnd();
+      return;
+    }
+
+    let currentIndex = 0;
+
+    const playNext = () => {
+      if (currentIndex >= segments.length) {
+        this.isSpeaking = false;
+        if (onAllEnd) onAllEnd();
+        return;
+      }
+
+      const seg = segments[currentIndex];
+      if (onSegmentStart) onSegmentStart(seg, currentIndex);
+
+      this.speak(
+        seg.text,
+        {
+          voice_id: seg.persona?.voiceId || 'es-ES-ElviraNeural',
+          pitch: seg.persona?.pitch || 1.0,
+          rate: seg.persona?.rate || 1.02,
+          volume: 1.0
+        },
+        () => {
+          this.isSpeaking = true;
+        },
+        () => {
+          if (onSegmentEnd) onSegmentEnd(seg, currentIndex);
+          currentIndex++;
+          // Brief dynamic pause between speakers
+          setTimeout(playNext, 250);
+        }
+      );
+    };
+
+    playNext();
   }
 
   stopSpeaking() {
@@ -251,10 +389,12 @@ class OmniVoiceEngine {
       this.currentAudioElement = null;
     }
     if (this.synth) {
-      this.synth.cancel();
-      this.currentUtterance = null;
+      try {
+        this.synth.cancel();
+      } catch {}
     }
     this.isSpeaking = false;
+    this.currentUtterance = null;
   }
 
   startListening(onInterim, onFinal, onError) {

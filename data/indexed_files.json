@@ -2,7 +2,7 @@
   "Cuantizacio\u0301n vs. Offloading en IA.pdf": "4bb825054df6631280422d050cac0fe97593a3521cf84f3bf3265fd501998fb7",
   "Potencial y Desaf\u00edos del 1.58 Bits.pdf": "7a11fcd895abeb34f3beaf268a8b1452cb246d26f9ba09244990a5d177767ad0",
   "backend/requirements.txt": "0968626878def85268d2465747c7fc128005c86310410c7f1f7e914b4dc5d8f0",
-  "README.md": "498a7fd658e69cee7f2d71e46060a28d7543a032035cf640785dd2be63b39a77",
+  "README.md": "6b6e8ec034bf28b52b4932c72f7bce601a3d5a75d46f40750a243f6bc3915a26",
   "backend/BitNet/CODE_OF_CONDUCT.md": "9daeae709a0bd71bcfd1c96dc5822ecec5210327eff929da64b0ae7f8faf1444",
   "backend/BitNet/CMakeLists.txt": "4b765c5adeb82b9fa0275361804c3e99a8ac246802ba4031e0c144d2c20fc4bb",
   "backend/BitNet/requirements.txt": "34bce77b06863c8cf28e66f08f744c8178f7f8463a55245c3710ae319160097b",
@@ -326,5 +326,18 @@
   "backend/BitNet/src/CMakeLists.txt": "d090a2d795ca90aa8b008126e52cc6354a5d094687603ae77ed6fcbd6acf60dc",
   "backend/BitNet/src/README.md": "f21aed4c39c279e2846ec5ffa62f6a6c1a33221fe86b2fbd78239e2d2d6a6a40",
   "deploy/vercel-app/.vercel/README.txt": "f5d1ed0f5032ae128931f46459b5faa1af6319fc2dfb3e7a5fe54a84bf93dbd6",
-  "frontend/.vercel/README.txt": "f5d1ed0f5032ae128931f46459b5faa1af6319fc2dfb3e7a5fe54a84bf93dbd6"
+  "frontend/.vercel/README.txt": "f5d1ed0f5032ae128931f46459b5faa1af6319fc2dfb3e7a5fe54a84bf93dbd6",
+  "backend/app/core/needle_src/README.md": "0fcc482d59f16ea12ce66bb5bc78b3c89165f69f5b0813802fb10b8d4855d3c4",
+  "backend/app/core/needle_src/host/CMakeLists.txt": "881c5cf0a4854c95d31727931d604450f37c3022d4d1af2b916facf987de5ef7",
+  "backend/app/core/needle_src/esp32/needle_demo/CMakeLists.txt": "3f0ea8cc9f1160f7e2d71f672257a89b7ebb5aabbcc49ffb28d081514acda09a",
+  "backend/app/core/needle_src/esp32/needle_demo/main/CMakeLists.txt": "ed08db0259b8526ea62c929db15d66d10d1cf8c4e2c917434b8d6ebab9d059e8",
+  "backend/app/core/needle_src/esp32/psram_test/CMakeLists.txt": "2deff1df49bb442ca311ffff2311487a69f7aa88eecd0e1e036cf2990ab50a4c",
+  "backend/app/core/needle_src/esp32/psram_test/main/CMakeLists.txt": "978a4e027e1ceaa8e33262b241a000c373e1e7c35fe188fbb27443fc20dfb9fd",
+  "backend/app/core/needle_src/esp32/led_probe/CMakeLists.txt": "252818f210c93a220b98be736ba4c1aa146616792c50e263655f1846dda323be",
+  "backend/app/core/needle_src/esp32/led_probe/main/CMakeLists.txt": "fdeaad85692a0656a4591c8da0b44ca2dd62b401f0e09d75db90388ece920b45",
+  "backend/app/core/needle_src/build/CMakeCache.txt": "b89a70fddd77206865a5f97c9e1966bad1e0d78135b06651bd48e68078e44726",
+  "backend/app/core/needle_src/build/CMakeFiles/TargetDirectories.txt": "4f3ecaafe474e5b1f742ab6822e07ad7e7ad7bb70b2024c6f7392019b5822525",
+  "backend/app/core/needle_src/build/CMakeFiles/needle_engine.dir/link.txt": "347dfb0a27c111f2586cfa367acc6244dfef9926e15610c2ce4af7cfc76bb939",
+  "backend/app/core/needle_src/build/CMakeFiles/nd_dump.dir/link.txt": "2311086ee66c46f7512a41903aaa2155a42ae28c71f3e9a8f0d1df31596978b5",
+  "backend/app/core/needle_src/build/CMakeFiles/nd_gtest.dir/link.txt": "01a3b6e34fab2794b5279213d7daa0df4afa87d1388b11e03cad5b906df39796"
 }

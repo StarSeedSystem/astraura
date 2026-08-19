@@ -1,0 +1,25 @@
+[
+  {
+    "name": "set_servo",
+    "description": "Rotate a servo motor on a specific PWM channel",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "degrees": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 180
+        }
+      },
+      "required": [
+        "channel",
+        "degrees"
+      ]
+    }
+  }
+]

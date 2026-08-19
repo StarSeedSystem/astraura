@@ -540,6 +540,14 @@ class PersonalityEngine:
                 all_personas.append(c)
         return all_personas
 
+    def get_all_profiles(self) -> List[Dict[str, Any]]:
+        """Alias for list_personalities."""
+        return self.list_personalities()
+
+    @property
+    def active_personality_id(self) -> str:
+        return self.get_active_persona().get("id", "astraura_prime")
+
     def get_active_persona(self) -> Dict[str, Any]:
         active_id = "astraura_prime"
         try:

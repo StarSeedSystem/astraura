@@ -1,0 +1,23 @@
+[
+  {
+    "name": "set_relay",
+    "description": "Switch a physical power relay on or off",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "relay_id": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "state": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "relay_id",
+        "state"
+      ]
+    }
+  }
+]

@@ -1637,6 +1637,7 @@ async def get_bitnet_status():
 class ChatRequest(BaseModel):
     prompt: str
     system_prompt: Optional[str] = ""
+    preferences: Optional[Dict[str, Any]] = None
 
 @app.post("/api/chat")
 async def chat_endpoint(req: ChatRequest):
@@ -1644,11 +1645,11 @@ async def chat_endpoint(req: ChatRequest):
     agent_traces = []
     tool_executions = []
     branching_plan = None
-    async for event in orchestrator.generate_response_stream(req.prompt, req.system_prompt):
+    async for event in orchestrator.generate_response_stream(req.prompt, req.system_prompt, preferences=req.preferences):
         if event["type"] == "branching_plan":
             branching_plan = event.get("plan")
         elif event["type"] == "agent_traces":
-            agent_traces = event["traces"]
+            agent_traces = event.get("traces", [])
             tool_executions = event.get("tool_executions", [])
         elif event["type"] == "token":
             tokens.append(event["token"])
@@ -1662,7 +1663,7 @@ async def chat_endpoint(req: ChatRequest):
 @app.post("/api/chat/stream")
 async def chat_stream_endpoint(req: ChatRequest):
     async def sse_generator():
-        async for event in orchestrator.generate_response_stream(req.prompt, req.system_prompt):
+        async for event in orchestrator.generate_response_stream(req.prompt, req.system_prompt, preferences=req.preferences):
             yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
     return StreamingResponse(sse_generator(), media_type="text/event-stream")
 

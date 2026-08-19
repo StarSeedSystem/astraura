@@ -33,7 +33,13 @@ import {
   Compass,
   SlidersHorizontal,
   Clock,
-  Gauge
+  Gauge,
+  Shield,
+  Flame,
+  Radio,
+  Play,
+  Pause,
+  Users
 } from 'lucide-react';
 import MultimodalMessageRenderer from './MultimodalMessageRenderer';
 import ChatHistoryDrawer from './ChatHistoryDrawer';
@@ -41,6 +47,7 @@ import MessagePreferencesModal, { RESPONSE_STYLES } from './MessagePreferencesMo
 import ParallelAgentBranchingTree from './ParallelAgentBranchingTree';
 import { omniVoice } from '../services/omniVoice';
 import { uploadChatAttachment } from '../services/api';
+import { PRESET_PERSONALITIES } from './PersonalitiesView';
 
 export default function ChatInterface({
   messages,
@@ -57,6 +64,8 @@ export default function ChatInterface({
   onOpenExplorer,
   activePersona,
   onOpenPersonalities,
+  onSelectPersona,
+  personalities = PRESET_PERSONALITIES,
   sessions,
   activeSessionId,
   folders,
@@ -70,50 +79,36 @@ export default function ChatInterface({
   const [showThinking, setShowThinking] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
   const [speakingMessageId, setSpeakingMessageId] = useState(null);
+  const [currentlySpeakingSegment, setCurrentlySpeakingSegment] = useState(null);
   const [showHistoryDrawer, setShowHistoryDrawer] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState([]);
   const [isUploadingAttachment, setIsUploadingAttachment] = useState(false);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [showVoiceSettings, setShowVoiceSettings] = useState(false);
   const [isMsgPrefsOpen, setIsMsgPrefsOpen] = useState(false);
+
+  // Live Conversational Voice State (Full-Duplex / Vibrational 1.58b)
   const [isFullDuplexVoiceActive, setIsFullDuplexVoiceActive] = useState(false);
   const [duplexVoiceStatus, setDuplexVoiceStatus] = useState('idle'); // 'idle' | 'listening' | 'user_speaking' | 'thinking' | 'speaking'
   const [duplexLiveTranscript, setDuplexLiveTranscript] = useState('');
+  const [activeSpeakingPersona, setActiveSpeakingPersona] = useState(null);
 
-  // Full-Duplex Conversational Voice Toggle (Vibrational / Continuous 1.58b Dialogue)
-  const toggleFullDuplexConversation = () => {
-    if (isFullDuplexVoiceActive) {
-      omniVoice.stopFullDuplexConversation();
-      setIsFullDuplexVoiceActive(false);
-      setDuplexVoiceStatus('idle');
-      setDuplexLiveTranscript('');
-      return;
-    }
+  // Active Multi-Personality Selection (for group dialogues & coral synthesis)
+  const [selectedPersonaIds, setSelectedPersonaIds] = useState(() => {
+    return [activePersona?.id || 'astraura_prime'];
+  });
+  const [multiResponseMode, setMultiResponseMode] = useState('auto'); // 'single' | 'multi_dialogue' | 'coral_synthesis' | 'auto'
 
-    setIsFullDuplexVoiceActive(true);
-    setDuplexVoiceStatus('listening');
-
-    omniVoice.startFullDuplexConversation({
-      personaId: activePersona?.id || 'astraura_prime',
-      voiceProfile: activePersona?.voice_profile || {},
-      allowInterrupt: true,
-      onStateChange: (st) => setDuplexVoiceStatus(st),
-      onUserSpeech: (transcript) => {
-        setDuplexLiveTranscript(transcript);
-        onSendMessage(transcript, msgPreferences);
-      },
-      onAiSpeakingStart: () => setDuplexVoiceStatus('speaking'),
-      onAiSpeakingEnd: () => setDuplexVoiceStatus('listening')
-    });
-  };
-
+  // Sync with activePersona prop
   useEffect(() => {
-    return () => {
-      if (isFullDuplexVoiceActive) {
-        omniVoice.stopFullDuplexConversation();
-      }
-    };
-  }, [isFullDuplexVoiceActive]);
+    if (activePersona?.id) {
+      setSelectedPersonaIds((prev) => {
+        if (prev.length <= 1) return [activePersona.id];
+        if (!prev.includes(activePersona.id)) return [activePersona.id, ...prev.slice(0, 3)];
+        return prev;
+      });
+    }
+  }, [activePersona]);
 
   // Message Preferences State
   const [msgPreferences, setMsgPreferences] = useState(() => {
@@ -123,6 +118,8 @@ export default function ChatInterface({
     } catch {}
     return {
       personaId: activePersona?.id || 'astraura_prime',
+      selected_personalities: [activePersona?.id || 'astraura_prime'],
+      multi_personality_mode: 'auto',
       brainId: 'brain_genesis',
       responseStyle: 'analytical',
       maxLengthChars: 4000,
@@ -136,36 +133,90 @@ export default function ChatInterface({
   });
 
   useEffect(() => {
+    const updated = {
+      ...msgPreferences,
+      personaId: selectedPersonaIds[0] || 'astraura_prime',
+      selected_personalities: selectedPersonaIds,
+      multi_personality_mode: selectedPersonaIds.length > 1 ? (multiResponseMode === 'single' ? 'multi_dialogue' : multiResponseMode) : 'single'
+    };
+    setMsgPreferences(updated);
     try {
-      localStorage.setItem('astraura_msg_preferences', JSON.stringify(msgPreferences));
+      localStorage.setItem('astraura_msg_preferences', JSON.stringify(updated));
     } catch {}
-  }, [msgPreferences]);
+  }, [selectedPersonaIds, multiResponseMode]);
+
+  // Toggle Persona in the active conversation tray
+  const handleTogglePersona = (pId) => {
+    setSelectedPersonaIds((prev) => {
+      let next;
+      if (prev.includes(pId)) {
+        next = prev.filter((id) => id !== pId);
+        if (next.length === 0) next = [pId];
+      } else {
+        next = [...prev, pId];
+      }
+      if (onSelectPersona && next[0]) {
+        onSelectPersona(next[0]);
+      }
+      return next;
+    });
+  };
+
+  // Full-Duplex Conversational Voice Toggle
+  const toggleFullDuplexConversation = () => {
+    if (isFullDuplexVoiceActive) {
+      omniVoice.stopFullDuplexConversation();
+      setIsFullDuplexVoiceActive(false);
+      setDuplexVoiceStatus('idle');
+      setDuplexLiveTranscript('');
+      setActiveSpeakingPersona(null);
+      return;
+    }
+
+    setIsFullDuplexVoiceActive(true);
+    setDuplexVoiceStatus('listening');
+
+    omniVoice.startFullDuplexConversation({
+      personaId: activePersona?.id || 'astraura_prime',
+      voiceProfile: activePersona?.voice_profile || {},
+      allowInterrupt: true,
+      onStateChange: (st) => setDuplexVoiceStatus(st),
+      onUserSpeech: (transcript) => {
+        setDuplexLiveTranscript(transcript);
+        onSendMessage(transcript, {
+          ...msgPreferences,
+          selected_personalities: selectedPersonaIds,
+          multi_personality_mode: selectedPersonaIds.length > 1 ? 'multi_dialogue' : 'single'
+        });
+      },
+      onAiSpeakingStart: () => setDuplexVoiceStatus('speaking'),
+      onAiSpeakingEnd: () => {
+        setDuplexVoiceStatus('listening');
+        setActiveSpeakingPersona(null);
+      }
+    });
+  };
+
+  // Auto-speak response in Live Conversation mode when generation finishes
+  const prevStreamingRef = useRef(isStreaming);
+  useEffect(() => {
+    if (prevStreamingRef.current && !isStreaming && isFullDuplexVoiceActive) {
+      const lastMsg = messages[messages.length - 1];
+      if (lastMsg && lastMsg.sender === 'ai' && lastMsg.text) {
+        handleSpeakMultiVoice(lastMsg.id, lastMsg.text);
+      }
+    }
+    prevStreamingRef.current = isStreaming;
+  }, [isStreaming, isFullDuplexVoiceActive, messages]);
 
   useEffect(() => {
-    if (activePersona?.id) {
-      setMsgPreferences(prev => ({ ...prev, personaId: activePersona.id }));
-    }
-  }, [activePersona]);
-
-  const [voiceSettings, setVoiceSettings] = useState({
-    pitch: 1.0,
-    rate: 1.05,
-    volume: 1.0,
-    voiceURI: ''
-  });
-
-  useEffect(() => {
-    if (activePersona?.voice_profile) {
-      setVoiceSettings({
-        pitch: activePersona.voice_profile.pitch || 1.0,
-        rate: activePersona.voice_profile.rate || 1.05,
-        volume: activePersona.voice_profile.volume || 1.0,
-        voiceURI: activePersona.voice_profile.voice_id || '',
-        toneShift: activePersona.voice_profile.tone_shift || 0.0,
-        traits: activePersona.traits || {}
-      });
-    }
-  }, [activePersona]);
+    return () => {
+      if (isFullDuplexVoiceActive) {
+        omniVoice.stopFullDuplexConversation();
+      }
+      omniVoice.stopSpeaking();
+    };
+  }, [isFullDuplexVoiceActive]);
 
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -198,7 +249,6 @@ export default function ChatInterface({
           }
         ]);
       } catch (err) {
-        // Fallback in-browser text reader if backend offline
         const reader = new FileReader();
         reader.onload = (e) => {
           setAttachedFiles((prev) => [
@@ -235,12 +285,16 @@ export default function ChatInterface({
       fullPrompt = fullPrompt ? `${fullPrompt}\n${attachSummary}` : `Por favor analiza el siguiente archivo adjunto:\n${attachSummary}`;
     }
 
-    onSendMessage(fullPrompt, msgPreferences);
+    onSendMessage(fullPrompt, {
+      ...msgPreferences,
+      selected_personalities: selectedPersonaIds,
+      multi_personality_mode: selectedPersonaIds.length > 1 ? (multiResponseMode === 'single' ? 'multi_dialogue' : multiResponseMode) : 'single'
+    });
     setInputText('');
     setAttachedFiles([]);
   };
 
-  // OmniVoice STT Mic Toggle
+  // Simple Mic Dictation Toggle (S2T)
   const handleVoiceToggle = () => {
     if (isRecording) {
       omniVoice.stopListening();
@@ -250,9 +304,7 @@ export default function ChatInterface({
 
     setIsRecording(true);
     omniVoice.startListening(
-      (interim) => {
-        // interim speech feedback
-      },
+      (interim) => {},
       (final) => {
         setInputText((prev) => (prev ? `${prev} ${final}` : final));
         setIsRecording(false);
@@ -263,20 +315,29 @@ export default function ChatInterface({
     );
   };
 
-  // OmniVoice TTS Speak Message
-  const handleSpeakText = (msgId, text) => {
+  // Multi-Voice Sequential Reproduction for messages
+  const handleSpeakMultiVoice = (msgId, text) => {
     if (speakingMessageId === msgId) {
       omniVoice.stopSpeaking();
       setSpeakingMessageId(null);
+      setCurrentlySpeakingSegment(null);
+      setActiveSpeakingPersona(null);
       return;
     }
 
     setSpeakingMessageId(msgId);
-    omniVoice.speak(
+    omniVoice.speakMultiPersonalityDialogue(
       text,
-      voiceSettings,
-      () => setSpeakingMessageId(msgId),
-      () => setSpeakingMessageId(null)
+      (seg, idx) => {
+        setCurrentlySpeakingSegment({ msgId, speaker: seg.speaker, persona: seg.persona, index: idx });
+        setActiveSpeakingPersona(seg.persona);
+      },
+      (seg, idx) => {},
+      () => {
+        setSpeakingMessageId(null);
+        setCurrentlySpeakingSegment(null);
+        setActiveSpeakingPersona(null);
+      }
     );
   };
 
@@ -329,8 +390,9 @@ export default function ChatInterface({
 
       {/* Main Chat Workspace */}
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
-        {/* Chat Header Bar */}
-        <div className="px-4 py-3 bg-[#0d1017] border-b border-white/10 flex items-center justify-between gap-3 z-10">
+        
+        {/* TOP BAR: Chat Controls, History & Live Voice Mode */}
+        <div className="px-3 sm:px-4 py-2.5 bg-[#0d1017] border-b border-white/10 flex items-center justify-between gap-2 z-10">
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowHistoryDrawer(!showHistoryDrawer)}
@@ -345,30 +407,27 @@ export default function ChatInterface({
               <span className="hidden sm:inline">Historial</span>
             </button>
 
-            {activePersona && (
-              <button
-                onClick={onOpenPersonalities}
-                className="px-3 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-purple-300 text-xs font-semibold flex items-center gap-1.5 transition-colors"
-                title="Cambiar personalidad"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span className="truncate max-w-[120px] sm:max-w-none">{activePersona.name}</span>
-              </button>
-            )}
+            {/* LIVE NATURAL VOICE CONVERSATION BUTTON (Primary Prominent Control) */}
+            <button
+              onClick={toggleFullDuplexConversation}
+              className={`px-3 py-1.5 rounded-xl border text-xs font-bold font-mono flex items-center gap-2 transition-all shadow-md ${
+                isFullDuplexVoiceActive
+                  ? 'bg-gradient-to-r from-purple-600/40 via-cyan-600/40 to-blue-600/40 border-cyan-400 text-cyan-200 ring-2 ring-cyan-500/30 animate-pulse'
+                  : 'bg-gradient-to-r from-purple-500/15 to-cyan-500/15 hover:from-purple-500/25 hover:to-cyan-500/25 border-purple-500/40 text-purple-300 hover:text-white'
+              }`}
+              title="Activar / Desactivar Conversación de Voz Continua 1.58b"
+            >
+              <Radio className={`w-3.5 h-3.5 ${isFullDuplexVoiceActive ? 'text-cyan-300 animate-spin' : 'text-purple-400'}`} />
+              <span className="hidden md:inline">
+                {isFullDuplexVoiceActive ? '🎙️ Voz en Vivo: ACTIVA' : '🎙️ Iniciar Charla de Voz en Vivo'}
+              </span>
+              <span className="md:hidden">
+                {isFullDuplexVoiceActive ? '🎙️ Voz Activa' : '🎙️ Voz'}
+              </span>
+            </button>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowVoiceSettings(!showVoiceSettings)}
-              className={`p-1.5 rounded-lg border text-xs flex items-center gap-1 transition-colors ${
-                showVoiceSettings ? 'bg-pink-500/20 text-pink-300 border-pink-500/40' : 'bg-white/5 text-slate-400 border-white/5'
-              }`}
-              title="Ajustes de Voz OmniVoice"
-            >
-              <Volume2 className="w-4 h-4" />
-              <span className="hidden md:inline font-mono text-[11px]">OmniVoice</span>
-            </button>
-
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => setShowThinking(!showThinking)}
               className="text-[11px] font-mono px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-slate-200 border border-white/5 flex items-center gap-1"
@@ -379,84 +438,144 @@ export default function ChatInterface({
           </div>
         </div>
 
-        {/* OmniVoice Quick Settings Floating Card */}
-        {showVoiceSettings && (
-          <div className="absolute top-14 right-4 z-30 p-3.5 bg-[#0a0d15]/95 backdrop-blur-xl border border-pink-500/30 rounded-2xl shadow-2xl space-y-2.5 w-72 text-xs">
-            <div className="flex items-center justify-between pb-1.5 border-b border-white/10">
-              <span className="font-bold text-white flex items-center gap-1.5 font-mono">
-                <Volume2 className="w-4 h-4 text-pink-400" />
-                Voz Nativa OmniVoice
+        {/* MULTI-PERSONALITY CONVOCATORIA & LIVE VOICE TRAY */}
+        <div className="px-3 sm:px-4 py-2 bg-[#090c14] border-b border-white/5 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+          <div className="flex items-center gap-1.5 overflow-x-auto custom-scrollbar py-0.5 max-w-full">
+            <span className="text-[10px] text-slate-400 uppercase font-bold flex items-center gap-1 mr-1 shrink-0">
+              <Users className="w-3 h-3 text-purple-400" />
+              <span>Entidades en Diálogo:</span>
+            </span>
+
+            {personalities.map((p) => {
+              const isActive = selectedPersonaIds.includes(p.id);
+              const isCurrentlyTalking = activeSpeakingPersona?.id === p.id;
+
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => handleTogglePersona(p.id)}
+                  className={`px-2 py-1 rounded-lg border text-[11px] flex items-center gap-1.5 transition-all shrink-0 ${
+                    isCurrentlyTalking
+                      ? 'bg-cyan-500/30 border-cyan-400 text-white font-bold ring-2 ring-cyan-400/50 animate-pulse'
+                      : isActive
+                      ? 'bg-purple-500/20 border-purple-500/50 text-purple-200 font-bold shadow-sm'
+                      : 'bg-white/5 border-white/5 text-slate-400 hover:text-slate-200 hover:bg-white/10'
+                  }`}
+                  title={`${p.name} (${p.title || 'Arquetipo'})\nClick para sumar/quitar de la conversación.`}
+                >
+                  <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-cyan-400' : 'bg-slate-600'}`} />
+                  <span>{p.name.split(' ')[0]}</span>
+                  {isCurrentlyTalking && <Volume2 className="w-3 h-3 text-cyan-300 animate-bounce" />}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Mode Badge / Selector */}
+          <div className="flex items-center gap-1 shrink-0">
+            {selectedPersonaIds.length > 1 && (
+              <span className="px-2 py-0.5 rounded bg-purple-500/25 border border-purple-500/40 text-[10px] text-purple-300 font-bold flex items-center gap-1">
+                <Sparkles className="w-2.5 h-2.5 text-cyan-400" />
+                Coral ({selectedPersonaIds.length})
               </span>
-              <button onClick={() => setShowVoiceSettings(false)} className="text-slate-400 hover:text-white">
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-            <div>
-              <label className="text-[10px] text-slate-400 font-mono block mb-1">Voz del Dispositivo</label>
-              <select
-                value={voiceSettings.voiceURI}
-                onChange={(e) => setVoiceSettings({ ...voiceSettings, voiceURI: e.target.value })}
-                className="w-full p-1.5 rounded-lg bg-black/60 border border-white/10 text-[11px] text-white"
-              >
-                <option value="">Predeterminada del Sistema</option>
-                {omniVoice.getVoices().map((v, i) => (
-                  <option key={i} value={v.voiceURI}>{v.name} ({v.lang})</option>
-                ))}
-              </select>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="text-[10px] text-slate-400 font-mono block">Tono: {voiceSettings.pitch}x</label>
-                <input
-                  type="range"
-                  min="0.5"
-                  max="2.0"
-                  step="0.1"
-                  value={voiceSettings.pitch}
-                  onChange={(e) => setVoiceSettings({ ...voiceSettings, pitch: parseFloat(e.target.value) })}
-                  className="w-full accent-pink-400"
-                />
+            )}
+            <button
+              onClick={() => setIsMsgPrefsOpen(true)}
+              className="p-1 rounded bg-white/5 hover:bg-white/10 text-slate-400 hover:text-cyan-300"
+              title="Ajustes de mensaje y personalidades"
+            >
+              <SlidersHorizontal className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+
+        {/* LIVE FULL-DUPLEX HUD / SPEECH FEEDBACK BANNER */}
+        {isFullDuplexVoiceActive && (
+          <div className="px-4 py-2 bg-gradient-to-r from-purple-950/60 via-cyan-950/50 to-blue-950/60 border-b border-cyan-500/30 flex items-center justify-between text-xs animate-fade-in z-20">
+            <div className="flex items-center gap-3">
+              <div className="relative flex items-center justify-center">
+                <span className="absolute inline-flex h-4 w-4 rounded-full bg-cyan-400 opacity-75 animate-ping" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-400" />
               </div>
+
               <div>
-                <label className="text-[10px] text-slate-400 font-mono block">Velocidad: {voiceSettings.rate}x</label>
-                <input
-                  type="range"
-                  min="0.5"
-                  max="2.0"
-                  step="0.05"
-                  value={voiceSettings.rate}
-                  onChange={(e) => setVoiceSettings({ ...voiceSettings, rate: parseFloat(e.target.value) })}
-                  className="w-full accent-pink-400"
-                />
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-white font-mono text-xs">
+                    {duplexVoiceStatus === 'listening' ? '🎧 Escuchando tu voz...' :
+                     duplexVoiceStatus === 'user_speaking' ? '🗣️ Procesando lo que dijiste...' :
+                     duplexVoiceStatus === 'thinking' ? '⚡ Razonamiento Multiagéntico 1.58b...' :
+                     `🎙️ Hablando: ${activeSpeakingPersona?.name || 'Astraura Prime'}`}
+                  </span>
+                </div>
+                {duplexLiveTranscript && (
+                  <p className="text-[10px] text-cyan-300 font-mono italic truncate max-w-xl">
+                    "{duplexLiveTranscript}"
+                  </p>
+                )}
               </div>
             </div>
+
+            <button
+              onClick={toggleFullDuplexConversation}
+              className="px-2.5 py-0.5 rounded bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 text-[10px] font-mono"
+            >
+              Pausar Voz
+            </button>
           </div>
         )}
 
-        {/* Message Feed Area */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
-          {messages.length === 0 && !isStreaming && (
-            <div className="flex flex-col items-center justify-center h-full text-center space-y-4 max-w-md mx-auto p-6">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 flex items-center justify-center shadow-lg">
-                <Zap className="w-7 h-7 text-cyan-400 animate-pulse" />
+        {/* CURRENTLY SPEAKING MULTI-VOICE FLOATING HUD */}
+        {speakingMessageId && currentlySpeakingSegment && (
+          <div className="px-4 py-1.5 bg-black/80 border-b border-purple-500/30 flex items-center justify-between text-xs font-mono animate-fade-in">
+            <div className="flex items-center gap-2">
+              <Volume2 className="w-3.5 h-3.5 text-cyan-400 animate-bounce" />
+              <span className="text-slate-400">Voz Activa:</span>
+              <span className="font-bold text-white px-2 py-0.5 rounded bg-purple-500/20 border border-purple-500/40" style={{ color: currentlySpeakingSegment.persona?.color || '#00f0ff' }}>
+                {currentlySpeakingSegment.speaker}
+              </span>
+            </div>
+            <button
+              onClick={() => {
+                omniVoice.stopSpeaking();
+                setSpeakingMessageId(null);
+                setCurrentlySpeakingSegment(null);
+              }}
+              className="text-[10px] text-slate-400 hover:text-white underline"
+            >
+              Detener Audio
+            </button>
+          </div>
+        )}
+
+        {/* Messages Scroll Area */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+          {messages.length === 0 && (
+            <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
+              <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-cyan-500/20 via-purple-500/20 to-blue-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-2xl shadow-cyan-500/10">
+                <Sparkles className="w-8 h-8 animate-pulse" />
               </div>
-              <div className="space-y-1">
-                <h3 className="font-display font-bold text-lg text-white">Astraura Cognitive Engine // 1.58b</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Inferencia ternaria multiagéntica, adjunción universal de archivos, síntesis vocal OmniVoice y memoria biológica StarSeed.
+              <div className="max-w-md space-y-1">
+                <h3 className="font-display font-bold text-lg text-white">
+                  Astraura 1.58-Bit & StarSeed OS
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed font-sans">
+                  Núcleo cognitivo soberano con diálogo multi-personalidad, escucha activa 24/7 y aceleración ternaria.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full pt-2">
+              {/* Suggestions */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-lg w-full pt-2 font-mono">
                 {[
-                  "Genera una gráfica 2D interactiva con funciones matemáticas",
-                  "Crea un objeto 3D volumétrico en WebGL con rotación interactiva",
-                  "Crea un sintetizador sonoro con WebAudio y visualizador espectral",
-                  "Escribe y ejecuta un programa Python/JavaScript interactivo en vivo"
+                  "🎙️ @Hephaestus @Atenea optimicen el código C++",
+                  "⚡ Diálogo Coral sobre la arquitectura 1.58b",
+                  "💻 @Hermione ejecuta una prueba en la terminal",
+                  "🎨 @Oneiros genera un shader interactivo"
                 ].map((s, idx) => (
                   <button
                     key={idx}
-                    onClick={() => onSendMessage(s)}
+                    onClick={() => {
+                      setInputText(s.replace(/^[🎙️⚡💻🎨]\s*/, ''));
+                    }}
                     className="p-2.5 rounded-xl bg-white/[0.03] hover:bg-cyan-500/10 border border-white/5 hover:border-cyan-500/30 text-left text-xs text-slate-300 transition-colors"
                   >
                     {s}
@@ -473,20 +592,26 @@ export default function ChatInterface({
               className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} space-y-1 group`}
             >
               <div className="flex items-center gap-2 px-1 text-[10px] font-mono text-slate-500">
-                <span>{msg.sender === 'user' ? 'Tú' : 'Astraura Core'}</span>
+                <span>{msg.sender === 'user' ? 'Tú' : 'Astraura Core (1.58b)'}</span>
                 <span>•</span>
                 <span>{msg.timestamp}</span>
 
-                {/* Message Actions */}
+                {/* Message Audio Controls */}
                 {msg.sender === 'ai' && (
-                  <div className="flex items-center gap-1.5 opacity-70 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity">
                     <button
-                      onClick={() => handleSpeakText(msg.id, msg.text)}
-                      className={`p-1 rounded hover:bg-white/10 transition-colors ${speakingMessageId === msg.id ? 'text-pink-400 animate-pulse' : 'text-slate-400 hover:text-cyan-400'}`}
-                      title={speakingMessageId === msg.id ? "Detener voz" : "Escuchar con OmniVoice"}
+                      onClick={() => handleSpeakMultiVoice(msg.id, msg.text)}
+                      className={`px-2 py-0.5 rounded-md border text-[10px] flex items-center gap-1 transition-all ${
+                        speakingMessageId === msg.id
+                          ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 font-bold animate-pulse'
+                          : 'bg-white/5 border-white/5 text-slate-400 hover:text-cyan-300 hover:bg-cyan-500/10'
+                      }`}
+                      title={speakingMessageId === msg.id ? "Detener reproducción" : "Escuchar diálogo multi-voz de las personalidades"}
                     >
-                      {speakingMessageId === msg.id ? <VolumeX className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
+                      {speakingMessageId === msg.id ? <VolumeX className="w-3 h-3 text-pink-400" /> : <Volume2 className="w-3 h-3 text-cyan-400" />}
+                      <span>{speakingMessageId === msg.id ? 'Detener' : 'Escuchar Voces'}</span>
                     </button>
+
                     {onRegenerate && index === messages.length - 1 && (
                       <button
                         onClick={onRegenerate}
@@ -584,7 +709,7 @@ export default function ChatInterface({
               )}
 
               <div className="p-4 rounded-2xl max-w-3xl w-full bg-[#0e121c] border border-cyan-500/30 text-slate-200 text-xs sm:text-sm rounded-bl-none shadow-md animate-fade-in overflow-hidden">
-                <MultimodalMessageRenderer text={currentStreamText || "Generando respuesta..."} />
+                <MultimodalMessageRenderer text={currentStreamText || "Generando respuesta multiagéntica..."} />
               </div>
             </div>
           )}
@@ -615,44 +740,6 @@ export default function ChatInterface({
           </div>
         )}
 
-        {/* Full-Duplex Conversational Voice Live Banner & Waveform */}
-        {isFullDuplexVoiceActive && (
-          <div className="px-4 py-2.5 bg-gradient-to-r from-purple-900/40 via-cyan-900/30 to-blue-900/40 border-t border-cyan-500/30 flex items-center justify-between text-xs animate-fade-in">
-            <div className="flex items-center gap-3">
-              <div className="relative flex items-center justify-center">
-                <span className="absolute inline-flex h-4 w-4 rounded-full bg-cyan-400 opacity-75 animate-ping" />
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-500" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-cyan-300">Modo Conversación Natural Continua (1.58b)</span>
-                  <span className={`px-2 py-0.2 rounded-full text-[9px] font-mono uppercase ${
-                    duplexVoiceStatus === 'listening' ? 'bg-cyan-500/20 text-cyan-300' :
-                    duplexVoiceStatus === 'user_speaking' ? 'bg-amber-500/20 text-amber-300 animate-pulse' :
-                    duplexVoiceStatus === 'thinking' ? 'bg-purple-500/20 text-purple-300 animate-pulse' :
-                    'bg-emerald-500/20 text-emerald-300'
-                  }`}>
-                    {duplexVoiceStatus === 'listening' ? '🎧 Escuchando continuamente...' :
-                     duplexVoiceStatus === 'user_speaking' ? '🗣️ Procesando tu voz...' :
-                     duplexVoiceStatus === 'thinking' ? '⚡ Sintetizando 1.58b...' : '🎙️ Respondiendo...'}
-                  </span>
-                </div>
-                <p className="text-[10px] text-slate-400 font-mono">
-                  Habla de forma fluida. Puedes interrumpir a Astraura en cualquier momento o continuar la charla.
-                </p>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={toggleFullDuplexConversation}
-              className="px-3 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 text-[11px] font-mono transition-colors"
-            >
-              Finalizar Charla
-            </button>
-          </div>
-        )}
-
         {/* Input Bar */}
         <div className="p-3 sm:p-4 bg-[#0a0d15] border-t border-white/10 z-10 space-y-2">
           {/* Quick Preferences & Mentions Pill Bar */}
@@ -662,12 +749,12 @@ export default function ChatInterface({
                 type="button"
                 onClick={() => setIsMsgPrefsOpen(true)}
                 className="px-2 py-0.5 rounded-md bg-purple-500/15 border border-purple-500/30 text-purple-300 hover:bg-purple-500/25 flex items-center gap-1 transition-colors"
-                title="Arquetipo y modo multi-personalidad"
+                title="Configuración de personalidades y orquestación"
               >
                 <Sparkles className="w-3 h-3" />
                 <span>
-                  {msgPreferences.multi_personality_mode && msgPreferences.multi_personality_mode !== 'single'
-                    ? `Coral (${(msgPreferences.selected_personalities || []).length || 2} personas)`
+                  {selectedPersonaIds.length > 1
+                    ? `Coral (${selectedPersonaIds.length} entidades)`
                     : (activePersona?.name || 'Astraura Prime')}
                 </span>
               </button>
@@ -684,17 +771,22 @@ export default function ChatInterface({
 
               {/* Quick Mention Chips */}
               <div className="hidden lg:flex items-center gap-1 border-l border-white/10 pl-1.5">
-                <span className="text-[9px] text-slate-500 uppercase">Mencionar:</span>
+                <span className="text-[9px] text-slate-500 uppercase">Sumar al chat:</span>
                 {[
-                  { name: '@Hephaestus', label: '⚡ Hephaestus' },
-                  { name: '@Hermione', label: '💻 Hermione' },
-                  { name: '@Atenea', label: '🛡️ Atenea' },
-                  { name: '@Oneiros', label: '🌌 Oneiros' }
+                  { id: 'hephaestus', name: '@Hephaestus', label: '⚡ Hephaestus' },
+                  { id: 'hermione', name: '@Hermione', label: '💻 Hermione' },
+                  { id: 'atenea', name: '@Atenea', label: '🛡️ Atenea' },
+                  { id: 'oneiros', name: '@Oneiros', label: '🎨 Oneiros' }
                 ].map((m) => (
                   <button
                     key={m.name}
                     type="button"
-                    onClick={() => setInputText(prev => prev ? `${prev} ${m.name} ` : `${m.name} `)}
+                    onClick={() => {
+                      if (!selectedPersonaIds.includes(m.id)) {
+                        handleTogglePersona(m.id);
+                      }
+                      setInputText(prev => prev ? `${prev} ${m.name} ` : `${m.name} `);
+                    }}
                     className="px-1.5 py-0.5 rounded bg-white/5 hover:bg-white/10 text-slate-400 hover:text-cyan-300 text-[9px] transition-colors"
                   >
                     {m.label}
@@ -737,7 +829,7 @@ export default function ChatInterface({
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploadingAttachment}
               className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition-colors"
-              title="Adjuntar archivos de cualquier formato (PDF, código, imágenes, datos...)"
+              title="Adjuntar archivos (PDF, código, imágenes, datos...)"
             >
               <Paperclip className="w-4 h-4" />
             </button>
@@ -748,10 +840,10 @@ export default function ChatInterface({
               onClick={toggleFullDuplexConversation}
               className={`p-2.5 rounded-xl border transition-all ${
                 isFullDuplexVoiceActive
-                  ? 'bg-gradient-to-r from-purple-500/30 to-cyan-500/30 border-cyan-400 text-cyan-200 shadow-lg shadow-cyan-500/30 animate-pulse'
-                  : 'bg-purple-500/10 border-purple-500/30 text-purple-300 hover:bg-purple-500/20 hover:text-purple-100'
+                  ? 'bg-gradient-to-r from-purple-500/40 to-cyan-500/40 border-cyan-400 text-cyan-200 shadow-lg shadow-cyan-500/30 animate-pulse'
+                  : 'bg-purple-500/15 border-purple-500/30 text-purple-300 hover:bg-purple-500/25 hover:text-purple-100'
               }`}
-              title="Conversación de Voz Continua e Inteligente (Full-Duplex / Fluida)"
+              title="Modo Conversación de Voz Continua (Habla y escucha continua)"
             >
               <Volume2 className={`w-4 h-4 ${isFullDuplexVoiceActive ? 'text-cyan-300 animate-bounce' : ''}`} />
             </button>
@@ -776,10 +868,12 @@ export default function ChatInterface({
               onChange={(e) => setInputText(e.target.value)}
               placeholder={
                 isFullDuplexVoiceActive
-                  ? "Modo conversación de voz continua activo... ¡habla libremente!"
+                  ? "🎙️ Charla en vivo activa... habla naturalmente o escribe..."
                   : isRecording
                   ? "Escuchando dictado..."
-                  : "Pregunta a Astraura, @menciona personalidades o pide explorar el sistema..."
+                  : selectedPersonaIds.length > 1
+                  ? `Pregunta a ${selectedPersonaIds.length} personalidades en debate coral...`
+                  : `Pregunta a ${activePersona?.name || 'Astraura'}, suma @personalidades...`
               }
               className="flex-1 px-4 py-2.5 rounded-xl glass-input text-xs sm:text-sm text-white placeholder-slate-500 outline-none"
             />
@@ -812,7 +906,16 @@ export default function ChatInterface({
         isOpen={isMsgPrefsOpen}
         onClose={() => setIsMsgPrefsOpen(false)}
         preferences={msgPreferences}
-        onSavePreferences={(newPrefs) => setMsgPreferences(newPrefs)}
+        onSavePreferences={(newPrefs) => {
+          setMsgPreferences(newPrefs);
+          if (newPrefs.selected_personalities) {
+            setSelectedPersonaIds(newPrefs.selected_personalities);
+          }
+          if (newPrefs.multi_personality_mode) {
+            setMultiResponseMode(newPrefs.multi_personality_mode);
+          }
+        }}
+        personalities={personalities}
       />
     </div>
   );

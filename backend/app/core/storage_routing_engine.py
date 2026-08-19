@@ -291,11 +291,12 @@ class StorageRoutingEngine:
         now = time.time()
         
         indexed_files = []
-        
-        # 1. Ingest / Index files if target path exists
-        mem_cfg = rule.get("auto_memory_routing", {})
-        if mem_cfg.get("enabled", True) and target_path.exists():
-            exts = tuple(mem_cfg.get("file_extensions", [".py", ".jsx", ".cpp", ".json", ".md"]))
+        brains_str = "brain_genesis"
+
+        # 1. Index and Connect Memories
+        mem_cfg = rule.get("memory_routing", {})
+        if mem_cfg.get("enabled", True):
+            exts = mem_cfg.get("allowed_extensions", [".md", ".txt", ".json", ".pdf", ".py", ".cpp"])
             try:
                 if target_path.is_file():
                     indexed_files.append(target_path.name)

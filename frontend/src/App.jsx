@@ -749,6 +749,7 @@ export default function App() {
               onOpenExplorer={() => setActiveTab('explorer')}
               activePersona={activePersona}
               onOpenPersonalities={() => setActiveTab('personalities')}
+              onSelectPersona={(id) => setActivePersonaId(id)}
               sessions={sessions}
               activeSessionId={activeSessionId}
               folders={folders}
