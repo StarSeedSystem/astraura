@@ -117,6 +117,10 @@ class BitNetUnifiedEngine:
                 f"{('[DOCUMENTOS DE MEMORIA]:' + context_summary) if context_summary else ''}"
             )
 
+            effective_system_prompt = master_system_prompt
+            if system_prompt and system_prompt.strip():
+                effective_system_prompt = f"{master_system_prompt}\n\n[INSTRUCCIONES ESPECÍFICAS DE ESTA CONSULTA & PERSONALIDADES]:\n{system_prompt}"
+
             try:
                 async with httpx.AsyncClient(timeout=90.0) as client:
                     async with client.stream(
@@ -125,20 +129,59 @@ class BitNetUnifiedEngine:
                         json={
                             "model": model_to_use,
                             "prompt": prompt,
-                            "system": master_system_prompt,
+                            "system": effective_system_prompt,
                             "stream": True,
                             "options": {
-                                "temperature": temperature,
-                                "num_predict": max_tokens
+                                "temperature": max(0.2, min(0.85, temperature)),
+                                "num_predict": max_tokens,
+                                "repeat_penalty": 1.25,
+                                "repeat_last_n": 128,
+                                "top_p": 0.9,
+                                "frequency_penalty": 0.4,
+                                "presence_penalty": 0.4,
+                                "stop": [
+                                    "<|im_end|>", "<|endoftext|>", "PERSONALIDAD 10:", "PERSONALIDAD 11:",
+                                    "PERSONALIDAD 12:", "PERSONALIDAD 13:", "PERSONALIDAD 14:", "PERSONALIDAD 15:"
+                                ]
                             }
                         }
                     ) as response:
                         if response.status_code == 200:
+                            recent_lines = []
+                            current_line_buffer = ""
+                            loop_detected = False
+
                             async for line in response.aiter_lines():
                                 if line:
                                     try:
                                         chunk_json = json.loads(line)
                                         token = chunk_json.get("response", "")
+                                        if not token:
+                                            continue
+
+                                        current_line_buffer += token
+                                        if "\n" in current_line_buffer or len(current_line_buffer) > 120:
+                                            sublines = current_line_buffer.split("\n")
+                                            for sl in sublines[:-1]:
+                                                sl_clean = " ".join(sl.split()).strip().lower()
+                                                if len(sl_clean) > 15:
+                                                    # Check exact line repetition loop
+                                                    if recent_lines.count(sl_clean) >= 2:
+                                                        loop_detected = True
+                                                        break
+                                                    # Check repeating personality header loop
+                                                    if "personalidad" in sl_clean and any(str(n) in sl_clean for n in range(6, 30)):
+                                                        loop_detected = True
+                                                        break
+                                                    recent_lines.append(sl_clean)
+                                                    if len(recent_lines) > 30:
+                                                        recent_lines.pop(0)
+                                            current_line_buffer = sublines[-1]
+
+                                        if loop_detected:
+                                            yield "\n\n### ⚡ [Síntesis Coral 1.58b]:\nTodas las personalidades y el núcleo cognitivo concluyen la deliberación en consenso soberano y resonancia armónica."
+                                            break
+
                                         self.stats["tokens_generated"] += 1
                                         yield token
                                     except Exception:

@@ -67,6 +67,7 @@ import ThemePickerModal from './components/ThemePickerModal';
 import { ChatWebSocketClient, fetchStatus, fetchSystemNotifications } from './services/api';
 import { webCognition } from './services/webCognition';
 import { deviceContextDetector } from './services/deviceContextDetector';
+import { omniVoice } from './services/omniVoice';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('chat');
@@ -250,7 +251,13 @@ export default function App() {
           setActiveNodes(data.related_nodes || []);
         } else if (data.type === 'token') {
           setCurrentStreamText((prev) => prev + data.token);
+          if (omniVoice.isConversationActive) {
+            omniVoice.feedStreamToken(data.token);
+          }
         } else if (data.type === 'done') {
+          if (omniVoice.isConversationActive) {
+            omniVoice.endProgressiveStream();
+          }
           handleStreamCompletion(data.full_text, activeTracesRef.current);
         } else if (data.type === 'learning_event') {
           const evt = data.event;
@@ -357,6 +364,10 @@ export default function App() {
     setActiveTraces([]);
     activeTracesRef.current = [];
 
+    if (omniVoice.isConversationActive) {
+      omniVoice.startProgressiveStream({ personaId: activePersonaId });
+    }
+
     // 1. Try WebSocket if open
     if (wsClientRef.current?.ws?.readyState === WebSocket.OPEN) {
       wsClientRef.current.sendMessage(text, settings.systemPrompt, preferences || {});
@@ -377,6 +388,9 @@ export default function App() {
           setActiveTraces(jsonRes.agent_traces);
           activeTracesRef.current = jsonRes.agent_traces;
         }
+        if (omniVoice.isConversationActive && jsonRes.response) {
+          omniVoice.speak(jsonRes.response, { persona_id: activePersonaId });
+        }
         handleStreamCompletion(jsonRes.response, jsonRes.agent_traces);
         return;
       }
@@ -396,7 +410,13 @@ export default function App() {
         } else if (event.type === 'token') {
           fullGen += event.token;
           setCurrentStreamText(fullGen);
+          if (omniVoice.isConversationActive) {
+            omniVoice.feedStreamToken(event.token);
+          }
         } else if (event.type === 'done') {
+          if (omniVoice.isConversationActive) {
+            omniVoice.endProgressiveStream();
+          }
           handleStreamCompletion(event.full_text, currentTraces);
         }
       }

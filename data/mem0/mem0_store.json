@@ -77,22 +77,6 @@
       }
     },
     {
-      "id": "mem0_1787107910197",
-      "user_id": "alex",
-      "agent_id": "*",
-      "run_id": "default",
-      "memory": "Usuario consultó a Aurora (StarSeed Core): actualmente Cuántas personalidades Estás usando -> Síntesis: Actualmente estoy utilizando tres personalidades: tú, Astraura, y Demuestra la Capacidad de Reconocimiento de Deseos.",
-      "category": "chat_episodic",
-      "confidence": 0.95,
-      "created_at": 1787107910.197647,
-      "updated_at": 1787107910.197647,
-      "metadata": {
-        "timestamp": 1787107910.197522,
-        "style": "analytical",
-        "persona": "aurora"
-      }
-    },
-    {
       "id": "mem0_1787107908773",
       "user_id": "alex",
       "agent_id": "*",
@@ -271,22 +255,6 @@
           "aurora",
           "astraura_prime"
         ]
-      }
-    },
-    {
-      "id": "mem0_1787107768291",
-      "user_id": "alex",
-      "agent_id": "*",
-      "run_id": "default",
-      "memory": "Usuario consultó a Astraura Prime (Zenith): Hola demuéstrame cómo funciona tu sistema de voz y Cómo puedes usar múltiples personalidades en este mismo chat -> Síntesis: ¡Hola! Me alegra que te guste mi sistema de voz. Ahora, voy a demostrarte cómo puedes usar múltiples personalidades en este chat.\n\n### Personalidad 1: Alex Bordón Garrigós (Eres tú)\n\nPrimero, como tú,",
-      "category": "chat_episodic",
-      "confidence": 0.95,
-      "created_at": 1787107768.29179,
-      "updated_at": 1787107768.29179,
-      "metadata": {
-        "timestamp": 1787107768.291456,
-        "style": "analytical",
-        "persona": "astraura_prime"
       }
     },
     {
@@ -776,6 +744,13 @@
   ],
   "history": [
     {
+      "id": "hist_1787108716245",
+      "memory_id": "mem0_1787108716245",
+      "action": "created",
+      "timestamp": 1787108716.245971,
+      "text": "Diálogo Coral con 4 personalidades sobre: demuéstrame cómo funciona tu sistema de voz y tus múltiples personalidades -> ¡Hola! Me alegra que estés interesado en cómo funciona mi sistema de voz y las múltiples personalidades. \n\n### Personalidad 1: Alex Bordón Garrigós (Eres tú)\nAquí estamos. Me encontré con una situació"
+    },
+    {
       "id": "hist_1787108112490",
       "memory_id": "mem0_1787108112490",
       "action": "created",
@@ -1084,5 +1059,5 @@
       "text": "El usuario Alex Bordón Garrigós es el creador de StarSeed OS y Astraura 1.58-Bit. Trabaja en un Apple Silicon M1 con 8 núcleos y memoria unificada."
     }
   ],
-  "updated_at": 1787108112.490442
+  "updated_at": 1787108716.2460868
 }

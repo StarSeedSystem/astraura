@@ -201,9 +201,12 @@ export default function ChatInterface({
   const prevStreamingRef = useRef(isStreaming);
   useEffect(() => {
     if (prevStreamingRef.current && !isStreaming && (isFullDuplexVoiceActive || omniVoice.isConversationActive)) {
-      const lastMsg = messages[messages.length - 1];
-      if (lastMsg && lastMsg.sender === 'ai' && lastMsg.text) {
-        handleSpeakMultiVoice(lastMsg.id, lastMsg.text);
+      // If progressive speech was already speaking or active, don't restart from beginning
+      if (!omniVoice.isSpeaking && !omniVoice.isProgressiveStreamActive && !omniVoice.isPlayingProgressiveChunk) {
+        const lastMsg = messages[messages.length - 1];
+        if (lastMsg && lastMsg.sender === 'ai' && lastMsg.text) {
+          handleSpeakMultiVoice(lastMsg.id, lastMsg.text);
+        }
       }
     }
     prevStreamingRef.current = isStreaming;

@@ -38,6 +38,12 @@ class OmniVoiceEngine {
     this.listeners = new Map();
     this.activeVoicePersonaId = 'aurora';
     this._speechTimer = null;
+    this.progressiveQueue = [];
+    this.progressiveTokenAccumulator = '';
+    this.isProgressiveStreamActive = false;
+    this.progressivePersonaId = 'aurora';
+    this.progressiveVoiceProfile = {};
+    this.isPlayingProgressiveChunk = false;
 
     this._initVoices();
     this._initRecognition();
@@ -893,6 +899,128 @@ class OmniVoiceEngine {
     };
 
     playNext();
+  }
+
+  /**
+   * Progressive Real-Time Speech Synthesizer:
+   * Starts speaking clauses/sentences in real-time as tokens are generated,
+   * without waiting for the full written response to complete.
+   */
+  startProgressiveStream({ personaId = 'aurora', voiceProfile = {} } = {}) {
+    this.stopSpeaking();
+    this.isSpeaking = true;
+    this.suppressRecognition = true;
+    this.progressiveQueue = [];
+    this.progressiveTokenAccumulator = '';
+    this.isProgressiveStreamActive = true;
+    this.progressivePersonaId = personaId || 'aurora';
+    this.progressiveVoiceProfile = voiceProfile || {};
+    this.isPlayingProgressiveChunk = false;
+    this.emit('state_change', 'speaking');
+  }
+
+  feedStreamToken(token) {
+    if (!this.isProgressiveStreamActive) return;
+    this.progressiveTokenAccumulator += token;
+
+    // 1. Detect dynamic persona switch in header (e.g. ### [Hephaestus]: or **Hermione**:)
+    const personaMatch = this.progressiveTokenAccumulator.match(/(?:###\s*(?:[^\n\[]*\[)?([a-zA-ZáéíóúñÁÉÍÓÚÑ\s/]+)\]?:\s*|\*\*([a-zA-ZáéíóúñÁÉÍÓÚÑ\s/]+)\*\*:\s*)/i);
+    if (personaMatch) {
+      const rawName = (personaMatch[1] || personaMatch[2] || '').toLowerCase().trim();
+      if (rawName.includes('hephaestus') || rawName.includes('hefestos')) this.progressivePersonaId = 'hephaestus';
+      else if (rawName.includes('hermione')) this.progressivePersonaId = 'hermione';
+      else if (rawName.includes('atenea') || rawName.includes('athena')) this.progressivePersonaId = 'atenea';
+      else if (rawName.includes('oneiros')) this.progressivePersonaId = 'oneiros';
+      else if (rawName.includes('hermes')) this.progressivePersonaId = 'hermes';
+      else if (rawName.includes('mnemosyne')) this.progressivePersonaId = 'mnemosyne';
+      else if (rawName.includes('logos')) this.progressivePersonaId = 'logos';
+      else if (rawName.includes('kallisti')) this.progressivePersonaId = 'kallisti';
+      else if (rawName.includes('aurora') || rawName.includes('astraura')) this.progressivePersonaId = 'aurora';
+    }
+
+    // 2. Check for sentence or clause boundary
+    const hasSentenceEnd = /[.?!]\s+|\n{2,}/.test(this.progressiveTokenAccumulator);
+    const hasCommaOrPause = /[,;:]\s+|\n/.test(this.progressiveTokenAccumulator);
+    const wordCount = this.progressiveTokenAccumulator.trim().split(/\s+/).filter(Boolean).length;
+
+    if (hasSentenceEnd || (hasCommaOrPause && wordCount >= 6) || wordCount >= 14) {
+      const delimiterRegex = /([.?!,;:]\s+|\n+)/;
+      const parts = this.progressiveTokenAccumulator.split(delimiterRegex);
+      if (parts.length >= 2) {
+        const clauseToSpeak = (parts[0] + (parts[1] || '')).trim();
+        this.progressiveTokenAccumulator = parts.slice(2).join('');
+
+        if (clauseToSpeak.length > 1) {
+          const cleanClause = this._prepareNaturalText(clauseToSpeak);
+          if (cleanClause) {
+            this.progressiveQueue.push({
+              text: cleanClause,
+              personaId: this.progressivePersonaId
+            });
+            this._drainProgressiveQueue();
+          }
+        }
+      }
+    }
+  }
+
+  endProgressiveStream() {
+    if (!this.isProgressiveStreamActive) return;
+    this.isProgressiveStreamActive = false;
+
+    if (this.progressiveTokenAccumulator.trim()) {
+      const cleanRemaining = this._prepareNaturalText(this.progressiveTokenAccumulator);
+      if (cleanRemaining) {
+        this.progressiveQueue.push({
+          text: cleanRemaining,
+          personaId: this.progressivePersonaId
+        });
+      }
+      this.progressiveTokenAccumulator = '';
+    }
+
+    this._drainProgressiveQueue();
+  }
+
+  _drainProgressiveQueue() {
+    if (this.isPlayingProgressiveChunk) return;
+    if (this.progressiveQueue.length === 0) {
+      if (!this.isProgressiveStreamActive) {
+        this.echoCooldownUntil = Date.now() + 900;
+        setTimeout(() => {
+          if (!this.isPlayingProgressiveChunk && this.progressiveQueue.length === 0) {
+            this.isSpeaking = false;
+            this.suppressRecognition = false;
+            this.emit('state_change', 'idle');
+          }
+        }, 900);
+      }
+      return;
+    }
+
+    const nextChunk = this.progressiveQueue.shift();
+    if (!nextChunk || !nextChunk.text) {
+      this._drainProgressiveQueue();
+      return;
+    }
+
+    this.isPlayingProgressiveChunk = true;
+    this.isSpeaking = true;
+    this.suppressRecognition = true;
+    this.recordSpokenPhrase(nextChunk.text);
+
+    this.speak(
+      nextChunk.text,
+      { persona_id: nextChunk.personaId },
+      () => {
+        this.isSpeaking = true;
+        this.suppressRecognition = true;
+      },
+      () => {
+        this.isPlayingProgressiveChunk = false;
+        this._drainProgressiveQueue();
+      }
+    );
   }
 
   /**

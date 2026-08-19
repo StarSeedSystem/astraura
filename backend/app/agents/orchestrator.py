@@ -158,10 +158,12 @@ class AstrauraOrchestrator:
             
             multi_sys_prompt = (
                 f"{self.system_prompt_base}\n\n"
-                f"### PERSONALIDADES ACTIVAS Y CONVOCADAS:\n{personas_desc}\n\n"
-                f"Debes estructurar una respuesta donde cada una de las personalidades convocadas ({', '.join([p['name'] for p in active_personas])}) "
-                f"haga su aporte diferenciado con su propio estilo, carácter, emoción y órgano cognitivo. "
-                f"Usa encabezados como `### 🌌 [{active_personas[0]['name']}]:` para cada intervención y concluye con una `### ⚡ [Síntesis Coral 1.58-Bit]:` consensuada."
+                f"### CONVOCATORIA DE PERSONALIDADES ({len(active_personas)} ENTIDADES):\n{personas_desc}\n\n"
+                f"DIRECTIVAS ESTRICTAS DE RESPUESTA:\n"
+                f"1. ÚNICAMENTE deben hablar las siguientes {len(active_personas)} personalidades: {', '.join([p['name'] for p in active_personas])}.\n"
+                f"2. NUNCA inventes personalidades adicionales ni uses listas numéricas infinitas como 'PERSONALIDAD 1', 'PERSONALIDAD 2', etc.\n"
+                f"3. Cada entidad hace UNA sola intervención concisa y sustanciosa desde su especialidad usando el formato `### [{p['name']}]:`.\n"
+                f"4. Concluye de forma definitiva con `### [Síntesis Coral 1.58-Bit]:` y finaliza la respuesta sin repetir."
             )
 
             if style == "concise":
