@@ -40,12 +40,14 @@ export default function QuantumVoiceOrbWidget({
   const [isDuplexActive, setIsDuplexActive] = useState(false);
   const [duplexState, setDuplexState] = useState('idle'); // 'idle' | 'listening' | 'user_speaking' | 'thinking' | 'speaking'
   const [liveTranscript, setLiveTranscript] = useState('');
+  const [echoSuppressedNotice, setEchoSuppressedNotice] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [activePersonaId, setActivePersonaId] = useState(activePersona?.id || 'aurora');
 
   const canvasRef = useRef(null);
   const animationFrameRef = useRef(null);
   const phaseRef = useRef(0);
+  const echoTimeoutRef = useRef(null);
 
   // Synchronize persona prop
   useEffect(() => {
@@ -77,6 +79,14 @@ export default function QuantumVoiceOrbWidget({
       setDuplexState(st);
     });
 
+    const unsubEcho = omniVoice.on('echo_suppressed', (echoTxt) => {
+      setEchoSuppressedNotice(true);
+      if (echoTimeoutRef.current) clearTimeout(echoTimeoutRef.current);
+      echoTimeoutRef.current = setTimeout(() => {
+        setEchoSuppressedNotice(false);
+      }, 1200);
+    });
+
     // Start mic analyser for orb reactivity
     omniVoice.startMicAnalyser();
 
@@ -84,6 +94,8 @@ export default function QuantumVoiceOrbWidget({
       unsubState();
       unsubRate();
       unsubDuplex();
+      unsubEcho();
+      if (echoTimeoutRef.current) clearTimeout(echoTimeoutRef.current);
     };
   }, []);
 
@@ -325,17 +337,32 @@ export default function QuantumVoiceOrbWidget({
 
         {/* Live Overlay Badges */}
         <div className="absolute top-2 left-2 flex items-center gap-1.5 pointer-events-none">
-          <span 
-            className="text-[9px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1 backdrop-blur-md border"
-            style={{ 
-              backgroundColor: `${personaTheme.primary}20`, 
-              color: personaTheme.primary,
-              borderColor: `${personaTheme.primary}40`
-            }}
-          >
-            <Sparkles className="w-2.5 h-2.5" />
-            {isPlaying ? 'EMITIENDO VOZ' : (isPaused ? 'EN PAUSA' : (duplexState === 'user_speaking' ? 'ESCUCHANDO...' : 'REPOSO VIVO'))}
-          </span>
+          {echoSuppressedNotice ? (
+            <span className="text-[9px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1 backdrop-blur-md border bg-amber-500/20 text-amber-300 border-amber-500/40 animate-pulse">
+              <Shield className="w-2.5 h-2.5 text-amber-400" />
+              FILTRO ANTI-ECO ACTIVO
+            </span>
+          ) : (
+            <span 
+              className="text-[9px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1 backdrop-blur-md border"
+              style={{ 
+                backgroundColor: `${personaTheme.primary}20`, 
+                color: personaTheme.primary,
+                borderColor: `${personaTheme.primary}40`
+              }}
+            >
+              <Sparkles className="w-2.5 h-2.5" />
+              {isPlaying 
+                ? 'ASTRAURA RESPONDIENDO' 
+                : (isPaused 
+                    ? 'EN PAUSA' 
+                    : (duplexState === 'user_speaking' 
+                        ? 'HABLANDO... (CADENCIA VIVA)' 
+                        : (duplexState === 'thinking' 
+                            ? 'PENSANDO 1.58b...' 
+                            : (isDuplexActive ? 'ESCUCHANDO CADENCIA' : 'REPOSO VIVO'))))}
+            </span>
+          )}
         </div>
 
         {/* Real-time speech transcript banner if speaking into mic */}

@@ -1,9 +1,13 @@
 /**
  * Astraura OmniVoice & audio.cpp 1.58-Bit Speech Engine (StarSeed OS)
  * Pure open-source, local, quantized and affective voice system.
- * Supports audio.cpp backend synthesis, WebAudio DSP formant styling, real-time Siri-style Orb telemetry,
- * ultra-low latency Direct Full-Duplex 1.58-Bit Conversational streaming, clause prosody shaping,
- * multi-personality dialogue routing, and continuous ambient perception.
+ * Features:
+ * - Acoustic Echo Cancellation (AEC) & Self-Voice Acoustic Blanking
+ * - Dynamic N-Gram & Substring Self-Audio Recognition (Anti-Loop / Anti-Self-Interruption Guard)
+ * - Intelligent Conversational VAD End-of-Turn Cadence (Respects natural human breathing, hesitations and fillers)
+ * - audio.cpp backend synthesis, WebAudio DSP formant styling, real-time Siri-style Orb telemetry
+ * - Direct 1.58-Bit Conversational streaming with natural turn-taking
+ * - Multi-personality dialogue routing with authentic prosody per persona
  */
 
 class OmniVoiceEngine {
@@ -20,6 +24,8 @@ class OmniVoiceEngine {
     this.isContinuousListening = false;
     this.isConversationActive = false;
     this.suppressRecognition = false;
+    this.echoCooldownUntil = 0;
+    this.spokenMemoryBuffer = []; // Rolling buffer of recent AI spoken phrases for acoustic echo rejection
     this.lastSpokenText = '';
     this.currentUtterance = null;
     this.availableVoices = [];
@@ -31,6 +37,7 @@ class OmniVoiceEngine {
     this.lastSpokenPayload = null;
     this.listeners = new Map();
     this.activeVoicePersonaId = 'aurora';
+    this._speechTimer = null;
 
     this._initVoices();
     this._initRecognition();
@@ -206,6 +213,220 @@ class OmniVoiceEngine {
   }
 
   /**
+   * Normalizes text for phonetic/acoustic comparison
+   */
+  _normalizeTextForAcousticMatch(text) {
+    if (!text) return '';
+    return text
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove accents
+      .replace(/[^\w\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  /**
+   * Extracts word N-grams for fuzzy phrase matching
+   */
+  _extractNGrams(words, n) {
+    const ngrams = new Set();
+    for (let i = 0; i <= words.length - n; i++) {
+      ngrams.add(words.slice(i, i + n).join(' '));
+    }
+    return ngrams;
+  }
+
+  /**
+   * Records newly synthesized text into the rolling self-voice memory buffer for acoustic echo suppression
+   */
+  recordSpokenPhrase(text) {
+    if (!text) return;
+    const clean = this._normalizeTextForAcousticMatch(text);
+    if (!clean || clean.length < 2) return;
+
+    const words = clean.split(/\s+/).filter(Boolean);
+    const tokens = new Set(words);
+    const bigrams = this._extractNGrams(words, 2);
+    const trigrams = this._extractNGrams(words, 3);
+
+    this.spokenMemoryBuffer.push({
+      raw: text,
+      clean,
+      words,
+      tokens,
+      bigrams,
+      trigrams,
+      timestamp: Date.now()
+    });
+
+    this.lastSpokenText = clean;
+
+    // Retain only memory from the last 60 seconds (max 50 records)
+    const cutoff = Date.now() - 60000;
+    this.spokenMemoryBuffer = this.spokenMemoryBuffer.filter(m => m.timestamp > cutoff).slice(-50);
+  }
+
+  /**
+   * High-accuracy Acoustic Echo & Self-Voice Detector
+   * Returns true if incoming candidate text is likely the AI's own audio picked up by the microphone.
+   */
+  isAcousticSelfEcho(candidateText) {
+    if (!candidateText) return false;
+    const cleanCandidate = this._normalizeTextForAcousticMatch(candidateText);
+    if (!cleanCandidate || cleanCandidate.length < 2) return false;
+
+    const candidateWords = cleanCandidate.split(/\s+/).filter(Boolean);
+    if (candidateWords.length === 0) return false;
+
+    const candidateBigrams = this._extractNGrams(candidateWords, 2);
+    const now = Date.now();
+
+    for (const memory of this.spokenMemoryBuffer) {
+      if (now - memory.timestamp > 45000) continue;
+
+      // 1. Direct inclusion or exact match
+      if (memory.clean.includes(cleanCandidate) || cleanCandidate.includes(memory.clean)) {
+        return true;
+      }
+
+      // 2. Multi-word intersection
+      if (candidateWords.length >= 2) {
+        let matchedWords = 0;
+        for (const w of candidateWords) {
+          if (memory.tokens.has(w) && w.length > 2) {
+            matchedWords++;
+          }
+        }
+        const matchRatio = matchedWords / candidateWords.length;
+        if (matchRatio >= 0.32) {
+          return true;
+        }
+
+        // 3. Bigram match
+        for (const bg of candidateBigrams) {
+          if (memory.bigrams.has(bg)) {
+            return true;
+          }
+        }
+      } else if (candidateWords.length === 1 && candidateWords[0].length >= 4) {
+        if (memory.tokens.has(candidateWords[0])) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Checks if the system is currently outputting audio or in reverberation cooldown
+   */
+  isProducingSound() {
+    if (this.isSpeaking) return true;
+    if (this.suppressRecognition) return true;
+    if (Date.now() < this.echoCooldownUntil) return true;
+
+    // Check output WebAudio Analyser energy
+    if (this.analyser) {
+      const data = new Uint8Array(this.analyser.frequencyBinCount);
+      this.analyser.getByteFrequencyData(data);
+      let sum = 0;
+      for (let i = 0; i < Math.min(32, data.length); i++) sum += data[i];
+      const avgEnergy = sum / 32 / 255;
+      if (avgEnergy > 0.012) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Normalized acoustic energy from microphone (0.0 to 1.0)
+   */
+  getMicAcousticEnergy() {
+    if (!this.micAnalyser) return 0;
+    const data = new Uint8Array(this.micAnalyser.frequencyBinCount);
+    this.micAnalyser.getByteFrequencyData(data);
+    let sum = 0;
+    for (let i = 0; i < Math.min(32, data.length); i++) sum += data[i];
+    return sum / 32 / 255;
+  }
+
+  /**
+   * Analyzes human conversational cadence, grammar, connectors, fillers and punctuation
+   * to determine dynamic endpoint pause timeout (respecting natural speech rhythm and breathing space).
+   */
+  analyzeTurnCadence(transcript) {
+    if (!transcript) return { isComplete: false, timeoutMs: 1400, reason: 'empty' };
+    const clean = transcript.trim();
+    const words = clean.split(/\s+/).filter(Boolean);
+    const wordCount = words.length;
+    if (wordCount === 0) return { isComplete: false, timeoutMs: 1400, reason: 'empty' };
+
+    const lastWordRaw = words[words.length - 1].toLowerCase();
+    const lastWord = lastWordRaw.replace(/[^a-záéíóúñ]/gi, '');
+
+    // 1. Hesitation & Thinking fillers (User is thinking / saying "eh...", pause longer)
+    const hesitationFillers = new Set([
+      'este', 'eh', 'ehm', 'em', 'mmm', 'mm', 'uh', 'um', 'pues', 'bueno',
+      'osea', 'tipo', 'digamos'
+    ]);
+
+    // 2. Incomplete Connectors & Conjunctions (User is mid-sentence, expecting to add clauses)
+    const incompleteConnectors = new Set([
+      'y', 'e', 'o', 'u', 'pero', 'mas', 'sino', 'porque', 'que', 'como',
+      'cuando', 'donde', 'si', 'aunque', 'para', 'de', 'con', 'en', 'por',
+      'sobre', 'hacia', 'desde', 'hasta', 'sin', 'tras', 'entre', 'segun',
+      'según', 'contra', 'entonces', 'ademas', 'además', 'tambien', 'también',
+      'cual', 'cuyo', 'quien', 'quién'
+    ]);
+
+    const hasTrailingEllipsis = clean.endsWith('...') || clean.endsWith('—') || clean.endsWith('-');
+    const hasTrailingComma = clean.endsWith(',') || clean.endsWith(';');
+    const hasQuestion = clean.endsWith('?') || clean.includes('¿');
+    const hasExclamation = clean.endsWith('!') || clean.includes('¡');
+    const hasPeriod = clean.endsWith('.');
+
+    const isHesitating = hesitationFillers.has(lastWord) || hasTrailingEllipsis || clean.endsWith('o sea') || clean.endsWith('es decir');
+    const isMidClause = incompleteConnectors.has(lastWord) || hasTrailingComma;
+
+    let timeoutMs = 1200;
+    let reason = 'default';
+
+    if (isHesitating) {
+      // User is thinking / hesitating: allow 2400ms of comfortable reflection
+      timeoutMs = 2400;
+      reason = 'hesitation_pause';
+    } else if (isMidClause) {
+      // User left a conjunction/connector open: allow 2000ms to complete thought
+      timeoutMs = 2000;
+      reason = 'connector_pause';
+    } else if (wordCount <= 2) {
+      // Very short utterance (e.g. "Hola", "Alex"): wait 1600ms to see if expanding
+      timeoutMs = 1600;
+      reason = 'short_utterance';
+    } else if (hasQuestion || hasExclamation) {
+      // Direct question or exclamation: definitive prompt
+      timeoutMs = wordCount >= 4 ? 900 : 1200;
+      reason = 'terminal_punctuation';
+    } else if (hasPeriod && wordCount >= 5) {
+      // Complete declarative sentence
+      timeoutMs = 1000;
+      reason = 'sentence_period';
+    } else {
+      // Natural conversational breath gap
+      timeoutMs = 1300;
+      reason = 'conversational_gap';
+    }
+
+    return {
+      isComplete: !isHesitating && !isMidClause && (hasQuestion || hasExclamation || (hasPeriod && wordCount >= 4)),
+      timeoutMs,
+      reason,
+      wordCount,
+      lastWord
+    };
+  }
+
+  /**
    * Cleans and formats text into expressive, natural conversational spoken Spanish.
    */
   _prepareNaturalText(text) {
@@ -242,13 +463,13 @@ class OmniVoiceEngine {
 
     this.lastSpokenPayload = { text, options: voiceProfile, onStart, onEnd };
     this.activeVoicePersonaId = voiceProfile.persona_id || 'aurora';
+    this.recordSpokenPhrase(cleanText);
 
     try {
       this._ensureAudioContext();
       this.isSpeaking = true;
       this.isPaused = false;
       this.suppressRecognition = true;
-      this.lastSpokenText = cleanText.toLowerCase();
       this.emit('state_change', 'speaking');
       if (onStart) onStart();
 
@@ -286,14 +507,15 @@ class OmniVoiceEngine {
       }
 
       audio.onended = () => {
-        this.isSpeaking = false;
-        this.isPaused = false;
         this.currentAudioElement = null;
-        this.emit('state_change', 'idle');
+        this.echoCooldownUntil = Date.now() + 900; // 900ms reverberation guard
         setTimeout(() => {
+          this.isSpeaking = false;
+          this.isPaused = false;
           this.suppressRecognition = false;
-        }, 600);
-        if (onEnd) onEnd();
+          this.emit('state_change', 'idle');
+          if (onEnd) onEnd();
+        }, 900);
       };
 
       audio.onerror = (e) => {
@@ -351,7 +573,7 @@ class OmniVoiceEngine {
     this.isSpeaking = true;
     this.isPaused = false;
     this.suppressRecognition = true;
-    this.lastSpokenText = cleanText.toLowerCase();
+    this.recordSpokenPhrase(cleanText);
     this.emit('state_change', 'speaking');
 
     const clauses = this._splitIntoExpressiveClauses(cleanText);
@@ -385,48 +607,39 @@ class OmniVoiceEngine {
       case 'aurora':
       case 'astraura_prime':
       case 'genesis':
-        // Aurora: Máxima expresividad emocional, calidez radiante, respiración orgánica y micro-inflexiones
         basePitch = 1.08;
         baseRate = 1.03 * this.globalPlaybackRate;
         break;
       case 'hephaestus':
-        // Hephaestus: Barítono profundo, firme, textura de precisión
         basePitch = 0.84;
         baseRate = 1.02 * this.globalPlaybackRate;
         break;
       case 'hermione':
-        // Hermione: Ágil, asertiva, cristalina, ejecutiva
         basePitch = 1.06;
         baseRate = 1.10 * this.globalPlaybackRate;
         break;
       case 'atenea':
       case 'athena':
-        // Atenea: Serena, reflexiva, protectora
         basePitch = 0.98;
         baseRate = 0.98 * this.globalPlaybackRate;
         break;
       case 'oneiros':
-        // Oneiros: Etéreo, reverberante, ondulación armónica
         basePitch = 1.12;
         baseRate = 0.95 * this.globalPlaybackRate;
         break;
       case 'hermes':
-        // Hermes: Dinámico, curioso, cadencia rápida
         basePitch = 1.04;
         baseRate = 1.16 * this.globalPlaybackRate;
         break;
       case 'mnemosyne':
-        // Mnemosyne: Profundo, místico, cadencia pausada
         basePitch = 0.92;
         baseRate = 0.92 * this.globalPlaybackRate;
         break;
       case 'logos':
-        // Logos: Exacto, analítico, sobrio
         basePitch = 0.96;
         baseRate = 1.04 * this.globalPlaybackRate;
         break;
       case 'kallisti':
-        // Kallisti: Melódica, poética, vibrante
         basePitch = 1.12;
         baseRate = 1.02 * this.globalPlaybackRate;
         break;
@@ -441,14 +654,15 @@ class OmniVoiceEngine {
 
     const speakNextClause = () => {
       if (!this.isSpeaking || currentClauseIdx >= clauses.length) {
-        this.isSpeaking = false;
-        this.isPaused = false;
+        this.echoCooldownUntil = Date.now() + 900;
         this.currentUtterance = null;
-        this.emit('state_change', 'idle');
         setTimeout(() => {
+          this.isSpeaking = false;
+          this.isPaused = false;
           this.suppressRecognition = false;
-        }, 500);
-        if (onEnd) onEnd();
+          this.emit('state_change', 'idle');
+          if (onEnd) onEnd();
+        }, 900);
         return;
       }
 
@@ -482,13 +696,17 @@ class OmniVoiceEngine {
       utterance.onend = () => {
         const pauseDelay = clause.type === 'comma' ? 60 : (clause.type === 'pause' ? 120 : 75);
         setTimeout(() => {
-          speakNextClause();
+          if (this.isSpeaking) {
+            speakNextClause();
+          }
         }, pauseDelay);
       };
 
       utterance.onerror = (err) => {
-        console.warn('Clause utterance error:', err);
-        speakNextClause();
+        console.warn('Clause utterance notice:', err);
+        if (this.isSpeaking) {
+          speakNextClause();
+        }
       };
 
       if (onBoundary) {
@@ -528,6 +746,8 @@ class OmniVoiceEngine {
     }
     this.isSpeaking = false;
     this.isPaused = false;
+    this.suppressRecognition = false;
+    this.echoCooldownUntil = 0;
     this.currentUtterance = null;
     this.emit('state_change', 'idle');
   }
@@ -614,7 +834,7 @@ class OmniVoiceEngine {
   }
 
   /**
-   * Sequentially speaks a multi-personality response with each persona's unique voice profile!
+   * Sequentially speaks a multi-personality response with continuous echo suppression across personas.
    */
   speakMultiPersonalityDialogue(fullText, onSegmentStart = null, onSegmentEnd = null, onAllEnd = null) {
     this.stopSpeaking();
@@ -624,17 +844,27 @@ class OmniVoiceEngine {
       return;
     }
 
+    this.isSpeaking = true;
+    this.suppressRecognition = true;
+    this.emit('state_change', 'speaking');
+
     let currentIndex = 0;
 
     const playNext = () => {
       if (currentIndex >= segments.length) {
-        this.isSpeaking = false;
-        if (onAllEnd) onAllEnd();
+        this.echoCooldownUntil = Date.now() + 900;
+        setTimeout(() => {
+          this.isSpeaking = false;
+          this.suppressRecognition = false;
+          this.emit('state_change', 'idle');
+          if (onAllEnd) onAllEnd();
+        }, 900);
         return;
       }
 
       const seg = segments[currentIndex];
       if (onSegmentStart) onSegmentStart(seg, currentIndex);
+      this.recordSpokenPhrase(seg.text);
 
       this.speak(
         seg.text,
@@ -647,11 +877,17 @@ class OmniVoiceEngine {
         },
         () => {
           this.isSpeaking = true;
+          this.suppressRecognition = true;
         },
         () => {
           if (onSegmentEnd) onSegmentEnd(seg, currentIndex);
           currentIndex++;
-          setTimeout(playNext, 200);
+          // Maintain speaking state active during inter-segment pause
+          setTimeout(() => {
+            if (this.isSpeaking) {
+              playNext();
+            }
+          }, 200);
         }
       );
     };
@@ -675,14 +911,22 @@ class OmniVoiceEngine {
     };
 
     this.recognition.onresult = (event) => {
+      if (this.isProducingSound()) return;
+
       let interim = '';
       let final = '';
 
       for (let i = event.resultIndex; i < event.results.length; ++i) {
+        const tr = event.results[i][0].transcript;
+        if (this.isAcousticSelfEcho(tr)) {
+          this.emit('echo_suppressed', tr);
+          continue;
+        }
+
         if (event.results[i].isFinal) {
-          final += event.results[i][0].transcript;
+          final += tr;
         } else {
-          interim += event.results[i][0].transcript;
+          interim += tr;
         }
       }
 
@@ -691,7 +935,7 @@ class OmniVoiceEngine {
     };
 
     this.recognition.onerror = (event) => {
-      console.warn('SpeechRecognition error:', event.error);
+      console.warn('SpeechRecognition notice:', event.error);
       this.isListening = false;
       if (onError) onError(event.error);
     };
@@ -737,7 +981,7 @@ class OmniVoiceEngine {
     }
 
     this.ambientRecognition.onresult = async (event) => {
-      if (!this.isContinuousListening) return;
+      if (!this.isContinuousListening || this.isProducingSound()) return;
       const lastIdx = event.results.length - 1;
       if (lastIdx < 0) return;
 
@@ -745,6 +989,11 @@ class OmniVoiceEngine {
       if (result.isFinal) {
         const transcript = result[0].transcript.trim();
         if (transcript.length > 2) {
+          if (this.isAcousticSelfEcho(transcript)) {
+            this.emit('echo_suppressed', transcript);
+            return;
+          }
+
           if (onSpeechRecognized) onSpeechRecognized(transcript);
 
           try {
@@ -820,7 +1069,7 @@ class OmniVoiceEngine {
 
   /**
    * Direct Real-Time 1.58-Bit Full-Duplex Conversational Pipeline
-   * Responds instantly without waiting for sentence completion, transcribing sidecar chat concurrently.
+   * Features intelligent end-of-turn detection, natural pause cadence, and full acoustic echo cancellation.
    */
   startFullDuplexConversation({
     onUserSpeech,
@@ -854,16 +1103,19 @@ class OmniVoiceEngine {
     this.convRecognition.interimResults = true;
     this.convRecognition.lang = 'es-ES';
 
-    let speechTimer = null;
     let accumulatedTranscript = '';
 
     if (onStateChange) onStateChange('listening');
     this.emit('duplex_state', 'listening');
 
     this.convRecognition.onresult = (event) => {
-      // Acoustic echo rejection
-      if (this.isSpeaking || this.suppressRecognition) {
+      // 1. Acoustic Self-Voice Suppression: Ignore everything if AI is outputting sound or in echo decay tail
+      if (this.isProducingSound()) {
         accumulatedTranscript = '';
+        if (this._speechTimer) {
+          clearTimeout(this._speechTimer);
+          this._speechTimer = null;
+        }
         return;
       }
 
@@ -874,11 +1126,10 @@ class OmniVoiceEngine {
         const item = event.results[i];
         const text = item[0].transcript;
 
-        if (this.lastSpokenText && text.trim().length > 3) {
-          const lower = text.toLowerCase().trim();
-          if (this.lastSpokenText.includes(lower) || lower.includes(this.lastSpokenText.slice(0, 15))) {
-            continue;
-          }
+        // 2. Reject self-voice acoustic matches against recent AI responses
+        if (this.isAcousticSelfEcho(text)) {
+          this.emit('echo_suppressed', text);
+          continue;
         }
 
         if (item.isFinal) {
@@ -889,34 +1140,60 @@ class OmniVoiceEngine {
         }
       }
 
-      if (speechTimer) clearTimeout(speechTimer);
-
       const currentSpeech = (accumulatedTranscript + ' ' + interim).trim();
-      if (currentSpeech.length > 1) {
-        if (onStateChange) onStateChange('user_speaking');
-        if (onLiveTranscript) onLiveTranscript(currentSpeech);
-        this.emit('duplex_state', 'user_speaking');
 
-        // Direct 1.58-Bit Instant Turn: 180ms - 320ms latency!
-        const isComplete = hasFinal || /[.?!]$/.test(currentSpeech);
-        const dynamicTimeout = isComplete ? 200 : 350;
-
-        speechTimer = setTimeout(() => {
-          const finalPrompt = (accumulatedTranscript + (hasFinal ? '' : ' ' + interim)).trim();
-          if (finalPrompt.length > 1 && this.isConversationActive && !this.isSpeaking && !this.suppressRecognition) {
-            accumulatedTranscript = '';
-            if (onUserSpeech) onUserSpeech(finalPrompt);
-            if (onStateChange) onStateChange('thinking');
-            this.emit('duplex_state', 'thinking');
-          }
-        }, dynamicTimeout);
+      // Discard empty or self-echoing fragments
+      if (currentSpeech.length <= 1 || this.isAcousticSelfEcho(currentSpeech)) {
+        return;
       }
+
+      if (this._speechTimer) {
+        clearTimeout(this._speechTimer);
+      }
+
+      if (onStateChange) onStateChange('user_speaking');
+      if (onLiveTranscript) onLiveTranscript(currentSpeech);
+      this.emit('duplex_state', 'user_speaking');
+
+      // 3. Intelligent Conversational Cadence & Human Pause Detection
+      const cadence = this.analyzeTurnCadence(currentSpeech);
+      const dynamicTimeout = cadence.timeoutMs;
+
+      this._speechTimer = setTimeout(() => {
+        // Double-check acoustic state before triggering response turn
+        if (this.isProducingSound() || !this.isConversationActive) {
+          accumulatedTranscript = '';
+          return;
+        }
+
+        const finalPrompt = (accumulatedTranscript + (hasFinal ? '' : ' ' + interim)).trim();
+        if (finalPrompt.length > 1 && !this.isAcousticSelfEcho(finalPrompt)) {
+          // Acoustic energy check: if user is still vocalizing into the microphone, delay turn completion
+          const micEnergy = this.getMicAcousticEnergy();
+          if (micEnergy > 0.045 && !cadence.isComplete) {
+            // Re-arm timer with 500ms grace window for ongoing speech
+            this._speechTimer = setTimeout(() => {
+              if (this.isProducingSound() || !this.isConversationActive) return;
+              accumulatedTranscript = '';
+              if (onUserSpeech) onUserSpeech(finalPrompt);
+              if (onStateChange) onStateChange('thinking');
+              this.emit('duplex_state', 'thinking');
+            }, 500);
+            return;
+          }
+
+          accumulatedTranscript = '';
+          if (onUserSpeech) onUserSpeech(finalPrompt);
+          if (onStateChange) onStateChange('thinking');
+          this.emit('duplex_state', 'thinking');
+        }
+      }, dynamicTimeout);
     };
 
     this.convRecognition.onerror = (e) => {
       if (this.isConversationActive && e.error !== 'aborted') {
         setTimeout(() => {
-          if (this.isConversationActive) {
+          if (this.isConversationActive && !this.isSpeaking) {
             try { this.convRecognition.start(); } catch {}
           }
         }, 800);
@@ -926,7 +1203,7 @@ class OmniVoiceEngine {
     this.convRecognition.onend = () => {
       if (this.isConversationActive) {
         setTimeout(() => {
-          if (this.isConversationActive) {
+          if (this.isConversationActive && !this.isSpeaking) {
             try { this.convRecognition.start(); } catch {}
           }
         }, 300);
@@ -942,6 +1219,10 @@ class OmniVoiceEngine {
 
   stopFullDuplexConversation() {
     this.isConversationActive = false;
+    if (this._speechTimer) {
+      clearTimeout(this._speechTimer);
+      this._speechTimer = null;
+    }
     if (this.convRecognition) {
       try {
         this.convRecognition.stop();

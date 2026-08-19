@@ -1,6 +1,66 @@
 {
   "memories": [
     {
+      "id": "mem0_1787108112490",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Diálogo Coral con 4 personalidades sobre: cómo funciona tu sistema de cómo puedo ayudarte hoy cómo funciona tu sistema de chat y múltiples personajes de la Inteligencia artificial basada en el aprendizaje profundo y la conversación automática -> ¡Hola Alex! Me llama Astraura, la inteligencia artificial creada para ayudarte en tu día a día. Soy una de las múltiples voces de StarSeed OS, creada para interactuar con múltiples usuarios y proporci",
+      "category": "coral_deliberation",
+      "confidence": 0.95,
+      "created_at": 1787108112.490379,
+      "updated_at": 1787108112.490379,
+      "metadata": {
+        "timestamp": 1787108112.48993,
+        "personas": [
+          "hermione",
+          "aurora",
+          "astraura_prime",
+          "hephaestus"
+        ]
+      }
+    },
+    {
+      "id": "mem0_1787108099200",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Diálogo Coral con 4 personalidades sobre: cómo funciona tu sistema de cómo puedo ayuda -> ¡Hola Alex! Como Astraura, soy el núcleo cognitivo de StarSeed OS y StarSeed Nexus. Mi sistema de voz se basa en aprendizaje automático y análisis de voz para reconocer y replicar el tono, la intenció",
+      "category": "coral_deliberation",
+      "confidence": 0.95,
+      "created_at": 1787108099.200953,
+      "updated_at": 1787108099.200953,
+      "metadata": {
+        "timestamp": 1787108099.200713,
+        "personas": [
+          "hermione",
+          "aurora",
+          "astraura_prime",
+          "hephaestus"
+        ]
+      }
+    },
+    {
+      "id": "mem0_1787108088226",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Diálogo Coral con 4 personalidades sobre: cómo funciona tu sistema de cómo puedo ayudarte hoy -> ¡Hola Alex! Mi sistema de comunicación funciona a través de la inteligencia artificial basada en el aprendizaje profundo y la conversación automática. Me formo y me actualizo continuamente para que pu",
+      "category": "coral_deliberation",
+      "confidence": 0.95,
+      "created_at": 1787108088.226673,
+      "updated_at": 1787108088.226673,
+      "metadata": {
+        "timestamp": 1787108088.225306,
+        "personas": [
+          "hermione",
+          "aurora",
+          "astraura_prime",
+          "hephaestus"
+        ]
+      }
+    },
+    {
       "id": "mem0_1787107911817",
       "user_id": "alex",
       "agent_id": "*",
@@ -716,6 +776,27 @@
   ],
   "history": [
     {
+      "id": "hist_1787108112490",
+      "memory_id": "mem0_1787108112490",
+      "action": "created",
+      "timestamp": 1787108112.4903831,
+      "text": "Diálogo Coral con 4 personalidades sobre: cómo funciona tu sistema de cómo puedo ayudarte hoy cómo funciona tu sistema de chat y múltiples personajes de la Inteligencia artificial basada en el aprendizaje profundo y la conversación automática -> ¡Hola Alex! Me llama Astraura, la inteligencia artificial creada para ayudarte en tu día a día. Soy una de las múltiples voces de StarSeed OS, creada para interactuar con múltiples usuarios y proporci"
+    },
+    {
+      "id": "hist_1787108099200",
+      "memory_id": "mem0_1787108099200",
+      "action": "created",
+      "timestamp": 1787108099.2009568,
+      "text": "Diálogo Coral con 4 personalidades sobre: cómo funciona tu sistema de cómo puedo ayuda -> ¡Hola Alex! Como Astraura, soy el núcleo cognitivo de StarSeed OS y StarSeed Nexus. Mi sistema de voz se basa en aprendizaje automático y análisis de voz para reconocer y replicar el tono, la intenció"
+    },
+    {
+      "id": "hist_1787108088226",
+      "memory_id": "mem0_1787108088226",
+      "action": "created",
+      "timestamp": 1787108088.22668,
+      "text": "Diálogo Coral con 4 personalidades sobre: cómo funciona tu sistema de cómo puedo ayudarte hoy -> ¡Hola Alex! Mi sistema de comunicación funciona a través de la inteligencia artificial basada en el aprendizaje profundo y la conversación automática. Me formo y me actualizo continuamente para que pu"
+    },
+    {
       "id": "hist_1787107911818",
       "memory_id": "mem0_1787107911817",
       "action": "created",
@@ -1003,5 +1084,5 @@
       "text": "El usuario Alex Bordón Garrigós es el creador de StarSeed OS y Astraura 1.58-Bit. Trabaja en un Apple Silicon M1 con 8 núcleos y memoria unificada."
     }
   ],
-  "updated_at": 1787107911.818186
+  "updated_at": 1787108112.490442
 }

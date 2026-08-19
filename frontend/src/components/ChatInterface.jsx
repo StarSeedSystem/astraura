@@ -200,7 +200,7 @@ export default function ChatInterface({
   // Auto-speak response in Live Conversation mode when generation finishes
   const prevStreamingRef = useRef(isStreaming);
   useEffect(() => {
-    if (prevStreamingRef.current && !isStreaming && isFullDuplexVoiceActive) {
+    if (prevStreamingRef.current && !isStreaming && (isFullDuplexVoiceActive || omniVoice.isConversationActive)) {
       const lastMsg = messages[messages.length - 1];
       if (lastMsg && lastMsg.sender === 'ai' && lastMsg.text) {
         handleSpeakMultiVoice(lastMsg.id, lastMsg.text);

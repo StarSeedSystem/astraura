@@ -174,7 +174,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (cuales son las capacidades de este ...)",
       "strength": 1.0,
-      "updated_at": 1787107915.365728
+      "updated_at": 1787108114.940696
     },
     "Bits": {
       "id": "Bits",
@@ -374,7 +374,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (de hecho Alex Bordón Garrigós era m...)",
       "strength": 1.0,
-      "updated_at": 1787107915.377683
+      "updated_at": 1787108082.478394
     },
     "Bordón": {
       "id": "Bordón",
@@ -678,7 +678,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (desarrolla una historia dramatica s...)",
       "strength": 1.0,
-      "updated_at": 1787107898.985616
+      "updated_at": 1787108114.930193
     },
     "Todos": {
       "id": "Todos",
@@ -750,7 +750,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (quien soy yo, como me llamo y que s...)",
       "strength": 1.0,
-      "updated_at": 1787107898.9960918
+      "updated_at": 1787108098.431796
     },
     "Podría": {
       "id": "Podría",
@@ -910,7 +910,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (cuanto pesa este sistema de 1.5 bit...)",
       "strength": 1.0,
-      "updated_at": 1787107727.151697
+      "updated_at": 1787108114.937221
     },
     "Segundo": {
       "id": "Segundo",
@@ -942,7 +942,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (aprendes en segundo plano o funcion...)",
       "strength": 1.0,
-      "updated_at": 1787107837.486302
+      "updated_at": 1787108114.922932
     },
     "Redes": {
       "id": "Redes",
@@ -1150,7 +1150,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (actualmente Cuántas personalidades ...)",
       "strength": 1.0,
-      "updated_at": 1787107916.0188081
+      "updated_at": 1787108114.263537
     },
     "Perfectamente": {
       "id": "Perfectamente",
@@ -1389,8 +1389,8 @@
       "label": "Cada",
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (como funciona tu sistema de cerebro...)",
-      "strength": 0.6,
-      "updated_at": 1786978138.5613708
+      "strength": 0.7,
+      "updated_at": 1787108114.2685509
     },
     "Personalidades": {
       "id": "Personalidades",
@@ -1445,8 +1445,8 @@
       "label": "Ayudarte",
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (Hola demuéstrame cómo funciona tu s...)",
-      "strength": 0.8999999999999999,
-      "updated_at": 1787107837.482908
+      "strength": 1.0,
+      "updated_at": 1787108114.926683
     },
     "Diseñado": {
       "id": "Diseñado",
@@ -2101,8 +2101,8 @@
       "label": "Conversación",
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (Y cómo es que podemos tener una con...)",
-      "strength": 0.9999999999999999,
-      "updated_at": 1787107838.100696
+      "strength": 1.0,
+      "updated_at": 1787108114.276275
     },
     "Podemos": {
       "id": "Podemos",
@@ -2239,6 +2239,14 @@
       "description": "Concepto destilado de interacción (actualmente Cuántas personalidades ...)",
       "strength": 0.6,
       "updated_at": 1787107916.655491
+    },
+    "Múltiples": {
+      "id": "Múltiples",
+      "label": "Múltiples",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cómo funciona tu sistema de cómo pu...)",
+      "strength": 0.6,
+      "updated_at": 1787108114.933697
     }
   },
   "edges": [
@@ -4262,7 +4270,7 @@
       "source": "Puedo",
       "target": "Ayudarte",
       "relation": "asociado_con",
-      "weight": 0.75
+      "weight": 1.0
     },
     {
       "source": "Sistema",
@@ -4910,7 +4918,7 @@
       "source": "Hola",
       "target": "Alex",
       "relation": "asociado_con",
-      "weight": 0.85
+      "weight": 0.95
     },
     {
       "source": "Alex",
@@ -5138,7 +5146,7 @@
       "source": "Funciona",
       "target": "Sistema",
       "relation": "asociado_con",
-      "weight": 0.75
+      "weight": 1.0
     },
     {
       "source": "Sistema",
@@ -5174,7 +5182,7 @@
       "source": "Cómo",
       "target": "Hola",
       "relation": "asociado_con",
-      "weight": 0.75
+      "weight": 0.85
     },
     {
       "source": "Hola",
@@ -5252,7 +5260,7 @@
       "source": "Cómo",
       "target": "Conversación",
       "relation": "asociado_con",
-      "weight": 0.75
+      "weight": 0.85
     },
     {
       "source": "Conversación",
@@ -5503,6 +5511,66 @@
     {
       "source": "Tres",
       "target": "Cuántas",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Alex",
+      "target": "Puedo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cómo",
+      "target": "Funciona",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistema",
+      "target": "Puedo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Ayudarte",
+      "target": "Hola",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Estoy",
+      "target": "Cada",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cada",
+      "target": "Cómo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Conversación",
+      "target": "Funciona",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Ayudarte",
+      "target": "Cómo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cómo",
+      "target": "Múltiples",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Múltiples",
+      "target": "Funciona",
       "relation": "asociado_con",
       "weight": 0.65
     }
