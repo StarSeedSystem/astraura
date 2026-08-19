@@ -51,6 +51,7 @@ from .core.audio_cpp_engine import audio_cpp_engine
 from .core.continuous_voice_daemon import continuous_voice_daemon
 from .core.needle_engine import needle_engine
 from .core.personality_api_engine import personality_api_engine
+from .core.agent_vault_engine import agent_vault_engine
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -1140,6 +1141,172 @@ async def invoke_personality_via_api(
         "persona_name": auth.get("persona_name"),
         "latency_ms": elapsed_ms,
         "response": thought_cycle.get("final_synthesis", "Respuesta procesada."),
+        "branching_plan": thought_cycle.get("branching_plan"),
+        "timestamp": time.time()
+    }
+
+
+# ================= Agent Vault, Governance & Sovereign Agent APIs =================
+
+@app.get("/api/agents")
+async def list_agents_endpoint():
+    """Lists all configured agents, their personalities, cerebros, processes, and branches."""
+    return {"success": True, "agents": agent_vault_engine.list_agents()}
+
+@app.get("/api/agents/{agent_id}")
+async def get_agent_endpoint(agent_id: str):
+    """Returns detailed configuration for a specific agent."""
+    ag = agent_vault_engine.get_agent(agent_id)
+    if not ag:
+        return JSONResponse(status_code=404, content={"success": False, "error": f"Agente '{agent_id}' no encontrado."})
+    return {"success": True, "agent": ag}
+
+class SaveAgentRequest(BaseModel):
+    agent: Dict[str, Any]
+
+@app.post("/api/agents/save")
+async def save_agent_endpoint(req: SaveAgentRequest):
+    """Creates or updates an agent with custom personalities, cerebros, branches, and imagination settings."""
+    res = agent_vault_engine.save_agent(req.agent)
+    return res
+
+@app.delete("/api/agents/{agent_id}")
+async def delete_agent_endpoint(agent_id: str):
+    """Deletes a custom agent and its API profile."""
+    res = agent_vault_engine.delete_agent(agent_id)
+    return res
+
+class ToggleAgentImaginationRequest(BaseModel):
+    enabled: bool
+
+@app.post("/api/agents/{agent_id}/toggle_imagination")
+async def toggle_agent_imagination_endpoint(agent_id: str, req: ToggleAgentImaginationRequest):
+    """Toggles background active intuitive imagination for a specific agent."""
+    res = agent_vault_engine.toggle_agent_imagination(agent_id, req.enabled)
+    return res
+
+class UpdateAgentImaginationConfigRequest(BaseModel):
+    config: Dict[str, Any]
+
+@app.post("/api/agents/{agent_id}/update_imagination_config")
+async def update_agent_imagination_config_endpoint(agent_id: str, req: UpdateAgentImaginationConfigRequest):
+    """Updates imagination frequency, permission level, compute trunk, and resource quotas for an agent."""
+    res = agent_vault_engine.update_agent_imagination_config(agent_id, req.config)
+    return res
+
+@app.get("/api/agents_api/keys")
+async def list_agent_api_keys_endpoint():
+    """Lists all agent API keys with security masking."""
+    return {"success": True, "agents": agent_vault_engine.list_agent_apis()}
+
+@app.get("/api/agents_api/{agent_id}/api_status")
+async def get_agent_api_detail_endpoint(agent_id: str):
+    """Returns detailed API status, full key, permissions, active processes, and connections for an agent."""
+    detail = agent_vault_engine.get_agent_api_detail(agent_id)
+    if not detail:
+        return JSONResponse(status_code=404, content={"success": False, "error": f"Agente '{agent_id}' no encontrado."})
+    return {"success": True, "detail": detail}
+
+@app.post("/api/agents_api/{agent_id}/generate_key")
+async def regenerate_agent_key_endpoint(agent_id: str):
+    """Rotates/regenerates the API key for an agent."""
+    res = agent_vault_engine.regenerate_agent_api_key(agent_id)
+    return res
+
+@app.post("/api/agents_api/{agent_id}/revoke_key")
+async def revoke_agent_key_endpoint(agent_id: str):
+    """Revokes the API key for an agent."""
+    res = agent_vault_engine.revoke_agent_api_key(agent_id)
+    return res
+
+@app.post("/api/agents_api/{agent_id}/restore_key")
+async def restore_agent_key_endpoint(agent_id: str):
+    """Restores a revoked API key for an agent."""
+    res = agent_vault_engine.restore_agent_api_key(agent_id)
+    return res
+
+class UpdateAgentPermissionsRequest(BaseModel):
+    permissions: Dict[str, bool]
+
+@app.post("/api/agents_api/{agent_id}/update_permissions")
+async def update_agent_permissions_endpoint(agent_id: str, req: UpdateAgentPermissionsRequest):
+    """Updates granular modification & access permissions for an agent API."""
+    res = agent_vault_engine.update_agent_permissions(agent_id, req.permissions)
+    return res
+
+class SyncAgentServerRequest(BaseModel):
+    server_config: Dict[str, Any]
+
+@app.post("/api/agents_api/{agent_id}/sync_server")
+async def configure_agent_server_endpoint(agent_id: str, req: SyncAgentServerRequest):
+    """Configures a local or external sync server for an agent."""
+    res = agent_vault_engine.add_or_update_agent_server(agent_id, req.server_config)
+    return res
+
+@app.delete("/api/agents_api/{agent_id}/sync_server/{server_id}")
+async def remove_agent_server_endpoint(agent_id: str, server_id: str):
+    """Removes a linked server from an agent."""
+    res = agent_vault_engine.remove_agent_server(agent_id, server_id)
+    return res
+
+@app.post("/api/agents_api/{agent_id}/trigger_sync/{server_id}")
+async def trigger_agent_server_sync_endpoint(agent_id: str, server_id: str):
+    """Triggers manual bi-directional sync between an agent and a server."""
+    res = await agent_vault_engine.trigger_agent_server_sync(agent_id, server_id)
+    return res
+
+class InvokeAgentApiRequest(BaseModel):
+    prompt: str
+    target_action: Optional[str] = "execute_task"
+    context: Optional[Dict[str, Any]] = None
+
+@app.post("/api/v1/agents/{agent_id}/invoke")
+async def invoke_agent_via_api(
+    agent_id: str,
+    req: InvokeAgentApiRequest,
+    response: Response,
+    x_astraura_key: Optional[str] = Header(None, alias="X-Astraura-Key"),
+    authorization: Optional[str] = Header(None, alias="Authorization"),
+    api_key_query: Optional[str] = Query(None, alias="api_key")
+):
+    """
+    Direct programmatic API invocation endpoint for agents.
+    Authenticated with 'X-Astraura-Key' header, 'Authorization: Bearer <key>', or '?api_key=' param.
+    """
+    raw_key = x_astraura_key or api_key_query or ""
+    if not raw_key and authorization:
+        raw_key = authorization.replace("Bearer ", "").replace("bearer ", "").strip()
+
+    auth = agent_vault_engine.verify_agent_api_key_access(raw_key, required_scope="invoke_subagents")
+    if not auth.get("authenticated"):
+        return JSONResponse(status_code=401, content={"success": False, "error": auth.get("error", "No autorizado.")})
+
+    start_t = time.time()
+    agent = agent_vault_engine.get_agent(agent_id) or {}
+    primary_persona = agent.get("used_personalities", [{"id": "aurora"}])[0].get("id", "aurora")
+
+    thought_cycle = await orchestrator.execute_thought_cycle(
+        f"[{agent.get('name', agent_id)}] {req.prompt}",
+        preferences={"selected_personalities": [primary_persona], "multi_personality_mode": "single"}
+    )
+    elapsed_ms = round((time.time() - start_t) * 1000, 1)
+
+    agent_vault_engine._record_api_call(agent_id, {
+        "method": "POST",
+        "endpoint": f"/api/v1/agents/{agent_id}/invoke",
+        "client_ip": "External Client / Script",
+        "status_code": 200,
+        "latency_ms": elapsed_ms,
+        "tokens_used": 165,
+        "scope_checked": "invoke_subagents"
+    })
+
+    return {
+        "success": True,
+        "agent_id": agent_id,
+        "agent_name": auth.get("agent_name"),
+        "latency_ms": elapsed_ms,
+        "response": thought_cycle.get("final_synthesis", "Tarea del agente completada."),
         "branching_plan": thought_cycle.get("branching_plan"),
         "timestamp": time.time()
     }

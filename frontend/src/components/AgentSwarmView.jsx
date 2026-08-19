@@ -28,7 +28,12 @@ import {
   Gauge,
   Radio,
   Battery,
-  AlertCircle
+  AlertCircle,
+  Edit3,
+  Key,
+  GitBranch,
+  ArrowRight,
+  Bot
 } from 'lucide-react';
 import { 
   fetchSwarmStatus, 
@@ -39,14 +44,27 @@ import {
   updateSwarmScheduleFrequency, 
   createSwarmSchedule, 
   toggleAgent, 
-  updateAgentConcurrency 
+  updateAgentConcurrency,
+  fetchAgents,
+  saveAgent,
+  deleteAgent,
+  toggleAgentImagination
 } from '../services/api';
+import AgentEditorModal from './AgentEditorModal';
+import AgentApiManagerModal from './AgentApiManagerModal';
 
 export default function AgentSwarmView() {
   const [swarmData, setSwarmData] = useState(null);
+  const [agentsList, setAgentsList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeSubTab, setActiveSubTab] = useState('tasks'); // 'tasks', 'schedules', 'agents', 'telemetry'
   const [toastMsg, setToastMsg] = useState('');
+
+  // Agent Vault Modals
+  const [isAgentEditorOpen, setIsAgentEditorOpen] = useState(false);
+  const [editingAgent, setEditingAgent] = useState(null);
+  const [isAgentApiModalOpen, setIsAgentApiModalOpen] = useState(false);
+  const [selectedApiAgent, setSelectedApiAgent] = useState(null);
 
   // Dispatch Task Modal State
   const [isDispatchModalOpen, setIsDispatchModalOpen] = useState(false);
@@ -69,10 +87,14 @@ export default function AgentSwarmView() {
 
   const loadSwarm = async () => {
     try {
-      const data = await fetchSwarmStatus();
-      if (data) setSwarmData(data);
+      const [sData, aData] = await Promise.all([
+        fetchSwarmStatus(),
+        fetchAgents()
+      ]);
+      if (sData) setSwarmData(sData);
+      if (aData && aData.agents) setAgentsList(aData.agents);
     } catch (err) {
-      console.warn('Error fetching swarm status:', err);
+      console.warn('Error fetching swarm/agents status:', err);
     } finally {
       setIsLoading(false);
     }
@@ -83,6 +105,58 @@ export default function AgentSwarmView() {
     const interval = setInterval(loadSwarm, 4000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleSaveAgentData = async (agentPayload) => {
+    try {
+      await saveAgent(agentPayload);
+      setToastMsg(`💾 Agente guardado: ${agentPayload.name}`);
+      setTimeout(() => setToastMsg(''), 3000);
+      setIsAgentEditorOpen(false);
+      setEditingAgent(null);
+      loadSwarm();
+    } catch (err) {
+      alert(`Error al guardar agente: ${err.message}`);
+    }
+  };
+
+  const handleDeleteAgentData = async (agentId) => {
+    if (!confirm('¿Eliminar este agente soberano personalizado?')) return;
+    try {
+      await deleteAgent(agentId);
+      setToastMsg(`🗑️ Agente eliminado`);
+      setTimeout(() => setToastMsg(''), 3000);
+      loadSwarm();
+    } catch (err) {
+      alert(`Error al eliminar agente: ${err.message}`);
+    }
+  };
+
+  const handleToggleAgentImaginationState = async (agentId, currentVal) => {
+    try {
+      const newVal = !currentVal;
+      await toggleAgentImagination(agentId, newVal);
+      setToastMsg(`🌌 Imaginación en segundo plano: ${newVal ? 'ACTIVADA' : 'DESACTIVADA'}`);
+      setTimeout(() => setToastMsg(''), 3000);
+      loadSwarm();
+    } catch (err) {
+      alert(`Error al cambiar estado de imaginación: ${err.message}`);
+    }
+  };
+
+  const handleOpenCreateAgent = () => {
+    setEditingAgent(null);
+    setIsAgentEditorOpen(true);
+  };
+
+  const handleOpenEditAgent = (agentObj) => {
+    setEditingAgent(agentObj);
+    setIsAgentEditorOpen(true);
+  };
+
+  const handleOpenApiModal = (agentObj) => {
+    setSelectedApiAgent(agentObj);
+    setIsAgentApiModalOpen(true);
+  };
 
   const handleSetCapacityMode = async (mode, manualPercent = null) => {
     try {
@@ -479,89 +553,191 @@ export default function AgentSwarmView() {
         </div>
       )}
 
-      {/* TAB 3: AGENTS MATRIX */}
+      {/* TAB 3: AGENTS MATRIX & VAULT GOVERNANCE */}
       {activeSubTab === 'agents' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 font-mono text-xs">
-          {(swarmData?.agents || []).map((agent) => (
-            <div
-              key={agent.id}
-              className="p-5 rounded-3xl bg-[#0c0f18] border border-white/10 shadow-xl space-y-3 flex flex-col justify-between"
+        <div className="space-y-4 font-mono text-xs">
+          {/* Header with Create Button */}
+          <div className="p-4 rounded-2xl bg-black/40 border border-white/10 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-bold text-white flex items-center gap-2 font-display">
+                <Bot className="w-4 h-4 text-cyan-400" />
+                Matriz de Agentes Soberanos & Bóveda de Configuración
+              </h2>
+              <p className="text-[11px] text-slate-400">
+                Personalidades, accesos a cerebros/memorias, procesos en desarrollo, ramificaciones paralelas y APIs.
+              </p>
+            </div>
+
+            <button
+              onClick={handleOpenCreateAgent}
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold flex items-center gap-1.5 shadow-lg shadow-cyan-500/20 transition-all cursor-pointer"
             >
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between pb-2 border-b border-white/5">
-                  <span className="font-bold text-white text-xs">{agent.name}</span>
-                  <span
-                    className="text-[10px] px-2 py-0.5 rounded-full font-bold"
-                    style={{ backgroundColor: `${agent.color}20`, color: agent.color }}
-                  >
-                    {agent.status.toUpperCase()}
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-300 leading-snug">
-                  {agent.role}
-                </p>
+              <Plus className="w-4 h-4" />
+              <span>Crear Nuevo Agente</span>
+            </button>
+          </div>
 
-                {/* Personalities in Use */}
-                <div className="p-2 rounded-xl bg-black/40 border border-purple-500/20 space-y-1.5 text-[10px]">
-                  <span className="text-purple-300 font-bold flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-purple-400" />
-                    Personalidades en Uso:
-                  </span>
-                  <div className="flex flex-wrap gap-1">
-                    {(agent.used_personalities || [
-                      { id: agent.id, name: agent.name.split(' ')[0], color: agent.color, archetype: agent.role }
-                    ]).map((pers, persIdx) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {(agentsList.length > 0 ? agentsList : (swarmData?.agents || [])).map((agent) => (
+              <div
+                key={agent.id}
+                className="p-5 rounded-3xl bg-[#0c0f18] border border-white/10 hover:border-cyan-500/30 transition-all shadow-xl space-y-3.5 flex flex-col justify-between"
+              >
+                <div className="space-y-3">
+                  {/* Top Name & Area */}
+                  <div className="flex items-center justify-between pb-2 border-b border-white/5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: agent.color || '#00f0ff' }} />
+                      <span className="font-bold text-white text-xs">{agent.name}</span>
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      {agent.is_custom && (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                          Custom
+                        </span>
+                      )}
                       <span
-                        key={persIdx}
-                        className="px-2 py-0.5 rounded-md border font-semibold flex items-center gap-1"
-                        style={{ backgroundColor: `${pers.color || '#a855f7'}15`, borderColor: `${pers.color || '#a855f7'}40`, color: pers.color || '#a855f7' }}
+                        className="text-[10px] px-2 py-0.5 rounded-full font-bold"
+                        style={{ backgroundColor: `${agent.color || '#00f0ff'}20`, color: agent.color || '#00f0ff' }}
                       >
-                        <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: pers.color || '#a855f7' }} />
-                        <span>{pers.name}</span>
-                        <span className="text-[8px] opacity-70 font-mono">({pers.archetype?.split(' ')[0] || 'Voz'})</span>
+                        {(agent.status || 'active').toUpperCase()}
                       </span>
-                    ))}
+                    </div>
                   </div>
-                </div>
 
-                {/* Linked Cerebros */}
-                {agent.linked_cerebros && agent.linked_cerebros.length > 0 && (
-                  <div className="p-2 rounded-xl bg-black/40 border border-cyan-500/20 space-y-1 text-[10px]">
-                    <span className="text-cyan-300 font-bold flex items-center gap-1">
-                      <Brain className="w-3 h-3 text-cyan-400" />
-                      Cerebros Vinculados:
+                  <p className="text-[11px] text-slate-300 leading-snug">
+                    {agent.role}
+                  </p>
+
+                  {/* Background Intuitive Imagination Quick Control */}
+                  <div className={`p-2.5 rounded-xl border flex items-center justify-between transition-all ${
+                    agent.imagination_enabled !== false
+                      ? 'bg-purple-950/20 border-purple-500/30 text-purple-200'
+                      : 'bg-black/40 border-white/5 text-slate-400'
+                  }`}>
+                    <div className="flex items-center gap-1.5 text-[11px]">
+                      <Wand2 className={`w-3.5 h-3.5 ${agent.imagination_enabled !== false ? 'text-purple-400 animate-pulse' : 'text-slate-500'}`} />
+                      <span className="font-bold">
+                        {agent.imagination_enabled !== false ? '🌌 Imaginación en 2do Plano' : '○ Imaginación Apagada'}
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={() => handleToggleAgentImaginationState(agent.id, agent.imagination_enabled !== false)}
+                      className={`text-[10px] px-2 py-0.5 rounded font-bold transition-all ${
+                        agent.imagination_enabled !== false
+                          ? 'bg-purple-500 text-black shadow-sm'
+                          : 'bg-white/10 text-slate-300 hover:bg-white/20'
+                      }`}
+                    >
+                      {agent.imagination_enabled !== false ? 'ON' : 'OFF'}
+                    </button>
+                  </div>
+
+                  {/* Personalities in Use */}
+                  <div className="p-2 rounded-xl bg-black/40 border border-purple-500/20 space-y-1 text-[10px]">
+                    <span className="text-purple-300 font-bold flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-purple-400" />
+                      Personalidades Habilitadas:
                     </span>
                     <div className="flex flex-wrap gap-1">
-                      {agent.linked_cerebros.map((cer, cerIdx) => (
+                      {(agent.used_personalities || [
+                        { id: agent.id, name: agent.name.split(' ')[0], color: agent.color }
+                      ]).map((pers, persIdx) => (
                         <span
-                          key={cerIdx}
-                          className="px-2 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-mono"
+                          key={persIdx}
+                          className="px-2 py-0.5 rounded-md border font-semibold flex items-center gap-1"
+                          style={{ backgroundColor: `${pers.color || '#a855f7'}15`, borderColor: `${pers.color || '#a855f7'}40`, color: pers.color || '#a855f7' }}
                         >
-                          {cer.name}
+                          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: pers.color || '#a855f7' }} />
+                          <span>{pers.name}</span>
                         </span>
                       ))}
                     </div>
                   </div>
-                )}
 
-                <div className="p-2 rounded-xl bg-black/40 border border-white/5 text-[10px] text-slate-400 space-y-1">
-                  <div>▸ Tarea: <b className="text-slate-200">{agent.current_task || 'En espera de despacho'}</b></div>
-                  <div>▸ Tareas Completadas: <b className="text-cyan-300">{agent.completed_tasks || 0}</b></div>
+                  {/* Linked Cerebros */}
+                  {agent.linked_cerebros && agent.linked_cerebros.length > 0 && (
+                    <div className="p-2 rounded-xl bg-black/40 border border-cyan-500/20 space-y-1 text-[10px]">
+                      <span className="text-cyan-300 font-bold flex items-center gap-1">
+                        <Brain className="w-3 h-3 text-cyan-400" />
+                        Cerebros & Memoria:
+                      </span>
+                      <div className="flex flex-wrap gap-1">
+                        {agent.linked_cerebros.map((cer, cerIdx) => (
+                          <span
+                            key={cerIdx}
+                            className="px-2 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-mono"
+                          >
+                            {cer.name?.split('//')[0] || cer.name}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Branches & Developing Processes */}
+                  <div className="p-2 rounded-xl bg-black/40 border border-white/5 text-[10px] text-slate-400 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span>Procesos en desarrollo:</span>
+                      <b className="text-emerald-300">{agent.developing_processes?.length || 2} activos</b>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Ramificación paralela:</span>
+                      <b className="text-cyan-300">
+                        {agent.generated_branches?.speedup_factor || '5.0x'} ({agent.generated_branches?.branch_tree?.length || 2} ramas)
+                      </b>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Cuota CPU / RAM:</span>
+                      <b className="text-white">{agent.cpu_quota_percent || 20}% / {agent.ram_limit_mb || 128} MB</b>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card Action Buttons */}
+                <div className="pt-3 border-t border-white/5 space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => handleOpenEditAgent(agent)}
+                      className="px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 font-bold flex items-center justify-center gap-1 border border-white/5 transition-colors cursor-pointer"
+                    >
+                      <Edit3 className="w-3 h-3 text-cyan-400" />
+                      <span>Administrar</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleOpenApiModal(agent)}
+                      className="px-2.5 py-1.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 font-bold flex items-center justify-center gap-1 border border-cyan-500/30 transition-colors cursor-pointer"
+                    >
+                      <Key className="w-3 h-3" />
+                      <span>API & Sync</span>
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1">
+                    <button
+                      onClick={() => handleToggleAgent(agent.id, agent.status)}
+                      className="text-[10px] text-slate-400 hover:text-white flex items-center gap-1 cursor-pointer"
+                    >
+                      {agent.status === 'active' ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
+                      <span>{agent.status === 'active' ? 'Pausar Agente' : 'Reanudar Agente'}</span>
+                    </button>
+
+                    {agent.is_custom && (
+                      <button
+                        onClick={() => handleDeleteAgentData(agent.id)}
+                        className="text-slate-500 hover:text-rose-400 p-1"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
-
-              <div className="pt-3 border-t border-white/5 flex items-center justify-between">
-                <button
-                  onClick={() => handleToggleAgent(agent.id, agent.status)}
-                  className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold flex items-center gap-1 cursor-pointer"
-                >
-                  {agent.status === 'active' ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
-                  <span>{agent.status === 'active' ? 'Pausar' : 'Activar'}</span>
-                </button>
-                <span className="text-[10px] text-slate-500">Concurrencia: {agent.concurrency || 2}</span>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
 
@@ -778,6 +954,30 @@ export default function AgentSwarmView() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* AGENT VAULT & SOVEREIGN API MODALS */}
+      {isAgentEditorOpen && (
+        <AgentEditorModal
+          isOpen={isAgentEditorOpen}
+          onClose={() => {
+            setIsAgentEditorOpen(false);
+            setEditingAgent(null);
+          }}
+          agent={editingAgent}
+          onSave={handleSaveAgentData}
+        />
+      )}
+
+      {isAgentApiModalOpen && selectedApiAgent && (
+        <AgentApiManagerModal
+          isOpen={isAgentApiModalOpen}
+          onClose={() => {
+            setIsAgentApiModalOpen(false);
+            setSelectedApiAgent(null);
+          }}
+          agent={selectedApiAgent}
+        />
       )}
     </div>
   );

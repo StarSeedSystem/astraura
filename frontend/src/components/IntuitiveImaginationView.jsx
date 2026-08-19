@@ -48,7 +48,8 @@ import {
   ShieldAlert,
   Bot,
   ArrowRight,
-  FolderCheck
+  FolderCheck,
+  Key
 } from 'lucide-react';
 import { 
   fetchImaginationStatus, 
@@ -66,18 +67,25 @@ import {
   applyAllProposals,
   updateProcessPermissionPolicy,
   grantAllRequests,
-  grantSingleRequest
+  grantSingleRequest,
+  fetchAgents,
+  toggleAgentImagination,
+  updateAgentImaginationConfig,
+  saveAgent
 } from '../services/api';
 import { deviceContextDetector } from '../services/deviceContextDetector';
 import UniversalDeviceModal from './UniversalDeviceModal';
 import AgentBackgroundTasksZone from './AgentBackgroundTasksZone';
 import ProcessBranchesModal from './ProcessBranchesModal';
+import AgentEditorModal from './AgentEditorModal';
+import AgentApiManagerModal from './AgentApiManagerModal';
 
 export default function IntuitiveImaginationView() {
-  const [activeSubTab, setActiveSubTab] = useState('processes'); // 'processes', 'branches', 'creations', 'governance', 'config'
+  const [activeSubTab, setActiveSubTab] = useState('processes'); // 'processes', 'agents_imagination', 'branches', 'creations', 'config'
   const [status, setStatus] = useState(null);
   const [processTypes, setProcessTypes] = useState([]);
   const [cerebrosList, setCerebrosList] = useState([]);
+  const [agentsList, setAgentsList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isTriggering, setIsTriggering] = useState(false);
   const [isRecycling, setIsRecycling] = useState(false);
@@ -86,6 +94,12 @@ export default function IntuitiveImaginationView() {
   const [customTheme, setCustomTheme] = useState('');
   const [selectedProcessType, setSelectedProcessType] = useState('rem_synaptic_consolidation');
   const [countdown, setCountdown] = useState('05:00');
+
+  // Agent Vault Modals
+  const [isAgentEditorOpen, setIsAgentEditorOpen] = useState(false);
+  const [selectedEditingAgent, setSelectedEditingAgent] = useState(null);
+  const [isAgentApiModalOpen, setIsAgentApiModalOpen] = useState(false);
+  const [selectedApiAgent, setSelectedApiAgent] = useState(null);
   
   // Dedicated Process Branches Modal State
   const [selectedBranchesProcessId, setSelectedBranchesProcessId] = useState(null);
@@ -140,12 +154,17 @@ export default function IntuitiveImaginationView() {
 
   const loadData = async () => {
     try {
-      const [sData, pTypesData, cData, dtData] = await Promise.all([
+      const [sData, pTypesData, cData, dtData, agData] = await Promise.all([
         fetchImaginationStatus().catch(() => null),
         fetchImaginationProcessTypes().catch(() => null),
         fetchCerebros().catch(() => null),
-        fetchDualTrunkGovernor().catch(() => null)
+        fetchDualTrunkGovernor().catch(() => null),
+        fetchAgents().catch(() => null)
       ]);
+
+      if (agData && agData.agents) {
+        setAgentsList(agData.agents);
+      }
 
       if (sData) {
         setStatus(sData);
@@ -191,6 +210,42 @@ export default function IntuitiveImaginationView() {
       console.warn('Error fetching intuitive imagination status:', err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleToggleAgentImaginationState = async (agentId, currentVal) => {
+    try {
+      const newVal = !currentVal;
+      await toggleAgentImagination(agentId, newVal);
+      setToastMsg(`🌌 Imaginación en 2do Plano para ${agentId}: ${newVal ? 'ACTIVADA' : 'DESACTIVADA'}`);
+      setTimeout(() => setToastMsg(''), 3000);
+      loadData();
+    } catch (err) {
+      alert(`Error cambiando estado de imaginación: ${err.message}`);
+    }
+  };
+
+  const handleUpdateAgentImagConfig = async (agentId, partialConfig) => {
+    try {
+      await updateAgentImaginationConfig(agentId, partialConfig);
+      setToastMsg(`⚙️ Configuración de ${agentId} actualizada`);
+      setTimeout(() => setToastMsg(''), 3000);
+      loadData();
+    } catch (err) {
+      alert(`Error actualizando configuración del agente: ${err.message}`);
+    }
+  };
+
+  const handleSaveAgentData = async (agentPayload) => {
+    try {
+      await saveAgent(agentPayload);
+      setToastMsg(`💾 Agente guardado: ${agentPayload.name}`);
+      setTimeout(() => setToastMsg(''), 3000);
+      setIsAgentEditorOpen(false);
+      setSelectedEditingAgent(null);
+      loadData();
+    } catch (err) {
+      alert(`Error guardando agente: ${err.message}`);
     }
   };
 
@@ -720,6 +775,7 @@ export default function IntuitiveImaginationView() {
       <div className="flex flex-wrap items-center gap-2 border-b border-white/10 pb-3 text-xs font-mono">
         {[
           { id: 'processes', label: 'Procesos Oníricos & Niveladores', icon: Moon },
+          { id: 'agents_imagination', label: '🧠 Agentes & Imaginación en 2do Plano', icon: Users, count: agentsList?.length || 7 },
           { id: 'branches', label: 'Ramas & Propuestas (Control)', icon: GitBranch, count: totalCount },
           { id: 'creations', label: 'Creaciones Proactivas', icon: Wand2, count: status?.creations?.length || 0 },
           { id: 'config', label: 'Permisos & Configuración Global', icon: Sliders }
@@ -924,6 +980,228 @@ export default function IntuitiveImaginationView() {
                         <span>Disparar</span>
                       </button>
                     </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* TAB: AGENTS & BACKGROUND INTUITIVE IMAGINATION GOVERNANCE */}
+      {activeSubTab === 'agents_imagination' && (
+        <div className="space-y-4 font-mono text-xs">
+          {/* Header Banner */}
+          <div className="p-4 rounded-2xl bg-black/40 border border-purple-500/30 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-bold text-white flex items-center gap-2 font-display">
+                <Wand2 className="w-4 h-4 text-purple-400" />
+                Gobernanza de Imaginación en Segundo Plano por Agente
+              </h2>
+              <p className="text-[11px] text-slate-400">
+                Enciende o apaga la imaginación activa en reposo, ajusta permisos, troncos de cómputo, cuotas de recursos, interconexiones y APIs para cada agente.
+              </p>
+            </div>
+
+            <button
+              onClick={() => {
+                setSelectedEditingAgent(null);
+                setIsAgentEditorOpen(true);
+              }}
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold flex items-center gap-1.5 shadow-lg shadow-purple-500/20 transition-all cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Crear Nuevo Agente</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {(agentsList || []).map((ag) => {
+              const isImagOn = ag.imagination_enabled !== false;
+              return (
+                <div
+                  key={ag.id}
+                  className={`p-5 rounded-3xl border transition-all shadow-xl space-y-4 flex flex-col justify-between ${
+                    isImagOn
+                      ? 'bg-gradient-to-br from-[#100c1e] via-[#0d1222] to-[#090e1a] border-purple-500/40 ring-1 ring-purple-500/20'
+                      : 'bg-[#090b12] border-white/10 opacity-80'
+                  }`}
+                >
+                  <div className="space-y-3.5">
+                    {/* Header */}
+                    <div className="flex items-center justify-between pb-2.5 border-b border-white/10">
+                      <div className="flex items-center gap-2.5">
+                        <div 
+                          className="w-9 h-9 rounded-xl flex items-center justify-center border shadow-md"
+                          style={{ backgroundColor: `${ag.color || '#00f0ff'}20`, borderColor: `${ag.color || '#00f0ff'}50` }}
+                        >
+                          <Brain className="w-5 h-5" style={{ color: ag.color || '#00f0ff' }} />
+                        </div>
+                        <div>
+                          <div className="font-bold text-white text-xs flex items-center gap-2">
+                            <span>{ag.name}</span>
+                            {ag.is_custom && (
+                              <span className="text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 font-mono">
+                                Custom
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[10px] text-slate-400">{ag.role}</span>
+                        </div>
+                      </div>
+
+                      {/* Main Background Imagination Toggle Button */}
+                      <button
+                        onClick={() => handleToggleAgentImaginationState(ag.id, isImagOn)}
+                        className={`px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all text-xs cursor-pointer shadow-md ${
+                          isImagOn
+                            ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white border border-purple-400 shadow-purple-500/25'
+                            : 'bg-white/5 hover:bg-white/10 text-slate-400 border border-white/10'
+                        }`}
+                      >
+                        <Wand2 className={`w-3.5 h-3.5 ${isImagOn ? 'text-white animate-pulse' : 'text-slate-500'}`} />
+                        <span>{isImagOn ? '● IMAGINACIÓN ON' : '○ APAGADA'}</span>
+                      </button>
+                    </div>
+
+                    {/* Permissions & Trunk Controls Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-[11px]">
+                      <div className="p-2.5 rounded-xl bg-black/40 border border-white/5 space-y-1">
+                        <span className="text-slate-400 block text-[10px] uppercase">Nivel de Permisos de Ensueño:</span>
+                        <select
+                          value={ag.imagination_permission_level || 'auto_apply_safe'}
+                          onChange={(e) => handleUpdateAgentImagConfig(ag.id, { imagination_permission_level: e.target.value })}
+                          className="w-full bg-[#080b12] border border-white/10 rounded-lg p-1.5 text-white outline-none text-[11px]"
+                        >
+                          <option value="autonomous_sovereign">Soberano (Auto-Aplica Todo)</option>
+                          <option value="auto_apply_safe">Seguro (Auto-Aplica Leves/Seguros)</option>
+                          <option value="auto_apply_minor">Mínimo (Solo Cosméticos/Doc)</option>
+                          <option value="always_ask">Siempre Preguntar</option>
+                        </select>
+                      </div>
+
+                      <div className="p-2.5 rounded-xl bg-black/40 border border-white/5 space-y-1">
+                        <span className="text-slate-400 block text-[10px] uppercase">Tronco de Cómputo:</span>
+                        <select
+                          value={ag.compute_trunk || 'trunk_a'}
+                          onChange={(e) => handleUpdateAgentImagConfig(ag.id, { compute_trunk: e.target.value })}
+                          className="w-full bg-[#080b12] border border-white/10 rounded-lg p-1.5 text-white outline-none text-[11px]"
+                        >
+                          <option value="trunk_a">Tronco A (Ensueño & Shaders 3D)</option>
+                          <option value="trunk_b">Tronco B (Sensorial & Seguridad)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Resource Quotas Live Sliders */}
+                    <div className="p-3 rounded-2xl bg-black/40 border border-white/10 space-y-2">
+                      <div className="flex items-center justify-between text-[11px]">
+                        <span className="text-slate-300">Cuota de CPU Asignada:</span>
+                        <span className="text-cyan-300 font-bold">{ag.cpu_quota_percent || 20}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="5"
+                        max="60"
+                        step="5"
+                        value={ag.cpu_quota_percent || 20}
+                        onChange={(e) => handleUpdateAgentImagConfig(ag.id, { cpu_quota_percent: parseInt(e.target.value) })}
+                        className="w-full accent-cyan-400"
+                      />
+
+                      <div className="flex items-center justify-between text-[11px] pt-1">
+                        <span className="text-slate-300">Límite de Memoria RAM:</span>
+                        <span className="text-purple-300 font-bold">{ag.ram_limit_mb || 128} MB</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="64"
+                        max="512"
+                        step="32"
+                        value={ag.ram_limit_mb || 128}
+                        onChange={(e) => handleUpdateAgentImagConfig(ag.id, { ram_limit_mb: parseInt(e.target.value) })}
+                        className="w-full accent-purple-400"
+                      />
+                    </div>
+
+                    {/* Personalities & Cerebros Badges */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px]">
+                      <div className="p-2 rounded-xl bg-black/40 border border-purple-500/20 space-y-1">
+                        <span className="text-purple-300 font-bold flex items-center gap-1">
+                          <Sparkles className="w-3 h-3 text-purple-400" />
+                          Personalidades Habilitadas:
+                        </span>
+                        <div className="flex flex-wrap gap-1">
+                          {(ag.used_personalities || [{ id: ag.id, name: ag.name.split(' ')[0], color: ag.color }]).map((p, i) => (
+                            <span
+                              key={i}
+                              className="px-1.5 py-0.5 rounded border flex items-center gap-1"
+                              style={{ backgroundColor: `${p.color || '#a855f7'}15`, borderColor: `${p.color || '#a855f7'}40`, color: p.color || '#a855f7' }}
+                            >
+                              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: p.color || '#a855f7' }} />
+                              <span>{p.name}</span>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="p-2 rounded-xl bg-black/40 border border-cyan-500/20 space-y-1">
+                        <span className="text-cyan-300 font-bold flex items-center gap-1">
+                          <Brain className="w-3 h-3 text-cyan-400" />
+                          Cerebros & Memoria:
+                        </span>
+                        <div className="flex flex-wrap gap-1">
+                          {(ag.linked_cerebros || [{ id: 'brain_genesis', name: 'Génesis' }]).map((c, i) => (
+                            <span key={i} className="px-1.5 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-300">
+                              {c.name?.split('//')[0] || c.name}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Interconnections Preview */}
+                    {ag.interconnections && ag.interconnections.length > 0 && (
+                      <div className="p-2.5 rounded-xl bg-black/40 border border-white/5 space-y-1 text-[10px]">
+                        <span className="text-slate-400 font-bold flex items-center gap-1">
+                          <Layers className="w-3 h-3 text-cyan-400" />
+                          Interconexiones con otros Agentes:
+                        </span>
+                        <div className="space-y-1">
+                          {ag.interconnections.slice(0, 2).map((link, idx) => (
+                            <div key={idx} className="flex items-center justify-between text-slate-300">
+                              <span className="text-white font-bold">{link.target_agent_id}</span>
+                              <span className="text-slate-400 truncate max-w-[200px]">{link.relationship}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Bottom Action Buttons */}
+                  <div className="pt-3 border-t border-white/10 grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => {
+                        setSelectedEditingAgent(ag);
+                        setIsAgentEditorOpen(true);
+                      }}
+                      className="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 font-bold flex items-center justify-center gap-1.5 border border-white/5 transition-colors cursor-pointer"
+                    >
+                      <Edit3 className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>Configurar & Ramas</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setSelectedApiAgent(ag);
+                        setIsAgentApiModalOpen(true);
+                      }}
+                      className="px-3 py-2 rounded-xl bg-gradient-to-r from-cyan-500/20 to-blue-600/20 hover:from-cyan-500/30 hover:to-blue-600/30 text-cyan-300 font-bold flex items-center justify-center gap-1.5 border border-cyan-500/40 transition-colors cursor-pointer"
+                    >
+                      <Key className="w-3.5 h-3.5" />
+                      <span>API Soberana</span>
+                    </button>
                   </div>
                 </div>
               );
@@ -1818,6 +2096,30 @@ export default function IntuitiveImaginationView() {
         onClose={() => setIsBranchesModalOpen(false)}
         onRefreshData={loadData}
       />
+
+      {/* AGENT VAULT & SOVEREIGN API MODALS */}
+      {isAgentEditorOpen && (
+        <AgentEditorModal
+          isOpen={isAgentEditorOpen}
+          onClose={() => {
+            setIsAgentEditorOpen(false);
+            setSelectedEditingAgent(null);
+          }}
+          agent={selectedEditingAgent}
+          onSave={handleSaveAgentData}
+        />
+      )}
+
+      {isAgentApiModalOpen && selectedApiAgent && (
+        <AgentApiManagerModal
+          isOpen={isAgentApiModalOpen}
+          onClose={() => {
+            setIsAgentApiModalOpen(false);
+            setSelectedApiAgent(null);
+          }}
+          agent={selectedApiAgent}
+        />
+      )}
     </div>
   );
 }

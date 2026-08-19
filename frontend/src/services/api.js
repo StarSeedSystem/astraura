@@ -652,6 +652,100 @@ export async function triggerPersonalityServerSync(personaId, serverId) {
   });
 }
 
+// ================= Agent Vault, Governance & Sovereign Agent APIs =================
+
+export async function fetchAgents() {
+  return apiFetch('/agents');
+}
+
+export async function fetchAgentDetail(agentId) {
+  return apiFetch(`/agents/${agentId}`);
+}
+
+export async function saveAgent(agent) {
+  return apiFetch('/agents/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ agent })
+  });
+}
+
+export async function deleteAgent(agentId) {
+  return apiFetch(`/agents/${agentId}`, {
+    method: 'DELETE'
+  });
+}
+
+export async function toggleAgentImagination(agentId, enabled) {
+  return apiFetch(`/agents/${agentId}/toggle_imagination`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ enabled })
+  });
+}
+
+export async function updateAgentImaginationConfig(agentId, config) {
+  return apiFetch(`/agents/${agentId}/update_imagination_config`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ config })
+  });
+}
+
+export async function fetchAgentApiKeys() {
+  return apiFetch('/agents_api/keys');
+}
+
+export async function fetchAgentApiDetail(agentId) {
+  return apiFetch(`/agents_api/${agentId}/api_status`);
+}
+
+export async function regenerateAgentApiKey(agentId) {
+  return apiFetch(`/agents_api/${agentId}/generate_key`, {
+    method: 'POST'
+  });
+}
+
+export async function revokeAgentApiKey(agentId) {
+  return apiFetch(`/agents_api/${agentId}/revoke_key`, {
+    method: 'POST'
+  });
+}
+
+export async function restoreAgentApiKey(agentId) {
+  return apiFetch(`/agents_api/${agentId}/restore_key`, {
+    method: 'POST'
+  });
+}
+
+export async function updateAgentApiPermissions(agentId, permissions) {
+  return apiFetch(`/agents_api/${agentId}/update_permissions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ permissions })
+  });
+}
+
+export async function saveAgentSyncServer(agentId, serverConfig) {
+  return apiFetch(`/agents_api/${agentId}/sync_server`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ server_config: serverConfig })
+  });
+}
+
+export async function deleteAgentSyncServer(agentId, serverId) {
+  return apiFetch(`/agents_api/${agentId}/sync_server/${serverId}`, {
+    method: 'DELETE'
+  });
+}
+
+export async function triggerAgentServerSync(agentId, serverId) {
+  return apiFetch(`/agents_api/${agentId}/trigger_sync/${serverId}`, {
+    method: 'POST'
+  });
+}
+
 // ================= Autonomous Browser & Search APIs =================
 
 export async function navigateBrowser(url, takeScreenshot = true) {

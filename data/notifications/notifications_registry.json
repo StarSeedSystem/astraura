@@ -1,6 +1,476 @@
 {
   "notifications": [
     {
+      "id": "notif_1787105604",
+      "title": "⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
+      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 1.",
+      "category": "Almacenamiento & Memoria",
+      "severity": "success",
+      "timestamp": 1787105604.538927,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105604",
+      "title": "✨ Auto-Mejora Aplicada: Sueño Lúcido Ciberdélico (UI, Arte & 3D)",
+      "message": "Se aplicó automáticamente: 'Exploración Intuitiva: Ingesta Automática de Carpeta de Shaders & Assets 3D: '. Todos los subsistemas sincronizados.",
+      "category": "Imaginación Intuitiva",
+      "severity": "success",
+      "timestamp": 1787105604.532017,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105603",
+      "title": "⚡ Medio Detectado: Almacenamiento Externo / SSD USB (/Volumes)",
+      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 2.",
+      "category": "Almacenamiento & Memoria",
+      "severity": "success",
+      "timestamp": 1787105603.9981508,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105603",
+      "title": "✨ Auto-Mejora Aplicada: Simulación Predictiva & Tendencias",
+      "message": "Se aplicó automáticamente: 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Todos los subsistemas sincronizados.",
+      "category": "Imaginación Intuitiva",
+      "severity": "success",
+      "timestamp": 1787105603.991943,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105603",
+      "title": "⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' clasificada como [MEDIUM]. Esperando tu confirmación en la pestaña de Propuestas.",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787105603.4299479,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105602",
+      "title": "⚡ Medio Detectado: Workspace Soberano Local (IA 1.58 bit)",
+      "message": "Enrutamiento a brain_genesis activado. 10 archivos indexados. Procesos disparados: 2.",
+      "category": "Almacenamiento & Memoria",
+      "severity": "success",
+      "timestamp": 1787105602.873473,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105602",
+      "title": "✨ Auto-Mejora Aplicada: Sueño REM Cognitivo (Consolidación Sináptica)",
+      "message": "Se aplicó automáticamente: 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.backup.json, README.md, Cuantización vs. Offloading en IA.pdf, Potencial y Desafíos del 1.58 Bits.pdf'. Todos los subsistemas sincronizados.",
+      "category": "Imaginación Intuitiva",
+      "severity": "success",
+      "timestamp": 1787105602.866859,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105602",
+      "title": "✨ Auto-Mejora Aplicada: Auto-Reflexión & Optimización de Código ARM NEON",
+      "message": "Se aplicó automáticamente: 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.backup.json, README.md, Cuantización vs. Offloading en IA.pdf, Potencial y Desafíos del 1.58 Bits.pdf'. Todos los subsistemas sincronizados.",
+      "category": "Imaginación Intuitiva",
+      "severity": "success",
+      "timestamp": 1787105602.307319,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105577",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105577.055396,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105572",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105572.0427039,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105567",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105567.029483,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105562",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105562.022944,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105557",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105557.0147781,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105552",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105552.004537,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105546",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105546.99089,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105541",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105541.981432,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105536",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105536.97454,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105531",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105531.96107,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105526",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105526.944028,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105521",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105521.9298828,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105516",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105516.915946,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105511",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105511.9020412,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105506",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105506.888083,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105501",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105501.872213,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105496",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105496.8667462,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105491",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105491.859404,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105486",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105486.8547359,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105481",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105481.842426,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105476",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105476.827307,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105471",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105471.812989,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105466",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105466.7985122,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105461",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105461.784214,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105456",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105456.767508,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105451",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105451.750433,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105446",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105446.738378,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105441",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105441.723704,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787105436",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 17 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787105436.705757,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787104836",
+      "title": "⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
+      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 1.",
+      "category": "Almacenamiento & Memoria",
+      "severity": "success",
+      "timestamp": 1787104836.415277,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787104836",
+      "title": "✨ Auto-Mejora Aplicada: Sueño Lúcido Ciberdélico (UI, Arte & 3D)",
+      "message": "Se aplicó automáticamente: 'Exploración Intuitiva: Ingesta Automática de Carpeta de Shaders & Assets 3D: '. Todos los subsistemas sincronizados.",
+      "category": "Imaginación Intuitiva",
+      "severity": "success",
+      "timestamp": 1787104836.4089441,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787104835",
+      "title": "⚡ Medio Detectado: Almacenamiento Externo / SSD USB (/Volumes)",
+      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 2.",
+      "category": "Almacenamiento & Memoria",
+      "severity": "success",
+      "timestamp": 1787104835.854829,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787104835",
+      "title": "✨ Auto-Mejora Aplicada: Simulación Predictiva & Tendencias",
+      "message": "Se aplicó automáticamente: 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Todos los subsistemas sincronizados.",
+      "category": "Imaginación Intuitiva",
+      "severity": "success",
+      "timestamp": 1787104835.847892,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787104835",
+      "title": "⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' clasificada como [MEDIUM]. Esperando tu confirmación en la pestaña de Propuestas.",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787104835.3150232,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787104834",
+      "title": "⚡ Medio Detectado: Workspace Soberano Local (IA 1.58 bit)",
+      "message": "Enrutamiento a brain_genesis activado. 10 archivos indexados. Procesos disparados: 2.",
+      "category": "Almacenamiento & Memoria",
+      "severity": "success",
+      "timestamp": 1787104834.762822,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787104834",
+      "title": "✨ Auto-Mejora Aplicada: Sueño REM Cognitivo (Consolidación Sináptica)",
+      "message": "Se aplicó automáticamente: 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.backup.json, README.md, Cuantización vs. Offloading en IA.pdf, Potencial y Desafíos del 1.58 Bits.pdf'. Todos los subsistemas sincronizados.",
+      "category": "Imaginación Intuitiva",
+      "severity": "success",
+      "timestamp": 1787104834.756563,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787104834",
+      "title": "✨ Auto-Mejora Aplicada: Auto-Reflexión & Optimización de Código ARM NEON",
+      "message": "Se aplicó automáticamente: 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.backup.json, README.md, Cuantización vs. Offloading en IA.pdf, Potencial y Desafíos del 1.58 Bits.pdf'. Todos los subsistemas sincronizados.",
+      "category": "Imaginación Intuitiva",
+      "severity": "success",
+      "timestamp": 1787104834.22344,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787104810",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787104810.044689,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787104805",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787104805.032,
+      "read": false,
+      "action_type": null
+    },
+    {
       "id": "notif_1787104800",
       "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
       "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
@@ -127,476 +597,6 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787104739.893353,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104734",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787104734.88117,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104729",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787104729.869577,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104724",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787104724.8593369,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104719",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787104719.844644,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104714",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787104714.831464,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104709",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787104709.815815,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104704",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787104704.800457,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104699",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787104699.795106,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104694",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787104694.784498,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104689",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787104689.774553,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104684",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787104684.761495,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104679",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787104679.749133,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104674",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787104674.733674,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104669",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787104669.7227871,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104664",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787104664.70296,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104659",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787104659.685905,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104653",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787104653.955083,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104648",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787104648.940171,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104643",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787104643.9201531,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104043",
-      "title": "⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 1.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787104043.7809181,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104043",
-      "title": "✨ Auto-Mejora Aplicada: Sueño Lúcido Ciberdélico (UI, Arte & 3D)",
-      "message": "Se aplicó automáticamente: 'Exploración Intuitiva: Ingesta Automática de Carpeta de Shaders & Assets 3D: '. Todos los subsistemas sincronizados.",
-      "category": "Imaginación Intuitiva",
-      "severity": "success",
-      "timestamp": 1787104043.774932,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104043",
-      "title": "⚡ Medio Detectado: Almacenamiento Externo / SSD USB (/Volumes)",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787104043.17105,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104043",
-      "title": "✨ Auto-Mejora Aplicada: Simulación Predictiva & Tendencias",
-      "message": "Se aplicó automáticamente: 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Todos los subsistemas sincronizados.",
-      "category": "Imaginación Intuitiva",
-      "severity": "success",
-      "timestamp": 1787104043.165601,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104042",
-      "title": "⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' clasificada como [MEDIUM]. Esperando tu confirmación en la pestaña de Propuestas.",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787104042.557315,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104041",
-      "title": "⚡ Medio Detectado: Workspace Soberano Local (IA 1.58 bit)",
-      "message": "Enrutamiento a brain_genesis activado. 10 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787104041.970028,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104041",
-      "title": "✨ Auto-Mejora Aplicada: Sueño REM Cognitivo (Consolidación Sináptica)",
-      "message": "Se aplicó automáticamente: 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.backup.json, README.md, Cuantización vs. Offloading en IA.pdf, Potencial y Desafíos del 1.58 Bits.pdf'. Todos los subsistemas sincronizados.",
-      "category": "Imaginación Intuitiva",
-      "severity": "success",
-      "timestamp": 1787104041.963816,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787104041",
-      "title": "✨ Auto-Mejora Aplicada: Auto-Reflexión & Optimización de Código ARM NEON",
-      "message": "Se aplicó automáticamente: 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.backup.json, README.md, Cuantización vs. Offloading en IA.pdf, Potencial y Desafíos del 1.58 Bits.pdf'. Todos los subsistemas sincronizados.",
-      "category": "Imaginación Intuitiva",
-      "severity": "success",
-      "timestamp": 1787104041.383347,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787103999",
-      "title": "⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 1.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787103999.440395,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787103999",
-      "title": "✨ Auto-Mejora Aplicada: Sueño Lúcido Ciberdélico (UI, Arte & 3D)",
-      "message": "Se aplicó automáticamente: 'Exploración Intuitiva: Ingesta Automática de Carpeta de Shaders & Assets 3D: '. Todos los subsistemas sincronizados.",
-      "category": "Imaginación Intuitiva",
-      "severity": "success",
-      "timestamp": 1787103999.43506,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787103998",
-      "title": "⚡ Medio Detectado: Almacenamiento Externo / SSD USB (/Volumes)",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787103998.860074,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787103998",
-      "title": "✨ Auto-Mejora Aplicada: Simulación Predictiva & Tendencias",
-      "message": "Se aplicó automáticamente: 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Todos los subsistemas sincronizados.",
-      "category": "Imaginación Intuitiva",
-      "severity": "success",
-      "timestamp": 1787103998.854721,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787103998",
-      "title": "⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' clasificada como [MEDIUM]. Esperando tu confirmación en la pestaña de Propuestas.",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787103998.319684,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787103997",
-      "title": "⚡ Medio Detectado: Workspace Soberano Local (IA 1.58 bit)",
-      "message": "Enrutamiento a brain_genesis activado. 10 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787103997.766027,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787103997",
-      "title": "✨ Auto-Mejora Aplicada: Sueño REM Cognitivo (Consolidación Sináptica)",
-      "message": "Se aplicó automáticamente: 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.backup.json, README.md, Cuantización vs. Offloading en IA.pdf, Potencial y Desafíos del 1.58 Bits.pdf'. Todos los subsistemas sincronizados.",
-      "category": "Imaginación Intuitiva",
-      "severity": "success",
-      "timestamp": 1787103997.7602901,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787103997",
-      "title": "✨ Auto-Mejora Aplicada: Auto-Reflexión & Optimización de Código ARM NEON",
-      "message": "Se aplicó automáticamente: 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.backup.json, README.md, Cuantización vs. Offloading en IA.pdf, Potencial y Desafíos del 1.58 Bits.pdf'. Todos los subsistemas sincronizados.",
-      "category": "Imaginación Intuitiva",
-      "severity": "success",
-      "timestamp": 1787103997.224212,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787103969",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 14 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787103969.7806778,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787103964",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 14 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787103964.7652302,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787103959",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 14 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787103959.748192,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787103954",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 14 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787103954.73662,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787103949",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 14 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787103949.7306528,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787103944",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 14 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787103944.7230122,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787103939",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 14 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787103939.711158,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787103934",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 14 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787103934.698239,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787103929",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 14 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787103929.689118,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787103924",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 14 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787103924.671442,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787103919",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 14 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787103919.665514,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787103914",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 14 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787103914.6520488,
       "read": false,
       "action_type": null
     }
