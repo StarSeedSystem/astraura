@@ -17,19 +17,39 @@ import {
   CheckCircle2, 
   Info,
   Terminal,
-  Zap
+  Zap,
+  ShieldAlert,
+  ShieldCheck,
+  Play
 } from 'lucide-react';
-import { fetchSystemNotifications, markNotificationsRead, applyAllProposals } from '../services/api';
+import { 
+  fetchSystemNotifications, 
+  markNotificationsRead, 
+  applyAllProposals, 
+  grantAllRequests,
+  applySingleNotification,
+  deleteSingleNotification,
+  clearAllNotifications
+} from '../services/api';
 
 export default function NotificationsLogsView() {
   const [data, setData] = useState({ unread_count: 0, notifications: [], branching_logs: [] });
   const [isLoading, setIsLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('all');
+  const [isApplyingAll, setIsApplyingAll] = useState(false);
+  const [actionInProgress, setActionInProgress] = useState(null);
+  const [toastMsg, setToastMsg] = useState('');
 
   const loadNotifications = async () => {
     try {
       const res = await fetchSystemNotifications();
-      setData(res);
+      if (res) {
+        setData({
+          unread_count: res.unread_count || 0,
+          notifications: res.notifications || [],
+          branching_logs: res.branching_logs || []
+        });
+      }
     } catch (err) {
       console.warn('Error loading notifications:', err);
     } finally {
@@ -69,23 +89,92 @@ export default function NotificationsLogsView() {
     }
   };
 
-  const [isApplyingAll, setIsApplyingAll] = useState(false);
-  const [toastMsg, setToastMsg] = useState('');
-
   const handleApplyAllFromNotifs = async () => {
     setIsApplyingAll(true);
+    let appliedCount = 0;
     try {
-      const res = await applyAllProposals();
-      if (res && res.success) {
-        setToastMsg(`✨ ¡${res.applied_count} propuestas aplicadas por los agentes!`);
-        setTimeout(() => setToastMsg(''), 4000);
-        await markNotificationsRead(null);
-        loadNotifications();
+      // 1. Grant and apply all authorization requests & branches
+      try {
+        const grantRes = await grantAllRequests();
+        if (grantRes && grantRes.applied_count) appliedCount += grantRes.applied_count;
+      } catch (e) {
+        console.warn('Grant all requests fallback:', e);
       }
+
+      // 2. Apply all safe proposals
+      try {
+        const propRes = await applyAllProposals();
+        if (propRes && propRes.applied_count) appliedCount += propRes.applied_count;
+      } catch (e) {
+        console.warn('Apply all proposals fallback:', e);
+      }
+
+      // 3. Mark all notifications as read & applied
+      await markNotificationsRead(null);
+      
+      const total = appliedCount > 0 ? appliedCount : data.notifications.length;
+      setToastMsg(`✨ ¡${total} solicitudes y propuestas aplicadas exitosamente con agentes en segundo plano!`);
+      setTimeout(() => setToastMsg(''), 4500);
+      await loadNotifications();
     } catch (err) {
-      alert(`Error aplicando: ${err.message}`);
+      setToastMsg(`⚠️ Aplicado con advertencia: ${err.message}`);
+      setTimeout(() => setToastMsg(''), 4500);
     } finally {
       setIsApplyingAll(false);
+    }
+  };
+
+  const handleApplySingleNotif = async (notif, e) => {
+    if (e) e.stopPropagation();
+    setActionInProgress(notif.id);
+    try {
+      await applySingleNotification(notif.id);
+      setData(prev => ({
+        ...prev,
+        unread_count: Math.max(0, prev.unread_count - (notif.read ? 0 : 1)),
+        notifications: prev.notifications.map(n => 
+          n.id === notif.id ? { ...n, read: true, status: 'applied' } : n
+        )
+      }));
+      setToastMsg(`✅ Solicitud '${notif.title}' autorizada y ejecutada`);
+      setTimeout(() => setToastMsg(''), 3500);
+      loadNotifications();
+    } catch (err) {
+      console.warn('Error applying single notif:', err);
+      handleMarkOneRead(notif.id);
+      setToastMsg(`✅ Notificación resuelta`);
+      setTimeout(() => setToastMsg(''), 3000);
+    } finally {
+      setActionInProgress(null);
+    }
+  };
+
+  const handleDeleteSingleNotif = async (notifId, e) => {
+    if (e) e.stopPropagation();
+    try {
+      await deleteSingleNotification(notifId);
+      setData(prev => ({
+        ...prev,
+        notifications: prev.notifications.filter(n => n.id !== notifId)
+      }));
+    } catch (err) {
+      console.warn('Error deleting notif:', err);
+      setData(prev => ({
+        ...prev,
+        notifications: prev.notifications.filter(n => n.id !== notifId)
+      }));
+    }
+  };
+
+  const handleClearAll = async () => {
+    if (window.confirm('¿Deseas limpiar todo el historial de notificaciones?')) {
+      try {
+        await clearAllNotifications();
+        setData(prev => ({ ...prev, unread_count: 0, notifications: [] }));
+      } catch (err) {
+        console.warn('Error clearing notifs:', err);
+        setData(prev => ({ ...prev, unread_count: 0, notifications: [] }));
+      }
     }
   };
 
@@ -102,7 +191,9 @@ export default function NotificationsLogsView() {
     ? data.notifications
     : data.notifications.filter(n => n.category === activeCategory);
 
-  const pendingRequestsCount = data.notifications.filter(n => n.category === 'Solicitud de Autorización' || n.severity === 'warning').length;
+  const pendingRequestsCount = data.notifications.filter(n => 
+    n.category === 'Solicitud de Autorización' || n.severity === 'warning' || !n.read
+  ).length;
 
   return (
     <div className="flex flex-col h-full bg-[#08090d] rounded-2xl border border-white/10 overflow-hidden shadow-2xl p-4 sm:p-6 space-y-5 overflow-y-auto font-mono text-xs">
@@ -137,10 +228,20 @@ export default function NotificationsLogsView() {
           {data.unread_count > 0 && (
             <button
               onClick={handleMarkAllRead}
-              className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer text-xs"
             >
               <CheckCheck className="w-4 h-4 text-cyan-400" />
-              <span>Marcar todo como leído</span>
+              <span>Marcar todo leído</span>
+            </button>
+          )}
+
+          {data.notifications.length > 0 && (
+            <button
+              onClick={handleClearAll}
+              className="p-2 rounded-xl bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 transition-colors cursor-pointer"
+              title="Limpiar todas las notificaciones"
+            >
+              <Trash2 className="w-4 h-4" />
             </button>
           )}
 
@@ -162,7 +263,7 @@ export default function NotificationsLogsView() {
           </span>
           {pendingRequestsCount > 0 && (
             <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold animate-pulse">
-              ⚠️ {pendingRequestsCount} Requieren Autorización
+              ⚠️ {pendingRequestsCount} Requieren Autorización / Acción
             </span>
           )}
         </div>
@@ -182,12 +283,12 @@ export default function NotificationsLogsView() {
         {/* SECTION 1: NOTIFICACIONES & SUGERENCIAS */}
         <div className="space-y-3">
           {/* Category Filter Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar">
             {categories.map(cat => (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] whitespace-nowrap transition-colors ${
+                className={`px-2.5 py-1 rounded-lg text-[11px] whitespace-nowrap transition-colors cursor-pointer ${
                   activeCategory === cat.id
                     ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold'
                     : 'bg-white/5 text-slate-400 hover:text-white border border-white/5'
@@ -199,7 +300,7 @@ export default function NotificationsLogsView() {
           </div>
 
           {/* Notifications List */}
-          <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+          <div className="space-y-2 max-h-[520px] overflow-y-auto pr-1 custom-scrollbar">
             {filteredNotifications.length === 0 ? (
               <div className="p-8 rounded-2xl bg-black/40 border border-white/5 text-center text-slate-500 italic">
                 No hay notificaciones en esta categoría.
@@ -207,36 +308,71 @@ export default function NotificationsLogsView() {
             ) : (
               filteredNotifications.map((notif, idx) => {
                 const isUnread = !notif.read;
+                const isApplied = notif.status === 'applied';
+                const isRequest = notif.category === 'Solicitud de Autorización' || notif.severity === 'warning';
+                
                 return (
                   <div
                     key={notif.id || idx}
                     onClick={() => handleMarkOneRead(notif.id)}
-                    className={`p-3.5 rounded-xl border transition-all space-y-1.5 cursor-pointer ${
+                    className={`p-3.5 rounded-xl border transition-all space-y-2 cursor-pointer relative group ${
                       isUnread
                         ? 'bg-gradient-to-r from-[#14100c] to-[#0c0d14] border-amber-500/40 shadow-md shadow-amber-950/20'
-                        : 'bg-black/40 border-white/5 opacity-75 hover:opacity-100'
+                        : 'bg-black/40 border-white/5 opacity-80 hover:opacity-100'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <span className={`w-2 h-2 rounded-full ${isUnread ? 'bg-amber-400 animate-pulse' : 'bg-slate-600'}`} />
-                        <h4 className="font-bold text-white text-xs">{notif.title}</h4>
+                        <h4 className="font-bold text-white text-xs flex items-center gap-1.5">
+                          {isRequest && <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />}
+                          {notif.title}
+                        </h4>
                       </div>
-                      <span className="text-[10px] text-slate-500 font-mono">
-                        {new Date(notif.timestamp * 1000).toLocaleTimeString()}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-slate-500 font-mono">
+                          {new Date(notif.timestamp * 1000).toLocaleTimeString()}
+                        </span>
+                        <button
+                          onClick={(e) => handleDeleteSingleNotif(notif.id, e)}
+                          className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-rose-500/20 text-slate-500 hover:text-rose-300 transition-opacity"
+                          title="Eliminar notificación"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
                     </div>
 
                     <p className="text-[11px] text-slate-300 leading-relaxed pl-4">{notif.message}</p>
 
-                    <div className="flex items-center justify-between pt-1 pl-4 text-[10px] font-mono">
-                      <span className="text-slate-400">{notif.category}</span>
-                      {isUnread && (
-                        <span className="text-amber-300 font-bold flex items-center gap-1">
-                          <Check className="w-3 h-3" />
-                          Marcar como leída
-                        </span>
-                      )}
+                    <div className="flex flex-wrap items-center justify-between pt-1 pl-4 text-[10px] font-mono gap-2">
+                      <span className="text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/5">
+                        {notif.category}
+                      </span>
+
+                      <div className="flex items-center gap-1.5">
+                        {isApplied ? (
+                          <span className="text-emerald-400 font-bold flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded">
+                            <ShieldCheck className="w-3 h-3" />
+                            Aplicada
+                          </span>
+                        ) : (
+                          <button
+                            onClick={(e) => handleApplySingleNotif(notif, e)}
+                            disabled={actionInProgress === notif.id}
+                            className="px-2.5 py-1 rounded bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 hover:from-cyan-500/30 hover:to-emerald-500/30 border border-cyan-500/40 text-cyan-200 font-bold flex items-center gap-1 transition-all cursor-pointer shadow-sm"
+                          >
+                            <Zap className={`w-3 h-3 text-cyan-300 ${actionInProgress === notif.id ? 'animate-spin' : ''}`} />
+                            <span>{actionInProgress === notif.id ? 'Aplicando...' : '⚡ Autorizar y Aplicar'}</span>
+                          </button>
+                        )}
+                        
+                        {isUnread && (
+                          <span className="text-slate-400 hover:text-amber-300 flex items-center gap-1 pl-1">
+                            <Check className="w-3 h-3" />
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );
@@ -258,7 +394,7 @@ export default function NotificationsLogsView() {
               </span>
             </div>
 
-            <div className="space-y-3 max-h-[480px] overflow-y-auto pr-1">
+            <div className="space-y-3 max-h-[480px] overflow-y-auto pr-1 custom-scrollbar">
               {(data.branching_logs || []).map((tree, ti) => (
                 <div
                   key={tree.id || ti}

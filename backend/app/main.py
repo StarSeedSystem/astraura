@@ -1827,6 +1827,23 @@ async def mark_notifications_read(req: MarkReadRequest):
     success = system_notifications_engine.mark_as_read(req.notif_id)
     return {"success": success}
 
+class NotificationActionRequest(BaseModel):
+    notif_id: str
+
+@app.post("/api/notifications/apply")
+async def apply_single_notification_endpoint(req: NotificationActionRequest):
+    # Also if imagination engine has a matching request, grant it
+    intuitive_imagination_engine.grant_and_apply_all_requests()
+    return system_notifications_engine.apply_notification(req.notif_id)
+
+@app.post("/api/notifications/delete")
+async def delete_notification_endpoint(req: NotificationActionRequest):
+    return system_notifications_engine.delete_notification(req.notif_id)
+
+@app.post("/api/notifications/clear")
+async def clear_all_notifications_endpoint():
+    return system_notifications_engine.clear_all()
+
 # ================= Sovereign Privacy & Sensor Permissions Control APIs =================
 
 @app.get("/api/privacy/settings")

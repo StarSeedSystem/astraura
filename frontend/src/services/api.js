@@ -972,6 +972,28 @@ export async function markNotificationsRead(notifId = null) {
   });
 }
 
+export async function applySingleNotification(notifId) {
+  return apiFetch('/notifications/apply', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ notif_id: notifId })
+  });
+}
+
+export async function deleteSingleNotification(notifId) {
+  return apiFetch('/notifications/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ notif_id: notifId })
+  });
+}
+
+export async function clearAllNotifications() {
+  return apiFetch('/notifications/clear', {
+    method: 'POST'
+  });
+}
+
 // ================= Storage Media, Folders & Files Dynamic Memory Routing APIs =================
 
 export async function fetchStorageDevices() {

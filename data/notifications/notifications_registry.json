@@ -1,6 +1,36 @@
 {
   "notifications": [
     {
+      "id": "notif_1787132027",
+      "title": "⚠️ Solicitud de Aprobación de Mejora: Auto-Reflexión & Optimización de Código ARM NEON",
+      "message": "Propuesta 'Auto-Optimización de Código: Cuantización vs. Offloading en IA.pdf' clasificada como [HIGH]. Esperando tu confirmación en la pestaña de Propuestas.",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787132027.491866,
+      "read": false,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787131591",
+      "title": "✨ Enjambre Sincronizado: Propuestas Aplicadas",
+      "message": "Se aplicaron exitosamente 1 propuestas con agentes paralelos.",
+      "category": "Enjambre de Agentes",
+      "severity": "success",
+      "timestamp": 1787131591.187795,
+      "read": true,
+      "action_type": null
+    },
+    {
+      "id": "notif_1787131426",
+      "title": "⚠️ Solicitud de Aprobación de Mejora: Auto-Reflexión & Optimización de Código ARM NEON",
+      "message": "Propuesta 'Auto-Optimización de Código: install_and_run.sh' clasificada como [HIGH]. Esperando tu confirmación en la pestaña de Propuestas.",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787131426.077261,
+      "read": true,
+      "action_type": null
+    },
+    {
       "id": "notif_1787130824",
       "title": "✨ Auto-Mejora Aplicada: Simulación Predictiva & Tendencias",
       "message": "Se aplicó automáticamente: 'Simulación Predictiva & Contexto Sensorial en Guadalajara, México'. Todos los subsistemas sincronizados.",
@@ -567,36 +597,6 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787126959.250541,
-      "read": true,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787126954",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787126954.237849,
-      "read": true,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787126949",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787126949.225395,
-      "read": true,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787126944",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 16 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787126944.214118,
       "read": true,
       "action_type": null
     }

@@ -45,7 +45,6 @@ import SystemDiagnostics from './components/SystemDiagnostics';
 import WorkspaceFiles from './components/WorkspaceFiles';
 import EnvironmentWidget from './components/EnvironmentWidget';
 import QuantumVoiceOrbWidget from './components/QuantumVoiceOrbWidget';
-import FloatingQuantumVoiceOrb from './components/FloatingQuantumVoiceOrb';
 import ComputerFileExplorer from './components/ComputerFileExplorer';
 import StarSeedLibrary from './components/StarSeedLibrary';
 import TerminalConsole from './components/TerminalConsole';
@@ -782,6 +781,16 @@ export default function App() {
           </div>
         </header>
 
+        {/* Small Screens Integrated Menu Voice Orb Top Bar */}
+        <div className="lg:hidden mb-2.5 p-2 bg-[#090c14]/90 backdrop-blur-md rounded-2xl border border-white/10 shadow-md shrink-0">
+          <QuantumVoiceOrbWidget
+            activePersona={activePersona}
+            onSelectPersona={(p) => setActivePersonaId(p?.id || p)}
+            personalities={PRESET_PERSONALITIES}
+            onDirectConversationSpeech={(text) => handleSendMessage(text)}
+          />
+        </div>
+
         {/* Mobile Navigation Drawer */}
         {isMobileMenuOpen && (
           <div className="lg:hidden p-3 bg-[#0a0d15] rounded-2xl border border-white/10 space-y-1 mb-2 z-30 animate-slide-up max-h-72 overflow-y-auto">
@@ -956,13 +965,6 @@ export default function App() {
           <span>Más</span>
         </button>
       </div>
-
-      {/* Persistent Universal Floating Quantum Voice Orb (Accessible Everywhere on Mobile & Desktop) */}
-      <FloatingQuantumVoiceOrb
-        activePersona={activePersona}
-        onSelectPersona={(id) => setActivePersonaId(id)}
-        onDirectConversationSpeech={(text) => handleSendMessage(text)}
-      />
     </div>
   );
 }
