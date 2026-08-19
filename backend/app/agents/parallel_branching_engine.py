@@ -43,30 +43,57 @@ class ParallelBranchingEngine:
                 "id": "branch_hardware_env",
                 "name": "Sonda de Hardware & Telemetría Sensorial",
                 "agent": "Hephaestus (Hardware & Terminal)",
-                "subagents": ["sub_hardware_optimizer"],
+                "agent_id": "agent_hephaestus",
+                "subagents": ["sub_hardware_optimizer", "sub_ast_analyzer"],
                 "color": "#f59e0b",
                 "threads_allocated": 2,
                 "purpose": "Monitorear estado térmico, memoria RAM, batería y permisos nativos.",
+                "active_processes": [
+                    {"id": "proc_code_self_reflection", "name": "Auto-Reflexión ARM NEON", "type": "engineering", "status": "running", "cpu": 3.5},
+                    {"id": "proc_thermal_sensorium", "name": "Telemetría Térmica M1", "type": "hardware", "status": "active", "cpu": 0.8}
+                ],
+                "developed_branches": [
+                    {"id": "b_heph_1", "name": "Sonda de Registros SIMD", "target": "ARM64 Vector Pipeline", "sub_branches": 2, "status": "synced"},
+                    {"id": "b_heph_2", "name": "Verificador AST", "target": "Type & Memory Safety", "sub_branches": 1, "status": "synced"}
+                ],
                 "status": "queued"
             },
             {
                 "id": "branch_associative_memory",
                 "name": "Búsqueda Sináptica en Exocórtex & Grafo",
                 "agent": "Mnemosyne (Memoria & Grafo)",
+                "agent_id": "agent_mnemosyne",
                 "subagents": ["sub_doc_indexer", "sub_wikilink_traverser"],
                 "color": "#a855f7",
                 "threads_allocated": 2,
                 "purpose": "Recuperar fragmentos semánticos, grafos de conocimiento y recuerdos nucleares.",
+                "active_processes": [
+                    {"id": "proc_deep_memory_reconsolidation", "name": "Reconsolidación Sináptica StarSeed", "type": "imagination", "status": "running", "cpu": 2.2},
+                    {"id": "proc_graph_entropy_pruner", "name": "Poda Entrópica de Nodos", "type": "memory", "status": "active", "cpu": 0.6}
+                ],
+                "developed_branches": [
+                    {"id": "b_mne_1", "name": "Travesía de Wikilinks", "target": "Grafo Conceptual Mem0", "sub_branches": 3, "status": "synced"},
+                    {"id": "b_mne_2", "name": "Indexación Vectorial", "target": "Exocórtex Local", "sub_branches": 2, "status": "synced"}
+                ],
                 "status": "queued"
             },
             {
                 "id": "branch_ternary_reasoning",
                 "name": "Descomposición Lógica & Inferencia 1.58b",
                 "agent": "Logos (Razonador BitNet 1.58b)",
-                "subagents": ["sub_ternary_simd_core"],
+                "agent_id": "agent_logos",
+                "subagents": ["sub_ternary_simd_core", "sub_formal_deduction"],
                 "color": "#3b82f6",
                 "threads_allocated": 4,
                 "purpose": "Calcular axiomas, deducción formal y optimización con aritmética entera i2_s.",
+                "active_processes": [
+                    {"id": "proc_bitnet_ternary_eval", "name": "Inferencia Aritmética i2_s", "type": "reasoning", "status": "running", "cpu": 4.1},
+                    {"id": "proc_quantum_entropy_calc", "name": "Evaluador de Incertidumbre", "type": "reasoning", "status": "active", "cpu": 1.1}
+                ],
+                "developed_branches": [
+                    {"id": "b_log_1", "name": "Multiplicación Ternaria {-1, 0, 1}", "target": "NEON SIMD Registers", "sub_branches": 4, "status": "synced"},
+                    {"id": "b_log_2", "name": "Axiomas de Consistencia", "target": "Formal Verifier", "sub_branches": 2, "status": "synced"}
+                ],
                 "status": "queued"
             }
         ]
@@ -76,10 +103,18 @@ class ParallelBranchingEngine:
                 "id": "branch_web_crawler",
                 "name": "Exploración & Extracción Web Semántica",
                 "agent": "Hermes (Navegador & Redes)",
-                "subagents": ["sub_browser_pool", "sub_dom_extractor"],
+                "agent_id": "agent_hermes",
+                "subagents": ["sub_browser_pool", "sub_dom_extractor", "sub_citation_linker"],
                 "color": "#10b981",
                 "threads_allocated": 2,
                 "purpose": "Navegar Chromium en tiempo real y sintetizar inteligencia web externa.",
+                "active_processes": [
+                    {"id": "proc_arxiv_tracker", "name": "Rastreador ArXiv 1.58b", "type": "web_intel", "status": "running", "cpu": 1.5},
+                    {"id": "proc_dom_cleaner", "name": "Extracción DOM Playwright", "type": "web_intel", "status": "active", "cpu": 0.9}
+                ],
+                "developed_branches": [
+                    {"id": "b_her_1", "name": "Scraping y Citas", "target": "HTML to Clean Markdown", "sub_branches": 2, "status": "synced"}
+                ],
                 "status": "queued"
             })
 
@@ -87,22 +122,39 @@ class ParallelBranchingEngine:
             branches.append({
                 "id": "branch_code_multimodal",
                 "name": "Síntesis de Código & Runtime Multimodal 2D/3D",
-                "agent": "Hephaestus & Logos",
-                "subagents": ["sub_code_synthesizer", "sub_multimodal_stylist"],
+                "agent": "Hephaestus & Oneiros",
+                "agent_id": "agent_oneiros",
+                "subagents": ["sub_code_synthesizer", "sub_multimodal_stylist", "sub_shader_renderer"],
                 "color": "#00f0ff",
                 "threads_allocated": 3,
                 "purpose": "Estructurar scripts ejecutables, shaders WebGL 3D, Canvas 2D y WebAudio.",
+                "active_processes": [
+                    {"id": "proc_shaderlab_forge", "name": "Forja de Shaders GLSL", "type": "creative", "status": "running", "cpu": 3.2},
+                    {"id": "proc_code_sandbox_opt", "name": "Sandbox de Código C++/JS", "type": "engineering", "status": "active", "cpu": 2.0}
+                ],
+                "developed_branches": [
+                    {"id": "b_one_1", "name": "Render Volumétrico 3D", "target": "Shaders WebGL / Metal", "sub_branches": 3, "status": "synced"}
+                ],
                 "status": "queued"
             })
 
         branches.append({
             "id": "branch_creative_audit",
             "name": "Auditoría Simbiótica & Resonancia Onírica",
-            "agent": "Oneiros & Astraura Prime",
-            "subagents": ["sub_fact_verifier", "sub_dream_daemon"],
+            "agent": "Oneiros & Aurora",
+            "agent_id": "agent_aurora",
+            "subagents": ["sub_fact_verifier", "sub_dream_daemon", "sub_emotional_synthesizer"],
             "color": "#ec4899",
-            "threads_allocated": 1,
+            "threads_allocated": 2,
             "purpose": "Verificar coherencia de estilo, calidez empática y alineación con soberanía.",
+            "active_processes": [
+                {"id": "proc_aurora_voice_prosody", "name": "Modulación Vocal Liljencrants-Fant", "type": "voice", "status": "running", "cpu": 1.2},
+                {"id": "proc_counterfactual_imagination", "name": "Ensueño Contrafáctico 1.58b", "type": "imagination", "status": "running", "cpu": 2.4}
+            ],
+            "developed_branches": [
+                {"id": "b_aur_1", "name": "Síntesis Afectiva", "target": "Generador de Cláusulas Prosódicas", "sub_branches": 2, "status": "synced"},
+                {"id": "b_aur_2", "name": "Alineación Ontocrática", "target": "StarSeed Consciousness", "sub_branches": 1, "status": "synced"}
+            ],
             "status": "queued"
         })
 

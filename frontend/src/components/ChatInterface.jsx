@@ -635,30 +635,14 @@ export default function ChatInterface({
                 )}
               </div>
 
-              {/* Quantum Multi-Agent Parallel Tree Branching */}
-              {msg.branchingPlan && showThinking && (
+              {/* Quantum Multi-Agent Parallel Tree Branching & Deliberation (Compact by Default with In-Situ Expand & Full-Screen Modal) */}
+              {(msg.branchingPlan || (msg.agentTraces && msg.agentTraces.length > 0)) && showThinking && (
                 <div className="max-w-3xl w-full">
-                  <ParallelAgentBranchingTree branchingPlan={msg.branchingPlan} />
-                </div>
-              )}
-
-              {/* Agent Traces Box */}
-              {msg.agentTraces && msg.agentTraces.length > 0 && showThinking && (
-                <div className="p-3 rounded-2xl bg-[#0f1422] border border-cyan-500/20 max-w-2xl w-full text-xs font-mono space-y-2 mb-1">
-                  <div className="text-[10px] text-cyan-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
-                    <Sparkles className="w-3 h-3" />
-                    Deliberación Multiagéntica en Paralelo (1.58 Bits)
-                  </div>
-                  {msg.agentTraces.map((trace, idx) => (
-                    <div key={idx} className="space-y-0.5 border-l-2 pl-2" style={{ borderColor: trace.color || '#00f0ff' }}>
-                      <span className="text-[11px] font-bold" style={{ color: trace.color || '#00f0ff' }}>
-                        {trace.agent}
-                      </span>
-                      {trace.thoughts?.map((th, tidx) => (
-                        <p key={tidx} className="text-[11px] text-slate-400">{th}</p>
-                      ))}
-                    </div>
-                  ))}
+                  <ParallelAgentBranchingTree 
+                    branchingPlan={msg.branchingPlan} 
+                    agentTraces={msg.agentTraces || []} 
+                    elapsedSeconds={msg.latency}
+                  />
                 </div>
               )}
 
@@ -682,29 +666,14 @@ export default function ChatInterface({
                 <span>Astraura Ramificando y Ejecutando Agentes en Paralelo...</span>
               </div>
 
-              {/* Active Live Parallel Tree Branching */}
-              {activeBranchingPlan && showThinking && (
+              {/* Active Live Parallel Tree Branching & Deliberation (Compact by Default with In-Situ Expand & Full-Screen Modal) */}
+              {(activeBranchingPlan || (activeTraces && activeTraces.length > 0)) && showThinking && (
                 <div className="max-w-3xl w-full">
-                  <ParallelAgentBranchingTree branchingPlan={activeBranchingPlan} elapsedSeconds={activeBranchingLatency} />
-                </div>
-              )}
-
-              {activeTraces.length > 0 && showThinking && (
-                <div className="p-3 rounded-2xl bg-[#0f1422] border border-cyan-500/20 max-w-2xl w-full text-xs font-mono space-y-2 mb-1">
-                  <div className="text-[10px] text-cyan-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
-                    <Sparkles className="w-3 h-3 animate-spin" />
-                    Deliberación Activa de Agentes Simultáneos
-                  </div>
-                  {activeTraces.map((trace, idx) => (
-                    <div key={idx} className="space-y-0.5 border-l-2 pl-2" style={{ borderColor: trace.color || '#00f0ff' }}>
-                      <span className="text-[11px] font-bold" style={{ color: trace.color || '#00f0ff' }}>
-                        {trace.agent}
-                      </span>
-                      {trace.thoughts?.map((th, tidx) => (
-                        <p key={tidx} className="text-[11px] text-slate-400">{th}</p>
-                      ))}
-                    </div>
-                  ))}
+                  <ParallelAgentBranchingTree 
+                    branchingPlan={activeBranchingPlan} 
+                    agentTraces={activeTraces}
+                    elapsedSeconds={activeBranchingLatency} 
+                  />
                 </div>
               )}
 

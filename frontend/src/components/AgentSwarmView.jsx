@@ -677,21 +677,50 @@ export default function AgentSwarmView() {
                     </div>
                   )}
 
-                  {/* Branches & Developing Processes */}
-                  <div className="p-2 rounded-xl bg-black/40 border border-white/5 text-[10px] text-slate-400 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span>Procesos en desarrollo:</span>
-                      <b className="text-emerald-300">{agent.developing_processes?.length || 2} activos</b>
+                  {/* Branches & Developing Processes Breakdown */}
+                  <div className="p-2.5 rounded-xl bg-black/40 border border-white/5 space-y-2 text-[10px]">
+                    <div className="flex items-center justify-between text-slate-400">
+                      <span className="font-bold text-white flex items-center gap-1">
+                        <Activity className="w-3 h-3 text-emerald-400" />
+                        Procesos Activos ({agent.developing_processes?.length || 2}):
+                      </span>
+                      <span className="text-cyan-300 font-bold">{agent.cpu_quota_percent || 20}% CPU</span>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span>Ramificación paralela:</span>
-                      <b className="text-cyan-300">
-                        {agent.generated_branches?.speedup_factor || '5.0x'} ({agent.generated_branches?.branch_tree?.length || 2} ramas)
-                      </b>
+
+                    <div className="space-y-1">
+                      {(agent.developing_processes || [
+                        { name: "Inferencia 1.58b Continua", status: "running", cpu: 2.5 }
+                      ]).slice(0, 2).map((proc, pidx) => (
+                        <div key={pidx} className="px-2 py-1 rounded-lg bg-[#07090f] border border-white/5 flex items-center justify-between">
+                          <div className="flex items-center gap-1.5 truncate">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                            <span className="text-slate-200 truncate">{proc.name}</span>
+                          </div>
+                          <span className="text-cyan-400 font-mono text-[9px] shrink-0">{proc.cpu || 1.5}%</span>
+                        </div>
+                      ))}
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span>Cuota CPU / RAM:</span>
-                      <b className="text-white">{agent.cpu_quota_percent || 20}% / {agent.ram_limit_mb || 128} MB</b>
+
+                    {/* Developed Branches Tree Info */}
+                    <div className="pt-1.5 border-t border-white/5 space-y-1">
+                      <div className="flex items-center justify-between text-slate-400">
+                        <span className="font-bold text-purple-300 flex items-center gap-1">
+                          <GitBranch className="w-3 h-3 text-purple-400" />
+                          Ramas Desarrolladas:
+                        </span>
+                        <span className="text-cyan-400 font-bold">{agent.generated_branches?.speedup_factor || '5.0x'}</span>
+                      </div>
+
+                      <div className="flex flex-wrap gap-1">
+                        {(agent.generated_branches?.branch_tree || [
+                          { name: "Sonda AST", target: "SIMD NEON" }
+                        ]).slice(0, 2).map((br, bidx) => (
+                          <span key={bidx} className="px-1.5 py-0.5 rounded bg-purple-950/30 border border-purple-500/30 text-purple-200 text-[9px] flex items-center gap-1 truncate max-w-full">
+                            <span>🌿 {br.name}</span>
+                            <span className="text-slate-400">→ {br.target}</span>
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>

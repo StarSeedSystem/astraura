@@ -28,7 +28,7 @@
   "max_accumulated_requests_threshold": 5,
   "max_proposals_per_agent_limit": 4,
   "auto_sync_all_proposals_enabled": true,
-  "is_paused_due_to_threshold": false,
+  "is_paused_due_to_threshold": true,
   "permission_policies": {
     "rem_synaptic_consolidation": {
       "process_id": "rem_synaptic_consolidation",
