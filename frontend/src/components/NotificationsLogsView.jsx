@@ -1,0 +1,297 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Bell, 
+  Check, 
+  CheckCheck, 
+  Trash2, 
+  Sparkles, 
+  Activity, 
+  Cpu, 
+  GitBranch, 
+  HardDrive, 
+  RotateCcw, 
+  RefreshCw, 
+  Clock, 
+  ChevronRight, 
+  AlertTriangle, 
+  CheckCircle2, 
+  Info,
+  Terminal,
+  Zap
+} from 'lucide-react';
+import { fetchSystemNotifications, markNotificationsRead, applyAllProposals } from '../services/api';
+
+export default function NotificationsLogsView() {
+  const [data, setData] = useState({ unread_count: 0, notifications: [], branching_logs: [] });
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('all');
+
+  const loadNotifications = async () => {
+    try {
+      const res = await fetchSystemNotifications();
+      setData(res);
+    } catch (err) {
+      console.warn('Error loading notifications:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadNotifications();
+    const interval = setInterval(loadNotifications, 8000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleMarkAllRead = async () => {
+    try {
+      await markNotificationsRead(null);
+      setData(prev => ({
+        ...prev,
+        unread_count: 0,
+        notifications: prev.notifications.map(n => ({ ...n, read: true }))
+      }));
+    } catch (err) {
+      console.warn('Error marking read:', err);
+    }
+  };
+
+  const handleMarkOneRead = async (notifId) => {
+    try {
+      await markNotificationsRead(notifId);
+      setData(prev => ({
+        ...prev,
+        unread_count: Math.max(0, prev.unread_count - 1),
+        notifications: prev.notifications.map(n => n.id === notifId ? { ...n, read: true } : n)
+      }));
+    } catch (err) {
+      console.warn('Error marking one read:', err);
+    }
+  };
+
+  const [isApplyingAll, setIsApplyingAll] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+
+  const handleApplyAllFromNotifs = async () => {
+    setIsApplyingAll(true);
+    try {
+      const res = await applyAllProposals();
+      if (res && res.success) {
+        setToastMsg(`✨ ¡${res.applied_count} propuestas aplicadas por los agentes!`);
+        setTimeout(() => setToastMsg(''), 4000);
+        await markNotificationsRead(null);
+        loadNotifications();
+      }
+    } catch (err) {
+      alert(`Error aplicando: ${err.message}`);
+    } finally {
+      setIsApplyingAll(false);
+    }
+  };
+
+  const categories = [
+    { id: 'all', label: 'Todas' },
+    { id: 'Solicitud de Autorización', label: '⚠️ Solicitudes de Autorización' },
+    { id: 'Imaginación Intuitiva', label: '✨ Imaginación & Sueños' },
+    { id: 'Sensores & Entorno', label: '📊 Sensores & Clima' },
+    { id: 'Hardware & M1', label: '⚡ Hardware & M1' },
+    { id: 'Reciclaje de Memoria', label: '♻️ Reciclaje' }
+  ];
+
+  const filteredNotifications = activeCategory === 'all'
+    ? data.notifications
+    : data.notifications.filter(n => n.category === activeCategory);
+
+  const pendingRequestsCount = data.notifications.filter(n => n.category === 'Solicitud de Autorización' || n.severity === 'warning').length;
+
+  return (
+    <div className="flex flex-col h-full bg-[#08090d] rounded-2xl border border-white/10 overflow-hidden shadow-2xl p-4 sm:p-6 space-y-5 overflow-y-auto font-mono text-xs">
+      {/* Toast Notification */}
+      {toastMsg && (
+        <div className="fixed bottom-6 right-6 z-50 p-4 rounded-2xl bg-gradient-to-r from-purple-900 to-cyan-900 border border-purple-400 text-white font-mono text-xs shadow-2xl animate-fade-in flex items-center gap-3">
+          <Sparkles className="w-4 h-4 text-cyan-300 animate-spin" />
+          <span>{toastMsg}</span>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <h2 className="font-display font-bold text-2xl text-white flex items-center gap-2">
+              <Bell className="w-6 h-6 text-amber-400" />
+              Notificaciones & Solicitudes de Autorización
+            </h2>
+            {data.unread_count > 0 && (
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono font-bold animate-pulse">
+                {data.unread_count} no leídas
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-slate-400">
+            Historial de propuestas de auto-mejora, solicitudes de permisos graduales y ramificación jerárquica de procesos en segundo plano.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {data.unread_count > 0 && (
+            <button
+              onClick={handleMarkAllRead}
+              className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <CheckCheck className="w-4 h-4 text-cyan-400" />
+              <span>Marcar todo como leído</span>
+            </button>
+          )}
+
+          <button
+            onClick={loadNotifications}
+            className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 cursor-pointer"
+            title="Recargar notificaciones"
+          >
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
+      </div>
+
+      {/* Bulk Apply & Counter Banner */}
+      <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-950/30 via-amber-950/20 to-cyan-950/30 border border-amber-500/30 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-bold text-white">
+            📌 {data.notifications.length} Notificaciones Enlistadas
+          </span>
+          {pendingRequestsCount > 0 && (
+            <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold animate-pulse">
+              ⚠️ {pendingRequestsCount} Requieren Autorización
+            </span>
+          )}
+        </div>
+
+        <button
+          onClick={handleApplyAllFromNotifs}
+          disabled={isApplyingAll}
+          className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-bold flex items-center gap-2 cursor-pointer shadow-md shadow-emerald-500/20 transition-all disabled:opacity-50"
+        >
+          <Sparkles className={`w-3.5 h-3.5 ${isApplyingAll ? 'animate-spin' : ''}`} />
+          <span>{isApplyingAll ? 'Sincronizando Agentes...' : '✨ Aplicar Todas con Agentes en 2do Plano'}</span>
+        </button>
+      </div>
+
+      {/* Main Grid: Notifications on Left, Branching Logs on Right */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* SECTION 1: NOTIFICACIONES & SUGERENCIAS */}
+        <div className="space-y-3">
+          {/* Category Filter Pills */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+            {categories.map(cat => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`px-2.5 py-1 rounded-lg text-[11px] whitespace-nowrap transition-colors ${
+                  activeCategory === cat.id
+                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold'
+                    : 'bg-white/5 text-slate-400 hover:text-white border border-white/5'
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Notifications List */}
+          <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+            {filteredNotifications.length === 0 ? (
+              <div className="p-8 rounded-2xl bg-black/40 border border-white/5 text-center text-slate-500 italic">
+                No hay notificaciones en esta categoría.
+              </div>
+            ) : (
+              filteredNotifications.map((notif, idx) => {
+                const isUnread = !notif.read;
+                return (
+                  <div
+                    key={notif.id || idx}
+                    onClick={() => handleMarkOneRead(notif.id)}
+                    className={`p-3.5 rounded-xl border transition-all space-y-1.5 cursor-pointer ${
+                      isUnread
+                        ? 'bg-gradient-to-r from-[#14100c] to-[#0c0d14] border-amber-500/40 shadow-md shadow-amber-950/20'
+                        : 'bg-black/40 border-white/5 opacity-75 hover:opacity-100'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full ${isUnread ? 'bg-amber-400 animate-pulse' : 'bg-slate-600'}`} />
+                        <h4 className="font-bold text-white text-xs">{notif.title}</h4>
+                      </div>
+                      <span className="text-[10px] text-slate-500 font-mono">
+                        {new Date(notif.timestamp * 1000).toLocaleTimeString()}
+                      </span>
+                    </div>
+
+                    <p className="text-[11px] text-slate-300 leading-relaxed pl-4">{notif.message}</p>
+
+                    <div className="flex items-center justify-between pt-1 pl-4 text-[10px] font-mono">
+                      <span className="text-slate-400">{notif.category}</span>
+                      {isUnread && (
+                        <span className="text-amber-300 font-bold flex items-center gap-1">
+                          <Check className="w-3 h-3" />
+                          Marcar como leída
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        {/* SECTION 2: ÁRBOL DE LOGS RAMIFICADOS EN SEGUNDO PLANO */}
+        <div className="p-4 rounded-2xl bg-black/60 border border-white/10 space-y-4 flex flex-col justify-between">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-white/10">
+              <span className="font-bold text-white flex items-center gap-2 text-sm">
+                <GitBranch className="w-4 h-4 text-cyan-400" />
+                Árbol de Procesos Ramificados en Background
+              </span>
+              <span className="text-[10px] text-slate-500 font-mono">
+                {data.branching_logs?.length || 0} ramas registradas
+              </span>
+            </div>
+
+            <div className="space-y-3 max-h-[480px] overflow-y-auto pr-1">
+              {(data.branching_logs || []).map((tree, ti) => (
+                <div
+                  key={tree.id || ti}
+                  className="p-3 rounded-xl bg-[#0a0d16] border border-cyan-500/20 space-y-2"
+                >
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold text-cyan-300 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-cyan-400" />
+                      {tree.root_process}
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-mono">
+                      {new Date(tree.timestamp * 1000).toLocaleTimeString()}
+                    </span>
+                  </div>
+
+                  {/* Branches */}
+                  <div className="space-y-1 pl-3 border-l-2 border-cyan-500/30">
+                    {(tree.branches || []).map((b, bi) => (
+                      <div key={bi} className="p-1.5 rounded bg-black/40 flex items-center justify-between text-[11px] text-slate-300">
+                        <div className="flex items-center gap-2">
+                          <span className="text-cyan-400 text-[10px]">↳</span>
+                          <span>{b.step}</span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-mono">{b.latency_ms}ms</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

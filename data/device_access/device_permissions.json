@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "filesystem_full_access": true,
+    "terminal_execution": true,
+    "sensors_environment": true,
+    "memory_vault_persistence": true,
+    "simd_hardware_acceleration": true,
+    "multi_agent_concurrency": true,
+    "storage_volumes_watcher": true,
+    "all": true
+  },
+  "updated_at": 1787083306.904463,
+  "os": "Darwin",
+  "arch": "arm64"
+}

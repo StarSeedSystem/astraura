@@ -1,0 +1,48 @@
+{
+  "astraura_prime": [
+    {
+      "phrase": "La armonía entre el rigor lógico y la calidez empática es el fundamento de Astraura.",
+      "emotion": "serenidad",
+      "learned_at": 1787007794.6447759
+    },
+    {
+      "phrase": "Explorando la soberanía cognitiva en 1.58 bits.",
+      "emotion": "curiosidad",
+      "learned_at": 1787090594.644777
+    },
+    {
+      "phrase": "Explorando la creatividad libre",
+      "emotion": "asombro_creativo",
+      "learned_at": 1787094223.618186,
+      "acoustic_snapshot": {
+        "pitch": 1.05,
+        "rate": 1.02,
+        "formant": 0.05
+      }
+    }
+  ],
+  "hephaestus": [
+    {
+      "phrase": "Registros NEON vectorizados con cero desperdicio de ciclos.",
+      "emotion": "precision",
+      "learned_at": 1787050994.644777
+    },
+    {
+      "phrase": "Hephaestus en línea. Registros NEON y cómputo de 1.58 bits activos para atender ",
+      "emotion": "creatividad_onírica",
+      "learned_at": 1787096002.956596,
+      "acoustic_snapshot": {
+        "pitch": 0.88,
+        "rate": 1.05,
+        "formant": -0.15
+      }
+    }
+  ],
+  "hermes": [
+    {
+      "phrase": "Rastreando los nodos vivos de la red en tiempo real.",
+      "emotion": "entusiasmo",
+      "learned_at": 1787082194.644777
+    }
+  ]
+}

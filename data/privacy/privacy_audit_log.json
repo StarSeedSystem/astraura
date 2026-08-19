@@ -1,0 +1,50 @@
+[
+  {
+    "id": "audit_1787000633718",
+    "timestamp": 1787000633.718268,
+    "event": "Modo Soberano Air-Gap",
+    "sensor_type": "Network & Cloud",
+    "action": "air_gap_toggle",
+    "details": "Air-Gap estricto DESACTIVADO"
+  },
+  {
+    "id": "audit_1787000629701",
+    "timestamp": 1787000629.701765,
+    "event": "Modo Soberano Air-Gap",
+    "sensor_type": "Network & Cloud",
+    "action": "air_gap_toggle",
+    "details": "Air-Gap estricto ACTIVADO (Aislamiento Total)"
+  },
+  {
+    "id": "audit_1786998901393",
+    "timestamp": 1786998901.393012,
+    "event": "Modo Soberano Air-Gap",
+    "sensor_type": "Network & Cloud",
+    "action": "air_gap_toggle",
+    "details": "Air-Gap estricto DESACTIVADO"
+  },
+  {
+    "id": "audit_1786998901390",
+    "timestamp": 1786998901.390698,
+    "event": "Modo Soberano Air-Gap",
+    "sensor_type": "Network & Cloud",
+    "action": "air_gap_toggle",
+    "details": "Air-Gap estricto ACTIVADO (Aislamiento Total)"
+  },
+  {
+    "id": "audit_1",
+    "timestamp": 1786995287.938519,
+    "event": "Inicialización de Sensorium Soberano",
+    "sensor_type": "Hardware M1 & Clima",
+    "action": "allowed",
+    "details": "Lectura local de 8 núcleos ARM NEON y promediado de clima"
+  },
+  {
+    "id": "audit_2",
+    "timestamp": 1786997087.93852,
+    "event": "Muestreo Acústico Ambiental",
+    "sensor_type": "Micrófono",
+    "action": "allowed",
+    "details": "Cálculo de 42.0 dB en buffer WebAudio volátil (no grabado en disco)"
+  }
+]

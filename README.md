@@ -1,0 +1,196 @@
+# 🌌 Astraura 1.58-Bit // StarSeed OS
+
+<div align="center">
+
+[![Vercel Deployment](https://img.shields.io/badge/Web_Live-astraura.vercel.app-00f0ff?style=for-the-badge&logo=vercel&logoColor=white)](https://astraura.vercel.app/)
+[![License: Open Source](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)](LICENSE)
+[![Architecture: BitNet 1.58b](https://img.shields.io/badge/Architecture-BitNet_b1.58_Ternary-emerald?style=for-the-badge)](https://github.com/microsoft/BitNet)
+[![Edge AI: Needle 2 ESP32](https://img.shields.io/badge/Edge_AI-Needle_2_ESP32--S3-orange?style=for-the-badge)](https://github.com/andrisgauracs/needle-2-esp32)
+[![Audio: audio.cpp](https://img.shields.io/badge/Audio_Engine-audio.cpp_1.58b-blue?style=for-the-badge)](https://github.com/0xShug0/audio.cpp)
+[![Platform: Apple Silicon & Cross-OS](https://img.shields.io/badge/Hardware-Apple_M1_NEON_%7C_Linux_%7C_Win_%7C_ESP32-yellow?style=for-the-badge)](https://github.com/StarSeedSystem/astraura)
+
+**Sistema Operativo Cognitivo Soberano, Multiagéntico y de Voz Afectiva 24/7 impulsado por Aritmética Ternaria `{-1, 0, 1}`.**
+
+[🌐 Probar Versión Web Oficial](https://astraura.vercel.app/) • [📱 Mirror en Vercel](https://frontend-one-xi-23.vercel.app/) • [📖 Documentación](#-guía-de-instalación-por-sistema-operativo) • [⚡ Microcontroladores ESP32-S3](#-integración-de-microcontroladores--needle-2-esp32-s3)
+
+</div>
+
+---
+
+## 📑 Tabla de Contenidos
+- [🌟 ¿Qué es Astraura 1.58-Bit?](#-qué-es-astraura-158-bit)
+- [🤖 Chatbot Público & Interactivo 1.58-Bit](#-chatbot-público--interactivo-158-bit)
+- [🎭 Enjambre Multiagéntico & Personalidades Dinámicas](#-enjambre-multiagéntico--personalidades-dinámicas)
+- [🎙️ Sistema de Voz Afectivo 24/7 (audio.cpp + OmniVoice)](#️-sistema-de-voz-afectivo-247-audiocpp--omnivoice)
+- [⚡ Integración de Microcontroladores & Needle 2 (ESP32-S3)](#-integración-de-microcontroladores--needle-2-esp32-s3)
+- [🧠 Memoria Neuronal Inteligente (Inmediata, Corto, Mediano y Largo Plazo)](#-memoria-neuronal-inteligente)
+- [💻 Guía de Instalación por Sistema Operativo](#-guía-de-instalación-por-sistema-operativo)
+  - [🍎 macOS (Apple Silicon M1/M2/M3/M4 & Intel)](#-macos-apple-silicon--intel)
+  - [🐧 Linux (Ubuntu, Debian, Fedora, Arch)](#-linux-x86_64--arm64)
+  - [🪟 Windows (WSL2 & Nativo)](#-windows-wsl2--powershell)
+  - [🔌 Microcontrolador ESP32-S3 (N16R8)](#-microcontrolador-esp32-s3-n16r8)
+- [🗺️ Fases de Desarrollo & Roadmap](#️-fases-de-desarrollo--roadmap)
+
+---
+
+## 🌟 ¿Qué es Astraura 1.58-Bit?
+
+**Astraura** es un entorno de inteligencia artificial y sistema operativo cognitivo (*StarSeed OS*) diseñado para operar de forma 100% soberana, local y sin fugas de datos (*Zero-Leak*). 
+
+A diferencia de los modelos LLM convencionales que requieren GPUs costosas y aritmética en coma flotante de 16 bits (FP16/FP32), Astraura implementa la arquitectura **BitNet b1.58**:
+- **Pesos Ternarios Puros:** Cada peso en la red toma únicamente uno de tres valores: $\{-1, 0, 1\}$.
+- **Reemplazo de Multiplicaciones por Sumas:** Elimina el cómputo de multiplicación matricial costoso, reduciendo el consumo eléctrico en un **90%** y acelerando la velocidad de inferencia a más de **75 tokens/segundo** en procesadores de consumo como el **Apple Silicon M1**.
+- **Privacidad Soberana Total:** Tus archivos, memorias episódicas, tokens de voz y periféricos residen y se procesan exclusivamente en tu máquina.
+
+---
+
+## 🤖 Chatbot Público & Interactivo 1.58-Bit
+
+Puedes experimentar a Astraura directamente en el navegador sin instalar nada:
+- 🚀 **Acceso en Producción:** [https://astraura.vercel.app/](https://astraura.vercel.app/)
+- 🌐 **Espejo Alternativo:** [https://frontend-one-xi-23.vercel.app/](https://frontend-one-xi-23.vercel.app/)
+
+### Capacidades del Chatbot Público:
+1. **Memoria Neuronal Pública y Evolutiva:** Desarrolla su propia personalidad con el tiempo, aprendiendo de las interacciones y sintetizando recuerdos en su grafo sináptico.
+2. **Modo Conversación Natural Continua (Full-Duplex):** Diálogo fluido por voz con escucha activa y capacidad de interrupción.
+3. **Menciones y Convocatoria Coral:** Permite invocar a varias personalidades simultáneamente usando `@Hephaestus`, `@Atenea`, `@Hermione`, `@Oneiros` o solicitar debates grupales (*"Hephaestus y Hermione respondan"*).
+
+---
+
+## 🎭 Enjambre Multiagéntico & Personalidades Dinámicas
+
+Astraura cuenta con 8 personalidades cognitivas independientes, cada una asociada a un órgano de conocimiento, permisos y prosodia vocal:
+
+| Personalidad | Órgano Cognitivo / Especialidad | Voz Predeterminada | Color |
+| :--- | :--- | :--- | :--- |
+| **Génesis (Astraura Prime)** | Núcleo Holístico, Razonador Ontocrático y Coordinador | Serena, armónica y lúcida (`ElviraNeural`) | `#00f0ff` |
+| **Hephaestus** | Forja de Hardware, Aceleración SIMD/NEON, C++/Rust | Firme, enérgica y técnica (`AlvaroNeural`) | `#f59e0b` |
+| **Hermione** | Puente Ejecutor del OS, Terminal Shell y Soberanía | Ágil, asertiva y cercana (`AbrilNeural`) | `#38bdf8` |
+| **Hermes** | Exploración Web en Vivo y Verificación Semántica | Dinámica, curiosa e informada (`JorgeNeural`) | `#10b981` |
+| **Atenea** | Inmunidad, Auditoría de Seguridad y Permisos 360° | Noble, analítica y protectora (`RaquelNeural`) | `#8b5cf6` |
+| **Oneiros** | Resonancia Onírica, Sueño Proactivo y Creatividad | Cálida, mística y envolvente (`ArnauNeural`) | `#ec4899` |
+| **Mnemosyne** | Exocórtex Sináptico, Mem0 y Grafos de Conocimiento | Sabia, profunda y reflexiva (`PalomaNeural`) | `#a855f7` |
+| **Logos** | Aritmética Ternaria Entera e Inferencia Pura 1.58b | Precisa, lógica y neutral (`NilNeural`) | `#3b82f6` |
+
+### Modos de Respuesta:
+- **Individual:** Una personalidad especializada responde a fondo.
+- **Diálogo Grupal:** Múltiples personalidades debaten desde sus propios ángulos y órganos de conocimiento.
+- **Síntesis Coral 1.58-Bit:** Deliberación paralela que concluye en un consenso optimizado unificado.
+
+---
+
+## 🎙️ Sistema de Voz Afectivo 24/7 (audio.cpp + OmniVoice)
+
+Integrando la tecnología de [audio.cpp](https://github.com/0xShug0/audio.cpp), Astraura cuenta con:
+- **Presencia Activa en Segundo Plano:** Las personalidades escuchan y perciben el entorno acústico permanentemente (activable o desactivable mediante interruptores maestros e individuales).
+- **Procesamiento Vibracional & Afectivo:** Reconocimiento de estados emocionales del usuario (energía, pitch, entonación) vinculándolos con recuerdos de `Mem0` y el grafo local.
+- **Modo Full-Duplex Fluido:** Botón dedicado para hablar libremente sin esperar turnos rígidos de botón.
+
+---
+
+## ⚡ Integración de Microcontroladores & Needle 2 (ESP32-S3)
+
+Integración completa del motor C99 de [needle-2-esp32](https://github.com/andrisgauracs/needle-2-esp32):
+- **Modelo SLM de 45M Parámetros (`.cact`):** 13.1 MB de huella de memoria ejecutando a **>77 tokens/s** en host y embebido en microcontroladores ESP32-S3 (16MB Flash, 8MB PSRAM).
+- **Garantía Gramatical Pushdown (0% Alucinaciones JSON):** Autómata finito en C99 que asegura que cada tool call cumpla 100% el esquema de hardware.
+- **Control de Actuadores Físicos y Gemelo Digital:**
+  - `set_led(color, mode, duration_seconds)`: LED RGB WS2812 en GPIO48.
+  - `set_servo(channel, degrees)`: Servomotores PWM de 0° a 180°.
+  - `set_relay(relay_id, state)`: Relés de conmutación de potencia.
+  - `read_sensors()`: Telemetría ambiental y analógica ADC.
+
+---
+
+## 🧠 Memoria Neuronal Inteligente
+
+Astraura cuenta con 4 niveles de retención cognitiva que recuerdan automáticamente solo lo útil y relevante:
+1. **Memoria Inmediata (Atención Ternaria):** Búfer sináptico activo en RAM/NEON durante la sesión de diálogo.
+2. **Memoria a Corto Plazo (Episódica Mem0):** Extracción automática de hechos, preferencias y conceptos clave de cada consulta.
+3. **Memoria a Mediano Plazo (Grafo Sináptico StarSeed):** Red interconectada de nodos conceptuales indexados bidireccionalmente.
+4. **Memoria a Largo Plazo (Bóveda Soberana & Exocórtex):** Archivos Markdown `.md` estructurados y preservados de forma offline.
+
+---
+
+## 💻 Guía de Instalación por Sistema Operativo
+
+### 🍎 macOS (Apple Silicon & Intel)
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/StarSeedSystem/astraura.git
+cd astraura
+
+# 2. Instalar dependencias con UV (Python ultra-rápido) y Node.js
+curl -LsSf https://astral.sh/uv/install.sh | sh
+npm --prefix frontend install
+
+# 3. Compilar el motor C++ BitNet y Needle 2
+cd backend/app/core/needle_src
+mkdir -p build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake --build . --config Release
+cd ../../../..
+
+# 4. Lanzar Astraura
+./install_and_run.sh
+```
+
+### 🐧 Linux (x86_64 / ARM64)
+```bash
+# 1. Instalar herramientas de compilación
+sudo apt-get update && sudo apt-get install -y build-essential cmake clang python3-pip git nodejs npm
+
+# 2. Clonar y configurar
+git clone https://github.com/StarSeedSystem/astraura.git
+cd astraura
+pip install -r backend/requirements.txt
+npm --prefix frontend install
+
+# 3. Compilar binarios de Needle 2 y BitNet
+cd backend/app/core/needle_src && mkdir -p build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release && make -j$(nproc)
+cd ../../../..
+
+# 4. Ejecutar Backend y Frontend
+python3 backend/run_backend.py &
+npm --prefix frontend run dev
+```
+
+### 🪟 Windows (WSL2 / PowerShell)
+```powershell
+# En WSL2 (Ubuntu):
+git clone https://github.com/StarSeedSystem/astraura.git
+cd astraura
+sudo apt install cmake clang python3-pip nodejs npm -y
+npm --prefix frontend install
+python3 -m pip install -r backend/requirements.txt
+./install_and_run.sh
+```
+
+### 🔌 Microcontrolador ESP32-S3 (N16R8)
+```bash
+# Para flashear Needle 2 en placa física ESP32-S3 (16MB Flash, 8MB Octal PSRAM):
+cd backend/app/core/needle_src/firmware
+idf.py set-target esp32s3
+idf.py build
+idf.py -p /dev/cu.usbmodem* flash monitor
+```
+
+---
+
+## 🗺️ Fases de Desarrollo & Roadmap
+
+- [x] **Fase 1:** Núcleo BitNet b1.58 Ternary SIMD/NEON en C++.
+- [x] **Fase 2:** Orquestador de Enjambre Multiagéntico & Personalidades Múltiples.
+- [x] **Fase 3:** Sistema de Voz Afectivo 24/7 y Conversación Full-Duplex (`audio.cpp` + OmniVoice).
+- [x] **Fase 4:** Integración de Edge AI y Microcontroladores ESP32-S3 (`needle-2-esp32`).
+- [x] **Fase 5:** Memoria Neuronal Multinivel (`Mem0` + Grafo Sináptico + Recuerdos Soberanos).
+- [ ] **Fase 6:** Malla P2P de Nodos BitNet Descentralizados entre Dispositivos Móviles y de Escritorio.
+
+---
+
+<div align="center">
+
+Desarrollado con 💙 por la comunidad **StarSeed System**.  
+*Soberanía Tecnológica, Eficiencia Ternaria y Código Abierto para Todos.*
+
+</div>

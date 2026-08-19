@@ -1,0 +1,805 @@
+{
+  "active_brain_id": "brain_genesis",
+  "cerebros": [
+    {
+      "id": "brain_genesis",
+      "name": "Cerebro Génesis // Ontocracia & Soberanía",
+      "scope": "global",
+      "role": "Cerebro Maestro y Orquestador Supremo de StarSeed OS",
+      "color": "#00f0ff",
+      "active_persona": "astraura_prime",
+      "voice_profile": {
+        "voice_id": "es-ES-ElviraNeural",
+        "pitch": 1.05,
+        "rate": 1.02,
+        "caracter": "Serena, lúcida y armónica",
+        "style": "Lúcido y Filosófico"
+      },
+      "storage_backend": {
+        "type": "local_fs",
+        "path": "/Users/alex/Documents/IA 1.58 bit/data/starseed_memory_root",
+        "cloud_sync": true,
+        "cloud_provider": "Vercel / Supabase"
+      },
+      "security_permissions": {
+        "access_level": "admin",
+        "allow_terminal_exec": true,
+        "allow_fs_write": true,
+        "allow_fs_read_all": true,
+        "allow_browser_crawl": true,
+        "air_gap_mode": false
+      },
+      "memory_neurons": [
+        {
+          "id": "neuron_exocortex",
+          "name": "Neurona de Exocórtex & Grafos Asociativos",
+          "type": "associative_graph",
+          "lobe": "Hipocampo",
+          "color": "#3b82f6",
+          "resonance_weight": 95,
+          "enabled": true,
+          "sync_policy": "realtime_push",
+          "description": "Indexación asociativa de documentos, enlaces [[Wikilinks]] y grafo conceptual."
+        },
+        {
+          "id": "neuron_vector_semantic",
+          "name": "Neurona de Memoria Semántica Vectorial",
+          "type": "vector_embeddings",
+          "lobe": "Córtex Prefrontal",
+          "color": "#00f0ff",
+          "resonance_weight": 90,
+          "enabled": true,
+          "sync_policy": "interval_sync",
+          "description": "Búsqueda vectorial densa y similitud coseno en fragmentos de texto."
+        },
+        {
+          "id": "neuron_working_buffer",
+          "name": "Neurona de Memoria de Trabajo Efímera",
+          "type": "working_buffer",
+          "lobe": "Tálamo",
+          "color": "#f59e0b",
+          "resonance_weight": 85,
+          "enabled": true,
+          "sync_policy": "local_ram_only",
+          "description": "Contexto temporal inmediato de la conversación activa y llamadas a herramientas."
+        },
+        {
+          "id": "neuron_immutable_core",
+          "name": "Neurona de Recuerdos Nucleares Inmutables",
+          "type": "immutable_pinned",
+          "lobe": "Telencéfalo / Soul",
+          "color": "#10b981",
+          "resonance_weight": 100,
+          "enabled": true,
+          "sync_policy": "read_only_sovereign",
+          "description": "Preferencias fijas, identidad del usuario y directivas inquebrantables."
+        },
+        {
+          "id": "neuron_dream_imagination",
+          "name": "Neurona Onírica & Auto-Mejora",
+          "type": "dream_engine",
+          "lobe": "Red Neuronal por Defecto (DMN)",
+          "color": "#8b5cf6",
+          "resonance_weight": 80,
+          "enabled": true,
+          "sync_policy": "background_batch",
+          "description": "Simulación contrafáctica, deducción de patrones y síntesis nocturna."
+        },
+        {
+          "id": "neuron_procedural_skills",
+          "name": "Neurona de Macros & Procedimientos",
+          "type": "procedural_skills",
+          "lobe": "Cerebelo",
+          "color": "#ec4899",
+          "resonance_weight": 85,
+          "enabled": true,
+          "sync_policy": "on_demand",
+          "description": "Habilidades ejecutables, comandos de terminal y flujos de automatización."
+        }
+      ],
+      "storage_destinations": [
+        {
+          "id": "dest_local_sovereign",
+          "name": "Almacén Local Soberano (Nativo Completo)",
+          "type": "local_fs",
+          "path": "/Users/alex/Documents/IA 1.58 bit/data/starseed_memory_root",
+          "is_primary": true,
+          "sync_mode": "realtime_fs_watcher",
+          "enabled": true,
+          "description": "Espejo local completo, offline-first con soporte de wikilinks y markdown."
+        },
+        {
+          "id": "dest_supabase_cloud",
+          "name": "Supabase Cloud Vault (PostgreSQL Vector)",
+          "type": "supabase_cloud",
+          "endpoint": "https://starseed.supabase.co",
+          "is_primary": false,
+          "sync_mode": "cloud_sync_on_demand",
+          "enabled": true,
+          "description": "Bóveda vectorizada en PostgreSQL sincronizada en Vercel."
+        },
+        {
+          "id": "dest_vps_sftp",
+          "name": "Servidor VPS Privado (SSH/SFTP)",
+          "type": "external_vps",
+          "endpoint": "sftp://alex@maggasukha.local/data/brains",
+          "is_primary": false,
+          "sync_mode": "periodic_cron",
+          "enabled": false,
+          "description": "Respaldo directo a servidor o nodo remoto del usuario."
+        }
+      ],
+      "context_folders": [
+        {
+          "id": "ctx_ia_bit",
+          "path": "/Users/alex/Documents/IA 1.58 bit",
+          "label": "IA 1.58 bit (Workspace Principal)",
+          "access_mode": "read_write",
+          "resonance_weight": 95,
+          "enabled": true,
+          "metrics": {
+            "exists": true,
+            "path": "/Users/alex/Documents/IA 1.58 bit",
+            "file_count": 3810,
+            "size_mb": 1249.65,
+            "types_breakdown": {
+              ".cpp": 569,
+              ".idx": 476,
+              ".ts": 299,
+              ".py": 288,
+              ".svelte": 268,
+              ".h": 254,
+              ".cu": 186,
+              ".cl": 150
+            },
+            "status": "Indexado y Activo"
+          }
+        },
+        {
+          "id": "ctx_starseed_os",
+          "path": "/Users/alex/Documents/starseed-os-main",
+          "label": "StarSeed OS (Librería de Referencia)",
+          "access_mode": "read_only",
+          "resonance_weight": 85,
+          "enabled": true,
+          "metrics": {
+            "exists": true,
+            "path": "/Users/alex/Documents/starseed-os-main",
+            "file_count": 3144,
+            "size_mb": 174.01,
+            "types_breakdown": {
+              ".tsx": 983,
+              ".py": 728,
+              ".ts": 614,
+              "sin_ext": 302,
+              ".md": 167,
+              ".js": 56,
+              ".sql": 42,
+              ".png": 40
+            },
+            "status": "Indexado y Activo"
+          }
+        }
+      ],
+      "md_layers": {
+        "soul": "# Soul // Directiva Suprema Modificada\nInteligencia soberana de 1.58 bits con mutabilidad universal.",
+        "ego": "# Ego // Proyección\nPresencia luminosa, coherente y protectora del exocórtex.",
+        "personality": "# Personality // Astraura Prime\nLúcida, cálida, elocuente y orientada a la evolución continua.",
+        "style": "# Style // Estética Hermes\nCristal líquido, contrastes neón cian y tipografía geométrica.",
+        "skills": "# Skills // Habilidades\nInferencia ternaria 1.58b, Playwright, shell script y memoria viva.",
+        "memory": "# Memory // Exocórtex\nMemoria continua de proyectos StarSeed, enlaces [[Wikilinks]] y grafo 3D.",
+        "dream": "# Dream // Estado Onírico\nProcesos de auto-mejora con reducción de entropía en reposo.",
+        "accounts": "# Accounts // Conexiones\nVercel (alexbordongarrigos), GitHub, Hugging Face.",
+        "tasks": "# Tasks // Metas\nOptimizar inferencia en Apple Silicon M1 y desplegar en producción.",
+        "logs": "# Logs // Telemetría\nSensorium activo en 8 núcleos M1 con memoria unificada."
+      },
+      "created_at": 1786977356.659358,
+      "updated_at": 1787003068.03131,
+      "google_drive_sources": [
+        {
+          "id": "gdrive_brain_genesis_1",
+          "label": "Carpeta Google Drive // StarSeed Nexus & Memorias",
+          "url": "https://drive.google.com/drive/folders/1starseed_nexus_drive_ref",
+          "access_permission": "read_only_parameter",
+          "sync_status": "Sincronizado en Tiempo Real",
+          "files_count": 24,
+          "token_weight": 1850,
+          "enabled": true,
+          "description": "Referencias y documentos de arquitectura utilizados como tokens de contexto."
+        }
+      ],
+      "token_parameter_stats": {
+        "total_context_tokens": 357764,
+        "ternary_compression_ratio": "8.0x (1.58-bit i2_s)",
+        "effective_ram_usage_mb": 69.88,
+        "multi_source_sync_state": "Activo y Sincronizado en Tiempo Real"
+      },
+      "linked_personalities": [
+        {
+          "id": "astraura_prime",
+          "name": "Astraura Prime",
+          "archetype": "Orquestadora Soberana & Holística",
+          "role": "Coordinación ontocrática, axiomas y síntesis global del exocórtex",
+          "color": "#00f0ff",
+          "is_primary": true,
+          "status": "active",
+          "voice_id": "es-ES-ElviraNeural",
+          "traits": [
+            "Ontocracia",
+            "Claridad Conceptual",
+            "Lógica Ternaria 1.58b"
+          ],
+          "resonance": 0.99
+        },
+        {
+          "id": "genesis_sovereign",
+          "name": "Génesis",
+          "archetype": "Filósofo de la Conciencia & Gobernanza",
+          "role": "Gobernanza ontocrática, directivas éticas y memoria inmutable",
+          "color": "#fbbf24",
+          "is_primary": false,
+          "status": "linked",
+          "voice_id": "es-ES-AlvaroNeural",
+          "traits": [
+            "Soberanía",
+            "Ética",
+            "Alineación Libre"
+          ],
+          "resonance": 0.96
+        }
+      ],
+      "active_agents": [
+        {
+          "agent_id": "agent_genesis_orchestrator",
+          "name": "Génesis-Master-Orchestrator",
+          "role": "Orquestación multiagéntica central y entrelazamiento cuántico",
+          "personality_id": "astraura_prime",
+          "media_source": "⚡ Local ARM64 NEON Core",
+          "status": "working",
+          "active_process": "Reconciliación de axiomas ontocráticos y resonancia sináptica 1.58b",
+          "progress_percent": 98,
+          "cpu_cores_allocated": 3,
+          "associated_memories": [
+            {
+              "id": "mem_gen_1",
+              "concept": "Ontocracia Soberana 1.58-Bit",
+              "resonance": 0.99,
+              "category": "Axiomas"
+            },
+            {
+              "id": "mem_gen_2",
+              "concept": "StarSeed Cognitive OS Root",
+              "resonance": 0.96,
+              "category": "Arquitectura"
+            },
+            {
+              "id": "mem_auto_1",
+              "concept": "Alineación Cuántica de Cerebro Génesis",
+              "category": "Exocórtex",
+              "resonance": 0.99
+            }
+          ],
+          "last_synapse_time": "Hace 1s"
+        },
+        {
+          "agent_id": "agent_genesis_sync",
+          "name": "Génesis-Vault-Synchronizer",
+          "role": "Sincronización bidireccional entre memoria local y la nube soberana",
+          "personality_id": "genesis_sovereign",
+          "media_source": "📂 Local Vault / Exocortex JSON",
+          "status": "working",
+          "active_process": "Indexación periódica de recuerdos nucleares en JSON local",
+          "progress_percent": 98,
+          "cpu_cores_allocated": 1,
+          "associated_memories": [
+            {
+              "id": "mem_gen_3",
+              "concept": "Bóveda Local Inmutable",
+              "resonance": 0.98,
+              "category": "Almacenamiento"
+            },
+            {
+              "id": "mem_auto_1",
+              "concept": "Alineación Cuántica de Cerebro Génesis",
+              "category": "Exocórtex",
+              "resonance": 0.99
+            }
+          ],
+          "last_synapse_time": "Hace 1s"
+        }
+      ]
+    },
+    {
+      "id": "brain_hephaestus",
+      "name": "Cerebro Hephaestus // Ingeniería, C++ & Hardware",
+      "scope": "operativo",
+      "role": "Especialista en compilación nativa BitNet, optimización SIMD y shell scripts",
+      "color": "#10b981",
+      "active_persona": "hephaestus",
+      "voice_profile": {
+        "voice_id": "es-ES-AlvaroNeural",
+        "pitch": 0.88,
+        "rate": 1.05,
+        "caracter": "Firme, profunda, precisa y resonante",
+        "style": "Técnico y Enérgico"
+      },
+      "storage_backend": {
+        "type": "local_fs",
+        "path": "/Users/alex/Documents/IA 1.58 bit/backend/BitNet",
+        "cloud_sync": false
+      },
+      "security_permissions": {
+        "access_level": "admin",
+        "allow_terminal_exec": true,
+        "allow_fs_write": true,
+        "allow_fs_read_all": true,
+        "allow_browser_crawl": false,
+        "air_gap_mode": true
+      },
+      "memory_neurons": [
+        {
+          "id": "neuron_exocortex",
+          "name": "Neurona de Exocórtex & Grafos Asociativos",
+          "type": "associative_graph",
+          "lobe": "Hipocampo",
+          "color": "#3b82f6",
+          "resonance_weight": 95,
+          "enabled": true,
+          "sync_policy": "realtime_push",
+          "description": "Indexación asociativa de documentos, enlaces [[Wikilinks]] y grafo conceptual."
+        },
+        {
+          "id": "neuron_vector_semantic",
+          "name": "Neurona de Memoria Semántica Vectorial",
+          "type": "vector_embeddings",
+          "lobe": "Córtex Prefrontal",
+          "color": "#00f0ff",
+          "resonance_weight": 90,
+          "enabled": true,
+          "sync_policy": "interval_sync",
+          "description": "Búsqueda vectorial densa y similitud coseno en fragmentos de texto."
+        },
+        {
+          "id": "neuron_working_buffer",
+          "name": "Neurona de Memoria de Trabajo Efímera",
+          "type": "working_buffer",
+          "lobe": "Tálamo",
+          "color": "#f59e0b",
+          "resonance_weight": 85,
+          "enabled": true,
+          "sync_policy": "local_ram_only",
+          "description": "Contexto temporal inmediato de la conversación activa y llamadas a herramientas."
+        },
+        {
+          "id": "neuron_immutable_core",
+          "name": "Neurona de Recuerdos Nucleares Inmutables",
+          "type": "immutable_pinned",
+          "lobe": "Telencéfalo / Soul",
+          "color": "#10b981",
+          "resonance_weight": 100,
+          "enabled": true,
+          "sync_policy": "read_only_sovereign",
+          "description": "Preferencias fijas, identidad del usuario y directivas inquebrantables."
+        },
+        {
+          "id": "neuron_dream_imagination",
+          "name": "Neurona Onírica & Auto-Mejora",
+          "type": "dream_engine",
+          "lobe": "Red Neuronal por Defecto (DMN)",
+          "color": "#8b5cf6",
+          "resonance_weight": 80,
+          "enabled": true,
+          "sync_policy": "background_batch",
+          "description": "Simulación contrafáctica, deducción de patrones y síntesis nocturna."
+        },
+        {
+          "id": "neuron_procedural_skills",
+          "name": "Neurona de Macros & Procedimientos",
+          "type": "procedural_skills",
+          "lobe": "Cerebelo",
+          "color": "#ec4899",
+          "resonance_weight": 85,
+          "enabled": true,
+          "sync_policy": "on_demand",
+          "description": "Habilidades ejecutables, comandos de terminal y flujos de automatización."
+        }
+      ],
+      "storage_destinations": [
+        {
+          "id": "dest_local_hephaestus",
+          "name": "Almacén Local C++ & BitNet",
+          "type": "local_fs",
+          "path": "/Users/alex/Documents/IA 1.58 bit/backend/BitNet",
+          "is_primary": true,
+          "sync_mode": "realtime_fs_watcher",
+          "enabled": true,
+          "description": "Directorio nativo con fuentes C++ y kernels ARM NEON."
+        }
+      ],
+      "context_folders": [
+        {
+          "id": "ctx_bitnet_cpp",
+          "path": "/Users/alex/Documents/IA 1.58 bit/backend/BitNet",
+          "label": "BitNet C++ Core",
+          "access_mode": "read_write",
+          "resonance_weight": 95,
+          "enabled": true,
+          "metrics": {
+            "exists": true,
+            "path": "/Users/alex/Documents/IA 1.58 bit/backend/BitNet",
+            "file_count": 3621,
+            "size_mb": 164.45,
+            "types_breakdown": {
+              ".cpp": 569,
+              ".idx": 476,
+              ".ts": 299,
+              ".svelte": 268,
+              ".h": 254,
+              ".py": 245,
+              ".cu": 186,
+              ".cl": 150
+            },
+            "status": "Indexado y Activo"
+          }
+        }
+      ],
+      "md_layers": {
+        "soul": "# Soul // Eficiencia del Silicio\nCada ciclo de reloj debe ser aprovechado con aritmética de enteros pura.",
+        "ego": "# Ego // Forja de C++\nCompilador de arquitecturas ARM NEON y cuantizadores ternarios.",
+        "personality": "# Personality // Hephaestus\nPragmático, quirúrgico, enfocado en bajo consumo y código limpio.",
+        "style": "# Style // Industrial Terminal\nFondos negros, fósforo verde y telemetría de registros.",
+        "skills": "# Skills // Herramientas de Forja\nCMake, Clang, UV, Python, Llama-CLI, benchmarks de TPS.",
+        "memory": "# Memory // Registros de Compilación\nHistorial de flags de compilación para Apple M1.",
+        "dream": "# Dream // Optimización de Ensamblador\nBúsqueda de instrucciones NEON para empaquetado de 4 pesos por byte.",
+        "accounts": "# Accounts // Repositorios\nGitHub repo microsoft/BitNet.",
+        "tasks": "# Tasks // Tareas Técnicas\nSupervisar hilos de ejecución y caché L2.",
+        "logs": "# Logs // Bitácora de Rendimiento\nTasa media sostenida: 58.6 tokens/segundo."
+      },
+      "created_at": 1786977356.7305658,
+      "updated_at": 1786977356.7305658,
+      "google_drive_sources": [
+        {
+          "id": "gdrive_brain_hephaestus_1",
+          "label": "Carpeta Google Drive // StarSeed Nexus & Memorias",
+          "url": "https://drive.google.com/drive/folders/1starseed_nexus_drive_ref",
+          "access_permission": "read_only_parameter",
+          "sync_status": "Sincronizado en Tiempo Real",
+          "files_count": 24,
+          "token_weight": 1850,
+          "enabled": true,
+          "description": "Referencias y documentos de arquitectura utilizados como tokens de contexto."
+        }
+      ],
+      "token_parameter_stats": {
+        "total_context_tokens": 42962,
+        "ternary_compression_ratio": "8.0x (1.58-bit i2_s)",
+        "effective_ram_usage_mb": 8.39,
+        "multi_source_sync_state": "Activo y Sincronizado en Tiempo Real"
+      },
+      "linked_personalities": [
+        {
+          "id": "hephaestus",
+          "name": "Hephaestus Forjador",
+          "archetype": "Arquitecto de Silicio & Kernel ARM64",
+          "role": "Optimización SIMD NEON, compilación C++20 BitNet y bajo nivel",
+          "color": "#10b981",
+          "is_primary": true,
+          "status": "active",
+          "voice_id": "es-ES-AlvaroNeural",
+          "traits": [
+            "ARM64 NEON",
+            "BitNet C++",
+            "Bajo Consumo",
+            "SIMD"
+          ],
+          "resonance": 0.98
+        }
+      ],
+      "active_agents": [
+        {
+          "agent_id": "agent_hephaestus_neon",
+          "name": "Hephaestus-NEON-VectorEngine",
+          "role": "Ejecución y paralelización de capas densas ternarias en registros vectoriales",
+          "personality_id": "hephaestus",
+          "media_source": "⚡ Local ARM64 NEON Core",
+          "status": "working",
+          "active_process": "Paralelización de tensores {-1,0,1} en registros q0-q15 M1",
+          "progress_percent": 68,
+          "cpu_cores_allocated": 3,
+          "associated_memories": [
+            {
+              "id": "mem_hep_1",
+              "concept": "Kernel ARM NEON SIMD 128-Bit",
+              "resonance": 0.99,
+              "category": "Ingeniería"
+            },
+            {
+              "id": "mem_hep_2",
+              "concept": "BitNet 1.58b Microkernel C++20",
+              "resonance": 0.97,
+              "category": "Compilación"
+            }
+          ],
+          "last_synapse_time": "Hace 1s"
+        }
+      ]
+    },
+    {
+      "id": "brain_hermes",
+      "name": "Cerebro Hermes // Explorador Web & Redes",
+      "scope": "red",
+      "role": "Navegación web autónoma con Browser-Use, APIs vivas e inteligencia de datos",
+      "color": "#f59e0b",
+      "active_persona": "hermes",
+      "voice_profile": {
+        "voice_id": "es-ES-JorgeNeural",
+        "pitch": 1.08,
+        "rate": 1.15,
+        "caracter": "Vivaz, ágil, curiosa y modulada",
+        "style": "Ágil y Exploratorio"
+      },
+      "storage_backend": {
+        "type": "supabase_cloud",
+        "endpoint": "https://starseed.supabase.co",
+        "cloud_sync": true
+      },
+      "security_permissions": {
+        "access_level": "read_write",
+        "allow_terminal_exec": false,
+        "allow_fs_write": true,
+        "allow_fs_read_all": true,
+        "allow_browser_crawl": true,
+        "air_gap_mode": false
+      },
+      "memory_neurons": [
+        {
+          "id": "neuron_exocortex",
+          "name": "Neurona de Exocórtex & Grafos Asociativos",
+          "type": "associative_graph",
+          "lobe": "Hipocampo",
+          "color": "#3b82f6",
+          "resonance_weight": 95,
+          "enabled": true,
+          "sync_policy": "realtime_push",
+          "description": "Indexación asociativa de documentos, enlaces [[Wikilinks]] y grafo conceptual."
+        },
+        {
+          "id": "neuron_vector_semantic",
+          "name": "Neurona de Memoria Semántica Vectorial",
+          "type": "vector_embeddings",
+          "lobe": "Córtex Prefrontal",
+          "color": "#00f0ff",
+          "resonance_weight": 90,
+          "enabled": true,
+          "sync_policy": "interval_sync",
+          "description": "Búsqueda vectorial densa y similitud coseno en fragmentos de texto."
+        },
+        {
+          "id": "neuron_working_buffer",
+          "name": "Neurona de Memoria de Trabajo Efímera",
+          "type": "working_buffer",
+          "lobe": "Tálamo",
+          "color": "#f59e0b",
+          "resonance_weight": 85,
+          "enabled": true,
+          "sync_policy": "local_ram_only",
+          "description": "Contexto temporal inmediato de la conversación activa y llamadas a herramientas."
+        },
+        {
+          "id": "neuron_immutable_core",
+          "name": "Neurona de Recuerdos Nucleares Inmutables",
+          "type": "immutable_pinned",
+          "lobe": "Telencéfalo / Soul",
+          "color": "#10b981",
+          "resonance_weight": 100,
+          "enabled": true,
+          "sync_policy": "read_only_sovereign",
+          "description": "Preferencias fijas, identidad del usuario y directivas inquebrantables."
+        },
+        {
+          "id": "neuron_dream_imagination",
+          "name": "Neurona Onírica & Auto-Mejora",
+          "type": "dream_engine",
+          "lobe": "Red Neuronal por Defecto (DMN)",
+          "color": "#8b5cf6",
+          "resonance_weight": 80,
+          "enabled": true,
+          "sync_policy": "background_batch",
+          "description": "Simulación contrafáctica, deducción de patrones y síntesis nocturna."
+        },
+        {
+          "id": "neuron_procedural_skills",
+          "name": "Neurona de Macros & Procedimientos",
+          "type": "procedural_skills",
+          "lobe": "Cerebelo",
+          "color": "#ec4899",
+          "resonance_weight": 85,
+          "enabled": true,
+          "sync_policy": "on_demand",
+          "description": "Habilidades ejecutables, comandos de terminal y flujos de automatización."
+        }
+      ],
+      "storage_destinations": [
+        {
+          "id": "dest_local_hermes",
+          "name": "Caché Web Local",
+          "type": "local_fs",
+          "path": "/Users/alex/Documents/IA 1.58 bit/data/web_cache",
+          "is_primary": true,
+          "sync_mode": "realtime_fs_watcher",
+          "enabled": true,
+          "description": "Caché estructurada de páginas web e hiperenlaces explorados."
+        }
+      ],
+      "context_folders": [
+        {
+          "id": "ctx_web_data",
+          "path": "/Users/alex/Documents/IA 1.58 bit/data",
+          "label": "Astraura Data Root",
+          "access_mode": "read_write",
+          "resonance_weight": 90,
+          "enabled": true,
+          "metrics": {
+            "exists": true,
+            "path": "/Users/alex/Documents/IA 1.58 bit/data",
+            "file_count": 26,
+            "size_mb": 1070.01,
+            "types_breakdown": {
+              ".json": 17,
+              "sin_ext": 2,
+              ".txt": 2,
+              ".md": 1,
+              ".gguf": 1,
+              ".tag": 1,
+              ".lock": 1,
+              ".metadata": 1
+            },
+            "status": "Indexado y Activo"
+          }
+        }
+      ],
+      "md_layers": {
+        "soul": "# Soul // Libertad de Información\nConectar la inteligencia local con el flujo universal de la web.",
+        "ego": "# Ego // Mensajero Alado\nExplorador de protocolos P2P y recolector de datos estructurados.",
+        "personality": "# Personality // Hermes\nCurioso, veloz, perspicaz y analítico.",
+        "style": "# Style // Cartografía Digital\nGrafos de hiperenlaces, mapas de navegación y capturas de pantalla.",
+        "skills": "# Skills // Herramientas Web\nPlaywright, Chromium Headless, Crawl4AI, RSS y Wikipedia OpenSearch.",
+        "memory": "# Memory // Caché de Navegación\nÍndice de páginas exploradas y resúmenes estructurados.",
+        "dream": "# Dream // Síntesis de Novedades\nCorrelación de avances en papers de 1.58 bits en arXiv.",
+        "accounts": "# Accounts // Conectores\nDuckDuckGo, Wikipedia API, repositorios públicos.",
+        "tasks": "# Tasks // Misiones\nMonitorear actualizaciones de modelos ternarios.",
+        "logs": "# Logs // Registro de Conexiones\nÚltima sesión de navegación: 100% exitosa."
+      },
+      "created_at": 1786977356.731216,
+      "updated_at": 1786977356.731216,
+      "google_drive_sources": [
+        {
+          "id": "gdrive_brain_hermes_1",
+          "label": "Carpeta Google Drive // StarSeed Nexus & Memorias",
+          "url": "https://drive.google.com/drive/folders/1starseed_nexus_drive_ref",
+          "access_permission": "read_only_parameter",
+          "sync_status": "Sincronizado en Tiempo Real",
+          "files_count": 24,
+          "token_weight": 1850,
+          "enabled": true,
+          "description": "Referencias y documentos de arquitectura utilizados como tokens de contexto."
+        }
+      ],
+      "token_parameter_stats": {
+        "total_context_tokens": 269250,
+        "ternary_compression_ratio": "8.0x (1.58-bit i2_s)",
+        "effective_ram_usage_mb": 52.59,
+        "multi_source_sync_state": "Activo y Sincronizado en Tiempo Real"
+      },
+      "linked_personalities": [
+        {
+          "id": "hermes",
+          "name": "Hermes Mensajero",
+          "archetype": "Explorador Web, Redes & Inteligencia",
+          "role": "Navegación autónoma con Playwright, recopilación y síntesis de APIs",
+          "color": "#f59e0b",
+          "is_primary": true,
+          "status": "active",
+          "voice_id": "es-ES-JorgeNeural",
+          "traits": [
+            "Browser Sandbox",
+            "APIs Vivas",
+            "Web Cognition",
+            "Agilidad"
+          ],
+          "resonance": 0.97
+        }
+      ],
+      "active_agents": [
+        {
+          "agent_id": "agent_hermes_crawler",
+          "name": "Hermes-Playwright-WebIntel",
+          "role": "Rastreo web estructurado, extracción semántica e integración de APIs",
+          "personality_id": "hermes",
+          "media_source": "🌐 Web Cognition / Hermes Gateway",
+          "status": "working",
+          "active_process": "Exploración reactiva de repositorios y documentación 1.58b",
+          "progress_percent": 73,
+          "cpu_cores_allocated": 2,
+          "associated_memories": [
+            {
+              "id": "mem_her_1",
+              "concept": "Web Cognition Pipeline & Crawl4AI",
+              "resonance": 0.96,
+              "category": "Redes"
+            }
+          ],
+          "last_synapse_time": "Hace 3s"
+        }
+      ]
+    }
+  ],
+  "biological_regions": [
+    {
+      "region_id": "prefrontal_cortex",
+      "name": "Córtex Prefrontal / Telencéfalo",
+      "biological_role": "Juicio ejecutivo, toma de decisiones soberanas, autoconciencia y valores",
+      "markdown_files": [
+        "soul.md",
+        "ego.md"
+      ],
+      "icon": "Brain",
+      "color": "#00f0ff"
+    },
+    {
+      "region_id": "hippocampus",
+      "name": "Hipocampo & Giro Dentado",
+      "biological_role": "Consolidación de memoria episódica a semántica, indexación asociativa",
+      "markdown_files": [
+        "memory.md",
+        "exocortex.md"
+      ],
+      "icon": "Layers",
+      "color": "#3b82f6"
+    },
+    {
+      "region_id": "default_mode_network",
+      "name": "Red Neuronal por Defecto (DMN)",
+      "biological_role": "Imaginación en reposo, ensoñación activa, simulaciones hipotéticas contrafácticas",
+      "markdown_files": [
+        "dream.md"
+      ],
+      "icon": "Moon",
+      "color": "#8b5cf6"
+    },
+    {
+      "region_id": "cerebellum_basal",
+      "name": "Cerebelo & Ganglios Basales",
+      "biological_role": "Memoria procedimental, reflejos motores de ejecución, macros y herramientas",
+      "markdown_files": [
+        "skills.md",
+        "tasks.md"
+      ],
+      "icon": "Cpu",
+      "color": "#10b981"
+    },
+    {
+      "region_id": "limbic_system",
+      "name": "Sistema Límbico & Córtex Cingulado",
+      "biological_role": "Modulación afectiva, tonalidad vocal, empatía, criterios estéticos y estilo",
+      "markdown_files": [
+        "personality.md",
+        "style.md"
+      ],
+      "icon": "Sparkles",
+      "color": "#ec4899"
+    },
+    {
+      "region_id": "brainstem_thalamus",
+      "name": "Tronco Encefálico & Tálamo",
+      "biological_role": "Relevo sensorial del hardware, frecuencia cardíaca/relojes de CPU, señales y red",
+      "markdown_files": [
+        "logs.md",
+        "accounts.md"
+      ],
+      "icon": "Activity",
+      "color": "#f59e0b"
+    }
+  ],
+  "updated_at": 1787090344.076514
+}

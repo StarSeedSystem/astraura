@@ -1,0 +1,12 @@
+{
+  "is_always_on": true,
+  "max_kb_per_minute": 55,
+  "max_mb_per_hour": 5.0,
+  "storage_target": "google_drive",
+  "associated_brain_ids": [
+    "brain_genesis",
+    "brain_hermes",
+    "brain_hephaestus"
+  ],
+  "auto_recycle_memories": true
+}

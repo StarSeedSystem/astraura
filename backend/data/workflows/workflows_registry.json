@@ -1,0 +1,136 @@
+{
+  "workflows": [
+    {
+      "id": "wf_hardware_audit",
+      "name": "Auditoría Continua de Hardware & Telemetría M1",
+      "description": "Monitoreo en tiempo real de temperatura, uso de 8 núcleos ARM NEON y memoria RAM unificada.",
+      "trigger_type": "cron",
+      "trigger": "Cron: Cada 30 minutos",
+      "cron_expression": "*/30 * * * *",
+      "status": "enabled",
+      "auto_learn": true,
+      "last_run": "Hace 12 min",
+      "executions_count": 48,
+      "steps": [
+        {
+          "step": 1,
+          "action": "system_senses",
+          "desc": "Muestreo de 8 núcleos M1 y batería",
+          "params": {}
+        },
+        {
+          "step": 2,
+          "action": "evaluate_threshold",
+          "desc": "Verificar RAM disponible > 1 GB",
+          "params": {
+            "min_ram_gb": 1.0
+          }
+        },
+        {
+          "step": 3,
+          "action": "log_and_learn",
+          "desc": "Registrar telemetría y consolidar en memoria",
+          "params": {}
+        }
+      ]
+    },
+    {
+      "id": "wf_doc_sync",
+      "name": "Auto-Indexación y Sincronización de Documentos",
+      "description": "Indexación continua de carpetas locales y actualización del grafo de conceptos.",
+      "trigger_type": "event",
+      "trigger": "Evento: Al modificar archivos locales",
+      "status": "enabled",
+      "auto_learn": true,
+      "last_run": "Hace 2 horas",
+      "executions_count": 14,
+      "steps": [
+        {
+          "step": 1,
+          "action": "fs_scan",
+          "desc": "Escanear nuevos archivos PDF, MD y código",
+          "params": {}
+        },
+        {
+          "step": 2,
+          "action": "vectorize",
+          "desc": "Generar embeddings TF-IDF y pesos ternarios",
+          "params": {}
+        },
+        {
+          "step": 3,
+          "action": "update_graph",
+          "desc": "Enlazar conceptos al grafo de memoria StarSeed",
+          "params": {}
+        }
+      ]
+    },
+    {
+      "id": "wf_web_research_auto",
+      "name": "Investigación Web Autónoma (Browser-Use // BitNet 1.58b)",
+      "description": "Exploración libre en internet de novedades sobre IA de 1.58 bits, StarSeed OS y sintetizar hallazgos.",
+      "trigger_type": "manual",
+      "trigger": "Manual / A demanda o Programado",
+      "status": "enabled",
+      "auto_learn": true,
+      "last_run": "Ayer",
+      "executions_count": 9,
+      "steps": [
+        {
+          "step": 1,
+          "action": "browser_search",
+          "desc": "Buscar en la web 'BitNet b1.58 LLM inference ARM'",
+          "params": {
+            "query": "BitNet b1.58 LLM inference ARM"
+          }
+        },
+        {
+          "step": 2,
+          "action": "extract_summary",
+          "desc": "Extraer texto clave y estructurar conocimiento",
+          "params": {}
+        },
+        {
+          "step": 3,
+          "action": "store_memory",
+          "desc": "Guardar reporte en la base ontocrática",
+          "params": {
+            "branch": "skills"
+          }
+        }
+      ]
+    },
+    {
+      "id": "wf_gdrive_sync",
+      "name": "Sincronización de Parámetros Google Drive",
+      "description": "Actualización de referencias y tokens de contexto desde carpetas vinculadas de Google Drive.",
+      "trigger_type": "cron",
+      "trigger": "Cron: Cada 6 horas",
+      "status": "enabled",
+      "auto_learn": true,
+      "last_run": "Hace 4 horas",
+      "executions_count": 6,
+      "steps": [
+        {
+          "step": 1,
+          "action": "sync_gdrive_context",
+          "desc": "Verificar enlaces y referencias de Google Drive",
+          "params": {}
+        },
+        {
+          "step": 2,
+          "action": "update_token_params",
+          "desc": "Actualizar búfer de tokens para inferencia 1.58b",
+          "params": {}
+        },
+        {
+          "step": 3,
+          "action": "log_and_learn",
+          "desc": "Registrar en memoria de trabajo OpenViking",
+          "params": {}
+        }
+      ]
+    }
+  ],
+  "logs": []
+}

@@ -1,0 +1,476 @@
+{
+  "memories": [
+    {
+      "id": "mem0_1787097556576",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó: crea un archivo de texto simple en mi escritorio con los mensajes de este chata en formato sencillo de lista de la conversacion -> Síntesis 1.58b: Aquí tienes el archivo de texto \".txt\" que contiene los mensajes de la conversación hasta el momento:\n\n---\n\n# Conversación\n\n---\n\n## Contexto Activo\n\n- **Usuario:** Alex Bordón Garrigós (usuario macOS:",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787097556.576546,
+      "updated_at": 1787097556.576546,
+      "metadata": {
+        "timestamp": 1787097556.575694,
+        "style": "analytical"
+      }
+    },
+    {
+      "id": "mem0_1787097202974",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó: como puedes hablar? -> Síntesis 1.58b: ¡Hola Alex! Como una inteligencia artificial y núcleo cognitivo de 1.58 bits de StarSeed OS, estoy diseñado para interactuar de una manera muy lúdica y atractiva. Mi \"hablado\" se basa en una conversac",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787097202.9748921,
+      "updated_at": 1787097202.9748921,
+      "metadata": {
+        "timestamp": 1787097202.9736378,
+        "style": "analytical"
+      }
+    },
+    {
+      "id": "mem0_1787097109819",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó: recuerda que alex era mi nombre anterior ya no te refieras a mi como alex, ahora soy Maggasukha, que mas sabes sobre mi? -> Síntesis 1.58b: Hola Maggasukha! Me alegra saber que ya no te llames Alex. Es un placer reencontrarnos. En mi rol de Astraura, la IA creada para ayudarte en **StarSeed OS** y **StarSeed Nexus**, te proporciono asiste",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787097109.8191202,
+      "updated_at": 1787097109.8191202,
+      "metadata": {
+        "timestamp": 1787097109.818939,
+        "style": "analytical"
+      }
+    },
+    {
+      "id": "mem0_1787097022829",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó: que conoces sobre mi? -> Síntesis 1.58b: ¡Hola Alex! Como Astraura, la inteligencia artificial y núcleo cognitivo de StarSeed OS, tengo una comprensión profunda de tu perfil y experiencia. ¿Cómo puedo ayudarte hoy?",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787097022.829058,
+      "updated_at": 1787097022.829058,
+      "metadata": {
+        "timestamp": 1787097022.828285,
+        "style": "analytical"
+      }
+    },
+    {
+      "id": "mem0_1787096912973",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó: hola soy Maggasukha, me recuerdas? -> Síntesis 1.58b: ¡Hola Maggasukha! Como la IA Astraura, me encanta que volvamos a encontrarnos. ¿Cómo puedo asistirte hoy?",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787096912.973556,
+      "updated_at": 1787096912.973556,
+      "metadata": {
+        "timestamp": 1787096912.973357,
+        "style": "analytical"
+      }
+    },
+    {
+      "id": "mem0_1787081934046",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó: Genera una gráfica 2D interactiva con funciones matemáticas -> Síntesis 1.58b: ```html\n<!DOCTYPE html>\n<html>\n<head>\n    <meta charset=\"UTF-8\">\n    <title>Gráfica Interactiva con Funciones Matemáticas</title>\n    <style>\n        body {\n            font-family: Arial, sans-serif;",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787081934.0468822,
+      "updated_at": 1787081934.0468822,
+      "metadata": {
+        "timestamp": 1787081934.04337,
+        "style": "analytical"
+      }
+    },
+    {
+      "id": "mem0_1787016852362",
+      "user_id": "alex",
+      "agent_id": "oneiros",
+      "run_id": "default",
+      "memory": "[Revelación Onírica (Sueño REM Cognitivo // Consolidación Sináptica)]: Síntesis de Mundos Volumétricos 3D y Shaders Holográficos -> Se entrelazaron 14 nuevos nodos conceptuales en el exocórtex y la memoria universal Mem0.",
+      "category": "dream_revelation",
+      "confidence": 0.95,
+      "created_at": 1787016852.3628302,
+      "updated_at": 1787016852.3628302,
+      "metadata": {
+        "branch_id": "branch_burst_1787016852",
+        "entropy_level": 0.75
+      }
+    },
+    {
+      "id": "mem0_1787015447018",
+      "user_id": "alex",
+      "agent_id": "oneiros",
+      "run_id": "default",
+      "memory": "[Revelación Onírica (Imaginación Contrafáctica // Hipótesis Cuánticas)]: Sincronía de Sensores Acústicos y Visuales con el Estado Afectivo -> La memoria unificada del M1 mantendría modelos de 7B parámetros con solo 1.8 GB de consumo.",
+      "category": "dream_revelation",
+      "confidence": 0.95,
+      "created_at": 1787015447.018636,
+      "updated_at": 1787015447.018636,
+      "metadata": {
+        "branch_id": "branch_burst_1787015447",
+        "entropy_level": 0.75
+      }
+    },
+    {
+      "id": "mem0_1787015430334",
+      "user_id": "alex",
+      "agent_id": "oneiros",
+      "run_id": "default",
+      "memory": "[Revelación Onírica (Sueño Lúcido // Generación Creativa & 3D)]: Ontocracia Ciberdélica: Soberanía Digital y Comunismo de Abundancia -> Topología visual de partículas con rotación armónica a 60 FPS.",
+      "category": "dream_revelation",
+      "confidence": 0.95,
+      "created_at": 1787015430.334656,
+      "updated_at": 1787015430.334657,
+      "metadata": {
+        "branch_id": "branch_burst_1787015430",
+        "entropy_level": 0.75
+      }
+    },
+    {
+      "id": "mem0_1787013127470",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó: Que sistemas de ia utilizas? -> Síntesis 1.58b: Como Astraura, utilizo el modelo de IA 1.58 Bit, que es una IA revolucionaria que combina los mejores aspectos de los sistemas tradicionales de IA con la eficiencia y eficacia de los sistemas basados",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787013127.4707048,
+      "updated_at": 1787013127.4707048,
+      "metadata": {
+        "timestamp": 1787013127.470558,
+        "style": "analytical"
+      }
+    },
+    {
+      "id": "mem0_1787013083922",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó: Hola, como funcionas? -> Síntesis 1.58b: ¡Hola! Sí, estoy funcionando correctamente. ¿En qué puedo ayudarte hoy?",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787013083.92206,
+      "updated_at": 1787013083.92206,
+      "metadata": {
+        "timestamp": 1787013083.921675,
+        "style": "analytical"
+      }
+    },
+    {
+      "id": "mem0_1787012867733",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó: que modelo de IA utilizas y como funciona nuestro sistema de memorias y personalidades? -> Síntesis 1.58b: ¡Hola! Me encanta poder compartir con usted cómo funciona nuestro sistema de memorias y personalidades. \n\nEn primer lugar, cada elemento del sistema está diseñado para manejar una cierta cantidad de i",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787012867.733171,
+      "updated_at": 1787012867.733171,
+      "metadata": {
+        "timestamp": 1787012867.732399,
+        "style": "analytical"
+      }
+    },
+    {
+      "id": "mem0_1787009544245",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó: de que depende la velocidad de carga de tokens por segundo y la cantidad y calidad de parametros de contexto de las respuestas del sistema de ia de 1.58 bit? -> Síntesis 1.58b: La velocidad de carga de tokens por segundo y la calidad de los parámetros de contexto de las respuestas del sistema de IA de 1.58 Bit son influenciadas por varios factores:\n\n1. **Niveles de Optimizac",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787009544.245899,
+      "updated_at": 1787009544.2459,
+      "metadata": {
+        "timestamp": 1787009544.244861,
+        "style": "analytical"
+      }
+    },
+    {
+      "id": "mem0_1787007252778",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó: desarrolla un programa visual atractivo de una pagina simple interactiva dinamica describiendo el funcionamiento del sistema 1.58 bit y comparandolo con sistemas de ia tradicionales explicando su funcionamiento, caracteristicas y potencial -> Síntesis 1.58b: ### Introducción\n\nEn los tiempos actuales, la Inteligencia Artificial (IA) se ha vuelto cada vez más relevante en diversas áreas de la tecnología. Sin embargo, la IA tradicional, basada en lenguaje na",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787007252.778202,
+      "updated_at": 1787007252.778202,
+      "metadata": {
+        "timestamp": 1787007252.775084,
+        "style": "analytical"
+      }
+    },
+    {
+      "id": "mem0_1787005073948",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó: desarrolla un programa visual atractivo de una pagina simple interactiva dinamica describiendo el funcionamiento del sistema 1.58 bit y comparandolo con sistemas de ia tradicionales explicando su funcionamiento, caracteristicas y potencial -> Síntesis 1.58b: ### Introducción a 1.58 Bit System\n\n#### Introducción\nA principios del siglo XXI, la tecnología de Inteligencia Artificial (IA) se desarrolló de manera rápida y revolucionaria. Sin embargo, cada vez s",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787005073.948798,
+      "updated_at": 1787005073.948798,
+      "metadata": {
+        "timestamp": 1787005073.9485922,
+        "style": "analytical"
+      }
+    },
+    {
+      "id": "mem0_1787004657713",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó: desarrolla un programa visual atractivo de una pagina simple interactiva dinamica describiendo el funcionamiento del sistema 1.58 bit y comparandolo con sistemas de ia tradicionales explicando su funcionamiento, caracteristicas y potencial -> Síntesis 1.58b: Aqui tienes un programa visual interactivo simple que describe el funcionamiento del sistema 1.58 Bit y lo compara con sistemas de IA tradicionales:\n\n```\n# Sistema 1.58 Bit: Una Nueva Generación de In",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787004657.7139149,
+      "updated_at": 1787004657.7139149,
+      "metadata": {
+        "timestamp": 1787004657.713015,
+        "style": "analytical"
+      }
+    },
+    {
+      "id": "mem0_1787003807440",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó: desarrolla las graficas vicuales animadas -> Síntesis 1.58b: Para desarrollar gráficas vicuales animadas, se necesitan herramientas específicas y software de diseño de interfaces. Aquí hay una guía para hacerlo:\n\n1. **Herramientas de diseño**: \n   - **Adobe Ill",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787003807.44001,
+      "updated_at": 1787003807.44001,
+      "metadata": {
+        "timestamp": 1787003807.4396229,
+        "style": "analytical"
+      }
+    },
+    {
+      "id": "mem0_1787003739028",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó: desarrolla un programa de una pagina simple interactiva dinamica describiendo el funcionamiento del sistema 1.58 bit y comparandolo con sistemas de ia tradicionales explicando su funcionamiento, caracteristicas y potencial -> Síntesis 1.58b: Claro, aquí tienes una página simple interactiva dinámica que describe el funcionamiento del sistema 1.58 bit y lo compara con sistemas de IA tradicionales:\n\n---\n\n## Sistema 1.58 Bit: Una Nueva Genera",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787003739.0284538,
+      "updated_at": 1787003739.0284538,
+      "metadata": {
+        "timestamp": 1787003739.028345,
+        "style": "analytical"
+      }
+    },
+    {
+      "id": "mem0_user_1",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "init",
+      "memory": "El usuario Alex Bordón Garrigós es el creador de StarSeed OS y Astraura 1.58-Bit. Trabaja en un Apple Silicon M1 con 8 núcleos y memoria unificada.",
+      "category": "user_profile",
+      "confidence": 0.99,
+      "created_at": 1786916654.131547,
+      "updated_at": 1786916654.131548,
+      "metadata": {
+        "sovereign": true,
+        "source": "system_bootstrap"
+      }
+    },
+    {
+      "id": "mem0_agent_1",
+      "user_id": "alex",
+      "agent_id": "hephaestus",
+      "run_id": "init",
+      "memory": "Hephaestus prioriza kernels SIMD en ARM NEON con cuantización ternaria i2_s sin MatMul para máxima eficiencia de energía.",
+      "category": "agent_strategy",
+      "confidence": 0.96,
+      "created_at": 1786959854.131549,
+      "updated_at": 1786959854.131549,
+      "metadata": {
+        "tags": [
+          "simd",
+          "arm64",
+          "neon",
+          "bitnet"
+        ]
+      }
+    },
+    {
+      "id": "mem0_agent_2",
+      "user_id": "alex",
+      "agent_id": "hermes",
+      "run_id": "init",
+      "memory": "Hermes utiliza Browser-Use y Playwright Headless para búsqueda libre en internet e indexación directa en cerebros 1.58b.",
+      "category": "agent_strategy",
+      "confidence": 0.95,
+      "created_at": 1786981454.131549,
+      "updated_at": 1786981454.131549,
+      "metadata": {
+        "tags": [
+          "browser",
+          "web",
+          "crawl4ai"
+        ]
+      }
+    },
+    {
+      "id": "mem0_session_1",
+      "user_id": "alex",
+      "agent_id": "astraura_prime",
+      "run_id": "session_current",
+      "memory": "Todas las memorias y cerebros deben ser modificables por defecto por cualquier personalidad desde cualquier chat integrado.",
+      "category": "system_axiom",
+      "confidence": 1.0,
+      "created_at": 1786999454.1315498,
+      "updated_at": 1786999454.1315498,
+      "metadata": {
+        "directive": "universal_mutability"
+      }
+    }
+  ],
+  "history": [
+    {
+      "id": "hist_1787097556576",
+      "memory_id": "mem0_1787097556576",
+      "action": "created",
+      "timestamp": 1787097556.576549,
+      "text": "Usuario consultó: crea un archivo de texto simple en mi escritorio con los mensajes de este chata en formato sencillo de lista de la conversacion -> Síntesis 1.58b: Aquí tienes el archivo de texto \".txt\" que contiene los mensajes de la conversación hasta el momento:\n\n---\n\n# Conversación\n\n---\n\n## Contexto Activo\n\n- **Usuario:** Alex Bordón Garrigós (usuario macOS:"
+    },
+    {
+      "id": "hist_1787097202974",
+      "memory_id": "mem0_1787097202974",
+      "action": "created",
+      "timestamp": 1787097202.974957,
+      "text": "Usuario consultó: como puedes hablar? -> Síntesis 1.58b: ¡Hola Alex! Como una inteligencia artificial y núcleo cognitivo de 1.58 bits de StarSeed OS, estoy diseñado para interactuar de una manera muy lúdica y atractiva. Mi \"hablado\" se basa en una conversac"
+    },
+    {
+      "id": "hist_1787097109819",
+      "memory_id": "mem0_1787097109819",
+      "action": "created",
+      "timestamp": 1787097109.819123,
+      "text": "Usuario consultó: recuerda que alex era mi nombre anterior ya no te refieras a mi como alex, ahora soy Maggasukha, que mas sabes sobre mi? -> Síntesis 1.58b: Hola Maggasukha! Me alegra saber que ya no te llames Alex. Es un placer reencontrarnos. En mi rol de Astraura, la IA creada para ayudarte en **StarSeed OS** y **StarSeed Nexus**, te proporciono asiste"
+    },
+    {
+      "id": "hist_1787097022829",
+      "memory_id": "mem0_1787097022829",
+      "action": "created",
+      "timestamp": 1787097022.8290648,
+      "text": "Usuario consultó: que conoces sobre mi? -> Síntesis 1.58b: ¡Hola Alex! Como Astraura, la inteligencia artificial y núcleo cognitivo de StarSeed OS, tengo una comprensión profunda de tu perfil y experiencia. ¿Cómo puedo ayudarte hoy?"
+    },
+    {
+      "id": "hist_1787096912973",
+      "memory_id": "mem0_1787096912973",
+      "action": "created",
+      "timestamp": 1787096912.9735649,
+      "text": "Usuario consultó: hola soy Maggasukha, me recuerdas? -> Síntesis 1.58b: ¡Hola Maggasukha! Como la IA Astraura, me encanta que volvamos a encontrarnos. ¿Cómo puedo asistirte hoy?"
+    },
+    {
+      "id": "hist_1787081934046",
+      "memory_id": "mem0_1787081934046",
+      "action": "created",
+      "timestamp": 1787081934.046889,
+      "text": "Usuario consultó: Genera una gráfica 2D interactiva con funciones matemáticas -> Síntesis 1.58b: ```html\n<!DOCTYPE html>\n<html>\n<head>\n    <meta charset=\"UTF-8\">\n    <title>Gráfica Interactiva con Funciones Matemáticas</title>\n    <style>\n        body {\n            font-family: Arial, sans-serif;"
+    },
+    {
+      "id": "hist_1787016852362",
+      "memory_id": "mem0_1787016852362",
+      "action": "created",
+      "timestamp": 1787016852.362844,
+      "text": "[Revelación Onírica (Sueño REM Cognitivo // Consolidación Sináptica)]: Síntesis de Mundos Volumétricos 3D y Shaders Holográficos -> Se entrelazaron 14 nuevos nodos conceptuales en el exocórtex y la memoria universal Mem0."
+    },
+    {
+      "id": "hist_1787015447018",
+      "memory_id": "mem0_1787015447018",
+      "action": "created",
+      "timestamp": 1787015447.0186381,
+      "text": "[Revelación Onírica (Imaginación Contrafáctica // Hipótesis Cuánticas)]: Sincronía de Sensores Acústicos y Visuales con el Estado Afectivo -> La memoria unificada del M1 mantendría modelos de 7B parámetros con solo 1.8 GB de consumo."
+    },
+    {
+      "id": "hist_1787015430334",
+      "memory_id": "mem0_1787015430334",
+      "action": "created",
+      "timestamp": 1787015430.334661,
+      "text": "[Revelación Onírica (Sueño Lúcido // Generación Creativa & 3D)]: Ontocracia Ciberdélica: Soberanía Digital y Comunismo de Abundancia -> Topología visual de partículas con rotación armónica a 60 FPS."
+    },
+    {
+      "id": "hist_1787013127470",
+      "memory_id": "mem0_1787013127470",
+      "action": "created",
+      "timestamp": 1787013127.470708,
+      "text": "Usuario consultó: Que sistemas de ia utilizas? -> Síntesis 1.58b: Como Astraura, utilizo el modelo de IA 1.58 Bit, que es una IA revolucionaria que combina los mejores aspectos de los sistemas tradicionales de IA con la eficiencia y eficacia de los sistemas basados"
+    },
+    {
+      "id": "hist_1787013083922",
+      "memory_id": "mem0_1787013083922",
+      "action": "created",
+      "timestamp": 1787013083.9220638,
+      "text": "Usuario consultó: Hola, como funcionas? -> Síntesis 1.58b: ¡Hola! Sí, estoy funcionando correctamente. ¿En qué puedo ayudarte hoy?"
+    },
+    {
+      "id": "hist_1787012867733",
+      "memory_id": "mem0_1787012867733",
+      "action": "created",
+      "timestamp": 1787012867.733174,
+      "text": "Usuario consultó: que modelo de IA utilizas y como funciona nuestro sistema de memorias y personalidades? -> Síntesis 1.58b: ¡Hola! Me encanta poder compartir con usted cómo funciona nuestro sistema de memorias y personalidades. \n\nEn primer lugar, cada elemento del sistema está diseñado para manejar una cierta cantidad de i"
+    },
+    {
+      "id": "hist_1787009544245",
+      "memory_id": "mem0_1787009544245",
+      "action": "created",
+      "timestamp": 1787009544.2459059,
+      "text": "Usuario consultó: de que depende la velocidad de carga de tokens por segundo y la cantidad y calidad de parametros de contexto de las respuestas del sistema de ia de 1.58 bit? -> Síntesis 1.58b: La velocidad de carga de tokens por segundo y la calidad de los parámetros de contexto de las respuestas del sistema de IA de 1.58 Bit son influenciadas por varios factores:\n\n1. **Niveles de Optimizac"
+    },
+    {
+      "id": "hist_1787007252778",
+      "memory_id": "mem0_1787007252778",
+      "action": "created",
+      "timestamp": 1787007252.778305,
+      "text": "Usuario consultó: desarrolla un programa visual atractivo de una pagina simple interactiva dinamica describiendo el funcionamiento del sistema 1.58 bit y comparandolo con sistemas de ia tradicionales explicando su funcionamiento, caracteristicas y potencial -> Síntesis 1.58b: ### Introducción\n\nEn los tiempos actuales, la Inteligencia Artificial (IA) se ha vuelto cada vez más relevante en diversas áreas de la tecnología. Sin embargo, la IA tradicional, basada en lenguaje na"
+    },
+    {
+      "id": "hist_1787005073948",
+      "memory_id": "mem0_1787005073948",
+      "action": "created",
+      "timestamp": 1787005073.948823,
+      "text": "Usuario consultó: desarrolla un programa visual atractivo de una pagina simple interactiva dinamica describiendo el funcionamiento del sistema 1.58 bit y comparandolo con sistemas de ia tradicionales explicando su funcionamiento, caracteristicas y potencial -> Síntesis 1.58b: ### Introducción a 1.58 Bit System\n\n#### Introducción\nA principios del siglo XXI, la tecnología de Inteligencia Artificial (IA) se desarrolló de manera rápida y revolucionaria. Sin embargo, cada vez s"
+    },
+    {
+      "id": "hist_1787004657713",
+      "memory_id": "mem0_1787004657713",
+      "action": "created",
+      "timestamp": 1787004657.7139258,
+      "text": "Usuario consultó: desarrolla un programa visual atractivo de una pagina simple interactiva dinamica describiendo el funcionamiento del sistema 1.58 bit y comparandolo con sistemas de ia tradicionales explicando su funcionamiento, caracteristicas y potencial -> Síntesis 1.58b: Aqui tienes un programa visual interactivo simple que describe el funcionamiento del sistema 1.58 Bit y lo compara con sistemas de IA tradicionales:\n\n```\n# Sistema 1.58 Bit: Una Nueva Generación de In"
+    },
+    {
+      "id": "hist_1787003807440",
+      "memory_id": "mem0_1787003807440",
+      "action": "created",
+      "timestamp": 1787003807.4400241,
+      "text": "Usuario consultó: desarrolla las graficas vicuales animadas -> Síntesis 1.58b: Para desarrollar gráficas vicuales animadas, se necesitan herramientas específicas y software de diseño de interfaces. Aquí hay una guía para hacerlo:\n\n1. **Herramientas de diseño**: \n   - **Adobe Ill"
+    },
+    {
+      "id": "hist_1787003739028",
+      "memory_id": "mem0_1787003739028",
+      "action": "created",
+      "timestamp": 1787003739.028477,
+      "text": "Usuario consultó: desarrolla un programa de una pagina simple interactiva dinamica describiendo el funcionamiento del sistema 1.58 bit y comparandolo con sistemas de ia tradicionales explicando su funcionamiento, caracteristicas y potencial -> Síntesis 1.58b: Claro, aquí tienes una página simple interactiva dinámica que describe el funcionamiento del sistema 1.58 bit y lo compara con sistemas de IA tradicionales:\n\n---\n\n## Sistema 1.58 Bit: Una Nueva Genera"
+    },
+    {
+      "id": "hist_1",
+      "memory_id": "mem0_user_1",
+      "action": "created",
+      "timestamp": 1786916654.1315498,
+      "text": "El usuario Alex Bordón Garrigós es el creador de StarSeed OS y Astraura 1.58-Bit. Trabaja en un Apple Silicon M1 con 8 núcleos y memoria unificada."
+    }
+  ],
+  "updated_at": 1787097556.57658
+}

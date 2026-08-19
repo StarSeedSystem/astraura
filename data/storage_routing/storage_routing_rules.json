@@ -1,0 +1,127 @@
+{
+  "rules": [
+    {
+      "id": "rule_workspace_main",
+      "name": "Workspace Soberano Local (IA 1.58 bit)",
+      "media_type": "folder",
+      "target_path": "/Users/alex/Documents/IA 1.58 bit",
+      "is_enabled": true,
+      "auto_memory_routing": {
+        "enabled": true,
+        "target_brains": [
+          "brain_genesis",
+          "brain_hephaestus"
+        ],
+        "memory_category": "Código Fuente & Arquitectura 1.58b",
+        "index_files": true,
+        "file_extensions": [
+          ".py",
+          ".jsx",
+          ".cpp",
+          ".h",
+          ".json",
+          ".md"
+        ]
+      },
+      "trigger_imagination": {
+        "enabled": true,
+        "process_types": [
+          "code_self_reflection_opt",
+          "rem_synaptic_consolidation"
+        ],
+        "burst_cycles": 1
+      },
+      "capacity_limits_override": {
+        "enabled": true,
+        "imagination_max_percent": 30,
+        "swarm_max_percent": 45,
+        "capacity_mode": "auto"
+      },
+      "last_detected_at": 1787096004.862391,
+      "last_detected_formatted": "18/08/2026 17:33:24",
+      "status": "connected"
+    },
+    {
+      "id": "rule_external_ssd_default",
+      "name": "Almacenamiento Externo / SSD USB (/Volumes)",
+      "media_type": "external_storage",
+      "target_path": "/Volumes/External_SSD",
+      "is_enabled": true,
+      "auto_memory_routing": {
+        "enabled": true,
+        "target_brains": [
+          "brain_hermes",
+          "brain_hephaestus"
+        ],
+        "memory_category": "Bóveda de Investigación & Datasets",
+        "index_files": true,
+        "file_extensions": [
+          ".json",
+          ".parquet",
+          ".csv",
+          ".txt",
+          ".md",
+          ".gguf"
+        ]
+      },
+      "trigger_imagination": {
+        "enabled": true,
+        "process_types": [
+          "counterfactual_quantum_imagination",
+          "predictive_future_simulation"
+        ],
+        "burst_cycles": 2
+      },
+      "capacity_limits_override": {
+        "enabled": true,
+        "imagination_max_percent": 40,
+        "swarm_max_percent": 50,
+        "capacity_mode": "high_performance"
+      },
+      "last_detected_at": 1787096004.862391,
+      "last_detected_formatted": "18/08/2026 17:33:24",
+      "status": "connected"
+    },
+    {
+      "id": "rule_creative_3d_assets",
+      "name": "Carpeta de Shaders & Assets 3D",
+      "media_type": "folder",
+      "target_path": "/Users/alex/Documents/IA 1.58 bit/frontend/src/assets",
+      "is_enabled": true,
+      "auto_memory_routing": {
+        "enabled": true,
+        "target_brains": [
+          "brain_oneiros",
+          "brain_genesis"
+        ],
+        "memory_category": "Diseño Ciberdélico & UI 3D",
+        "index_files": true,
+        "file_extensions": [
+          ".glsl",
+          ".frag",
+          ".vert",
+          ".css",
+          ".jsx",
+          ".svg"
+        ]
+      },
+      "trigger_imagination": {
+        "enabled": true,
+        "process_types": [
+          "lucid_cyberdelic_creativity"
+        ],
+        "burst_cycles": 1
+      },
+      "capacity_limits_override": {
+        "enabled": true,
+        "imagination_max_percent": 35,
+        "swarm_max_percent": 35,
+        "capacity_mode": "auto"
+      },
+      "last_detected_at": 1787096027.763231,
+      "last_detected_formatted": "18/08/2026 17:33:47",
+      "status": "connected"
+    }
+  ],
+  "updated_at": 1787101879.76695
+}

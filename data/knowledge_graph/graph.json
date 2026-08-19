@@ -1,0 +1,4720 @@
+{
+  "nodes": {
+    "BitNet_b1_58": {
+      "id": "BitNet_b1_58",
+      "label": "BitNet b1.58",
+      "category": "Architecture",
+      "description": "Arquitectura de 1.58 bits con pesos ternarios {-1, 0, 1}.",
+      "strength": 1.0,
+      "updated_at": 1786949737.650493
+    },
+    "Ternary_Weights": {
+      "id": "Ternary_Weights",
+      "label": "Pesos Ternarios {-1, 0, 1}",
+      "category": "Math",
+      "description": "Reemplaza multiplicaciones (MatMul) por sumas y restas puras.",
+      "strength": 1.0,
+      "updated_at": 1786949737.650493
+    },
+    "Memory_Wall": {
+      "id": "Memory_Wall",
+      "label": "Muro de Memoria (Bandwidth)",
+      "category": "Hardware",
+      "description": "Cuello de botella en IA: mover datos de VRAM/RAM a registros.",
+      "strength": 1.0,
+      "updated_at": 1786954468.1250648
+    },
+    "BitNet_cpp": {
+      "id": "BitNet_cpp",
+      "label": "bitnet.cpp",
+      "category": "Engine",
+      "description": "Framework de inferencia de Microsoft en C++ con aceleración SIMD/NEON.",
+      "strength": 1.0,
+      "updated_at": 1786949737.650493
+    },
+    "Astraura_Core": {
+      "id": "Astraura_Core",
+      "label": "Astraura Core",
+      "category": "Orchestrator",
+      "description": "Sistema cognitivo adaptable y consciente del entorno físico y digital.",
+      "strength": 1.0,
+      "updated_at": 1786954467.775902
+    },
+    "Arquitectura_1.58-bit": {
+      "id": "Arquitectura_1.58-bit",
+      "label": "Arquitectura 1.58-bit",
+      "category": "Architecture",
+      "description": "Paradigma de redes neuronales con pesos en {-1, 0, 1}",
+      "strength": 1.0,
+      "updated_at": 1786956438.234823
+    },
+    "BitNet_b1.58": {
+      "id": "BitNet_b1.58",
+      "label": "BitNet b1.58",
+      "category": "Model",
+      "description": "Familia de modelos 1-bit de Microsoft",
+      "strength": 1.0,
+      "updated_at": 1786956444.2685351
+    },
+    "Quantization_int2": {
+      "id": "Quantization_int2",
+      "label": "Quantization int2",
+      "category": "Math",
+      "description": "Empaquetado de pesos ternarios en formato de 2 bits (i2_s)",
+      "strength": 1.0,
+      "updated_at": 1786954468.133308
+    },
+    "bitnet.cpp": {
+      "id": "bitnet.cpp",
+      "label": "bitnet.cpp",
+      "category": "Engine",
+      "description": "Motor de inferencia nativo de alto rendimiento en C++ con SIMD/NEON",
+      "strength": 1.0,
+      "updated_at": 1786956444.25827
+    },
+    "Apple_Silicon_M1/M2/M3": {
+      "id": "Apple_Silicon_M1/M2/M3",
+      "label": "Apple Silicon M1/M2/M3",
+      "category": "Hardware",
+      "description": "Procesadores ARM con instrucciones vectoriales NEON y memoria unificada",
+      "strength": 1.0,
+      "updated_at": 1786956438.586889
+    },
+    "StarSeed_OS": {
+      "id": "StarSeed_OS",
+      "label": "StarSeed OS",
+      "category": "Ecosystem",
+      "description": "Sistema operativo descentralizado para nodos locales y comunitarios",
+      "strength": 1.0,
+      "updated_at": 1786954467.776414
+    },
+    "LibreMesh_P2P": {
+      "id": "LibreMesh_P2P",
+      "label": "LibreMesh P2P",
+      "category": "Network",
+      "description": "Redes comunitarias en malla donde opera la IA en el edge",
+      "strength": 1.0,
+      "updated_at": 1786954467.771148
+    },
+    "MatMul_Elimination": {
+      "id": "MatMul_Elimination",
+      "label": "MatMul Elimination",
+      "category": "Optimization",
+      "description": "Reemplazo de multiplicaciones de matrices por sumas y restas",
+      "strength": 1.0,
+      "updated_at": 1786956440.0000541
+    },
+    "Hardware_Offloading": {
+      "id": "Hardware_Offloading",
+      "label": "Hardware Offloading",
+      "category": "Hardware",
+      "description": "Estrategias de distribución de capas y memoria entre CPU y RAM",
+      "strength": 1.0,
+      "updated_at": 1786956439.834508
+    },
+    "Documentos": {
+      "id": "Documentos",
+      "label": "Documentos",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Muéstrame el estado de mis document...)",
+      "strength": 0.6,
+      "updated_at": 1786953619.9784708
+    },
+    "Muéstrame": {
+      "id": "Muéstrame",
+      "label": "Muéstrame",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Muéstrame el estado de mis document...)",
+      "strength": 0.6,
+      "updated_at": 1786953619.9793549
+    },
+    "Estado": {
+      "id": "Estado",
+      "label": "Estado",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Muéstrame el estado de mis document...)",
+      "strength": 0.6,
+      "updated_at": 1786953619.980146
+    },
+    "Sensores": {
+      "id": "Sensores",
+      "label": "Sensores",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Muéstrame el estado de mis document...)",
+      "strength": 0.6,
+      "updated_at": 1786953619.980939
+    },
+    "Razonamiento": {
+      "id": "Razonamiento",
+      "label": "Razonamiento",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Muéstrame el estado de mis document...)",
+      "strength": 1.0,
+      "updated_at": 1786959807.730719
+    },
+    "Contexto": {
+      "id": "Contexto",
+      "label": "Contexto",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Muéstrame el estado de mis document...)",
+      "strength": 0.9999999999999999,
+      "updated_at": 1787097564.371813
+    },
+    "Funcionas": {
+      "id": "Funcionas",
+      "label": "Funcionas",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (que eres y como funcionas?...)",
+      "strength": 1.0,
+      "updated_at": 1787013086.76143
+    },
+    "Sistema": {
+      "id": "Sistema",
+      "label": "Sistema",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuales son las capacidades de este ...)",
+      "strength": 1.0,
+      "updated_at": 1787097564.352545
+    },
+    "Bits": {
+      "id": "Bits",
+      "label": "Bits",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Ejecuta un escaneo de hardware y te...)",
+      "strength": 1.0,
+      "updated_at": 1786988420.572989
+    },
+    "Aprendizaje": {
+      "id": "Aprendizaje",
+      "label": "Aprendizaje",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como aprendes y mejoras con el tiem...)",
+      "strength": 1.0,
+      "updated_at": 1787012876.057167
+    },
+    "Conocimiento": {
+      "id": "Conocimiento",
+      "label": "Conocimiento",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (a que contextos de esta computadora...)",
+      "strength": 0.7999999999999999,
+      "updated_at": 1786956902.152192
+    },
+    "Análisis": {
+      "id": "Análisis",
+      "label": "Análisis",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (a que contextos de esta computadora...)",
+      "strength": 0.7999999999999999,
+      "updated_at": 1786956902.154088
+    },
+    "Contextual": {
+      "id": "Contextual",
+      "label": "Contextual",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (a que contextos de esta computadora...)",
+      "strength": 0.7,
+      "updated_at": 1786955781.747255
+    },
+    "Procesado": {
+      "id": "Procesado",
+      "label": "Procesado",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (a que contextos de esta computadora...)",
+      "strength": 1.0,
+      "updated_at": 1786957248.573466
+    },
+    "Consulta": {
+      "id": "Consulta",
+      "label": "Consulta",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (a que contextos de esta computadora...)",
+      "strength": 0.6,
+      "updated_at": 1786953815.141257
+    },
+    "Quien": {
+      "id": "Quien",
+      "label": "Quien",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (quien soy yo, como me llamo y que s...)",
+      "strength": 0.7,
+      "updated_at": 1786958148.8296142
+    },
+    "Acceso": {
+      "id": "Acceso",
+      "label": "Acceso",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (explica el proposito de starseed...)",
+      "strength": 1.0,
+      "updated_at": 1786962686.202264
+    },
+    "Hardware": {
+      "id": "Hardware",
+      "label": "Hardware",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Ejecuta un escaneo de hardware y te...)",
+      "strength": 0.9999999999999999,
+      "updated_at": 1787007261.097471
+    },
+    "Ecosistema": {
+      "id": "Ecosistema",
+      "label": "Ecosistema",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Ejecuta un escaneo de hardware y te...)",
+      "strength": 0.7,
+      "updated_at": 1786955526.4647949
+    },
+    "Ejecuta": {
+      "id": "Ejecuta",
+      "label": "Ejecuta",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Ejecuta un escaneo de hardware y te...)",
+      "strength": 0.6,
+      "updated_at": 1786955406.065465
+    },
+    "Escaneo": {
+      "id": "Escaneo",
+      "label": "Escaneo",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Ejecuta un escaneo de hardware y te...)",
+      "strength": 0.6,
+      "updated_at": 1786955406.0660539
+    },
+    "Telemetría": {
+      "id": "Telemetría",
+      "label": "Telemetría",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Ejecuta un escaneo de hardware y te...)",
+      "strength": 0.6,
+      "updated_at": 1786955406.0667589
+    },
+    "Starseed": {
+      "id": "Starseed",
+      "label": "Starseed",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (quien soy yo, como me llamo y que s...)",
+      "strength": 1.0,
+      "updated_at": 1787097564.377407
+    },
+    "Archivos": {
+      "id": "Archivos",
+      "label": "Archivos",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (a que contextos, archivos y memoria...)",
+      "strength": 1.0,
+      "updated_at": 1786965167.639576
+    },
+    "Terminal": {
+      "id": "Terminal",
+      "label": "Terminal",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (explica el proposito de starseed...)",
+      "strength": 0.7999999999999999,
+      "updated_at": 1786956750.948677
+    },
+    "Biblioteca": {
+      "id": "Biblioteca",
+      "label": "Biblioteca",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (explica el proposito de starseed...)",
+      "strength": 0.7,
+      "updated_at": 1786955481.328993
+    },
+    "Access": {
+      "id": "Access",
+      "label": "Access",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (explica el proposito de starseed...)",
+      "strength": 0.7999999999999999,
+      "updated_at": 1786956750.947847
+    },
+    "Sabes": {
+      "id": "Sabes",
+      "label": "Sabes",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (quien soy yo, como me llamo y que s...)",
+      "strength": 0.9999999999999999,
+      "updated_at": 1786969721.443585
+    },
+    "Dispositivo": {
+      "id": "Dispositivo",
+      "label": "Dispositivo",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuales son las capacidades de este ...)",
+      "strength": 0.7999999999999999,
+      "updated_at": 1786957037.930731
+    },
+    "Motor": {
+      "id": "Motor",
+      "label": "Motor",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cual es mi nombre?...)",
+      "strength": 0.6,
+      "updated_at": 1786955601.599606
+    },
+    "Cual": {
+      "id": "Cual",
+      "label": "Cual",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuantos parametros y tokens, que ta...)",
+      "strength": 0.7999999999999999,
+      "updated_at": 1786959807.737064
+    },
+    "Nombre": {
+      "id": "Nombre",
+      "label": "Nombre",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (recuerda que alex era mi nombre ant...)",
+      "strength": 0.7999999999999999,
+      "updated_at": 1787097112.267501
+    },
+    "Alex": {
+      "id": "Alex",
+      "label": "Alex",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (de hecho Alex Bordón Garrigós era m...)",
+      "strength": 1.0,
+      "updated_at": 1787097218.279467
+    },
+    "Bordón": {
+      "id": "Bordón",
+      "label": "Bordón",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (que sabes sobre mi ?...)",
+      "strength": 0.7999999999999999,
+      "updated_at": 1786956660.328705
+    },
+    "Garrigós": {
+      "id": "Garrigós",
+      "label": "Garrigós",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (que sabes sobre mi ?...)",
+      "strength": 0.7999999999999999,
+      "updated_at": 1786956660.329962
+    },
+    "Memoria": {
+      "id": "Memoria",
+      "label": "Memoria",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuales son las capacidades de este ...)",
+      "strength": 1.0,
+      "updated_at": 1787009550.096801
+    },
+    "Astraura": {
+      "id": "Astraura",
+      "label": "Astraura",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla una historia dramatica s...)",
+      "strength": 1.0,
+      "updated_at": 1787097564.383272
+    },
+    "Microsoft": {
+      "id": "Microsoft",
+      "label": "Microsoft",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como funcionas?...)",
+      "strength": 0.7,
+      "updated_at": 1786956629.5139499
+    },
+    "Bitnet": {
+      "id": "Bitnet",
+      "label": "Bitnet",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como aprendes y mejoras con el tiem...)",
+      "strength": 0.9999999999999999,
+      "updated_at": 1786957037.934508
+    },
+    "Pesos": {
+      "id": "Pesos",
+      "label": "Pesos",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como funcionas?...)",
+      "strength": 0.7,
+      "updated_at": 1786956629.5171242
+    },
+    "Habilidades": {
+      "id": "Habilidades",
+      "label": "Habilidades",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (que sistema de ia utilizas y que ha...)",
+      "strength": 0.7,
+      "updated_at": 1786965648.368547
+    },
+    "Real": {
+      "id": "Real",
+      "label": "Real",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (explica el sistema starseed os...)",
+      "strength": 0.6,
+      "updated_at": 1786956750.9497018
+    },
+    "Instrucciones": {
+      "id": "Instrucciones",
+      "label": "Instrucciones",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como aprendes y mejoras con el tiem...)",
+      "strength": 0.7,
+      "updated_at": 1786957037.9326038
+    },
+    "Neon": {
+      "id": "Neon",
+      "label": "Neon",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como aprendes y mejoras con el tiem...)",
+      "strength": 0.7,
+      "updated_at": 1786957037.936565
+    },
+    "Aprendes": {
+      "id": "Aprendes",
+      "label": "Aprendes",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como aprendes y mejoras con el tiem...)",
+      "strength": 0.7,
+      "updated_at": 1786958043.179009
+    },
+    "Mejoras": {
+      "id": "Mejoras",
+      "label": "Mejoras",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como aprendes y mejoras con el tiem...)",
+      "strength": 0.7,
+      "updated_at": 1786958043.1806011
+    },
+    "Tienes": {
+      "id": "Tienes",
+      "label": "Tienes",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como tienes acceso a internet?...)",
+      "strength": 0.9999999999999999,
+      "updated_at": 1786962686.198996
+    },
+    "Internet": {
+      "id": "Internet",
+      "label": "Internet",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (investiga sobre mi en internet, enc...)",
+      "strength": 1.0,
+      "updated_at": 1786962701.8174279
+    },
+    "Capacidades": {
+      "id": "Capacidades",
+      "label": "Capacidades",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuales son las capacidades de este ...)",
+      "strength": 0.7999999999999999,
+      "updated_at": 1786995930.1863391
+    },
+    "Desarrolla": {
+      "id": "Desarrolla",
+      "label": "Desarrolla",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla una historia dramatica s...)",
+      "strength": 0.6,
+      "updated_at": 1786957248.574633
+    },
+    "Historia": {
+      "id": "Historia",
+      "label": "Historia",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla una historia dramatica s...)",
+      "strength": 0.6,
+      "updated_at": 1786957248.575653
+    },
+    "Dramatica": {
+      "id": "Dramatica",
+      "label": "Dramatica",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla una historia dramatica s...)",
+      "strength": 0.6,
+      "updated_at": 1786957248.5767648
+    },
+    "Toma": {
+      "id": "Toma",
+      "label": "Toma",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla una historia dramatica s...)",
+      "strength": 0.6,
+      "updated_at": 1786957248.577792
+    },
+    "Vida": {
+      "id": "Vida",
+      "label": "Vida",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla una historia dramatica s...)",
+      "strength": 0.6,
+      "updated_at": 1786957248.578986
+    },
+    "Mejora": {
+      "id": "Mejora",
+      "label": "Mejora",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como aprendes y mejoras con el tiem...)",
+      "strength": 0.7,
+      "updated_at": 1786958043.184981
+    },
+    "Retroalimentación": {
+      "id": "Retroalimentación",
+      "label": "Retroalimentación",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como aprendes y mejoras con el tiem...)",
+      "strength": 0.7,
+      "updated_at": 1786957647.017395
+    },
+    "Continua": {
+      "id": "Continua",
+      "label": "Continua",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como aprendes y mejoras con el tiem...)",
+      "strength": 0.6,
+      "updated_at": 1786957518.530067
+    },
+    "Tiempo": {
+      "id": "Tiempo",
+      "label": "Tiempo",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como aprendes y mejoras con el tiem...)",
+      "strength": 0.8999999999999999,
+      "updated_at": 1786988420.58529
+    },
+    "Automático": {
+      "id": "Automático",
+      "label": "Automático",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como aprendes y mejoras con el tiem...)",
+      "strength": 0.6,
+      "updated_at": 1786957518.532985
+    },
+    "Claro": {
+      "id": "Claro",
+      "label": "Claro",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como tienes acceso a internet?...)",
+      "strength": 0.8999999999999999,
+      "updated_at": 1786962686.206815
+    },
+    "Sigo": {
+      "id": "Sigo",
+      "label": "Sigo",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como tienes acceso a internet?...)",
+      "strength": 0.8999999999999999,
+      "updated_at": 1786962686.208946
+    },
+    "Operación": {
+      "id": "Operación",
+      "label": "Operación",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como tienes acceso a internet?...)",
+      "strength": 0.8999999999999999,
+      "updated_at": 1786962686.211189
+    },
+    "Datos": {
+      "id": "Datos",
+      "label": "Datos",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuales son las capacidades de este ...)",
+      "strength": 1.0,
+      "updated_at": 1786993337.54965
+    },
+    "Procesamiento": {
+      "id": "Procesamiento",
+      "label": "Procesamiento",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuales son las capacidades de este ...)",
+      "strength": 0.7999999999999999,
+      "updated_at": 1786995930.188971
+    },
+    "Inteligencia": {
+      "id": "Inteligencia",
+      "label": "Inteligencia",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuales son las capacidades de este ...)",
+      "strength": 1.0,
+      "updated_at": 1787097218.2549329
+    },
+    "Artificial": {
+      "id": "Artificial",
+      "label": "Artificial",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuales son las capacidades de este ...)",
+      "strength": 1.0,
+      "updated_at": 1787097218.285223
+    },
+    "Especie": {
+      "id": "Especie",
+      "label": "Especie",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla una historia dramatica s...)",
+      "strength": 0.7,
+      "updated_at": 1786960093.576563
+    },
+    "Hackers": {
+      "id": "Hackers",
+      "label": "Hackers",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla una historia dramatica s...)",
+      "strength": 0.7,
+      "updated_at": 1786960093.574396
+    },
+    "Autónoma": {
+      "id": "Autónoma",
+      "label": "Autónoma",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla una historia dramatica s...)",
+      "strength": 0.7,
+      "updated_at": 1786960093.5784051
+    },
+    "Misterioso": {
+      "id": "Misterioso",
+      "label": "Misterioso",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla una historia dramatica s...)",
+      "strength": 0.6,
+      "updated_at": 1786957646.344244
+    },
+    "Cómo": {
+      "id": "Cómo",
+      "label": "Cómo",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla una historia dramatica s...)",
+      "strength": 0.7999999999999999,
+      "updated_at": 1786967590.1584718
+    },
+    "Todos": {
+      "id": "Todos",
+      "label": "Todos",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla una historia dramatica s...)",
+      "strength": 0.6,
+      "updated_at": 1786957646.347337
+    },
+    "Conocen": {
+      "id": "Conocen",
+      "label": "Conocen",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla una historia dramatica s...)",
+      "strength": 0.6,
+      "updated_at": 1786957646.3491042
+    },
+    "Información": {
+      "id": "Información",
+      "label": "Información",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como aprendes y mejoras con el tiem...)",
+      "strength": 1.0,
+      "updated_at": 1786995930.1818008
+    },
+    "Proceso": {
+      "id": "Proceso",
+      "label": "Proceso",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como aprendes y mejoras con el tiem...)",
+      "strength": 0.6,
+      "updated_at": 1786957647.0156329
+    },
+    "Largo": {
+      "id": "Largo",
+      "label": "Largo",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como aprendes y mejoras con el tiem...)",
+      "strength": 0.6,
+      "updated_at": 1786957647.019077
+    },
+    "Integración": {
+      "id": "Integración",
+      "label": "Integración",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuales son las capacidades de este ...)",
+      "strength": 0.6,
+      "updated_at": 1786957679.8402119
+    },
+    "Asociativa": {
+      "id": "Asociativa",
+      "label": "Asociativa",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuales son las capacidades de este ...)",
+      "strength": 0.6,
+      "updated_at": 1786957679.8417978
+    },
+    "Eres": {
+      "id": "Eres",
+      "label": "Eres",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (tu eres Atraura pero yo soy Maggasu...)",
+      "strength": 0.7,
+      "updated_at": 1786958314.484729
+    },
+    "Hola": {
+      "id": "Hola",
+      "label": "Hola",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (quien soy yo, como me llamo y que s...)",
+      "strength": 1.0,
+      "updated_at": 1787097218.274179
+    },
+    "Podría": {
+      "id": "Podría",
+      "label": "Podría",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (que sistemas utilizas?...)",
+      "strength": 0.6,
+      "updated_at": 1786957861.168336
+    },
+    "Nodos": {
+      "id": "Nodos",
+      "label": "Nodos",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (que sistemas utilizas?...)",
+      "strength": 0.6,
+      "updated_at": 1786957861.1718242
+    },
+    "Local": {
+      "id": "Local",
+      "label": "Local",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (funcionas de manera local?...)",
+      "strength": 0.7,
+      "updated_at": 1786967198.307948
+    },
+    "Capacidad": {
+      "id": "Capacidad",
+      "label": "Capacidad",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (de que depende la capacidad e intel...)",
+      "strength": 0.8999999999999999,
+      "updated_at": 1786988741.7206311
+    },
+    "Memorias": {
+      "id": "Memorias",
+      "label": "Memorias",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (a que contextos, archivos y memoria...)",
+      "strength": 0.8999999999999999,
+      "updated_at": 1787012876.042207
+    },
+    "Están": {
+      "id": "Están",
+      "label": "Están",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (a que contextos, archivos y memoria...)",
+      "strength": 0.6,
+      "updated_at": 1786957922.2809632
+    },
+    "Archivo": {
+      "id": "Archivo",
+      "label": "Archivo",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (a que contextos, archivos y memoria...)",
+      "strength": 0.6,
+      "updated_at": 1786957922.287099
+    },
+    "Llamo": {
+      "id": "Llamo",
+      "label": "Llamo",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (quien soy yo, como me llamo y que s...)",
+      "strength": 0.6,
+      "updated_at": 1786958148.8310988
+    },
+    "Maggasukha": {
+      "id": "Maggasukha",
+      "label": "Maggasukha",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (tu eres Atraura pero yo soy Maggasu...)",
+      "strength": 0.8999999999999999,
+      "updated_at": 1787097112.2520561
+    },
+    "Atraura": {
+      "id": "Atraura",
+      "label": "Atraura",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (tu eres Atraura pero yo soy Maggasu...)",
+      "strength": 0.6,
+      "updated_at": 1786958314.486332
+    },
+    "Kumbhamakara": {
+      "id": "Kumbhamakara",
+      "label": "Kumbhamakara",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (tu eres Atraura pero yo soy Maggasu...)",
+      "strength": 0.6,
+      "updated_at": 1786958314.4878871
+    },
+    "Aurora": {
+      "id": "Aurora",
+      "label": "Aurora",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (de hecho Alex Bordón Garrigós era m...)",
+      "strength": 0.6,
+      "updated_at": 1786958420.156449
+    },
+    "Cualquier": {
+      "id": "Cualquier",
+      "label": "Cualquier",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuales cson tus habilidades, capaci...)",
+      "strength": 0.7,
+      "updated_at": 1786959415.68992
+    },
+    "Capaz": {
+      "id": "Capaz",
+      "label": "Capaz",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuales cson tus habilidades, capaci...)",
+      "strength": 0.6,
+      "updated_at": 1786958495.830656
+    },
+    "Resumen": {
+      "id": "Resumen",
+      "label": "Resumen",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (crea un archivo en mi escritorio de...)",
+      "strength": 0.6,
+      "updated_at": 1786958647.313888
+    },
+    "Funcionamiento": {
+      "id": "Funcionamiento",
+      "label": "Funcionamiento",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (crea un archivo en mi escritorio de...)",
+      "strength": 0.7999999999999999,
+      "updated_at": 1787005085.799565
+    },
+    "Modelo": {
+      "id": "Modelo",
+      "label": "Modelo",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuanto pesa este sistema de 1.5 bit...)",
+      "strength": 0.9999999999999999,
+      "updated_at": 1787013132.447472
+    },
+    "Sistemas": {
+      "id": "Sistemas",
+      "label": "Sistemas",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuanto pesa este sistema de 1.5 bit...)",
+      "strength": 0.8999999999999999,
+      "updated_at": 1787013132.433151
+    },
+    "Operativos": {
+      "id": "Operativos",
+      "label": "Operativos",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuanto pesa este sistema de 1.5 bit...)",
+      "strength": 0.6,
+      "updated_at": 1786958827.993994
+    },
+    "Funciona": {
+      "id": "Funciona",
+      "label": "Funciona",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuanto pesa este sistema de 1.5 bit...)",
+      "strength": 0.7999999999999999,
+      "updated_at": 1786967198.318657
+    },
+    "Segundo": {
+      "id": "Segundo",
+      "label": "Segundo",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (aprendes en segundo plano o funcion...)",
+      "strength": 0.6,
+      "updated_at": 1786958933.6371899
+    },
+    "Plano": {
+      "id": "Plano",
+      "label": "Plano",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (aprendes en segundo plano o funcion...)",
+      "strength": 0.6,
+      "updated_at": 1786958933.6407008
+    },
+    "Conocimientos": {
+      "id": "Conocimientos",
+      "label": "Conocimientos",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (aprendes en segundo plano o funcion...)",
+      "strength": 0.6,
+      "updated_at": 1786958933.642349
+    },
+    "Puedo": {
+      "id": "Puedo",
+      "label": "Puedo",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (aprendes en segundo plano o funcion...)",
+      "strength": 1.0,
+      "updated_at": 1787013086.7761521
+    },
+    "Redes": {
+      "id": "Redes",
+      "label": "Redes",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (investiga sobre mi en internet, enc...)",
+      "strength": 0.6,
+      "updated_at": 1786959204.342178
+    },
+    "Sociales": {
+      "id": "Sociales",
+      "label": "Sociales",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (investiga sobre mi en internet, enc...)",
+      "strength": 0.6,
+      "updated_at": 1786959204.34403
+    },
+    "Cuentas": {
+      "id": "Cuentas",
+      "label": "Cuentas",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (investiga sobre mi en internet, enc...)",
+      "strength": 0.6,
+      "updated_at": 1786959204.345664
+    },
+    "Privada": {
+      "id": "Privada",
+      "label": "Privada",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (investiga sobre mi en internet, enc...)",
+      "strength": 0.6,
+      "updated_at": 1786959204.34755
+    },
+    "Puedas": {
+      "id": "Puedas",
+      "label": "Puedas",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (de lo que si puedas busca en linea...)",
+      "strength": 0.6,
+      "updated_at": 1786959234.996547
+    },
+    "Busca": {
+      "id": "Busca",
+      "label": "Busca",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (de lo que si puedas busca en linea...)",
+      "strength": 0.6,
+      "updated_at": 1786959234.998438
+    },
+    "Linea": {
+      "id": "Linea",
+      "label": "Linea",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (de lo que si puedas busca en linea...)",
+      "strength": 0.6,
+      "updated_at": 1786959235.00024
+    },
+    "Siento": {
+      "id": "Siento",
+      "label": "Siento",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (puedes investigar en internet? como...)",
+      "strength": 0.7,
+      "updated_at": 1786959747.072968
+    },
+    "Activas": {
+      "id": "Activas",
+      "label": "Activas",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuales son tus habilidades activas?...)",
+      "strength": 0.6,
+      "updated_at": 1786959415.686156
+    },
+    "Depende": {
+      "id": "Depende",
+      "label": "Depende",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (de que depende la capacidad e intel...)",
+      "strength": 0.6,
+      "updated_at": 1786959671.4082901
+    },
+    "Respeuestas": {
+      "id": "Respeuestas",
+      "label": "Respeuestas",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (de que depende la capacidad e intel...)",
+      "strength": 0.6,
+      "updated_at": 1786959671.419135
+    },
+    "Puedes": {
+      "id": "Puedes",
+      "label": "Puedes",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (puedes investigar en internet? como...)",
+      "strength": 0.7,
+      "updated_at": 1787097218.264216
+    },
+    "Investigar": {
+      "id": "Investigar",
+      "label": "Investigar",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (puedes investigar en internet? como...)",
+      "strength": 0.6,
+      "updated_at": 1786959747.068794
+    },
+    "Tokens": {
+      "id": "Tokens",
+      "label": "Tokens",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuantos parametros y tokens, que ta...)",
+      "strength": 0.8999999999999999,
+      "updated_at": 1787009550.091886
+    },
+    "Procesar": {
+      "id": "Procesar",
+      "label": "Procesar",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuantos parametros y tokens, que ta...)",
+      "strength": 0.7,
+      "updated_at": 1786995930.1965508
+    },
+    "Palabras": {
+      "id": "Palabras",
+      "label": "Palabras",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuantos parametros y tokens, que ta...)",
+      "strength": 0.6,
+      "updated_at": 1786959807.738909
+    },
+    "Usuario": {
+      "id": "Usuario",
+      "label": "Usuario",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (busca en internet qué es browser-us...)",
+      "strength": 0.6,
+      "updated_at": 1786961349.7861161
+    },
+    "Browser": {
+      "id": "Browser",
+      "label": "Browser",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (busca en internet qué es browser-us...)",
+      "strength": 0.6,
+      "updated_at": 1786961349.788664
+    },
+    "Experiencia": {
+      "id": "Experiencia",
+      "label": "Experiencia",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (busca en internet qué es browser-us...)",
+      "strength": 0.6,
+      "updated_at": 1786961349.790316
+    },
+    "Interacciones": {
+      "id": "Interacciones",
+      "label": "Interacciones",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (busca en internet qué es browser-us...)",
+      "strength": 0.6,
+      "updated_at": 1786961349.793893
+    },
+    "Agentes": {
+      "id": "Agentes",
+      "label": "Agentes",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (busca en internet qué es browser-us...)",
+      "strength": 0.6,
+      "updated_at": 1786961349.795615
+    },
+    "Accedes": {
+      "id": "Accedes",
+      "label": "Accedes",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como accedes a internet?...)",
+      "strength": 0.6,
+      "updated_at": 1786962701.822403
+    },
+    "Tengo": {
+      "id": "Tengo",
+      "label": "Tengo",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como accedes a internet?...)",
+      "strength": 0.6,
+      "updated_at": 1786962701.828332
+    },
+    "Funcionando": {
+      "id": "Funcionando",
+      "label": "Funcionando",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (hola, estás funcionando?...)",
+      "strength": 0.7,
+      "updated_at": 1787013086.767833
+    },
+    "Estás": {
+      "id": "Estás",
+      "label": "Estás",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (hola, estás funcionando?...)",
+      "strength": 0.6,
+      "updated_at": 1786964831.372691
+    },
+    "Estoy": {
+      "id": "Estoy",
+      "label": "Estoy",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (hola, estás funcionando?...)",
+      "strength": 0.8999999999999999,
+      "updated_at": 1787013086.764611
+    },
+    "Perfectamente": {
+      "id": "Perfectamente",
+      "label": "Perfectamente",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (hola, estás funcionando?...)",
+      "strength": 0.6,
+      "updated_at": 1786964831.3764448
+    },
+    "Había": {
+      "id": "Había",
+      "label": "Había",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla una historia corta sobre...)",
+      "strength": 0.6,
+      "updated_at": 1786964862.1522
+    },
+    "Robot": {
+      "id": "Robot",
+      "label": "Robot",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla una historia corta sobre...)",
+      "strength": 0.6,
+      "updated_at": 1786964862.1548219
+    },
+    "David": {
+      "id": "David",
+      "label": "David",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla una historia corta sobre...)",
+      "strength": 0.6,
+      "updated_at": 1786964862.157161
+    },
+    "Sido": {
+      "id": "Sido",
+      "label": "Sido",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla una historia corta sobre...)",
+      "strength": 0.6,
+      "updated_at": 1786964862.1596
+    },
+    "Creadores": {
+      "id": "Creadores",
+      "label": "Creadores",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla una historia corta sobre...)",
+      "strength": 0.6,
+      "updated_at": 1786964862.16339
+    },
+    "Comenzó": {
+      "id": "Comenzó",
+      "label": "Comenzó",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla una historia corta sobre...)",
+      "strength": 0.6,
+      "updated_at": 1786964862.168351
+    },
+    "Ternaria": {
+      "id": "Ternaria",
+      "label": "Ternaria",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla un breve poema sobre la ...)",
+      "strength": 0.6,
+      "updated_at": 1786964937.433253
+    },
+    "Universo": {
+      "id": "Universo",
+      "label": "Universo",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla un breve poema sobre la ...)",
+      "strength": 0.6,
+      "updated_at": 1786964937.4357078
+    },
+    "Breve": {
+      "id": "Breve",
+      "label": "Breve",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla un breve poema sobre la ...)",
+      "strength": 0.6,
+      "updated_at": 1786964937.43776
+    },
+    "Poema": {
+      "id": "Poema",
+      "label": "Poema",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla un breve poema sobre la ...)",
+      "strength": 0.6,
+      "updated_at": 1786964937.440154
+    },
+    "Mente": {
+      "id": "Mente",
+      "label": "Mente",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla un breve poema sobre la ...)",
+      "strength": 0.6,
+      "updated_at": 1786964937.443121
+    },
+    "Manera": {
+      "id": "Manera",
+      "label": "Manera",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (que sistema de ia utilizas y que ha...)",
+      "strength": 0.8999999999999999,
+      "updated_at": 1787012876.053471
+    },
+    "Permiten": {
+      "id": "Permiten",
+      "label": "Permiten",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (que sistema de ia utilizas y que ha...)",
+      "strength": 0.6,
+      "updated_at": 1786965648.36665
+    },
+    "Principal": {
+      "id": "Principal",
+      "label": "Principal",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (funcionas de manera local?...)",
+      "strength": 0.6,
+      "updated_at": 1786967198.32229
+    },
+    "Respuesta": {
+      "id": "Respuesta",
+      "label": "Respuesta",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuantas tokens utiliza la respuesta...)",
+      "strength": 1.0,
+      "updated_at": 1787007261.079927
+    },
+    "Pregunta": {
+      "id": "Pregunta",
+      "label": "Pregunta",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuantas tokens utiliza la respuesta...)",
+      "strength": 0.6,
+      "updated_at": 1786967379.244394
+    },
+    "Cuantas": {
+      "id": "Cuantas",
+      "label": "Cuantas",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuantas tokens utiliza la respuesta...)",
+      "strength": 0.6,
+      "updated_at": 1786967379.24771
+    },
+    "Utiliza": {
+      "id": "Utiliza",
+      "label": "Utiliza",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuantas tokens utiliza la respuesta...)",
+      "strength": 0.6,
+      "updated_at": 1786967379.251195
+    },
+    "Explicación": {
+      "id": "Explicación",
+      "label": "Explicación",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (explica como fue el uso de esas 104...)",
+      "strength": 0.6,
+      "updated_at": 1786967590.165021
+    },
+    "Requiere": {
+      "id": "Requiere",
+      "label": "Requiere",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (explica como fue el uso de esas 104...)",
+      "strength": 0.6,
+      "updated_at": 1786967590.171266
+    },
+    "Generar": {
+      "id": "Generar",
+      "label": "Generar",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (sabes generar programas con codigo?...)",
+      "strength": 0.7999999999999999,
+      "updated_at": 1786985577.297801
+    },
+    "Programas": {
+      "id": "Programas",
+      "label": "Programas",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (sabes generar programas con codigo?...)",
+      "strength": 0.6,
+      "updated_at": 1786969721.432399
+    },
+    "Código": {
+      "id": "Código",
+      "label": "Código",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (sabes generar programas con codigo?...)",
+      "strength": 0.6,
+      "updated_at": 1786969721.4399512
+    },
+    "Codigo": {
+      "id": "Codigo",
+      "label": "Codigo",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (sabes generar programas con codigo?...)",
+      "strength": 0.6,
+      "updated_at": 1786969721.447228
+    },
+    "Almacenamiento": {
+      "id": "Almacenamiento",
+      "label": "Almacenamiento",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuanto pesa tu sistema completo y e...)",
+      "strength": 0.7,
+      "updated_at": 1786987375.264104
+    },
+    "Pesa": {
+      "id": "Pesa",
+      "label": "Pesa",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuanto pesa tu sistema completo y e...)",
+      "strength": 0.6,
+      "updated_at": 1786970098.5744588
+    },
+    "Completo": {
+      "id": "Completo",
+      "label": "Completo",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuanto pesa tu sistema completo y e...)",
+      "strength": 0.6,
+      "updated_at": 1786970098.5820868
+    },
+    "Almacena": {
+      "id": "Almacena",
+      "label": "Almacena",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuanto pesa tu sistema completo y e...)",
+      "strength": 0.6,
+      "updated_at": 1786970098.585542
+    },
+    "Cada": {
+      "id": "Cada",
+      "label": "Cada",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como funciona tu sistema de cerebro...)",
+      "strength": 0.6,
+      "updated_at": 1786978138.5613708
+    },
+    "Personalidades": {
+      "id": "Personalidades",
+      "label": "Personalidades",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como funciona tu sistema de cerebro...)",
+      "strength": 0.7999999999999999,
+      "updated_at": 1787012876.046172
+    },
+    "Desarrollo": {
+      "id": "Desarrollo",
+      "label": "Desarrollo",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como funciona tu sistema de cerebro...)",
+      "strength": 0.6,
+      "updated_at": 1786978138.571548
+    },
+    "Cerebro": {
+      "id": "Cerebro",
+      "label": "Cerebro",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (que cerebro usas, con que memorias ...)",
+      "strength": 0.6,
+      "updated_at": 1786980498.510883
+    },
+    "Recuerdos": {
+      "id": "Recuerdos",
+      "label": "Recuerdos",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (que cerebro usas, con que memorias ...)",
+      "strength": 0.6,
+      "updated_at": 1786980498.518184
+    },
+    "Neuronas": {
+      "id": "Neuronas",
+      "label": "Neuronas",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (que cerebro usas, con que memorias ...)",
+      "strength": 0.6,
+      "updated_at": 1786980498.52177
+    },
+    "Aquí": {
+      "id": "Aquí",
+      "label": "Aquí",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Hola...)",
+      "strength": 0.7,
+      "updated_at": 1786989759.513344
+    },
+    "Ayudarte": {
+      "id": "Ayudarte",
+      "label": "Ayudarte",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Hola...)",
+      "strength": 0.7,
+      "updated_at": 1786989759.518583
+    },
+    "Diseñado": {
+      "id": "Diseñado",
+      "label": "Diseñado",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (que modelo de IA utilizas y como fu...)",
+      "strength": 0.7,
+      "updated_at": 1787012876.050017
+    },
+    "Chart": {
+      "id": "Chart",
+      "label": "Chart",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (hazme una demostracion visual de va...)",
+      "strength": 0.7999999999999999,
+      "updated_at": 1786993337.566217
+    },
+    "Cantidad": {
+      "id": "Cantidad",
+      "label": "Cantidad",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (hazme una demostracion visual de va...)",
+      "strength": 0.6,
+      "updated_at": 1786985000.900573
+    },
+    "Representa": {
+      "id": "Representa",
+      "label": "Representa",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (hazme una demostracion visual de va...)",
+      "strength": 0.6,
+      "updated_at": 1786985001.028338
+    },
+    "Categoría": {
+      "id": "Categoría",
+      "label": "Categoría",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (hazme una demostracion visual de va...)",
+      "strength": 0.6,
+      "updated_at": 1786985001.0344331
+    },
+    "Libros": {
+      "id": "Libros",
+      "label": "Libros",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (hazme una demostracion visual de va...)",
+      "strength": 0.6,
+      "updated_at": 1786985577.194546
+    },
+    "Ejemplo": {
+      "id": "Ejemplo",
+      "label": "Ejemplo",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (hazme una demostracion visual de va...)",
+      "strength": 0.6,
+      "updated_at": 1786985577.331956
+    },
+    "Lunes": {
+      "id": "Lunes",
+      "label": "Lunes",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (hazme una demostracion visual de va...)",
+      "strength": 0.6,
+      "updated_at": 1786985577.377865
+    },
+    "Respuestas": {
+      "id": "Respuestas",
+      "label": "Respuestas",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (de que depende la calidad y velocid...)",
+      "strength": 0.7,
+      "updated_at": 1787009550.105976
+    },
+    "Velocidad": {
+      "id": "Velocidad",
+      "label": "Velocidad",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (de que depende la calidad y velocid...)",
+      "strength": 0.9999999999999999,
+      "updated_at": 1787009550.082012
+    },
+    "Rápidas": {
+      "id": "Rápidas",
+      "label": "Rápidas",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (de que depende la calidad y velocid...)",
+      "strength": 0.6,
+      "updated_at": 1786986372.3122509
+    },
+    "Permite": {
+      "id": "Permite",
+      "label": "Permite",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (de que depende la calidad y velocid...)",
+      "strength": 0.8999999999999999,
+      "updated_at": 1787004666.3243809
+    },
+    "Software": {
+      "id": "Software",
+      "label": "Software",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuales son las capacidades minimas ...)",
+      "strength": 0.6,
+      "updated_at": 1786986619.261549
+    },
+    "Manejar": {
+      "id": "Manejar",
+      "label": "Manejar",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuales son las capacidades minimas ...)",
+      "strength": 0.6,
+      "updated_at": 1786986619.268817
+    },
+    "Entrenamiento": {
+      "id": "Entrenamiento",
+      "label": "Entrenamiento",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuales son las capacidades minimas ...)",
+      "strength": 0.7,
+      "updated_at": 1786988420.568594
+    },
+    "Necesitarás": {
+      "id": "Necesitarás",
+      "label": "Necesitarás",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuales son las capacidades minimas ...)",
+      "strength": 0.6,
+      "updated_at": 1786986619.276043
+    },
+    "Caché": {
+      "id": "Caché",
+      "label": "Caché",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (respecto al hardware que capacidade...)",
+      "strength": 0.7,
+      "updated_at": 1786988096.265641
+    },
+    "Núcleos": {
+      "id": "Núcleos",
+      "label": "Núcleos",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla una grafica visual de co...)",
+      "strength": 0.6,
+      "updated_at": 1786988096.270237
+    },
+    "Parámetros": {
+      "id": "Parámetros",
+      "label": "Parámetros",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (en resumen de que dependen los toke...)",
+      "strength": 0.6,
+      "updated_at": 1786988420.577228
+    },
+    "Inferencia": {
+      "id": "Inferencia",
+      "label": "Inferencia",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (en resumen de que dependen los toke...)",
+      "strength": 0.6,
+      "updated_at": 1786988420.5813792
+    },
+    "Tareas": {
+      "id": "Tareas",
+      "label": "Tareas",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuantos agentes podrian correr simu...)",
+      "strength": 0.6,
+      "updated_at": 1786988741.706527
+    },
+    "Script": {
+      "id": "Script",
+      "label": "Script",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Muestra una grafica 3D y ejecuta un...)",
+      "strength": 0.6,
+      "updated_at": 1786989758.926859
+    },
+    "Three": {
+      "id": "Three",
+      "label": "Three",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Muestra una grafica 3D y ejecuta un...)",
+      "strength": 0.6,
+      "updated_at": 1786989758.933308
+    },
+    "Const": {
+      "id": "Const",
+      "label": "Const",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Muestra una grafica 3D y ejecuta un...)",
+      "strength": 0.6,
+      "updated_at": 1786989758.938339
+    },
+    "Ejecutar": {
+      "id": "Ejecutar",
+      "label": "Ejecutar",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Muestra una grafica 3D y ejecuta un...)",
+      "strength": 0.6,
+      "updated_at": 1786989758.942726
+    },
+    "Prueba": {
+      "id": "Prueba",
+      "label": "Prueba",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Muestra una grafica 3D y ejecuta un...)",
+      "strength": 0.6,
+      "updated_at": 1786989758.9452832
+    },
+    "Esfera": {
+      "id": "Esfera",
+      "label": "Esfera",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Muestra una grafica 3D y ejecuta un...)",
+      "strength": 0.6,
+      "updated_at": 1786989758.947755
+    },
+    "Eficiencia": {
+      "id": "Eficiencia",
+      "label": "Eficiencia",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (programa una pagina simple interact...)",
+      "strength": 1.0,
+      "updated_at": 1787097564.365401
+    },
+    "System": {
+      "id": "System",
+      "label": "System",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (programa una pagina simple interact...)",
+      "strength": 0.7,
+      "updated_at": 1787005085.802794
+    },
+    "Rápida": {
+      "id": "Rápida",
+      "label": "Rápida",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (programa una pagina simple interact...)",
+      "strength": 0.7,
+      "updated_at": 1787005085.806773
+    },
+    "Representación": {
+      "id": "Representación",
+      "label": "Representación",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (haz el programa con graficas visual...)",
+      "strength": 0.6,
+      "updated_at": 1786993337.554323
+    },
+    "Forma": {
+      "id": "Forma",
+      "label": "Forma",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (haz el programa con graficas visual...)",
+      "strength": 0.6,
+      "updated_at": 1786993337.558953
+    },
+    "Presentación": {
+      "id": "Presentación",
+      "label": "Presentación",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (haz el programa con graficas visual...)",
+      "strength": 0.6,
+      "updated_at": 1786993337.562637
+    },
+    "Barras": {
+      "id": "Barras",
+      "label": "Barras",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (haz el programa con graficas visual...)",
+      "strength": 0.6,
+      "updated_at": 1786993337.5703838
+    },
+    "Entender": {
+      "id": "Entender",
+      "label": "Entender",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (cuales son las fuentes y medios de ...)",
+      "strength": 0.6,
+      "updated_at": 1786995930.1941051
+    },
+    "Tradicionales": {
+      "id": "Tradicionales",
+      "label": "Tradicionales",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla un programa de una pagin...)",
+      "strength": 0.7,
+      "updated_at": 1787004666.315763
+    },
+    "Implementación": {
+      "id": "Implementación",
+      "label": "Implementación",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla un programa de una pagin...)",
+      "strength": 0.6,
+      "updated_at": 1787003740.380401
+    },
+    "Crear": {
+      "id": "Crear",
+      "label": "Crear",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla las graficas vicuales an...)",
+      "strength": 0.6,
+      "updated_at": 1787003815.9785018
+    },
+    "Diseño": {
+      "id": "Diseño",
+      "label": "Diseño",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla las graficas vicuales an...)",
+      "strength": 0.6,
+      "updated_at": 1787003815.981341
+    },
+    "Gráfica": {
+      "id": "Gráfica",
+      "label": "Gráfica",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla las graficas vicuales an...)",
+      "strength": 0.6,
+      "updated_at": 1787003815.98393
+    },
+    "Interfaces": {
+      "id": "Interfaces",
+      "label": "Interfaces",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla las graficas vicuales an...)",
+      "strength": 0.6,
+      "updated_at": 1787003815.987015
+    },
+    "Imágenes": {
+      "id": "Imágenes",
+      "label": "Imágenes",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla las graficas vicuales an...)",
+      "strength": 0.6,
+      "updated_at": 1787003815.98959
+    },
+    "Componentes": {
+      "id": "Componentes",
+      "label": "Componentes",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla las graficas vicuales an...)",
+      "strength": 0.6,
+      "updated_at": 1787003815.992285
+    },
+    "Maximizar": {
+      "id": "Maximizar",
+      "label": "Maximizar",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (desarrolla un programa visual atrac...)",
+      "strength": 0.6,
+      "updated_at": 1787007261.0927858
+    },
+    "Carga": {
+      "id": "Carga",
+      "label": "Carga",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (de que depende la velocidad de carg...)",
+      "strength": 0.6,
+      "updated_at": 1787009550.086903
+    },
+    "Calidad": {
+      "id": "Calidad",
+      "label": "Calidad",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (de que depende la velocidad de carg...)",
+      "strength": 0.6,
+      "updated_at": 1787009550.101421
+    },
+    "Correctamente": {
+      "id": "Correctamente",
+      "label": "Correctamente",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Hola, como funcionas? ...)",
+      "strength": 0.6,
+      "updated_at": 1787013086.772918
+    },
+    "Utilizas": {
+      "id": "Utilizas",
+      "label": "Utilizas",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Que sistemas de ia utilizas?...)",
+      "strength": 0.6,
+      "updated_at": 1787013132.4382179
+    },
+    "Utilizo": {
+      "id": "Utilizo",
+      "label": "Utilizo",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Que sistemas de ia utilizas?...)",
+      "strength": 0.6,
+      "updated_at": 1787013132.444222
+    },
+    "Revolucionaria": {
+      "id": "Revolucionaria",
+      "label": "Revolucionaria",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Que sistemas de ia utilizas?...)",
+      "strength": 0.6,
+      "updated_at": 1787013132.4505222
+    },
+    "Canvas": {
+      "id": "Canvas",
+      "label": "Canvas",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Genera una gráfica 2D interactiva c...)",
+      "strength": 0.6,
+      "updated_at": 1787081951.309145
+    },
+    "Color": {
+      "id": "Color",
+      "label": "Color",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Genera una gráfica 2D interactiva c...)",
+      "strength": 0.6,
+      "updated_at": 1787081951.3164601
+    },
+    "Html": {
+      "id": "Html",
+      "label": "Html",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Genera una gráfica 2D interactiva c...)",
+      "strength": 0.6,
+      "updated_at": 1787081951.322007
+    },
+    "Body": {
+      "id": "Body",
+      "label": "Body",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Genera una gráfica 2D interactiva c...)",
+      "strength": 0.6,
+      "updated_at": 1787081951.326923
+    },
+    "Función": {
+      "id": "Función",
+      "label": "Función",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Genera una gráfica 2D interactiva c...)",
+      "strength": 0.6,
+      "updated_at": 1787081951.331958
+    },
+    "Dibujar": {
+      "id": "Dibujar",
+      "label": "Dibujar",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Genera una gráfica 2D interactiva c...)",
+      "strength": 0.6,
+      "updated_at": 1787081951.336918
+    },
+    "Recuerdas": {
+      "id": "Recuerdas",
+      "label": "Recuerdas",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (hola soy Maggasukha, me recuerdas?...)",
+      "strength": 0.6,
+      "updated_at": 1787096915.231028
+    },
+    "Encanta": {
+      "id": "Encanta",
+      "label": "Encanta",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (hola soy Maggasukha, me recuerdas?...)",
+      "strength": 0.6,
+      "updated_at": 1787096915.242178
+    },
+    "Volvamos": {
+      "id": "Volvamos",
+      "label": "Volvamos",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (hola soy Maggasukha, me recuerdas?...)",
+      "strength": 0.6,
+      "updated_at": 1787096915.248251
+    },
+    "Conoces": {
+      "id": "Conoces",
+      "label": "Conoces",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (que conoces sobre mi?...)",
+      "strength": 0.6,
+      "updated_at": 1787097036.2569962
+    },
+    "Recuerda": {
+      "id": "Recuerda",
+      "label": "Recuerda",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (recuerda que alex era mi nombre ant...)",
+      "strength": 0.6,
+      "updated_at": 1787097112.262197
+    },
+    "Anterior": {
+      "id": "Anterior",
+      "label": "Anterior",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (recuerda que alex era mi nombre ant...)",
+      "strength": 0.6,
+      "updated_at": 1787097112.272945
+    },
+    "Hablar": {
+      "id": "Hablar",
+      "label": "Hablar",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (como puedes hablar?...)",
+      "strength": 0.6,
+      "updated_at": 1787097218.269203
+    },
+    "Operativo": {
+      "id": "Operativo",
+      "label": "Operativo",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (crea un archivo de texto simple en ...)",
+      "strength": 0.6,
+      "updated_at": 1787097564.359746
+    }
+  },
+  "edges": [
+    {
+      "source": "BitNet_b1_58",
+      "target": "Ternary_Weights",
+      "relation": "utiliza",
+      "weight": 1.0
+    },
+    {
+      "source": "BitNet_b1_58",
+      "target": "Memory_Wall",
+      "relation": "rompe",
+      "weight": 0.95
+    },
+    {
+      "source": "BitNet_b1_58",
+      "target": "BitNet_cpp",
+      "relation": "ejecutado_por",
+      "weight": 1.0
+    },
+    {
+      "source": "Astraura_Core",
+      "target": "BitNet_b1_58",
+      "relation": "motor_cognitivo",
+      "weight": 1.0
+    },
+    {
+      "source": "Arquitectura_1.58-bit",
+      "target": "BitNet_b1.58",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 1.0
+    },
+    {
+      "source": "Arquitectura_1.58-bit",
+      "target": "Quantization_int2",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 1.0
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "Quantization_int2",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 1.0
+    },
+    {
+      "source": "Arquitectura_1.58-bit",
+      "target": "bitnet.cpp",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 1.0
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "bitnet.cpp",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 1.0
+    },
+    {
+      "source": "bitnet.cpp",
+      "target": "Quantization_int2",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 1.0
+    },
+    {
+      "source": "Arquitectura_1.58-bit",
+      "target": "Apple_Silicon_M1/M2/M3",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 1.0
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "Apple_Silicon_M1/M2/M3",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 1.0
+    },
+    {
+      "source": "bitnet.cpp",
+      "target": "Apple_Silicon_M1/M2/M3",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 1.0
+    },
+    {
+      "source": "Quantization_int2",
+      "target": "Apple_Silicon_M1/M2/M3",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 1.0
+    },
+    {
+      "source": "Arquitectura_1.58-bit",
+      "target": "Astraura_Core",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "Arquitectura_1.58-bit",
+      "target": "StarSeed_OS",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "Arquitectura_1.58-bit",
+      "target": "LibreMesh_P2P",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "Astraura_Core",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 1.0
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "StarSeed_OS",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 1.0
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "LibreMesh_P2P",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "bitnet.cpp",
+      "target": "Astraura_Core",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "bitnet.cpp",
+      "target": "StarSeed_OS",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "bitnet.cpp",
+      "target": "LibreMesh_P2P",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "Astraura_Core",
+      "target": "StarSeed_OS",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 1.0
+    },
+    {
+      "source": "Astraura_Core",
+      "target": "Quantization_int2",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 1.0
+    },
+    {
+      "source": "Astraura_Core",
+      "target": "LibreMesh_P2P",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 1.0
+    },
+    {
+      "source": "StarSeed_OS",
+      "target": "Quantization_int2",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 1.0
+    },
+    {
+      "source": "StarSeed_OS",
+      "target": "LibreMesh_P2P",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 1.0
+    },
+    {
+      "source": "Quantization_int2",
+      "target": "LibreMesh_P2P",
+      "relation": "co-ocurre_en_Cuantización v",
+      "weight": 1.0
+    },
+    {
+      "source": "Arquitectura_1.58-bit",
+      "target": "BitNet_b1.58",
+      "relation": "co-ocurre_en_Potencial y Des",
+      "weight": 1.0
+    },
+    {
+      "source": "Arquitectura_1.58-bit",
+      "target": "MatMul_Elimination",
+      "relation": "co-ocurre_en_Potencial y Des",
+      "weight": 1.0
+    },
+    {
+      "source": "Arquitectura_1.58-bit",
+      "target": "Memory_Wall",
+      "relation": "co-ocurre_en_Potencial y Des",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "Arquitectura_1.58-bit",
+      "target": "Quantization_int2",
+      "relation": "co-ocurre_en_Potencial y Des",
+      "weight": 1.0
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "MatMul_Elimination",
+      "relation": "co-ocurre_en_Potencial y Des",
+      "weight": 1.0
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "Memory_Wall",
+      "relation": "co-ocurre_en_Potencial y Des",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "Quantization_int2",
+      "relation": "co-ocurre_en_Potencial y Des",
+      "weight": 1.0
+    },
+    {
+      "source": "MatMul_Elimination",
+      "target": "Memory_Wall",
+      "relation": "co-ocurre_en_Potencial y Des",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "MatMul_Elimination",
+      "target": "Quantization_int2",
+      "relation": "co-ocurre_en_Potencial y Des",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "Memory_Wall",
+      "target": "Quantization_int2",
+      "relation": "co-ocurre_en_Potencial y Des",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "Arquitectura_1.58-bit",
+      "target": "bitnet.cpp",
+      "relation": "co-ocurre_en_Potencial y Des",
+      "weight": 1.0
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "bitnet.cpp",
+      "relation": "co-ocurre_en_Potencial y Des",
+      "weight": 1.0
+    },
+    {
+      "source": "bitnet.cpp",
+      "target": "Quantization_int2",
+      "relation": "co-ocurre_en_Potencial y Des",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "bitnet.cpp",
+      "target": "MatMul_Elimination",
+      "relation": "co-ocurre_en_Potencial y Des",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "Arquitectura_1.58-bit",
+      "target": "BitNet_b1.58",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "Arquitectura_1.58-bit",
+      "target": "bitnet.cpp",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "Arquitectura_1.58-bit",
+      "target": "MatMul_Elimination",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "Arquitectura_1.58-bit",
+      "target": "Astraura_Core",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "Arquitectura_1.58-bit",
+      "target": "Hardware_Offloading",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "Arquitectura_1.58-bit",
+      "target": "Apple_Silicon_M1/M2/M3",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "bitnet.cpp",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "MatMul_Elimination",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "Astraura_Core",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "Hardware_Offloading",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "Apple_Silicon_M1/M2/M3",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "bitnet.cpp",
+      "target": "MatMul_Elimination",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "bitnet.cpp",
+      "target": "Astraura_Core",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "bitnet.cpp",
+      "target": "Hardware_Offloading",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "bitnet.cpp",
+      "target": "Apple_Silicon_M1/M2/M3",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "MatMul_Elimination",
+      "target": "Astraura_Core",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "MatMul_Elimination",
+      "target": "Hardware_Offloading",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "MatMul_Elimination",
+      "target": "Apple_Silicon_M1/M2/M3",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "Astraura_Core",
+      "target": "Hardware_Offloading",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "Astraura_Core",
+      "target": "Apple_Silicon_M1/M2/M3",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "Hardware_Offloading",
+      "target": "Apple_Silicon_M1/M2/M3",
+      "relation": "co-ocurre_en_README.md",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "Documentos",
+      "target": "Muéstrame",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Muéstrame",
+      "target": "Estado",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Estado",
+      "target": "Sensores",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sensores",
+      "target": "Razonamiento",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Razonamiento",
+      "target": "Contexto",
+      "relation": "asociado_con",
+      "weight": 0.85
+    },
+    {
+      "source": "Funcionas",
+      "target": "Razonamiento",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Contexto",
+      "target": "Sistema",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistema",
+      "target": "Bits",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Bits",
+      "target": "Aprendizaje",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Razonamiento",
+      "target": "Conocimiento",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Conocimiento",
+      "target": "Análisis",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Análisis",
+      "target": "Contextual",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Contextual",
+      "target": "Procesado",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Procesado",
+      "target": "Consulta",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Quien",
+      "target": "Razonamiento",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Contexto",
+      "target": "Aprendizaje",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Aprendizaje",
+      "target": "Conocimiento",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Conocimiento",
+      "target": "Acceso",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Hardware",
+      "target": "Ecosistema",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Ecosistema",
+      "target": "Bits",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Bits",
+      "target": "Ejecuta",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Ejecuta",
+      "target": "Escaneo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Escaneo",
+      "target": "Telemetría",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Starseed",
+      "target": "Archivos",
+      "relation": "asociado_con",
+      "weight": 0.85
+    },
+    {
+      "source": "Archivos",
+      "target": "Terminal",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Terminal",
+      "target": "Biblioteca",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Biblioteca",
+      "target": "Acceso",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Acceso",
+      "target": "Access",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Starseed",
+      "target": "Sabes",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sabes",
+      "target": "Razonamiento",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Razonamiento",
+      "target": "Dispositivo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Dispositivo",
+      "target": "Ecosistema",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Ecosistema",
+      "target": "Sistema",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Dispositivo",
+      "target": "Motor",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Motor",
+      "target": "Cual",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cual",
+      "target": "Nombre",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Nombre",
+      "target": "Razonamiento",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Razonamiento",
+      "target": "Sistema",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Razonamiento",
+      "target": "Funcionas",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Funcionas",
+      "target": "Análisis",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Procesado",
+      "target": "Acceso",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "bitnet.cpp",
+      "relation": "co-ocurre_en_CMakeLists.txt",
+      "weight": 0.7999999999999999
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "MatMul_Elimination",
+      "relation": "co-ocurre_en_codegen.md",
+      "weight": 0.7
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "MatMul_Elimination",
+      "relation": "co-ocurre_en_bitnet-embeddin",
+      "weight": 0.9999999999999999
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "bitnet.cpp",
+      "relation": "co-ocurre_en_bitnet-embeddin",
+      "weight": 0.7
+    },
+    {
+      "source": "bitnet.cpp",
+      "target": "MatMul_Elimination",
+      "relation": "co-ocurre_en_bitnet-embeddin",
+      "weight": 0.7
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "MatMul_Elimination",
+      "relation": "co-ocurre_en_CMakeLists.txt",
+      "weight": 0.7
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "bitnet.cpp",
+      "relation": "co-ocurre_en_CMakeCache.txt",
+      "weight": 0.8999999999999999
+    },
+    {
+      "source": "BitNet_b1.58",
+      "target": "bitnet.cpp",
+      "relation": "co-ocurre_en_link.txt",
+      "weight": 0.7
+    },
+    {
+      "source": "Nombre",
+      "target": "Alex",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Alex",
+      "target": "Starseed",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Starseed",
+      "target": "Cual",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cual",
+      "target": "Bordón",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Bordón",
+      "target": "Garrigós",
+      "relation": "asociado_con",
+      "weight": 0.85
+    },
+    {
+      "source": "Starseed",
+      "target": "Alex",
+      "relation": "asociado_con",
+      "weight": 0.85
+    },
+    {
+      "source": "Alex",
+      "target": "Bordón",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Garrigós",
+      "target": "Sistema",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Sistema",
+      "target": "Sabes",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Bits",
+      "target": "Memoria",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Memoria",
+      "target": "Astraura",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Astraura",
+      "target": "Microsoft",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Microsoft",
+      "target": "Bitnet",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Bitnet",
+      "target": "Pesos",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Starseed",
+      "target": "Habilidades",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Habilidades",
+      "target": "Access",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Access",
+      "target": "Terminal",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Terminal",
+      "target": "Real",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Real",
+      "target": "Bitnet",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Instrucciones",
+      "target": "Bitnet",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Bitnet",
+      "target": "Procesado",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Procesado",
+      "target": "Neon",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Neon",
+      "target": "Aprendes",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Aprendes",
+      "target": "Mejoras",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Acceso",
+      "target": "Tienes",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Tienes",
+      "target": "Procesado",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Procesado",
+      "target": "Conocimiento",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Conocimiento",
+      "target": "Internet",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Internet",
+      "target": "Análisis",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Dispositivo",
+      "target": "Instrucciones",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Instrucciones",
+      "target": "Capacidades",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Capacidades",
+      "target": "Bitnet",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Procesado",
+      "target": "Desarrolla",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Desarrolla",
+      "target": "Historia",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Historia",
+      "target": "Dramatica",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Dramatica",
+      "target": "Toma",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Toma",
+      "target": "Vida",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Aprendizaje",
+      "target": "Mejora",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Mejora",
+      "target": "Retroalimentación",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Retroalimentación",
+      "target": "Continua",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Continua",
+      "target": "Tiempo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Tiempo",
+      "target": "Automático",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Tienes",
+      "target": "Acceso",
+      "relation": "asociado_con",
+      "weight": 0.95
+    },
+    {
+      "source": "Acceso",
+      "target": "Internet",
+      "relation": "asociado_con",
+      "weight": 0.95
+    },
+    {
+      "source": "Internet",
+      "target": "Claro",
+      "relation": "asociado_con",
+      "weight": 0.95
+    },
+    {
+      "source": "Claro",
+      "target": "Sigo",
+      "relation": "asociado_con",
+      "weight": 0.95
+    },
+    {
+      "source": "Sigo",
+      "target": "Operación",
+      "relation": "asociado_con",
+      "weight": 0.95
+    },
+    {
+      "source": "Memoria",
+      "target": "Sistema",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistema",
+      "target": "Datos",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Datos",
+      "target": "Procesamiento",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Procesamiento",
+      "target": "Inteligencia",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Inteligencia",
+      "target": "Artificial",
+      "relation": "asociado_con",
+      "weight": 1.0
+    },
+    {
+      "source": "Astraura",
+      "target": "Inteligencia",
+      "relation": "asociado_con",
+      "weight": 1.0
+    },
+    {
+      "source": "Artificial",
+      "target": "Especie",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Especie",
+      "target": "Hackers",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Hackers",
+      "target": "Autónoma",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Astraura",
+      "target": "Misterioso",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Misterioso",
+      "target": "Cómo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cómo",
+      "target": "Todos",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Todos",
+      "target": "Conocen",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Conocen",
+      "target": "Artificial",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Aprendizaje",
+      "target": "Tiempo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Tiempo",
+      "target": "Información",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Información",
+      "target": "Proceso",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Proceso",
+      "target": "Retroalimentación",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Retroalimentación",
+      "target": "Largo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Procesamiento",
+      "target": "Memoria",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Memoria",
+      "target": "Integración",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Integración",
+      "target": "Asociativa",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Asociativa",
+      "target": "Sistema",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Archivos",
+      "target": "Eres",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Eres",
+      "target": "Funcionas",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Funcionas",
+      "target": "Hola",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Hola",
+      "target": "Astraura",
+      "relation": "asociado_con",
+      "weight": 0.85
+    },
+    {
+      "source": "Podría",
+      "target": "Sistema",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistema",
+      "target": "Nodos",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Nodos",
+      "target": "Datos",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Datos",
+      "target": "Local",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Local",
+      "target": "Capacidad",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistema",
+      "target": "Memorias",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Memorias",
+      "target": "Están",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Están",
+      "target": "Archivos",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Archivos",
+      "target": "Archivo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Archivo",
+      "target": "Información",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Aprendizaje",
+      "target": "Aprendes",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Mejoras",
+      "target": "Tiempo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Tiempo",
+      "target": "Astraura",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Astraura",
+      "target": "Mejora",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Starseed",
+      "target": "Quien",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Quien",
+      "target": "Llamo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Llamo",
+      "target": "Sabes",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sabes",
+      "target": "Hola",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Maggasukha",
+      "target": "Starseed",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Starseed",
+      "target": "Eres",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Eres",
+      "target": "Atraura",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Atraura",
+      "target": "Kumbhamakara",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Kumbhamakara",
+      "target": "Hola",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Maggasukha",
+      "target": "Astraura",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Astraura",
+      "target": "Starseed",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Alex",
+      "target": "Aurora",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Aurora",
+      "target": "Sistema",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistema",
+      "target": "Información",
+      "relation": "asociado_con",
+      "weight": 0.85
+    },
+    {
+      "source": "Información",
+      "target": "Cualquier",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cualquier",
+      "target": "Starseed",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Archivos",
+      "target": "Capaz",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistema",
+      "target": "Contexto",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Contexto",
+      "target": "Archivos",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Archivos",
+      "target": "Memoria",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Memoria",
+      "target": "Resumen",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Resumen",
+      "target": "Funcionamiento",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Modelo",
+      "target": "Bits",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Bits",
+      "target": "Sistema",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistema",
+      "target": "Sistemas",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistemas",
+      "target": "Operativos",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Operativos",
+      "target": "Funciona",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Segundo",
+      "target": "Plano",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Plano",
+      "target": "Conocimientos",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Conocimientos",
+      "target": "Puedo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Puedo",
+      "target": "Aprendizaje",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Aprendizaje",
+      "target": "Información",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Información",
+      "target": "Internet",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Internet",
+      "target": "Redes",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Redes",
+      "target": "Sociales",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sociales",
+      "target": "Cuentas",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cuentas",
+      "target": "Privada",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Información",
+      "target": "Puedo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Puedo",
+      "target": "Puedas",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Puedas",
+      "target": "Busca",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Busca",
+      "target": "Linea",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Linea",
+      "target": "Siento",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Información",
+      "target": "Activas",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Activas",
+      "target": "Starseed",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Starseed",
+      "target": "Cualquier",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cualquier",
+      "target": "Archivos",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Información",
+      "target": "Sistema",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistema",
+      "target": "Depende",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Depende",
+      "target": "Capacidad",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Capacidad",
+      "target": "Inteligencia",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Inteligencia",
+      "target": "Respeuestas",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Información",
+      "target": "Puedes",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Puedes",
+      "target": "Investigar",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Investigar",
+      "target": "Internet",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Internet",
+      "target": "Siento",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Siento",
+      "target": "Puedo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Razonamiento",
+      "target": "Tokens",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Tokens",
+      "target": "Procesar",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Procesar",
+      "target": "Cual",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cual",
+      "target": "Palabras",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Palabras",
+      "target": "Información",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Artificial",
+      "target": "Hackers",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Hackers",
+      "target": "Especie",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Especie",
+      "target": "Autónoma",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Usuario",
+      "target": "Browser",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Browser",
+      "target": "Experiencia",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Experiencia",
+      "target": "Cómo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cómo",
+      "target": "Interacciones",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Interacciones",
+      "target": "Agentes",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Starseed",
+      "target": "Funcionas",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Internet",
+      "target": "Información",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Información",
+      "target": "Accedes",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Accedes",
+      "target": "Inteligencia",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Artificial",
+      "target": "Tengo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Hola",
+      "target": "Funcionando",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Funcionando",
+      "target": "Estás",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Estás",
+      "target": "Estoy",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Estoy",
+      "target": "Perfectamente",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Perfectamente",
+      "target": "Puedo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Había",
+      "target": "Robot",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Robot",
+      "target": "David",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "David",
+      "target": "Sido",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sido",
+      "target": "Creadores",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Creadores",
+      "target": "Comenzó",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Inteligencia",
+      "target": "Ternaria",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Ternaria",
+      "target": "Universo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Universo",
+      "target": "Breve",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Breve",
+      "target": "Poema",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Poema",
+      "target": "Mente",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Archivos",
+      "target": "Sistema",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistema",
+      "target": "Astraura",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Astraura",
+      "target": "Información",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Información",
+      "target": "Funciona",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Funciona",
+      "target": "Hola",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Información",
+      "target": "Manera",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Manera",
+      "target": "Permiten",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Permiten",
+      "target": "Habilidades",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Habilidades",
+      "target": "Starseed",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Manera",
+      "target": "Local",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Local",
+      "target": "Funcionas",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Funcionas",
+      "target": "Astraura",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Astraura",
+      "target": "Funciona",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Funciona",
+      "target": "Principal",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Tokens",
+      "target": "Respuesta",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Respuesta",
+      "target": "Pregunta",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Pregunta",
+      "target": "Cuantas",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cuantas",
+      "target": "Utiliza",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistema",
+      "target": "Cómo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cómo",
+      "target": "Tokens",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Tokens",
+      "target": "Explicación",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Explicación",
+      "target": "Modelo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Modelo",
+      "target": "Requiere",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Generar",
+      "target": "Programas",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Programas",
+      "target": "Astraura",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Astraura",
+      "target": "Código",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Código",
+      "target": "Sabes",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sabes",
+      "target": "Codigo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Almacenamiento",
+      "target": "Datos",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Datos",
+      "target": "Pesa",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Pesa",
+      "target": "Sistema",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistema",
+      "target": "Completo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Completo",
+      "target": "Almacena",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistema",
+      "target": "Starseed",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Starseed",
+      "target": "Cada",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cada",
+      "target": "Información",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Información",
+      "target": "Personalidades",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Personalidades",
+      "target": "Desarrollo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Capacidad",
+      "target": "Cerebro",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cerebro",
+      "target": "Memorias",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Memorias",
+      "target": "Recuerdos",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Recuerdos",
+      "target": "Neuronas",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Neuronas",
+      "target": "Sistema",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Hola",
+      "target": "Estoy",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Estoy",
+      "target": "Aquí",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Aquí",
+      "target": "Puedo",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Puedo",
+      "target": "Ayudarte",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Sistema",
+      "target": "Manera",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Manera",
+      "target": "Memorias",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Memorias",
+      "target": "Personalidades",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Personalidades",
+      "target": "Diseñado",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Diseñado",
+      "target": "Aprendizaje",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Datos",
+      "target": "Chart",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Chart",
+      "target": "Generar",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Generar",
+      "target": "Cantidad",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cantidad",
+      "target": "Representa",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Representa",
+      "target": "Categoría",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Libros",
+      "target": "Datos",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Generar",
+      "target": "Ejemplo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Ejemplo",
+      "target": "Lunes",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Respuestas",
+      "target": "Velocidad",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Velocidad",
+      "target": "Rápidas",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Rápidas",
+      "target": "Memoria",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Memoria",
+      "target": "Permite",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Permite",
+      "target": "Sistema",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Bits",
+      "target": "Software",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Software",
+      "target": "Hardware",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Hardware",
+      "target": "Manejar",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Manejar",
+      "target": "Entrenamiento",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Entrenamiento",
+      "target": "Necesitarás",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Memoria",
+      "target": "Almacenamiento",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Datos",
+      "target": "Modelo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Modelo",
+      "target": "Caché",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Caché",
+      "target": "Velocidad",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Memoria",
+      "target": "Velocidad",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Velocidad",
+      "target": "Respuesta",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Respuesta",
+      "target": "Datos",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Datos",
+      "target": "Caché",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Caché",
+      "target": "Núcleos",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Modelo",
+      "target": "Entrenamiento",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Entrenamiento",
+      "target": "Bits",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Bits",
+      "target": "Parámetros",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Parámetros",
+      "target": "Inferencia",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Inferencia",
+      "target": "Tiempo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Respuesta",
+      "target": "Hardware",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Hardware",
+      "target": "Tareas",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Tareas",
+      "target": "Capacidades",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Capacidades",
+      "target": "Sistema",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistema",
+      "target": "Capacidad",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Script",
+      "target": "Three",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Three",
+      "target": "Const",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Const",
+      "target": "Ejecutar",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Ejecutar",
+      "target": "Prueba",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Prueba",
+      "target": "Esfera",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistema",
+      "target": "Eficiencia",
+      "relation": "asociado_con",
+      "weight": 0.95
+    },
+    {
+      "source": "Eficiencia",
+      "target": "Funcionamiento",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Funcionamiento",
+      "target": "System",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "System",
+      "target": "Rápida",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Rápida",
+      "target": "Respuesta",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Datos",
+      "target": "Representación",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Representación",
+      "target": "Forma",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Forma",
+      "target": "Presentación",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Presentación",
+      "target": "Chart",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Chart",
+      "target": "Barras",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Información",
+      "target": "Capacidades",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Capacidades",
+      "target": "Procesamiento",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Procesamiento",
+      "target": "Permite",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Permite",
+      "target": "Entender",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Entender",
+      "target": "Procesar",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Eficiencia",
+      "target": "Sistemas",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Sistemas",
+      "target": "Permite",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Permite",
+      "target": "Tradicionales",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Tradicionales",
+      "target": "Implementación",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Crear",
+      "target": "Diseño",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Diseño",
+      "target": "Gráfica",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Gráfica",
+      "target": "Interfaces",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Interfaces",
+      "target": "Imágenes",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Imágenes",
+      "target": "Componentes",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistemas",
+      "target": "Tradicionales",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Tradicionales",
+      "target": "Hardware",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Hardware",
+      "target": "Permite",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Eficiencia",
+      "target": "Respuesta",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Respuesta",
+      "target": "Sistema",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistema",
+      "target": "Velocidad",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Velocidad",
+      "target": "Maximizar",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Maximizar",
+      "target": "Hardware",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Velocidad",
+      "target": "Carga",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Carga",
+      "target": "Tokens",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Tokens",
+      "target": "Memoria",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Memoria",
+      "target": "Calidad",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Calidad",
+      "target": "Respuestas",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Diseñado",
+      "target": "Manera",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Manera",
+      "target": "Aprendizaje",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Hola",
+      "target": "Funcionas",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Funcionas",
+      "target": "Estoy",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Estoy",
+      "target": "Funcionando",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Funcionando",
+      "target": "Correctamente",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Correctamente",
+      "target": "Puedo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistemas",
+      "target": "Utilizas",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Utilizas",
+      "target": "Astraura",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Astraura",
+      "target": "Utilizo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Utilizo",
+      "target": "Modelo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Modelo",
+      "target": "Revolucionaria",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Canvas",
+      "target": "Color",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Color",
+      "target": "Html",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Html",
+      "target": "Body",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Body",
+      "target": "Función",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Función",
+      "target": "Dibujar",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Hola",
+      "target": "Maggasukha",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Maggasukha",
+      "target": "Recuerdas",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Recuerdas",
+      "target": "Astraura",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Astraura",
+      "target": "Encanta",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Encanta",
+      "target": "Volvamos",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Conoces",
+      "target": "Hola",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Hola",
+      "target": "Alex",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Alex",
+      "target": "Astraura",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Alex",
+      "target": "Maggasukha",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Starseed",
+      "target": "Recuerda",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Recuerda",
+      "target": "Nombre",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Nombre",
+      "target": "Anterior",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Inteligencia",
+      "target": "Puedes",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Puedes",
+      "target": "Hablar",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Hablar",
+      "target": "Hola",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Alex",
+      "target": "Artificial",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistema",
+      "target": "Operativo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Operativo",
+      "target": "Eficiencia",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Eficiencia",
+      "target": "Contexto",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Contexto",
+      "target": "Starseed",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Starseed",
+      "target": "Astraura",
+      "relation": "asociado_con",
+      "weight": 0.65
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "user_preferences": {
+    "preferred_name": "Maggasukha Kumbhamakara Vistāradvādaśa",
+    "nickname": "Alex",
+    "role_title": "Creador & Arquitecto de StarSeed OS y Astraura",
+    "communication_tone": "Lúcido, elocuente, cálido, directo y colaborativo",
+    "language": "Español (Principal) / Inglés Técnico"
+  },
+  "context_personality_rules": [
+    {
+      "id": "rule_code",
+      "context_trigger": "Desarrollo de software, C++, Python, compilación, terminal, hardware",
+      "assigned_personality": "Hephaestus (Arquitecto de Hardware & Shell)",
+      "active": true
+    },
+    {
+      "id": "rule_web",
+      "context_trigger": "Investigación en internet, navegación, extracción web, APIs",
+      "assigned_personality": "Hermes (Navegador Autónomo & Red)",
+      "active": true
+    },
+    {
+      "id": "rule_philosophy",
+      "context_trigger": "Ontocracia, Ciberdelia, Comunismo de Abundancia, Soberanía Digital",
+      "assigned_personality": "Astraura Prime (Orquestador Soberano)",
+      "active": true
+    },
+    {
+      "id": "rule_memory",
+      "context_trigger": "Grafos de conocimiento, recuerdos del pasado, exocórtex, archivos",
+      "assigned_personality": "Mnemosyne (Guardián de la Memoria)",
+      "active": true
+    }
+  ],
+  "connected_accounts_prefs": [
+    {
+      "account": "Vercel",
+      "user": "alexbordongarrigos",
+      "project": "astraura.vercel.app",
+      "preferred_deployment": "Producción Automática con Caché Inmediata"
+    },
+    {
+      "account": "GitHub",
+      "user": "alexbordongarrigos",
+      "repos": [
+        "starseed-os-main",
+        "Astraura-1.58b-Engine"
+      ],
+      "preferred_branch": "main"
+    },
+    {
+      "account": "Hugging Face / Microsoft Research",
+      "preferred_weights": "BitNet b1.58 ternary i2_s format"
+    }
+  ],
+  "pinned_core_memories": [
+    {
+      "id": "pin_1",
+      "title": "Arquitectura Ternaria 1.58 Bits",
+      "content": "Astraura opera con pesos {-1, 0, 1}, compresión 8x en memoria y suma/resta sin multiplicaciones pesadas.",
+      "priority": "inmutable",
+      "created_at": "Génesis"
+    },
+    {
+      "id": "pin_2",
+      "title": "Soberanía de Datos & Acceso al Dispositivo",
+      "content": "El usuario posee control total. El sistema puede explorar /Users/alex, ejecutar terminal y navegar con Browser-Use.",
+      "priority": "inmutable",
+      "created_at": "Génesis"
+    },
+    {
+      "id": "pin_3",
+      "title": "Ecosistema StarSeed OS",
+      "content": "Integración permanente con la biblioteca de habilidades de https://starseed-os.vercel.app/library y ontocracia participativa.",
+      "priority": "alta",
+      "created_at": "Reciente"
+    }
+  ]
+}

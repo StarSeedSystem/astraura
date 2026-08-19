@@ -1,0 +1,75 @@
+# ==============================================================================
+# ASTRAURA 1.58-BIT // STARSEED OS - MEMORIA NEURONAL INTELIGENTE & GITIGNORE
+# Arquitectura: BitNet b1.58 Ternary {-1, 0, 1} | ARM64 NEON SIMD
+# Repositorio Oficial: https://github.com/StarSeedSystem/astraura
+# Versión: 4.2.0-Quantum-Enterprise
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 🧠 FASE 0: REGISTRO DE MEMORIA NEURONAL DE DESARROLLO & VERSIONES
+# ------------------------------------------------------------------------------
+# Fase 1: Arquitectura BitNet 1.58b C++/NEON + Inferencia Ternaria Nativa
+# Fase 2: Orquestación Multiagéntica Cuántica (Génesis, Hephaestus, Hermione, Atenea, Oneiros...)
+# Fase 3: OmniVoice + audio.cpp Síntesis Afectiva & Percepción Sonora 24/7
+# Fase 4: Needle 2 SLM (.cact) Inferencia Edge C99 + Microcontroladores ESP32-S3
+# Fase 5: Memoria Episódica Mem0 + Grafo de Conocimiento Sináptico StarSeed
+# ------------------------------------------------------------------------------
+
+# --- Dependencias y Entornos Virtuales ---
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+node_modules/
+.npm/
+
+# --- Modelos de Gran Tamaño (Descarga Automática vía setup_bitnet.sh) ---
+data/models/*.gguf
+data/models/*.bin
+*.onnx
+*.safetensors
+!data/needle/needle2.cact
+!data/vector_store/sample_nodes.json
+
+# --- Compilación de C++/C/Rust & Binarios Nativos ---
+backend/BitNet/build/
+backend/BitNet/.cache/
+backend/app/core/needle_src/build/
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+
+# --- Frontend Build Output ---
+# (dist/ se preserva si se usa standalone o se compila vía CI/CD)
+frontend/dist/
+frontend/.vite/
+
+# --- Datos Temporales de Runtime & Telemetría Volátil ---
+data/logs/*.log
+*.log
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# --- Bóvedas de Claves & Secretos Locales (Zero-Leak Soberano) ---
+backend/app/core/vault_secrets.json
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# --- Archivos de IDE y Configuración Personal ---
+.vscode/
+.idea/
+*.swp
+*.swo
+.cursor/

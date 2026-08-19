@@ -1,0 +1,41 @@
+[
+  {
+    "id": "proj_genesis_158b",
+    "name": "Astraura 1.58b Core Engine",
+    "description": "Núcleo de computación ternaria y orquestación multiagéntica cuántica.",
+    "language": "python",
+    "category": "Cognitive System",
+    "persona_id": "astraura_prime",
+    "brain_id": "cerebro_genesis",
+    "created_at": 1786905953.1166751,
+    "updated_at": 1786992353.1166751,
+    "linked_folder": "/Users/alex/Documents/IA 1.58 bit",
+    "files": [
+      {
+        "filename": "main.py",
+        "path": "backend/app/main.py",
+        "language": "python",
+        "content": "# Servidor FastAPI y Rutas Cognitivas 1.58b\nimport asyncio\nprint('Astraura Online')\n"
+      },
+      {
+        "filename": "App.jsx",
+        "path": "frontend/src/App.jsx",
+        "language": "javascript",
+        "content": "// Interfaz Soberana StarSeed OS\nimport React from 'react';\n"
+      },
+      {
+        "filename": "README.md",
+        "path": "README.md",
+        "language": "markdown",
+        "content": "# Astraura 1.58-Bit\nEcosistema cognitivo ontocrático y multiagéntico.\n"
+      }
+    ],
+    "tags": [
+      "1.58b",
+      "StarSeed",
+      "BitNet",
+      "React",
+      "FastAPI"
+    ]
+  }
+]

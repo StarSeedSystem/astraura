@@ -1,0 +1,89 @@
+{
+  "master_voice_enabled": true,
+  "master_ambient_listening_enabled": true,
+  "master_affective_learning_enabled": true,
+  "master_device_sensory_link": true,
+  "personality_voice_states": {
+    "astraura_prime": {
+      "voice_autonomous_enabled": true,
+      "multiagent_enabled": true,
+      "presence_state": "listening",
+      "sensitivity": 0.85,
+      "current_affect": "serenidad_lúcida",
+      "character_evolution_score": 94,
+      "last_active_timestamp": 1787095985.906556,
+      "cognitive_organ": "Génesis (Núcleo Ontológico)"
+    },
+    "hermione": {
+      "voice_autonomous_enabled": true,
+      "multiagent_enabled": true,
+      "presence_state": "listening",
+      "sensitivity": 0.9,
+      "current_affect": "asertividad_ejecutiva",
+      "character_evolution_score": 92,
+      "last_active_timestamp": 1787095985.906556,
+      "cognitive_organ": "Puente Nativo & OS"
+    },
+    "hephaestus": {
+      "voice_autonomous_enabled": true,
+      "multiagent_enabled": true,
+      "presence_state": "listening",
+      "sensitivity": 0.8,
+      "current_affect": "creatividad_onírica",
+      "character_evolution_score": 97,
+      "last_active_timestamp": 1787096002.95814,
+      "cognitive_organ": "Forja ARM64 NEON"
+    },
+    "hermes": {
+      "voice_autonomous_enabled": true,
+      "multiagent_enabled": true,
+      "presence_state": "listening",
+      "sensitivity": 0.92,
+      "current_affect": "curiosidad_exploradora",
+      "character_evolution_score": 91,
+      "last_active_timestamp": 1787095985.9065568,
+      "cognitive_organ": "Ojo Navegante & Gateway Web"
+    },
+    "atenea": {
+      "voice_autonomous_enabled": true,
+      "multiagent_enabled": true,
+      "presence_state": "listening",
+      "sensitivity": 0.95,
+      "current_affect": "vigilancia_inmune",
+      "character_evolution_score": 95,
+      "last_active_timestamp": 1787095985.9065568,
+      "cognitive_organ": "Escudo Sentinel & SAIF 360°"
+    },
+    "oneiros": {
+      "voice_autonomous_enabled": true,
+      "multiagent_enabled": true,
+      "presence_state": "listening",
+      "sensitivity": 0.88,
+      "current_affect": "asombro_onirico",
+      "character_evolution_score": 93,
+      "last_active_timestamp": 1787095985.9065568,
+      "cognitive_organ": "ShaderLab 3D & Ensueño"
+    },
+    "kallisti": {
+      "voice_autonomous_enabled": true,
+      "multiagent_enabled": true,
+      "presence_state": "listening",
+      "sensitivity": 0.89,
+      "current_affect": "pasion_poetica",
+      "character_evolution_score": 90,
+      "last_active_timestamp": 1787095985.9065568,
+      "cognitive_organ": "Musa Ciberdélica"
+    },
+    "mnemosyne": {
+      "voice_autonomous_enabled": true,
+      "multiagent_enabled": true,
+      "presence_state": "listening",
+      "sensitivity": 0.85,
+      "current_affect": "memoria_continua",
+      "character_evolution_score": 97,
+      "last_active_timestamp": 1787095985.906558,
+      "cognitive_organ": "Bóveda Sináptica Exocórtex"
+    }
+  },
+  "updated_at": 1787096002.9581409
+}

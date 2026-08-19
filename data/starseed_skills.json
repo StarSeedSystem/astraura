@@ -1,0 +1,110 @@
+{
+  "starseed-auto-update": {
+    "id": "starseed-auto-update",
+    "name": "Auto-Actualización & Auto-Afinación",
+    "category": "Autonomía & Optimización",
+    "icon": "RefreshCw",
+    "blurb": "Sincroniza y optimiza continuamente los parámetros de inferencia y la memoria en segundo plano.",
+    "enabled": true,
+    "is_builtin": true
+  },
+  "computer-fs-access": {
+    "id": "computer-fs-access",
+    "name": "Acceso Universal al Sistema de Archivos",
+    "category": "Control del Dispositivo",
+    "icon": "FolderTree",
+    "blurb": "Navega, lee e indexa cualquier archivo o directorio en toda la computadora (/Users, /, /Volumes).",
+    "enabled": true,
+    "is_builtin": true
+  },
+  "terminal-exec": {
+    "id": "terminal-exec",
+    "name": "Consola & Ejecución de Terminal",
+    "category": "Control del Dispositivo",
+    "icon": "Terminal",
+    "blurb": "Ejecución real de comandos de shell y diagnósticos del sistema con permisos nativos.",
+    "enabled": true,
+    "is_builtin": true
+  },
+  "system-senses": {
+    "id": "system-senses",
+    "name": "Sentidos del Dispositivo & Hardware",
+    "category": "Percepción Sensorial",
+    "icon": "Activity",
+    "blurb": "Lectura en tiempo real de batería, carga de CPU por núcleo, RAM unificada, almacenamiento y red.",
+    "enabled": true,
+    "is_builtin": true
+  },
+  "aurora-web-access": {
+    "id": "aurora-web-access",
+    "name": "Web Scraping & Lector de URLs (Crawl4AI)",
+    "category": "Conocimiento & Web",
+    "icon": "Globe",
+    "blurb": "Extracción limpia de texto y markdown desde cualquier enlace web en tiempo real.",
+    "enabled": true,
+    "is_builtin": true
+  },
+  "research-open-notebook": {
+    "id": "research-open-notebook",
+    "name": "Investigación Profunda & RAG Sintético",
+    "category": "Conocimiento & Web",
+    "icon": "BookOpen",
+    "blurb": "Búsqueda vectorial local y síntesis de documentos fundacionales del workspace y la comunidad.",
+    "enabled": true,
+    "is_builtin": true
+  },
+  "knowledge-graph-engine": {
+    "id": "knowledge-graph-engine",
+    "name": "Grafo Semántico Asociativo (Exocórtex)",
+    "category": "Memoria & Cognición",
+    "icon": "Network",
+    "blurb": "Construcción y consolidación continua de conceptos y relaciones interconectadas.",
+    "enabled": true,
+    "is_builtin": true
+  },
+  "bitnet-158-engine": {
+    "id": "bitnet-158-engine",
+    "name": "Motor de Inferencia de 1.58 Bits (BitNet b1.58)",
+    "category": "Cómputo Ternario",
+    "icon": "Cpu",
+    "blurb": "Inferencia matricial basada en pesos {-1, 0, 1} con aceleración SIMD/NEON y compresión 8x.",
+    "enabled": true,
+    "is_builtin": true
+  },
+  "code-sandbox": {
+    "id": "code-sandbox",
+    "name": "Sandbox de Ejecución de Código Python",
+    "category": "Desarrollo",
+    "icon": "Code",
+    "blurb": "Ejecuta scripts y análisis de datos en el entorno local con retorno de resultados.",
+    "enabled": true,
+    "is_builtin": true
+  },
+  "hugging-bay": {
+    "id": "hugging-bay",
+    "name": "Hugging Bay (Descubrimiento de Modelos)",
+    "category": "Modelos & IA",
+    "icon": "DownloadCloud",
+    "blurb": "Registro y descarga de modelos cuantizados GGUF de Microsoft y la comunidad.",
+    "enabled": true,
+    "is_builtin": true
+  },
+  "audiomorphic-voice": {
+    "id": "audiomorphic-voice",
+    "name": "Síntesis de Voz Audiomórfica",
+    "category": "Multimedia",
+    "icon": "Volume2",
+    "blurb": "Articulación de voz natural y lectura interactiva de respuestas.",
+    "enabled": true,
+    "is_builtin": true
+  },
+  "taste-skill": {
+    "id": "taste-skill",
+    "name": "Taste Skill (Evaluación de Diseño & UI)",
+    "category": "Diseño",
+    "icon": "Sparkles",
+    "blurb": "Criterios de estética Cyberpunk, Glassmorphism y diseño fluido estilo Hermes.",
+    "enabled": true,
+    "is_builtin": true
+  }
+}

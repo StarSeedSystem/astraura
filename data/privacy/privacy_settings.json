@@ -1,0 +1,17 @@
+{
+  "strict_air_gap_mode": false,
+  "allow_gps_location": true,
+  "location_precision": "exact",
+  "allow_weather_sync": true,
+  "allow_microphone_stream": true,
+  "allow_camera_access": true,
+  "allow_compass_orientation": true,
+  "allow_gyroscope_motion": true,
+  "allow_hardware_telemetry": true,
+  "allow_external_web_search": true,
+  "allow_cloud_sync": true,
+  "allow_sensory_imagination": true,
+  "allow_persistent_logging": true,
+  "data_retention_days": 30,
+  "anonymize_network_ips": true
+}

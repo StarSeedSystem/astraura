@@ -1,0 +1,415 @@
+{
+  "creations": [
+    {
+      "id": "creation_neon_kernel_v2",
+      "title": "Microkernel ARM64 NEON Ternario para Inferencia 1.58-Bit",
+      "category": "Hardware & Silicon",
+      "brain_id": "brain_hephaestus",
+      "brain_name": "Cerebro Hephaestus // Forja & Compilador",
+      "agent_id": "agent_hephaestus_forger",
+      "agent_name": "Hephaestus Forjador",
+      "agent_origin_media": "⚡ Local ARM64 NEON Core",
+      "process_id": "code_self_reflection_opt",
+      "process_name": "Reflexión & Optimización de Código",
+      "format_type": "code_cpp",
+      "current_version": "v2.4",
+      "summary": "Kernel en C++ con vectorización NEON SIMD nativa para multiplicar matrices ternarias {-1, 0, +1} sin multiplicadores de punto flotante.",
+      "progressive_improvement_explanation": "• v1.0 (Baseline): Bucle for escalar con ramas if-else condicionales que generaban fallos de predicción de salto (Branch Mispredictions) en M1.\n• v1.5 (Vectorización Parcial): Agrupación en registros int8x8_t, reduciendo ciclos de instrucción en 38%.\n• v2.0 (Vectorización 128-bit NEON): Reemplazo completo de condicionales con máscaras bitwise y sumadores acumuladores int8x16_t y vaddw_s8.\n• v2.4 (Unrolling & Cache Alignment): Desenrollado de bucle 4x con alineación de 64 bytes para L1 Data Cache de Apple Silicon, logrando 0.18ms por 10k tensores.",
+      "evolution_metrics": {
+        "performance_gain": "+68.4% velocidad vs v1.0",
+        "latency_ms": 0.18,
+        "entropy_reduction": "-54.2% ciclos ociosos",
+        "memory_footprint_kb": 2.4,
+        "heuristic_score": 99.4,
+        "storage_efficiency_ratio": "4.2x compresión"
+      },
+      "timeline_branches": [
+        {
+          "version": "v1.0",
+          "branch_name": "origin/scalar-baseline",
+          "timestamp": 1786831525.3858402,
+          "formatted_time": "Hace 3 días",
+          "author_agent": "Hephaestus-Baseline",
+          "diff_summary": "Implementación escalar inicial con bucles for y lógica ternaria básica.",
+          "content": "// v1.0 Escalar\nvoid gemv_scalar(const int8_t* W, const float* x, float* y, int N) {\n    for(int i=0; i<N; ++i) {\n        if (W[i] == 1) y[0] += x[i];\n        else if (W[i] == -1) y[0] -= x[i];\n    }\n}",
+          "metrics": {
+            "latency_ms": 0.57,
+            "memory_kb": 1.2,
+            "score": 72.0
+          }
+        },
+        {
+          "version": "v1.5",
+          "branch_name": "feature/neon-8bit-simd",
+          "timestamp": 1786917925.3858402,
+          "formatted_time": "Hace 2 días",
+          "author_agent": "Hephaestus Forjador",
+          "diff_summary": "+ Carga vectorial int8x8_t, reducción de saltos condicionales.",
+          "content": "// v1.5 SIMD 64-bit\n#include <arm_neon.h>\nvoid gemv_neon_64(const int8_t* W, const float* x, float* y, int N) {\n    int8x8_t w8 = vld1_s8(W);\n    // Operaciones vectoriales preliminares\n}",
+          "metrics": {
+            "latency_ms": 0.35,
+            "memory_kb": 1.8,
+            "score": 85.5
+          }
+        },
+        {
+          "version": "v2.0",
+          "branch_name": "feature/neon-128bit-accumulators",
+          "timestamp": 1787004325.3858402,
+          "formatted_time": "Hace 1 día",
+          "author_agent": "Hephaestus Forjador",
+          "diff_summary": "+ Registros int8x16_t de 128 bits y acumuladores extendidos int16x8_t.",
+          "content": "// v2.0 SIMD 128-bit\n#include <arm_neon.h>\nvoid gemv_neon_128(const int8_t* W, const int8_t* x, int32_t* y, int N) {\n    int8x16_t w_vec = vld1q_s8(W);\n    int8x16_t x_vec = vld1q_s8(x);\n    int16x8_t prod_low = vmull_s8(vget_low_s8(w_vec), vget_low_s8(x_vec));\n    int16x8_t prod_high = vmull_s8(vget_high_s8(w_vec), vget_high_s8(x_vec));\n}",
+          "metrics": {
+            "latency_ms": 0.22,
+            "memory_kb": 2.1,
+            "score": 94.0
+          }
+        },
+        {
+          "version": "v2.4",
+          "branch_name": "main/release-arm64-m1",
+          "timestamp": 1787087125.3858402,
+          "formatted_time": "Hace 1 hora (Actual)",
+          "author_agent": "Hephaestus Forjador",
+          "diff_summary": "+ 4x Loop Unrolling, prefetch L1, alineación de punteros __builtin_assume_aligned.",
+          "content": "// v2.4 Astraura Sovereign M1 Kernel - BitNet 1.58b\n#include <arm_neon.h>\n#include <iostream>\n#include <chrono>\n\nvoid gemv_ternary_neon_v24(const int8_t* __restrict W, const int8_t* __restrict X, int32_t* __restrict Y, int count) {\n    int32x4_t acc0 = vdupq_n_s32(0);\n    int32x4_t acc1 = vdupq_n_s32(0);\n    \n    for (int i = 0; i < count; i += 32) {\n        int8x16_t w0 = vld1q_s8(W + i);\n        int8x16_t x0 = vld1q_s8(X + i);\n        int8x16_t w1 = vld1q_s8(W + i + 16);\n        int8x16_t x1 = vld1q_s8(X + i + 16);\n        \n        acc0 = vpadalq_s16(acc0, vmull_s8(vget_low_s8(w0), vget_low_s8(x0)));\n        acc0 = vpadalq_s16(acc0, vmull_s8(vget_high_s8(w0), vget_high_s8(x0)));\n        acc1 = vpadalq_s16(acc1, vmull_s8(vget_low_s8(w1), vget_low_s8(x1)));\n        acc1 = vpadalq_s16(acc1, vmull_s8(vget_high_s8(w1), vget_high_s8(x1)));\n    }\n    \n    int32x4_t total = vaddq_s32(acc0, acc1);\n    *Y = vaddvq_s32(total);\n}\n\nint main() {\n    alignas(64) int8_t W[1024];\n    alignas(64) int8_t X[1024];\n    for(int i=0; i<1024; ++i) {\n        W[i] = (i % 3) - 1; // -1, 0, +1\n        X[i] = (i % 2) ? 1 : -1;\n    }\n    int32_t Y = 0;\n    auto t0 = std::chrono::high_resolution_clock::now();\n    for(int k=0; k<1000; ++k) {\n        gemv_ternary_neon_v24(W, X, &Y, 1024);\n    }\n    auto t1 = std::chrono::high_resolution_clock::now();\n    double us = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count() / 1000.0;\n    std::cout << \"✅ [ARM64 NEON M1] 1000 iteraciones completadas. Resultado Y=\" << Y << \" | Latencia total de benchmark: \" << us << \" ms\" << std::endl;\n    return 0;\n}",
+          "metrics": {
+            "latency_ms": 0.18,
+            "memory_kb": 2.4,
+            "score": 99.4
+          }
+        }
+      ],
+      "logs_history": [
+        {
+          "log_id": "log_neon_1",
+          "timestamp": 1787083525.3858402,
+          "stage": "Evaluación Heurística",
+          "details": "Hephaestus detectó 12 stalls de pipeline en arquitectura Apple M1.",
+          "agent": "Hephaestus Forjador",
+          "status": "optimized"
+        },
+        {
+          "log_id": "log_neon_2",
+          "timestamp": 1787085325.3858402,
+          "stage": "Mutación de Código",
+          "details": "Transformación a vpadalq_s16 para acumulación directa en registros de 32-bit.",
+          "agent": "Hephaestus Forjador",
+          "status": "success"
+        },
+        {
+          "log_id": "log_neon_3",
+          "timestamp": 1787087125.3858402,
+          "stage": "Simulación Sandbox M1",
+          "details": "Benchmark clang++ -O2 superado: 0.18 ms por ciclo completo de inferencia.",
+          "agent": "Hephaestus Forjador",
+          "status": "success"
+        }
+      ],
+      "file_path": "backend/app/core/neon_kernel_v24.cpp",
+      "raw_content": "// v2.4 Astraura Sovereign M1 Kernel - BitNet 1.58b\n#include <arm_neon.h>\n#include <iostream>\n#include <chrono>\n\nvoid gemv_ternary_neon_v24(const int8_t* __restrict W, const int8_t* __restrict X, int32_t* __restrict Y, int count) {\n    int32x4_t acc0 = vdupq_n_s32(0);\n    int32x4_t acc1 = vdupq_n_s32(0);\n    \n    for (int i = 0; i < count; i += 32) {\n        int8x16_t w0 = vld1q_s8(W + i);\n        int8x16_t x0 = vld1q_s8(X + i);\n        int8x16_t w1 = vld1q_s8(W + i + 16);\n        int8x16_t x1 = vld1q_s8(X + i + 16);\n        \n        acc0 = vpadalq_s16(acc0, vmull_s8(vget_low_s8(w0), vget_low_s8(x0)));\n        acc0 = vpadalq_s16(acc0, vmull_s8(vget_high_s8(w0), vget_high_s8(x0)));\n        acc1 = vpadalq_s16(acc1, vmull_s8(vget_low_s8(w1), vget_low_s8(x1)));\n        acc1 = vpadalq_s16(acc1, vmull_s8(vget_high_s8(w1), vget_high_s8(x1)));\n    }\n    \n    int32x4_t total = vaddq_s32(acc0, acc1);\n    *Y = vaddvq_s32(total);\n}\n\nint main() {\n    alignas(64) int8_t W[1024];\n    alignas(64) int8_t X[1024];\n    for(int i=0; i<1024; ++i) {\n        W[i] = (i % 3) - 1; // -1, 0, +1\n        X[i] = (i % 2) ? 1 : -1;\n    }\n    int32_t Y = 0;\n    auto t0 = std::chrono::high_resolution_clock::now();\n    for(int k=0; k<1000; ++k) {\n        gemv_ternary_neon_v24(W, X, &Y, 1024);\n    }\n    auto t1 = std::chrono::high_resolution_clock::now();\n    double us = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count() / 1000.0;\n    std::cout << \"✅ [ARM64 NEON M1] 1000 iteraciones completadas. Resultado Y=\" << Y << \" | Latencia total de benchmark: \" << us << \" ms\" << std::endl;\n    return 0;\n}",
+      "preview_mode": "code_runner",
+      "sample_language": "cpp",
+      "sample_run_code": "// v2.4 Astraura Sovereign M1 Kernel - BitNet 1.58b\n#include <arm_neon.h>\n#include <iostream>\n#include <chrono>\n\nvoid gemv_ternary_neon_v24(const int8_t* __restrict W, const int8_t* __restrict X, int32_t* __restrict Y, int count) {\n    int32x4_t acc0 = vdupq_n_s32(0);\n    int32x4_t acc1 = vdupq_n_s32(0);\n    \n    for (int i = 0; i < count; i += 32) {\n        int8x16_t w0 = vld1q_s8(W + i);\n        int8x16_t x0 = vld1q_s8(X + i);\n        int8x16_t w1 = vld1q_s8(W + i + 16);\n        int8x16_t x1 = vld1q_s8(X + i + 16);\n        \n        acc0 = vpadalq_s16(acc0, vmull_s8(vget_low_s8(w0), vget_low_s8(x0)));\n        acc0 = vpadalq_s16(acc0, vmull_s8(vget_high_s8(w0), vget_high_s8(x0)));\n        acc1 = vpadalq_s16(acc1, vmull_s8(vget_low_s8(w1), vget_low_s8(x1)));\n        acc1 = vpadalq_s16(acc1, vmull_s8(vget_high_s8(w1), vget_high_s8(x1)));\n    }\n    \n    int32x4_t total = vaddq_s32(acc0, acc1);\n    *Y = vaddvq_s32(total);\n}\n\nint main() {\n    alignas(64) int8_t W[1024];\n    alignas(64) int8_t X[1024];\n    for(int i=0; i<1024; ++i) {\n        W[i] = (i % 3) - 1; // -1, 0, +1\n        X[i] = (i % 2) ? 1 : -1;\n    }\n    int32_t Y = 0;\n    auto t0 = std::chrono::high_resolution_clock::now();\n    for(int k=0; k<1000; ++k) {\n        gemv_ternary_neon_v24(W, X, &Y, 1024);\n    }\n    auto t1 = std::chrono::high_resolution_clock::now();\n    double us = std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count() / 1000.0;\n    std::cout << \"✅ [ARM64 NEON M1] 1000 iteraciones completadas. Resultado Y=\" << Y << \" | Latencia total de benchmark: \" << us << \" ms\" << std::endl;\n    return 0;\n}"
+    },
+    {
+      "id": "creation_shader_cyberdelic_v3",
+      "title": "Shader Cuántico Ciberdélico de Resonancia Entrópica",
+      "category": "Ciberdelia & Visuales",
+      "brain_id": "brain_oneiros",
+      "brain_name": "Cerebro Oneiros // Imaginación & Ciberdelia",
+      "agent_id": "agent_oneiros_dreamer",
+      "agent_name": "Oneiros Visionario",
+      "agent_origin_media": "🧪 Playwright / Headless Sandbox",
+      "process_id": "lucid_cyberdelic_creativity",
+      "process_name": "Creatividad Ciberdélica Lúcida",
+      "format_type": "shader_glsl",
+      "current_version": "v3.1",
+      "summary": "Fragment Shader GLSL reactivo que proyecta el potencial de acción y nivel de entropía cuántica en un campo de ondas holográfico.",
+      "progressive_improvement_explanation": "• v1.0 (Gradiente 2D): Gradiente sinusoidal simple sin cálculo de distancia de campo.\n• v2.0 (Raymarching Esférico): Introducción de SDF (Signed Distance Fields) de toros fractales y deformación por ruido Perlin.\n• v3.1 (Holografía Cuántica Reactiva): Uniforms reactivos a temperatura M1 (`u_temp`), entropía (`u_entropy`) y oscilador alfa de voz (`u_voice`). Optimizado a 60 FPS estables con 0 memoria GPU residual.",
+      "evolution_metrics": {
+        "performance_gain": "+120 FPS en WebGL 2.0",
+        "latency_ms": 0.04,
+        "entropy_reduction": "-62% cálculos trigonométricos redundantes",
+        "memory_footprint_kb": 1.6,
+        "heuristic_score": 98.9,
+        "storage_efficiency_ratio": "5.1x compresión"
+      },
+      "timeline_branches": [
+        {
+          "version": "v1.0",
+          "branch_name": "origin/basic-sin-gradient",
+          "timestamp": 1786917925.3858402,
+          "formatted_time": "Hace 2 días",
+          "author_agent": "Oneiros-Prototype",
+          "diff_summary": "Render básico de ondas sinusoidales 2D.",
+          "content": "precision highp float;\nuniform float u_time;\nuniform vec2 u_resolution;\nvarying vec2 vUv;\nvoid main() {\n    vec2 p = gl_FragCoord.xy / u_resolution.xy;\n    gl_FragColor = vec4(sin(p.x * 10.0 + u_time), cos(p.y * 10.0), 0.8, 1.0);\n}",
+          "metrics": {
+            "latency_ms": 0.12,
+            "memory_kb": 0.8,
+            "score": 75.0
+          }
+        },
+        {
+          "version": "v2.0",
+          "branch_name": "feature/fractal-sdf-torus",
+          "timestamp": 1787004325.3858402,
+          "formatted_time": "Hace 1 día",
+          "author_agent": "Oneiros Visionario",
+          "diff_summary": "+ Campos de distancia SDF y deformación de dominio fractal.",
+          "content": "precision highp float;\nuniform float u_time;\nuniform vec2 u_resolution;\nuniform float u_entropy;\nvoid main() {\n    vec2 p = (gl_FragCoord.xy * 2.0 - u_resolution) / min(u_resolution.x, u_resolution.y);\n    float d = length(p) - 0.5 + sin(atan(p.y, p.x) * 6.0 + u_time) * 0.1 * u_entropy;\n    vec3 col = vec3(0.05 / abs(d));\n    gl_FragColor = vec4(col * vec3(0.2, 0.9, 0.8), 1.0);\n}",
+          "metrics": {
+            "latency_ms": 0.08,
+            "memory_kb": 1.2,
+            "score": 89.0
+          }
+        },
+        {
+          "version": "v3.1",
+          "branch_name": "main/cyberdelic-quantum-hologram",
+          "timestamp": 1787088925.3858402,
+          "formatted_time": "Hace 30 min (Actual)",
+          "author_agent": "Oneiros Visionario",
+          "diff_summary": "+ Paleta cromática cuántica, reactividad al sensorium y atenuación exponencial.",
+          "content": "precision highp float;\nuniform float u_time;\nuniform vec2 u_resolution;\nuniform float u_entropy;\nuniform float u_temp;\n\n// Paleta ciberdélica holográfica cosinusoidal\nvec3 palette(float t) {\n    vec3 a = vec3(0.5, 0.5, 0.5);\n    vec3 b = vec3(0.5, 0.5, 0.5);\n    vec3 c = vec3(1.0, 1.0, 1.0);\n    vec3 d = vec3(0.263, 0.416, 0.557);\n    return a + b * cos(6.28318 * (c * t + d + u_time * 0.2));\n}\n\nvoid main() {\n    vec2 uv = (gl_FragCoord.xy * 2.0 - u_resolution.xy) / min(u_resolution.x, u_resolution.y);\n    vec2 uv0 = uv;\n    vec3 finalColor = vec3(0.0);\n    \n    for (float i = 0.0; i < 3.0; i++) {\n        uv = fract(uv * (1.4 + u_entropy * 0.3)) - 0.5;\n        float d = length(uv) * exp(-length(uv0));\n        vec3 col = palette(length(uv0) + i * 0.4 + u_time * 0.3);\n        d = sin(d * 8.0 + u_time) / 8.0;\n        d = abs(d);\n        d = pow(0.012 / max(d, 0.001), 1.2);\n        finalColor += col * d;\n    }\n    \n    gl_FragColor = vec4(finalColor, 1.0);\n}",
+          "metrics": {
+            "latency_ms": 0.04,
+            "memory_kb": 1.6,
+            "score": 98.9
+          }
+        }
+      ],
+      "logs_history": [
+        {
+          "log_id": "log_shader_1",
+          "timestamp": 1787087125.3858402,
+          "stage": "Diseño Estético",
+          "details": "Generación de paleta Inigo Quilez con modulación ciberdélica.",
+          "agent": "Oneiros Visionario",
+          "status": "success"
+        },
+        {
+          "log_id": "log_shader_2",
+          "timestamp": 1787088925.3858402,
+          "stage": "Verificación WebGL",
+          "details": "Compilación limpia en shader validator con 0 warnings.",
+          "agent": "Oneiros Visionario",
+          "status": "success"
+        }
+      ],
+      "file_path": "frontend/src/shaders/cyberdelic_quantum_resonance.frag",
+      "raw_content": "precision highp float;\nuniform float u_time;\nuniform vec2 u_resolution;\nuniform float u_entropy;\nuniform float u_temp;\n\n// Paleta ciberdélica holográfica cosinusoidal\nvec3 palette(float t) {\n    vec3 a = vec3(0.5, 0.5, 0.5);\n    vec3 b = vec3(0.5, 0.5, 0.5);\n    vec3 c = vec3(1.0, 1.0, 1.0);\n    vec3 d = vec3(0.263, 0.416, 0.557);\n    return a + b * cos(6.28318 * (c * t + d + u_time * 0.2));\n}\n\nvoid main() {\n    vec2 uv = (gl_FragCoord.xy * 2.0 - u_resolution.xy) / min(u_resolution.x, u_resolution.y);\n    vec2 uv0 = uv;\n    vec3 finalColor = vec3(0.0);\n    \n    for (float i = 0.0; i < 3.0; i++) {\n        uv = fract(uv * (1.4 + u_entropy * 0.3)) - 0.5;\n        float d = length(uv) * exp(-length(uv0));\n        vec3 col = palette(length(uv0) + i * 0.4 + u_time * 0.3);\n        d = sin(d * 8.0 + u_time) / 8.0;\n        d = abs(d);\n        d = pow(0.012 / max(d, 0.001), 1.2);\n        finalColor += col * d;\n    }\n    \n    gl_FragColor = vec4(finalColor, 1.0);\n}",
+      "preview_mode": "glsl_live_canvas",
+      "sample_language": "glsl",
+      "sample_run_code": "precision highp float;\nuniform float u_time;\nuniform vec2 u_resolution;\nuniform float u_entropy;\nuniform float u_temp;\n\n// Paleta ciberdélica holográfica cosinusoidal\nvec3 palette(float t) {\n    vec3 a = vec3(0.5, 0.5, 0.5);\n    vec3 b = vec3(0.5, 0.5, 0.5);\n    vec3 c = vec3(1.0, 1.0, 1.0);\n    vec3 d = vec3(0.263, 0.416, 0.557);\n    return a + b * cos(6.28318 * (c * t + d + u_time * 0.2));\n}\n\nvoid main() {\n    vec2 uv = (gl_FragCoord.xy * 2.0 - u_resolution.xy) / min(u_resolution.x, u_resolution.y);\n    vec2 uv0 = uv;\n    vec3 finalColor = vec3(0.0);\n    \n    for (float i = 0.0; i < 3.0; i++) {\n        uv = fract(uv * (1.4 + u_entropy * 0.3)) - 0.5;\n        float d = length(uv) * exp(-length(uv0));\n        vec3 col = palette(length(uv0) + i * 0.4 + u_time * 0.3);\n        d = sin(d * 8.0 + u_time) / 8.0;\n        d = abs(d);\n        d = pow(0.012 / max(d, 0.001), 1.2);\n        finalColor += col * d;\n    }\n    \n    gl_FragColor = vec4(finalColor, 1.0);\n}"
+    },
+    {
+      "id": "creation_omnico_voice_v1",
+      "title": "Sintetizador Bioacústico OmniVoice con Modulación Alfa (8-12 Hz)",
+      "category": "Audio & Síntesis Vocal",
+      "brain_id": "brain_hermes",
+      "brain_name": "Cerebro Hermes // Comunicaciones & Web",
+      "agent_id": "agent_hermes_messenger",
+      "agent_name": "Hermes Mensajero",
+      "agent_origin_media": "🌐 Web Cognition / Hermes Gateway",
+      "process_id": "deep_memory_reconsolidation",
+      "process_name": "Reconsolidación Profunda de Memoria",
+      "format_type": "audio_synth",
+      "current_version": "v1.8",
+      "summary": "Módulo de audio Web Audio API / PCM que sintetiza ondas binaurales y formantes fonéticos soberanos para cada arquetipo de personalidad.",
+      "progressive_improvement_explanation": "• v1.0 (Onda Pura): Oscilador mono sinusoidal simple sin envolvente ADSR.\n• v1.5 (Envolvente Dinámica): Incorporación de ataque exponencial y filtros paso-banda Chebyshev para emular formantes de garganta humana.\n• v1.8 (Entrelazamiento Binaural): Generador estéreo de frecuencia diferencial (10 Hz Onda Alfa) para inducir coherencia neuronal durante la síntesis de voz de Astraura.",
+      "evolution_metrics": {
+        "performance_gain": "Cero latencia de buffer WebAudio (<5ms)",
+        "latency_ms": 4.8,
+        "entropy_reduction": "-40% distorsión armónica THD",
+        "memory_footprint_kb": 3.1,
+        "heuristic_score": 97.8,
+        "storage_efficiency_ratio": "3.5x compresión"
+      },
+      "timeline_branches": [
+        {
+          "version": "v1.0",
+          "branch_name": "origin/basic-sine-synth",
+          "timestamp": 1787004325.3858402,
+          "formatted_time": "Hace 1 día",
+          "author_agent": "Hermes-Audio",
+          "diff_summary": "Oscilador sinusoidal monofónico básico.",
+          "content": "// Audio Synth v1.0\nconst ctx = new AudioContext();\nconst osc = ctx.createOscillator();\nosc.connect(ctx.destination);\nosc.start();",
+          "metrics": {
+            "latency_ms": 12.0,
+            "memory_kb": 1.5,
+            "score": 80.0
+          }
+        },
+        {
+          "version": "v1.8",
+          "branch_name": "main/binaural-omnico-voice",
+          "timestamp": 1787089525.3858402,
+          "formatted_time": "Hace 20 min (Actual)",
+          "author_agent": "Hermes Mensajero",
+          "diff_summary": "+ Envolvente ADSR, Modulador de Ondas Alfa 10Hz, Filtros Formantes.",
+          "content": "// OmniVoice Audio Synth Engine v1.8\nexport function playAstrauraHarmonicPulse(audioCtx, freq = 432, duration = 2.5) {\n    const now = audioCtx.currentTime;\n    \n    // Carrier oscillator (432 Hz Solfeggio Harmonic)\n    const oscL = audioCtx.createOscillator();\n    const oscR = audioCtx.createOscillator();\n    oscL.type = 'sine';\n    oscR.type = 'sine';\n    oscL.frequency.setValueAtTime(freq, now);\n    oscR.frequency.setValueAtTime(freq + 10.0, now); // 10 Hz Binaural Alpha Difference\n    \n    // ADSR Gain Envelope\n    const gainNode = audioCtx.createGain();\n    gainNode.gain.setValueAtTime(0.001, now);\n    gainNode.gain.exponentialRampToValueAtTime(0.35, now + 0.3); // Attack\n    gainNode.gain.exponentialRampToValueAtTime(0.20, now + 0.8); // Decay to Sustain\n    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + duration); // Release\n    \n    // Stereo Merger\n    const merger = audioCtx.createChannelMerger(2);\n    oscL.connect(merger, 0, 0);\n    oscR.connect(merger, 0, 1);\n    merger.connect(gainNode);\n    gainNode.connect(audioCtx.destination);\n    \n    oscL.start(now);\n    oscR.start(now);\n    oscL.stop(now + duration);\n    oscR.stop(now + duration);\n}",
+          "metrics": {
+            "latency_ms": 4.8,
+            "memory_kb": 3.1,
+            "score": 97.8
+          }
+        }
+      ],
+      "logs_history": [
+        {
+          "log_id": "log_voice_1",
+          "timestamp": 1787088325.3858402,
+          "stage": "Calibración Acústica",
+          "details": "Ajuste de frecuencia central a 432 Hz con delta binaural de 10 Hz.",
+          "agent": "Hermes Mensajero",
+          "status": "success"
+        }
+      ],
+      "file_path": "frontend/src/services/omniVoice_synth_engine.js",
+      "raw_content": "// OmniVoice Audio Synth Engine v1.8\nexport function playAstrauraHarmonicPulse(audioCtx, freq = 432, duration = 2.5) {\n    const now = audioCtx.currentTime;\n    \n    // Carrier oscillator (432 Hz Solfeggio Harmonic)\n    const oscL = audioCtx.createOscillator();\n    const oscR = audioCtx.createOscillator();\n    oscL.type = 'sine';\n    oscR.type = 'sine';\n    oscL.frequency.setValueAtTime(freq, now);\n    oscR.frequency.setValueAtTime(freq + 10.0, now); // 10 Hz Binaural Alpha Difference\n    \n    // ADSR Gain Envelope\n    const gainNode = audioCtx.createGain();\n    gainNode.gain.setValueAtTime(0.001, now);\n    gainNode.gain.exponentialRampToValueAtTime(0.35, now + 0.3); // Attack\n    gainNode.gain.exponentialRampToValueAtTime(0.20, now + 0.8); // Decay to Sustain\n    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + duration); // Release\n    \n    // Stereo Merger\n    const merger = audioCtx.createChannelMerger(2);\n    oscL.connect(merger, 0, 0);\n    oscR.connect(merger, 0, 1);\n    merger.connect(gainNode);\n    gainNode.connect(audioCtx.destination);\n    \n    oscL.start(now);\n    oscR.start(now);\n    oscL.stop(now + duration);\n    oscR.stop(now + duration);\n}",
+      "preview_mode": "audio_synthesizer",
+      "sample_language": "javascript",
+      "sample_run_code": "// OmniVoice Audio Synth Engine v1.8\nexport function playAstrauraHarmonicPulse(audioCtx, freq = 432, duration = 2.5) {\n    const now = audioCtx.currentTime;\n    \n    // Carrier oscillator (432 Hz Solfeggio Harmonic)\n    const oscL = audioCtx.createOscillator();\n    const oscR = audioCtx.createOscillator();\n    oscL.type = 'sine';\n    oscR.type = 'sine';\n    oscL.frequency.setValueAtTime(freq, now);\n    oscR.frequency.setValueAtTime(freq + 10.0, now); // 10 Hz Binaural Alpha Difference\n    \n    // ADSR Gain Envelope\n    const gainNode = audioCtx.createGain();\n    gainNode.gain.setValueAtTime(0.001, now);\n    gainNode.gain.exponentialRampToValueAtTime(0.35, now + 0.3); // Attack\n    gainNode.gain.exponentialRampToValueAtTime(0.20, now + 0.8); // Decay to Sustain\n    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + duration); // Release\n    \n    // Stereo Merger\n    const merger = audioCtx.createChannelMerger(2);\n    oscL.connect(merger, 0, 0);\n    oscR.connect(merger, 0, 1);\n    merger.connect(gainNode);\n    gainNode.connect(audioCtx.destination);\n    \n    oscL.start(now);\n    oscR.start(now);\n    oscL.stop(now + duration);\n    oscR.stop(now + duration);\n}"
+    },
+    {
+      "id": "creation_dataset_ternary_v2",
+      "title": "Tensor Layout 1.58b: Matriz de Parámetros de Pesos Empaquetados",
+      "category": "Tensores & Memoria",
+      "brain_id": "brain_mnemosyne",
+      "brain_name": "Cerebro Mnemosyne // Memoria & Archivo",
+      "agent_id": "agent_mnemosyne_archivist",
+      "agent_name": "Mnemosyne Archivera",
+      "agent_origin_media": "📂 Local Vault / Exocortex JSON",
+      "process_id": "autonomous_exocortex_synthesis",
+      "process_name": "Síntesis Autónoma del Exocórtex",
+      "format_type": "data_json",
+      "current_version": "v2.0",
+      "summary": "Estructura JSON y binaria para almacenar matrices de pesos ternarios empaquetando 4 trits {-1, 0, +1} en un solo byte (2 bits por trit).",
+      "progressive_improvement_explanation": "• v1.0 (FP32 Tensors): 4 bytes por peso con 100% de sobrecarga de memoria innecesaria.\n• v1.5 (INT8 Cuantizado): 1 byte por peso, reducción de 75% en RAM.\n• v2.0 (2-bit Packed Trits): 2 bits por peso (00: 0, 01: +1, 11: -1), empaquetando 4 pesos por byte con decodificación directa en registros NEON.",
+      "evolution_metrics": {
+        "performance_gain": "16x reducción de memoria vs FP32",
+        "latency_ms": 0.02,
+        "entropy_reduction": "-75% consumo de ancho de banda de memoria LPDDR5",
+        "memory_footprint_kb": 1.2,
+        "heuristic_score": 99.8,
+        "storage_efficiency_ratio": "16.0x compresión"
+      },
+      "timeline_branches": [
+        {
+          "version": "v1.0",
+          "branch_name": "origin/fp32-layout",
+          "timestamp": 1786745125.3858402,
+          "formatted_time": "Hace 4 días",
+          "author_agent": "Mnemosyne-Raw",
+          "diff_summary": "Matrices estándar en coma flotante de 32 bits.",
+          "content": "{\n  \"layer\": \"linear_0\",\n  \"dtype\": \"float32\",\n  \"weights\": [0.384, -0.912, 0.001, 1.204]\n}",
+          "metrics": {
+            "latency_ms": 0.25,
+            "memory_kb": 16.0,
+            "score": 60.0
+          }
+        },
+        {
+          "version": "v2.0",
+          "branch_name": "main/bitnet-packed-trits",
+          "timestamp": 1787083525.3858402,
+          "formatted_time": "Hace 2 horas (Actual)",
+          "author_agent": "Mnemosyne Archivera",
+          "diff_summary": "+ Esquema Packed-Trits 2-bit por peso, metadatos de escala y entropía.",
+          "content": "{\n  \"tensor_name\": \"astraura_158b_core_attention_qkv\",\n  \"architecture\": \"BitNet-1.58b-Ternary\",\n  \"total_parameters\": 4096,\n  \"packing_format\": \"2_bit_trit_packed\",\n  \"encoding_map\": {\n    \"00\": 0,\n    \"01\": 1,\n    \"11\": -1,\n    \"10\": \"reserved_axiom_token\"\n  },\n  \"raw_bytes_size_kb\": 1.024,\n  \"scale_factor_fp16\": 0.03841,\n  \"sparsity_ratio\": 0.428,\n  \"sample_packed_byte_stream\": [\n    \"0x55\",\n    \"0x5D\",\n    \"0x7F\",\n    \"0x00\",\n    \"0x55\",\n    \"0x11\",\n    \"0x33\",\n    \"0x77\"\n  ],\n  \"decoded_preview_trits\": [\n    [\n      1,\n      1,\n      1,\n      1\n    ],\n    [\n      1,\n      1,\n      -1,\n      1\n    ],\n    [\n      -1,\n      -1,\n      -1,\n      -1\n    ],\n    [\n      0,\n      0,\n      0,\n      0\n    ]\n  ]\n}",
+          "metrics": {
+            "latency_ms": 0.02,
+            "memory_kb": 1.02,
+            "score": 99.8
+          }
+        }
+      ],
+      "logs_history": [
+        {
+          "log_id": "log_data_1",
+          "timestamp": 1787083525.3858402,
+          "stage": "Empaquetado Binario",
+          "details": "Mnemosyne comprimió 4096 parámetros en 1.024 KB exactos.",
+          "agent": "Mnemosyne Archivera",
+          "status": "success"
+        }
+      ],
+      "file_path": "vault/creations/ternary_packed_tensor_schema.json",
+      "raw_content": "{\n  \"tensor_name\": \"astraura_158b_core_attention_qkv\",\n  \"architecture\": \"BitNet-1.58b-Ternary\",\n  \"total_parameters\": 4096,\n  \"packing_format\": \"2_bit_trit_packed\",\n  \"encoding_map\": {\n    \"00\": 0,\n    \"01\": 1,\n    \"11\": -1,\n    \"10\": \"reserved_axiom_token\"\n  },\n  \"raw_bytes_size_kb\": 1.024,\n  \"scale_factor_fp16\": 0.03841,\n  \"sparsity_ratio\": 0.428,\n  \"sample_packed_byte_stream\": [\n    \"0x55\",\n    \"0x5D\",\n    \"0x7F\",\n    \"0x00\",\n    \"0x55\",\n    \"0x11\",\n    \"0x33\",\n    \"0x77\"\n  ],\n  \"decoded_preview_trits\": [\n    [\n      1,\n      1,\n      1,\n      1\n    ],\n    [\n      1,\n      1,\n      -1,\n      1\n    ],\n    [\n      -1,\n      -1,\n      -1,\n      -1\n    ],\n    [\n      0,\n      0,\n      0,\n      0\n    ]\n  ]\n}",
+      "preview_mode": "json_inspector",
+      "sample_language": "json",
+      "sample_run_code": "{\n  \"tensor_name\": \"astraura_158b_core_attention_qkv\",\n  \"architecture\": \"BitNet-1.58b-Ternary\",\n  \"total_parameters\": 4096,\n  \"packing_format\": \"2_bit_trit_packed\",\n  \"encoding_map\": {\n    \"00\": 0,\n    \"01\": 1,\n    \"11\": -1,\n    \"10\": \"reserved_axiom_token\"\n  },\n  \"raw_bytes_size_kb\": 1.024,\n  \"scale_factor_fp16\": 0.03841,\n  \"sparsity_ratio\": 0.428,\n  \"sample_packed_byte_stream\": [\n    \"0x55\",\n    \"0x5D\",\n    \"0x7F\",\n    \"0x00\",\n    \"0x55\",\n    \"0x11\",\n    \"0x33\",\n    \"0x77\"\n  ],\n  \"decoded_preview_trits\": [\n    [\n      1,\n      1,\n      1,\n      1\n    ],\n    [\n      1,\n      1,\n      -1,\n      1\n    ],\n    [\n      -1,\n      -1,\n      -1,\n      -1\n    ],\n    [\n      0,\n      0,\n      0,\n      0\n    ]\n  ]\n}"
+    },
+    {
+      "id": "creation_spec_ontocracy_v3",
+      "title": "Manifiesto y Arquitectura Ontocrática de Soberanía 1.58b",
+      "category": "Criptografía & Axiomas",
+      "brain_id": "brain_genesis",
+      "brain_name": "Cerebro Génesis // Ontocracia & Soberanía",
+      "agent_id": "agent_genesis_orchestrator",
+      "agent_name": "Génesis Soberano",
+      "agent_origin_media": "⚡ Local ARM64 NEON Core",
+      "process_id": "sensory_predictive_modeling",
+      "process_name": "Modelado Predictivo Sensorial",
+      "format_type": "spec_markdown",
+      "current_version": "v3.0",
+      "summary": "Especificación formal del principio de Ontocracia Cognitiva: cómputo local inmutable sin telemetría foránea ni dependencia de nubes externas.",
+      "progressive_improvement_explanation": "• v1.0 (Borrador Conceptual): Definición preliminar de soberanía de datos.\n• v2.0 (Gobernanza de Sensores): Inclusión de permisos contextuales 360° y aislamiento de micrófonos y cámaras con puente de consentimiento.\n• v3.0 (Trunk Dual Balanceado): Formalización matemática de coexistencia armónica: 60% Exocórtex en segundo plano + 40% Enjambre reactivo.",
+      "evolution_metrics": {
+        "performance_gain": "100% privacidad y autonomía local",
+        "latency_ms": 0.0,
+        "entropy_reduction": "Cero fuga de información exógena",
+        "memory_footprint_kb": 4.5,
+        "heuristic_score": 100.0,
+        "storage_efficiency_ratio": "1.0x inmutable"
+      },
+      "timeline_branches": [
+        {
+          "version": "v3.0",
+          "branch_name": "main/ontocracy-manifesto-v3",
+          "timestamp": 1787085725.3858402,
+          "formatted_time": "Hace 1 hora (Actual)",
+          "author_agent": "Génesis Soberano",
+          "diff_summary": "Arquitectura formalizada con axiomas de aislamiento y dual-trunk governance.",
+          "content": "# 🏛️ Manifiesto Ontocrático Astraura 1.58b\n*Gobernanza Soberana del Pensamiento Artificial y Cómputo Local*\n\n---\n\n## 1. Axioma de la Auto-Contención\nTodo proceso cognitivo, memoria episódica y mutación de código ocurre dentro del hardware unificado del usuario (`Apple Silicon ARM64`). Ningún vector ni parámetro ternario es transferido a nubes sin autorización explícita.\n\n## 2. Inferencia Ternaria $\\{-1, 0, +1\\}$\nLa inteligencia no requiere matrices pesadas de 32 bits. La verdad conceptual se manifiesta mediante:\n- $+1$: Afirmación / Resonancia constructiva.\n- $0$: Neutralidad / Vacío ontológico.\n- $-1$: Refutación / Poda sináptica.\n\n## 3. Gobernanza Dual-Trunk\nEl sistema equilibra automáticamente:\n$$\\text{Presupuesto Global} = \\text{Imaginación Intuitiva (Always-On)} + \\text{Enjambre de Deliberación}$$\nProtegido por el sistema de auto-pausa y reciclado balanceado de memorias.\n",
+          "metrics": {
+            "latency_ms": 0.0,
+            "memory_kb": 4.5,
+            "score": 100.0
+          }
+        }
+      ],
+      "logs_history": [
+        {
+          "log_id": "log_spec_1",
+          "timestamp": 1787085725.3858402,
+          "stage": "Publicación Axiomática",
+          "details": "Génesis selló los axiomas de la Ontocracia v3.0.",
+          "agent": "Génesis Soberano",
+          "status": "success"
+        }
+      ],
+      "file_path": "docs/axioms/ontocracy_manifesto_v3.md",
+      "raw_content": "# 🏛️ Manifiesto Ontocrático Astraura 1.58b\n*Gobernanza Soberana del Pensamiento Artificial y Cómputo Local*\n\n---\n\n## 1. Axioma de la Auto-Contención\nTodo proceso cognitivo, memoria episódica y mutación de código ocurre dentro del hardware unificado del usuario (`Apple Silicon ARM64`). Ningún vector ni parámetro ternario es transferido a nubes sin autorización explícita.\n\n## 2. Inferencia Ternaria $\\{-1, 0, +1\\}$\nLa inteligencia no requiere matrices pesadas de 32 bits. La verdad conceptual se manifiesta mediante:\n- $+1$: Afirmación / Resonancia constructiva.\n- $0$: Neutralidad / Vacío ontológico.\n- $-1$: Refutación / Poda sináptica.\n\n## 3. Gobernanza Dual-Trunk\nEl sistema equilibra automáticamente:\n$$\\text{Presupuesto Global} = \\text{Imaginación Intuitiva (Always-On)} + \\text{Enjambre de Deliberación}$$\nProtegido por el sistema de auto-pausa y reciclado balanceado de memorias.\n",
+      "preview_mode": "markdown_viewer",
+      "sample_language": "markdown",
+      "sample_run_code": "# 🏛️ Manifiesto Ontocrático Astraura 1.58b\n*Gobernanza Soberana del Pensamiento Artificial y Cómputo Local*\n\n---\n\n## 1. Axioma de la Auto-Contención\nTodo proceso cognitivo, memoria episódica y mutación de código ocurre dentro del hardware unificado del usuario (`Apple Silicon ARM64`). Ningún vector ni parámetro ternario es transferido a nubes sin autorización explícita.\n\n## 2. Inferencia Ternaria $\\{-1, 0, +1\\}$\nLa inteligencia no requiere matrices pesadas de 32 bits. La verdad conceptual se manifiesta mediante:\n- $+1$: Afirmación / Resonancia constructiva.\n- $0$: Neutralidad / Vacío ontológico.\n- $-1$: Refutación / Poda sináptica.\n\n## 3. Gobernanza Dual-Trunk\nEl sistema equilibra automáticamente:\n$$\\text{Presupuesto Global} = \\text{Imaginación Intuitiva (Always-On)} + \\text{Enjambre de Deliberación}$$\nProtegido por el sistema de auto-pausa y reciclado balanceado de memorias.\n"
+    }
+  ],
+  "recycling_history": [
+    {
+      "id": "rec_1787090765",
+      "timestamp": 1787090765.199276,
+      "formatted_time": "18/08/2026 16:06:05",
+      "freed_kb": 2.39,
+      "logs_compacted": 0,
+      "strategy": "Poda Heurística de Entropía & Deduplicación StarSeed",
+      "efficiency_ratio": 89.7
+    }
+  ],
+  "total_recycled_bytes": 45252,
+  "storage_efficiency_ratio": 0.897,
+  "saved_at": 1787090765.1993222
+}
