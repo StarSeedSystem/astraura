@@ -1,0 +1,38 @@
+{
+  "name": "Hermione • Intelecto Cristalino",
+  "gender": "female",
+  "style": "scientific_analytical",
+  "age_group": "young_adult",
+  "pitch_base_hz": 238.0,
+  "cadence_rate": 1.16,
+  "warmth": 0.76,
+  "clarity": 1.0,
+  "breathiness": 0.14,
+  "prosody_dynamics": 0.88,
+  "formants": {
+    "f1": 610,
+    "f2": 2150,
+    "f3": 3000,
+    "f4": 4200
+  },
+  "dsp": {
+    "reverb": 0.08,
+    "eq_low_db": 0.0,
+    "eq_mid_db": 2.2,
+    "eq_high_db": 3.4,
+    "compression": 0.28
+  },
+  "preferred_voices": [
+    "paulina",
+    "francisca",
+    "dalia",
+    "salome",
+    "salomé",
+    "lucia"
+  ],
+  "rationale": "Alta articulación en formante F2/F3 y cadencia rápida (1.12x) para razonamiento deductivo sin titubeos. Sintonizado con alta precisión sintáctica y agilidad para asistencia técnica.",
+  "id": "evolved_hermione_1787114004",
+  "persona_id": "hermione",
+  "is_evolved": true,
+  "created_at": 1787114004.460468
+}

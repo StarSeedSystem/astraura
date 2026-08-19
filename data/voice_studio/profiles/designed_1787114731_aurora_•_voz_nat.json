@@ -1,0 +1,30 @@
+{
+  "id": "designed_1787114731_aurora_•_voz_nat",
+  "name": "Aurora • Voz Natural Calibrada",
+  "persona_id": "unassigned",
+  "gender": "neutral",
+  "age_group": "young_adult",
+  "accent": "es-ES",
+  "language": "es",
+  "pitch_base_hz": 248.0,
+  "warmth": 1.0,
+  "clarity": 1.0,
+  "breathiness": 0.6,
+  "emotion": "calm_warm",
+  "formants": {
+    "f1": 850.0,
+    "f2": 1980.0,
+    "f3": 2850.0,
+    "f4": 3950.0
+  },
+  "dsp": {
+    "reverb": 0.6,
+    "compression": 0.32,
+    "eq_low_db": 2.5,
+    "eq_mid_db": 1.5,
+    "eq_high_db": 3
+  },
+  "is_factory": false,
+  "is_designed": true,
+  "created_at": 1787114731.099761
+}

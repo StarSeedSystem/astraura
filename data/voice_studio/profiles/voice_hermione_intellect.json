@@ -1,0 +1,29 @@
+{
+  "id": "voice_hermione_intellect",
+  "name": "Hermione (Analítica Aguda)",
+  "persona_id": "hermione",
+  "gender": "female",
+  "age_group": "young_adult",
+  "accent": "es-MX-crisp",
+  "language": "es",
+  "pitch_base_hz": 235.0,
+  "warmth": 0.75,
+  "clarity": 0.98,
+  "breathiness": 0.15,
+  "emotion": "inquisitive_sharp",
+  "formants": {
+    "f1": 600,
+    "f2": 2100,
+    "f3": 2950,
+    "f4": 4100
+  },
+  "dsp": {
+    "reverb": 0.08,
+    "eq_low_db": 0.0,
+    "eq_mid_db": 2.0,
+    "eq_high_db": 3.0,
+    "compression": 0.25
+  },
+  "is_factory": true,
+  "created_at": 1787112372.202904
+}

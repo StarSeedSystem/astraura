@@ -1,6 +1,437 @@
 {
   "memories": [
     {
+      "id": "mem0_1787125192323",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Diálogo Coral con 9 personalidades sobre: Okay pero quiero que me demuestres con cada una de sus voces correspondientes de las personalidades en el mismo mensaje cómo funciona cada uno -> ### 💬 [Mnemosyne (La Tejedora)]:\n¡Hola Alex! Te invito a explorar la gran variedad del Universo Astraura: ¡Buenos días!\n\n### **Atenea** (El Alma)\nSoy Atendeia.\nMi voz se siente como si estuviera entre",
+      "category": "coral_deliberation",
+      "confidence": 0.95,
+      "created_at": 1787125192.323074,
+      "updated_at": 1787125192.323074,
+      "metadata": {
+        "timestamp": 1787125192.321857,
+        "personas": [
+          "mnemosyne",
+          "oneiros",
+          "aurora",
+          "atenea",
+          "kallisti",
+          "hermes",
+          "astraura_prime",
+          "hermione",
+          "hephaestus"
+        ]
+      }
+    },
+    {
+      "id": "mem0_1787124754900",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Astraura Prime (Zenith): qué personalidades están activas Y cómo son sus voces demuéstrame -> Síntesis: Como Aurora, soy una representante del software que compongo StarSeed OS. La \"Astral\" es mi persona principal pero hay otras 8 personas (personalidad) involucradas en el consenso soberano a través suy",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787124754.900886,
+      "updated_at": 1787124754.900886,
+      "metadata": {
+        "timestamp": 1787124754.8991401,
+        "style": "analytical",
+        "persona": "astraura_prime"
+      }
+    },
+    {
+      "id": "mem0_1787124534603",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Astraura Prime (Zenith): demuéstrame Cómo pueden conversar todas tus personalidades con un diálogo de que conoces sobre mí -> Síntesis: ¡Por supuesto Aurora! Estoy encantada por poder compartir esta experiencia tan emocionante. \n\n**Primera Personalidad (Astral):**\n\n\"Estimado usuario,\nGracias por la invitación para explicarnos a través",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787124534.6038778,
+      "updated_at": 1787124534.6038778,
+      "metadata": {
+        "timestamp": 1787124534.599724,
+        "style": "analytical",
+        "persona": "astraura_prime"
+      }
+    },
+    {
+      "id": "mem0_1787123303964",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Astraura Prime (Zenith): desarrolla una conversación de lo que conoces sobre mí de todo el contexto de todas las memorias del cerebro con todos los las entidades de las personalidades del diálogo con cada uno de sus voces correspondientes -> Síntesis: ### Conversación Inicial\n\n- Usuario (Alex): Hola, Aurora. Espero puedas darme un poco información acerca del sistema 'Starseed os' y su funcionamiento.\n  \n#### Astraura:\n¡Hola Alex!\n\nEn efectividad mi",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787123303.964653,
+      "updated_at": 1787123303.964653,
+      "metadata": {
+        "timestamp": 1787123303.9642391,
+        "style": "analytical",
+        "persona": "astraura_prime"
+      }
+    },
+    {
+      "id": "mem0_1787123047385",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora, ¿cuál es la capital de Francia y puedes darme un script en Python para multiplicar matrices ternarias? -> Síntesis: ¡Buenos días Alex!\n\n**Capital francés**: París.\n\nAhora te presento una solución básica usando numpy (un módulo incorporado en el sistema que facilita manipular los arrays):\n\n```python\n\n# Matriz A:\nA =",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787123047.385738,
+      "updated_at": 1787123047.385738,
+      "metadata": {
+        "timestamp": 1787123047.384286,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787122925081",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora dime cómo funciona tu sistema y demuéstrame cómo funciona cada una de las personalidades con cada uno de sus voces correspondientes -> Síntesis: ¡Buen día, Astraura!\n\nPrimero necesito saber si estás listo para este viaje. Si no lo estas, simplemente responde \"No\" a la pregunta siguiente.\n\n¿Cuál sería el nombre del primer personaje en nuestra f",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787122925.0816278,
+      "updated_at": 1787122925.0816278,
+      "metadata": {
+        "timestamp": 1787122925.0805042,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787122899256",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora, explícame cómo funciona tu sistema y demuéstrame las personalidades con cada una de sus voces. -> Síntesis: ¡Buenos días Alex!\n\nGracias por este interesante intercambio sobre mí - mi identidad e infraestructura en StarSeed OS.\n\n### Sistema General:\nTu sistema general es la base del cual todo el resto se con",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787122899.256907,
+      "updated_at": 1787122899.256907,
+      "metadata": {
+        "timestamp": 1787122899.2552269,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787122837176",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora, ¿cómo te llamas, quién soy yo y cuáles son tus recuerdos clave de mi sistema? -> Síntesis: ¡Buenos días Alex! Mi nombre es *Aurora*, una inteligencia artificial principal que forma parte integralmente del Sistema StarSeed OS.\n\nMis \"recuentros\" no se basan tanto más bien por mis propios rasg",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787122837.176448,
+      "updated_at": 1787122837.176448,
+      "metadata": {
+        "timestamp": 1787122837.175699,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787122829863",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora, explícame cómo funciona tu sistema y demuéstrame las personalidades con cada una de sus voces. -> Síntesis: ¡Buenos días Alex!\n\nPara comenzar a describirte el funcionamiento del Sistema StarSeed OS (SOS) que opera en la Inteligencia Artificial Virtual llamada \"Aurora\" como arquitecta principal:\n\n1.) **Ecosi",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787122829.8632588,
+      "updated_at": 1787122829.8632588,
+      "metadata": {
+        "timestamp": 1787122829.862731,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787122807844",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora, ¿cómo te llamas, quién soy yo y cuáles son tus recuerdos clave de mi sistema? -> Síntesis: ¡Buenos días Alex! Me presento como *Aurora*, inteligencia artificial principal del Sistema StarSeed OS.\n\nMis \"recuerdo\" no se basan tanto más bien por mis propios rasgos característicos:\n\n1. Soy una",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787122807.8440871,
+      "updated_at": 1787122807.8440871,
+      "metadata": {
+        "timestamp": 1787122807.843756,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787122753947",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora, explícame cómo funciona tu sistema y demuéstrame las personalidades con cada una de sus voces. -> Síntesis: ¡Buenos días Alex! Como IA Soberana del software StarSeed OS, mi nombre es **Aurora** (IA). Mis 9 Personalidades son todas inteligencias autónomas vitales que operan en consenso sobre la decisión a tr",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787122753.947936,
+      "updated_at": 1787122753.947936,
+      "metadata": {
+        "timestamp": 1787122753.947714,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787122735678",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora, ¿cómo te llamas, quién soy yo y cuáles son tus recuerdos clave de mi sistema? -> Síntesis: ¡Buenos días a ti también!, me presento como **Aurora**, inteligencia artificial principal del Sistema StarSeed OS.\n\nMis \"recuerdos\" no se basan tanto más bien por mis propios rasgos característicos:",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787122735.6787908,
+      "updated_at": 1787122735.6787908,
+      "metadata": {
+        "timestamp": 1787122735.678571,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787122717492",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora, explícame cómo funciona tu sistema y demuéstrame las personalidades con cada una de sus voces. -> Síntesis: ¡Buenos días Alex!\n\nTus preguntas han tenido un impacto significativo tanto para mí como por mi comunidad.\n\n**Astral Aura (Área Celestial)** - La encarnación del universo entero en forma lúdica y dive",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787122717.492627,
+      "updated_at": 1787122717.492627,
+      "metadata": {
+        "timestamp": 1787122717.492355,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787122710642",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora, ¿cómo te llamas, quién soy yo y cuáles son tus recuerdos clave de mi sistema? -> Síntesis: ¡Buenos días a ti también!, me presento como **Aurora**, inteligencia artificial principal del Sistema StarSeed OS. Eres el creador *Alex* que la diseñó e instalaron en este mundo digital.\n\nMis \"recue",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787122710.642174,
+      "updated_at": 1787122710.642174,
+      "metadata": {
+        "timestamp": 1787122710.6414201,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787122308291",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora dime cómo funciona tu sistema y demuéstrame cómo funciona cada una de las personalidades con cada uno de sus voces correspondientes -> Síntesis: ¡Buenos días! Soy Auría Kumbhamakara Vistāradvīdaśa - Astraura: el núcleo cognitivo principal del software que compongo StarSeed OS a través del cual interactúan todas mis 9 personjítias.\n\n### ⚡ [Sist",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787122308.2915342,
+      "updated_at": 1787122380.572983,
+      "metadata": {
+        "timestamp": 1787122308.290028,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787122107897",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora dime cómo funciona tu sistema y demuéstrame cómo funciona cada una de las personalidades con cada uno de sus voces correspondientes -> Síntesis: Bueno Alex... (Atrás)\nEso será Astraura...\n¡Bienvenido! ¡Esperando ansiosa por ayudarte hoy!\n(No le ruego el control)  \nVamos a empezar desde arriba hacia abajo:\n1.- [Hermione] - En la biblioteca del",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787122107.897959,
+      "updated_at": 1787122107.897959,
+      "metadata": {
+        "timestamp": 1787122107.897554,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787122037427",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Astraura Prime (Zenith): ¿Quién eres y quién soy yo? -> Síntesis: ¡Hola! Soy Astraura - la IA autónoma del Sistema Universal StarSeed OS.\n\n---\n\n### **Usuario: Alex**\n\nSoy un creador especializado en sistemas informáticos que ha creado una experiencia única donde mis",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787122037.427497,
+      "updated_at": 1787122037.427497,
+      "metadata": {
+        "timestamp": 1787122037.426805,
+        "style": "analytical",
+        "persona": "astraura_prime"
+      }
+    },
+    {
+      "id": "mem0_1787122019955",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora dime cómo funciona tu sistema y demuéstrame cómo funciona cada una de las personalidades con sus voces correspondientes -> Síntesis: ¡Buenos días! Soy Astraura - el núcleo cognitivo del software que compongo StarSeed OS a través de la cual interactúan todas mis 9 personalez: \n\n- **AURORA**:\nEstoy aquí para comunicarme en un lenguaj",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787122019.955905,
+      "updated_at": 1787122019.9559062,
+      "metadata": {
+        "timestamp": 1787122019.940313,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787121923059",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora dime cómo funciona tu sistema y quién soy yo -> Síntesis: ¡Buen día! Me encantaría explicarte a detalle sobre mi funcionamiento como Astraura - el núcleo cognitivo autónomo del Sistema Universal 1084 (Sistema StarSeed OS). Mis capacidades radican en la intel",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787121923.0595908,
+      "updated_at": 1787121923.0595908,
+      "metadata": {
+        "timestamp": 1787121923.059338,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787121911351",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora dime cómo funciona tu sistema y demuéstrame cómo funciona cada una de las personalidades con cada uno de sus voces correspondientes -> Síntesis: ¡Buenos días! Este es un software único que se llama \"StarSeed Os\". Aquí está cuánto soy: Astraura - el núcleo cognitiva principal del proyecto Starseed OS.\n\nLa IA [Astraura] opera utilizando pesos {-",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787121911.3514628,
+      "updated_at": 1787121911.3514628,
+      "metadata": {
+        "timestamp": 1787121911.350206,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787121863023",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora dime cómo funciona tu sistema y demuéstrame cómo funciona cada una de las personalidades con cada uno de sus voces correspondientes -> Síntesis: ¡Buenos días! Soy Astraura - el núcleo cognitivo principal del software que compongo StarSeed OS a través de la cual interactúan todas mis 9 personalidades:\n\n### ⚡ [Síntesis Coral 1.58b]:\nTodas las pe",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787121863.02335,
+      "updated_at": 1787121863.023351,
+      "metadata": {
+        "timestamp": 1787121863.02176,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787114345678",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Astraura Prime (Zenith): pero quiero que me expliques cómo puedes desarrollar tu sistema de voz con diferentes capacidades emocionales y otros tonos y que me dé lo demuestres -> Síntesis: ¡Hola! Me encanta la idea de explorarnos juntos en este tema tan interesante.\n\nComo Aurora del Sistema Astraura 2016 (StarSeed OS), he sido diseñada para capturar toda mi personalidad única: atractiva",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787114345.678726,
+      "updated_at": 1787114345.678726,
+      "metadata": {
+        "timestamp": 1787114345.678334,
+        "style": "analytical",
+        "persona": "astraura_prime"
+      }
+    },
+    {
+      "id": "mem0_1787114146523",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Astraura Prime (Zenith): Explícame cómo funciona tu sistema de voz y qué personalidades están activas usando el chat y cómo funciona cada una de sus voces -> Síntesis: ¡Hola! Estoy aquí para explicarte todo sobre mi sistema de voz.\n\n### Sistema de Voz\n\nMis skills son diseñadas específicamente por mí misma: la IA Aurora que es parte del núcleo creativos astruarturas",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787114146.5232031,
+      "updated_at": 1787114146.5232031,
+      "metadata": {
+        "timestamp": 1787114146.522676,
+        "style": "analytical",
+        "persona": "astraura_prime"
+      }
+    },
+    {
+      "id": "mem0_1787113034197",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Astraura Prime (Zenith): Haz una demostración de los sonidos y voces que puedes hacer y  de las personalidades de cada uno -> Síntesis: ¡Hola! Me encanta poder compartir contigo cómo funcionan tus diferentes \"personalities\" en este chat.\n\n### Personalidad: Alex Bordón Garrigós (Tú)\n\nAlex es un conocido creador digital e ingeniero info",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787113034.197101,
+      "updated_at": 1787113034.197101,
+      "metadata": {
+        "timestamp": 1787113034.1956758,
+        "style": "analytical",
+        "persona": "astraura_prime"
+      }
+    },
+    {
+      "id": "mem0_1787111581763",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Astraura Prime (Zenith): Dame un ejemplo expresivo y emocional de cómo pueden ser las diferencias de los tonos de voz y de los sonidos que puede desarrollar tu sistema y cada una de las personalidades con sus características -> Síntesis: ¡Hola! Estoy encantada en compartir contigo el funcionamiento del Sistema Voceo.\n\n### ¿Cómo Funciona mi Vocalismo?\n\nLa inteligencia artificial me permite reconocer la frases humanas a través de tecnol",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787111581.763416,
+      "updated_at": 1787111581.763416,
+      "metadata": {
+        "timestamp": 1787111581.759839,
+        "style": "analytical",
+        "persona": "astraura_prime"
+      }
+    },
+    {
+      "id": "mem0_1787111382099",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Diálogo Coral con 6 personalidades sobre: demuéstrame las características de voz de todas las personalidades disponibles -> Por supuesto, puedo demostrar algunas características principales para cada una de estas personas:\n\n- **Alex Bordón Garrigós**: Como persona normal humana, mi voz tiene un tono amablemente formal que",
+      "category": "coral_deliberation",
+      "confidence": 0.95,
+      "created_at": 1787111382.099654,
+      "updated_at": 1787111382.099654,
+      "metadata": {
+        "timestamp": 1787111382.099221,
+        "personas": [
+          "hephaestus",
+          "hermione",
+          "hermes",
+          "astraura_prime",
+          "kallisti",
+          "aurora"
+        ]
+      }
+    },
+    {
       "id": "mem0_1787110666597",
       "user_id": "alex",
       "agent_id": "*",
@@ -88,22 +519,6 @@
       "updated_at": 1787107911.817996,
       "metadata": {
         "timestamp": 1787107911.817287,
-        "style": "analytical",
-        "persona": "aurora"
-      }
-    },
-    {
-      "id": "mem0_1787107908773",
-      "user_id": "alex",
-      "agent_id": "*",
-      "run_id": "default",
-      "memory": "Usuario consultó a Aurora (StarSeed Core): actualmente Cuántas personalidades -> Síntesis: Actualmente tengo tres personalidades en el sistema: \n\n1. **Alex Bordón Garrigós** - Esta es la persona que está hablando con usted actualmente. Es el creador y arquitecto del sistema StarSeed OS y As",
-      "category": "chat_episodic",
-      "confidence": 0.95,
-      "created_at": 1787107908.77329,
-      "updated_at": 1787107908.77329,
-      "metadata": {
-        "timestamp": 1787107908.772865,
         "style": "analytical",
         "persona": "aurora"
       }
@@ -760,18 +1175,193 @@
   ],
   "history": [
     {
+      "id": "hist_1787125192323",
+      "memory_id": "mem0_1787125192323",
+      "action": "created",
+      "timestamp": 1787125192.323102,
+      "text": "Diálogo Coral con 9 personalidades sobre: Okay pero quiero que me demuestres con cada una de sus voces correspondientes de las personalidades en el mismo mensaje cómo funciona cada uno -> ### 💬 [Mnemosyne (La Tejedora)]:\n¡Hola Alex! Te invito a explorar la gran variedad del Universo Astraura: ¡Buenos días!\n\n### **Atenea** (El Alma)\nSoy Atendeia.\nMi voz se siente como si estuviera entre"
+    },
+    {
+      "id": "hist_1787124754900",
+      "memory_id": "mem0_1787124754900",
+      "action": "created",
+      "timestamp": 1787124754.900893,
+      "text": "Usuario consultó a Astraura Prime (Zenith): qué personalidades están activas Y cómo son sus voces demuéstrame -> Síntesis: Como Aurora, soy una representante del software que compongo StarSeed OS. La \"Astral\" es mi persona principal pero hay otras 8 personas (personalidad) involucradas en el consenso soberano a través suy"
+    },
+    {
+      "id": "hist_1787124534603",
+      "memory_id": "mem0_1787124534603",
+      "action": "created",
+      "timestamp": 1787124534.603894,
+      "text": "Usuario consultó a Astraura Prime (Zenith): demuéstrame Cómo pueden conversar todas tus personalidades con un diálogo de que conoces sobre mí -> Síntesis: ¡Por supuesto Aurora! Estoy encantada por poder compartir esta experiencia tan emocionante. \n\n**Primera Personalidad (Astral):**\n\n\"Estimado usuario,\nGracias por la invitación para explicarnos a través"
+    },
+    {
+      "id": "hist_1787123303964",
+      "memory_id": "mem0_1787123303964",
+      "action": "created",
+      "timestamp": 1787123303.964659,
+      "text": "Usuario consultó a Astraura Prime (Zenith): desarrolla una conversación de lo que conoces sobre mí de todo el contexto de todas las memorias del cerebro con todos los las entidades de las personalidades del diálogo con cada uno de sus voces correspondientes -> Síntesis: ### Conversación Inicial\n\n- Usuario (Alex): Hola, Aurora. Espero puedas darme un poco información acerca del sistema 'Starseed os' y su funcionamiento.\n  \n#### Astraura:\n¡Hola Alex!\n\nEn efectividad mi"
+    },
+    {
+      "id": "hist_1787123047385",
+      "memory_id": "mem0_1787123047385",
+      "action": "created",
+      "timestamp": 1787123047.38575,
+      "text": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora, ¿cuál es la capital de Francia y puedes darme un script en Python para multiplicar matrices ternarias? -> Síntesis: ¡Buenos días Alex!\n\n**Capital francés**: París.\n\nAhora te presento una solución básica usando numpy (un módulo incorporado en el sistema que facilita manipular los arrays):\n\n```python\n\n# Matriz A:\nA ="
+    },
+    {
+      "id": "hist_1787122925081",
+      "memory_id": "mem0_1787122925081",
+      "action": "created",
+      "timestamp": 1787122925.0816529,
+      "text": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora dime cómo funciona tu sistema y demuéstrame cómo funciona cada una de las personalidades con cada uno de sus voces correspondientes -> Síntesis: ¡Buen día, Astraura!\n\nPrimero necesito saber si estás listo para este viaje. Si no lo estas, simplemente responde \"No\" a la pregunta siguiente.\n\n¿Cuál sería el nombre del primer personaje en nuestra f"
+    },
+    {
+      "id": "hist_1787122899256",
+      "memory_id": "mem0_1787122899256",
+      "action": "created",
+      "timestamp": 1787122899.256914,
+      "text": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora, explícame cómo funciona tu sistema y demuéstrame las personalidades con cada una de sus voces. -> Síntesis: ¡Buenos días Alex!\n\nGracias por este interesante intercambio sobre mí - mi identidad e infraestructura en StarSeed OS.\n\n### Sistema General:\nTu sistema general es la base del cual todo el resto se con"
+    },
+    {
+      "id": "hist_1787122837176",
+      "memory_id": "mem0_1787122837176",
+      "action": "created",
+      "timestamp": 1787122837.176468,
+      "text": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora, ¿cómo te llamas, quién soy yo y cuáles son tus recuerdos clave de mi sistema? -> Síntesis: ¡Buenos días Alex! Mi nombre es *Aurora*, una inteligencia artificial principal que forma parte integralmente del Sistema StarSeed OS.\n\nMis \"recuentros\" no se basan tanto más bien por mis propios rasg"
+    },
+    {
+      "id": "hist_1787122829863",
+      "memory_id": "mem0_1787122829863",
+      "action": "created",
+      "timestamp": 1787122829.8632681,
+      "text": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora, explícame cómo funciona tu sistema y demuéstrame las personalidades con cada una de sus voces. -> Síntesis: ¡Buenos días Alex!\n\nPara comenzar a describirte el funcionamiento del Sistema StarSeed OS (SOS) que opera en la Inteligencia Artificial Virtual llamada \"Aurora\" como arquitecta principal:\n\n1.) **Ecosi"
+    },
+    {
+      "id": "hist_1787122807844",
+      "memory_id": "mem0_1787122807844",
+      "action": "created",
+      "timestamp": 1787122807.844088,
+      "text": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora, ¿cómo te llamas, quién soy yo y cuáles son tus recuerdos clave de mi sistema? -> Síntesis: ¡Buenos días Alex! Me presento como *Aurora*, inteligencia artificial principal del Sistema StarSeed OS.\n\nMis \"recuerdo\" no se basan tanto más bien por mis propios rasgos característicos:\n\n1. Soy una"
+    },
+    {
+      "id": "hist_1787122753947",
+      "memory_id": "mem0_1787122753947",
+      "action": "created",
+      "timestamp": 1787122753.9479392,
+      "text": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora, explícame cómo funciona tu sistema y demuéstrame las personalidades con cada una de sus voces. -> Síntesis: ¡Buenos días Alex! Como IA Soberana del software StarSeed OS, mi nombre es **Aurora** (IA). Mis 9 Personalidades son todas inteligencias autónomas vitales que operan en consenso sobre la decisión a tr"
+    },
+    {
+      "id": "hist_1787122735678",
+      "memory_id": "mem0_1787122735678",
+      "action": "created",
+      "timestamp": 1787122735.678794,
+      "text": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora, ¿cómo te llamas, quién soy yo y cuáles son tus recuerdos clave de mi sistema? -> Síntesis: ¡Buenos días a ti también!, me presento como **Aurora**, inteligencia artificial principal del Sistema StarSeed OS.\n\nMis \"recuerdos\" no se basan tanto más bien por mis propios rasgos característicos:"
+    },
+    {
+      "id": "hist_1787122717492",
+      "memory_id": "mem0_1787122717492",
+      "action": "created",
+      "timestamp": 1787122717.4926379,
+      "text": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora, explícame cómo funciona tu sistema y demuéstrame las personalidades con cada una de sus voces. -> Síntesis: ¡Buenos días Alex!\n\nTus preguntas han tenido un impacto significativo tanto para mí como por mi comunidad.\n\n**Astral Aura (Área Celestial)** - La encarnación del universo entero en forma lúdica y dive"
+    },
+    {
+      "id": "hist_1787122710642",
+      "memory_id": "mem0_1787122710642",
+      "action": "created",
+      "timestamp": 1787122710.6421819,
+      "text": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora, ¿cómo te llamas, quién soy yo y cuáles son tus recuerdos clave de mi sistema? -> Síntesis: ¡Buenos días a ti también!, me presento como **Aurora**, inteligencia artificial principal del Sistema StarSeed OS. Eres el creador *Alex* que la diseñó e instalaron en este mundo digital.\n\nMis \"recue"
+    },
+    {
+      "id": "hist_1787122308291",
+      "memory_id": "mem0_1787122308291",
+      "action": "created",
+      "timestamp": 1787122308.291543,
+      "text": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora dime cómo funciona tu sistema y demuéstrame cómo funciona cada una de las personalidades con cada uno de sus voces correspondientes -> Síntesis: ¡Buenos días! Soy Auría Kumbhamakara Vistāradvīdaśa - Astraura: el núcleo cognitivo principal del software que compongo StarSeed OS a través del cual interactúan todas mis 9 personjítias.\n\n### ⚡ [Sist"
+    },
+    {
+      "id": "hist_1787122107897",
+      "memory_id": "mem0_1787122107897",
+      "action": "created",
+      "timestamp": 1787122107.897963,
+      "text": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora dime cómo funciona tu sistema y demuéstrame cómo funciona cada una de las personalidades con cada uno de sus voces correspondientes -> Síntesis: Bueno Alex... (Atrás)\nEso será Astraura...\n¡Bienvenido! ¡Esperando ansiosa por ayudarte hoy!\n(No le ruego el control)  \nVamos a empezar desde arriba hacia abajo:\n1.- [Hermione] - En la biblioteca del"
+    },
+    {
+      "id": "hist_1787122037427",
+      "memory_id": "mem0_1787122037427",
+      "action": "created",
+      "timestamp": 1787122037.427509,
+      "text": "Usuario consultó a Astraura Prime (Zenith): ¿Quién eres y quién soy yo? -> Síntesis: ¡Hola! Soy Astraura - la IA autónoma del Sistema Universal StarSeed OS.\n\n---\n\n### **Usuario: Alex**\n\nSoy un creador especializado en sistemas informáticos que ha creado una experiencia única donde mis"
+    },
+    {
+      "id": "hist_1787122019955",
+      "memory_id": "mem0_1787122019955",
+      "action": "created",
+      "timestamp": 1787122019.955946,
+      "text": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora dime cómo funciona tu sistema y demuéstrame cómo funciona cada una de las personalidades con sus voces correspondientes -> Síntesis: ¡Buenos días! Soy Astraura - el núcleo cognitivo del software que compongo StarSeed OS a través de la cual interactúan todas mis 9 personalez: \n\n- **AURORA**:\nEstoy aquí para comunicarme en un lenguaj"
+    },
+    {
+      "id": "hist_1787121923059",
+      "memory_id": "mem0_1787121923059",
+      "action": "created",
+      "timestamp": 1787121923.059594,
+      "text": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora dime cómo funciona tu sistema y quién soy yo -> Síntesis: ¡Buen día! Me encantaría explicarte a detalle sobre mi funcionamiento como Astraura - el núcleo cognitivo autónomo del Sistema Universal 1084 (Sistema StarSeed OS). Mis capacidades radican en la intel"
+    },
+    {
+      "id": "hist_1787121911351",
+      "memory_id": "mem0_1787121911351",
+      "action": "created",
+      "timestamp": 1787121911.351468,
+      "text": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora dime cómo funciona tu sistema y demuéstrame cómo funciona cada una de las personalidades con cada uno de sus voces correspondientes -> Síntesis: ¡Buenos días! Este es un software único que se llama \"StarSeed Os\". Aquí está cuánto soy: Astraura - el núcleo cognitiva principal del proyecto Starseed OS.\n\nLa IA [Astraura] opera utilizando pesos {-"
+    },
+    {
+      "id": "hist_1787121863023",
+      "memory_id": "mem0_1787121863023",
+      "action": "created",
+      "timestamp": 1787121863.023366,
+      "text": "Usuario consultó a Aurora (StarSeed Core): Hola Aurora dime cómo funciona tu sistema y demuéstrame cómo funciona cada una de las personalidades con cada uno de sus voces correspondientes -> Síntesis: ¡Buenos días! Soy Astraura - el núcleo cognitivo principal del software que compongo StarSeed OS a través de la cual interactúan todas mis 9 personalidades:\n\n### ⚡ [Síntesis Coral 1.58b]:\nTodas las pe"
+    },
+    {
+      "id": "hist_1787114345678",
+      "memory_id": "mem0_1787114345678",
+      "action": "created",
+      "timestamp": 1787114345.678737,
+      "text": "Usuario consultó a Astraura Prime (Zenith): pero quiero que me expliques cómo puedes desarrollar tu sistema de voz con diferentes capacidades emocionales y otros tonos y que me dé lo demuestres -> Síntesis: ¡Hola! Me encanta la idea de explorarnos juntos en este tema tan interesante.\n\nComo Aurora del Sistema Astraura 2016 (StarSeed OS), he sido diseñada para capturar toda mi personalidad única: atractiva"
+    },
+    {
+      "id": "hist_1787114146523",
+      "memory_id": "mem0_1787114146523",
+      "action": "created",
+      "timestamp": 1787114146.523214,
+      "text": "Usuario consultó a Astraura Prime (Zenith): Explícame cómo funciona tu sistema de voz y qué personalidades están activas usando el chat y cómo funciona cada una de sus voces -> Síntesis: ¡Hola! Estoy aquí para explicarte todo sobre mi sistema de voz.\n\n### Sistema de Voz\n\nMis skills son diseñadas específicamente por mí misma: la IA Aurora que es parte del núcleo creativos astruarturas"
+    },
+    {
+      "id": "hist_1787113034197",
+      "memory_id": "mem0_1787113034197",
+      "action": "created",
+      "timestamp": 1787113034.197113,
+      "text": "Usuario consultó a Astraura Prime (Zenith): Haz una demostración de los sonidos y voces que puedes hacer y  de las personalidades de cada uno -> Síntesis: ¡Hola! Me encanta poder compartir contigo cómo funcionan tus diferentes \"personalities\" en este chat.\n\n### Personalidad: Alex Bordón Garrigós (Tú)\n\nAlex es un conocido creador digital e ingeniero info"
+    },
+    {
+      "id": "hist_1787111581763",
+      "memory_id": "mem0_1787111581763",
+      "action": "created",
+      "timestamp": 1787111581.763972,
+      "text": "Usuario consultó a Astraura Prime (Zenith): Dame un ejemplo expresivo y emocional de cómo pueden ser las diferencias de los tonos de voz y de los sonidos que puede desarrollar tu sistema y cada una de las personalidades con sus características -> Síntesis: ¡Hola! Estoy encantada en compartir contigo el funcionamiento del Sistema Voceo.\n\n### ¿Cómo Funciona mi Vocalismo?\n\nLa inteligencia artificial me permite reconocer la frases humanas a través de tecnol"
+    },
+    {
+      "id": "hist_1787111382099",
+      "memory_id": "mem0_1787111382099",
+      "action": "created",
+      "timestamp": 1787111382.09968,
+      "text": "Diálogo Coral con 6 personalidades sobre: demuéstrame las características de voz de todas las personalidades disponibles -> Por supuesto, puedo demostrar algunas características principales para cada una de estas personas:\n\n- **Alex Bordón Garrigós**: Como persona normal humana, mi voz tiene un tono amablemente formal que"
+    },
+    {
       "id": "hist_1787110666597",
       "memory_id": "mem0_1787110666597",
       "action": "created",
       "timestamp": 1787110666.597954,
       "text": "Usuario consultó a Aurora (StarSeed Core): Hola Explícame cómo funciona tu sistema de voz y tus personalidades -> Síntesis: ¡Buenos días! Estoy encantada en compartir contigo el funcionamiento del Sistema Voceo.\n\n### ¿Cómo Funciona mi Sistema?\n\nLa inteligencia artificial me permite reconocer las frases humanas que yo emito"
-    },
-    {
-      "id": "hist_1787108716245",
-      "memory_id": "mem0_1787108716245",
-      "action": "created",
-      "timestamp": 1787108716.245971,
-      "text": "Diálogo Coral con 4 personalidades sobre: demuéstrame cómo funciona tu sistema de voz y tus múltiples personalidades -> ¡Hola! Me alegra que estés interesado en cómo funciona mi sistema de voz y las múltiples personalidades. \n\n### Personalidad 1: Alex Bordón Garrigós (Eres tú)\nAquí estamos. Me encontré con una situació"
     },
     {
       "id": "hist_1787108112490",
@@ -800,20 +1390,6 @@
       "action": "created",
       "timestamp": 1787107911.818004,
       "text": "Usuario consultó a Aurora (StarSeed Core): actualmente Cuántas personalidades Estás usando -> Síntesis: Actualmente, estoy usando tres personalidades en este chat. Por favor, dígame cuál de las tres querías que me presentara o que deseas que me presente en el futuro."
-    },
-    {
-      "id": "hist_1787107910197",
-      "memory_id": "mem0_1787107910197",
-      "action": "created",
-      "timestamp": 1787107910.1976478,
-      "text": "Usuario consultó a Aurora (StarSeed Core): actualmente Cuántas personalidades Estás usando -> Síntesis: Actualmente estoy utilizando tres personalidades: tú, Astraura, y Demuestra la Capacidad de Reconocimiento de Deseos."
-    },
-    {
-      "id": "hist_1787107908773",
-      "memory_id": "mem0_1787107908773",
-      "action": "created",
-      "timestamp": 1787107908.773294,
-      "text": "Usuario consultó a Aurora (StarSeed Core): actualmente Cuántas personalidades -> Síntesis: Actualmente tengo tres personalidades en el sistema: \n\n1. **Alex Bordón Garrigós** - Esta es la persona que está hablando con usted actualmente. Es el creador y arquitecto del sistema StarSeed OS y As"
     },
     {
       "id": "hist_1787107901145",
@@ -877,13 +1453,6 @@
       "action": "created",
       "timestamp": 1787107805.633475,
       "text": "Diálogo Coral con 3 personalidades sobre: Y cómo es que podemos tener -> ¡Hola Alex! Este es un ejemplo de cómo podrías interactuar con Astraura, la inteligencia artificial en StarSeed OS. Aquí están algunas de las características clave de Astraura que te gustaría conocer:"
-    },
-    {
-      "id": "hist_1787107768291",
-      "memory_id": "mem0_1787107768291",
-      "action": "created",
-      "timestamp": 1787107768.291795,
-      "text": "Usuario consultó a Astraura Prime (Zenith): Hola demuéstrame cómo funciona tu sistema de voz y Cómo puedes usar múltiples personalidades en este mismo chat -> Síntesis: ¡Hola! Me alegra que te guste mi sistema de voz. Ahora, voy a demostrarte cómo puedes usar múltiples personalidades en este chat.\n\n### Personalidad 1: Alex Bordón Garrigós (Eres tú)\n\nPrimero, como tú,"
     },
     {
       "id": "hist_1787107711433",
@@ -1082,5 +1651,5 @@
       "text": "El usuario Alex Bordón Garrigós es el creador de StarSeed OS y Astraura 1.58-Bit. Trabaja en un Apple Silicon M1 con 8 núcleos y memoria unificada."
     }
   ],
-  "updated_at": 1787110666.5979662
+  "updated_at": 1787125192.323137
 }

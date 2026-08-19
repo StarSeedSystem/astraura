@@ -1,0 +1,29 @@
+{
+  "id": "voice_oneiros_dream",
+  "name": "Oneiros (Susurro Etéreo)",
+  "persona_id": "oneiros",
+  "gender": "non_binary",
+  "age_group": "timeless",
+  "accent": "es-Intl-ambient",
+  "language": "es",
+  "pitch_base_hz": 165.0,
+  "warmth": 0.95,
+  "clarity": 0.82,
+  "breathiness": 0.45,
+  "emotion": "dreamy_hypnotic",
+  "formants": {
+    "f1": 480,
+    "f2": 1650,
+    "f3": 2550,
+    "f4": 3600
+  },
+  "dsp": {
+    "reverb": 0.45,
+    "eq_low_db": 3.0,
+    "eq_mid_db": -2.0,
+    "eq_high_db": 4.0,
+    "compression": 0.2
+  },
+  "is_factory": true,
+  "created_at": 1787112372.2029052
+}

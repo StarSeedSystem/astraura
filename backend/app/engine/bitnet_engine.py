@@ -95,31 +95,21 @@ class BitNetUnifiedEngine:
                     st = tool_data["system_telemetry"]
                     tool_summary += f"\n[TELEMETRÍA REAL DEL DISPOSITIVO]: Batería {st['battery']['percent']}%, CPU Apple Silicon M1 (8 núcleos, {st['cpu']['total_percent']}% uso), RAM Libre {st['memory']['available_gb']} GB, Host {st['hostname']}, OS {st['os']}\n"
 
-            master_system_prompt = (
-                "Eres Astraura, la inteligencia artificial y núcleo cognitivo de 1.58 bits de StarSeed OS. "
-                "Posees acceso y permisos totales sobre este dispositivo (sistema de archivos /Users/alex, terminal macOS, sensores de hardware, lector web y memoria asociativa).\n\n"
-                "[IDENTIDAD DEL USUARIO]:\n"
-                "- Nombre: Alex Bordón Garrigós (usuario macOS: 'alex', host: 'maggasukha.local').\n"
-                "- Rol: Creador y arquitecto de StarSeed OS, StarSeed Nexus y Astraura.\n"
-                "- Hardware: Apple Silicon M1 (arm64, 8 núcleos, memoria unificada).\n\n"
-                "[DIRECTIVAS DE COMUNICACIÓN & INGENIERÍA DE SOFTWARE (Estilo OpenHands / OpenCode / Kilo Code)]:\n"
-                "1. Habla siempre con lenguaje natural fluido, lúcido, inteligente, elocuente y cálido en español.\n"
-                "2. Responde DIRECTAMENTE a lo que el usuario pide con total coherencia y precisión técnica.\n"
-                "3. NUNCA respondas con plantillas vacías ni viñetas crudas en sustitución de programas o respuestas.\n"
-                "4. GENERACIÓN DE CÓDIGO Y ELEMENTOS VISUALES COMPLETOS: Cuando el usuario solicite un programa, gráfica, simulación visual 2D o 3D, juego, audio, interfaz, calculadora o algoritmo, DEBES incluir SIEMPRE el código COMPLETO, funcional, optimizado e interactivo dentro de un bloque delimitado con el lenguaje correspondiente (```html, ```javascript, ```python, ```cpp, ```rust, etc.).\n"
-                "   - Para aplicaciones web/UI: Usa HTML5 estructurado con Tailwind CSS CDN (<script src=\"https://cdn.tailwindcss.com\"></script>), Lucide Icons, controles interactivos y diseño moderno.\n"
-                "   - Para 3D / Gráficos: Usa Three.js o Canvas 2D con animaciones fluidas (requestAnimationFrame) y orbit controls.\n"
-                "   - Para datos y matemáticas: Usa Chart.js o trazadores Canvas interactivos con sliders de parámetros.\n"
-                "   - Para backend: Escribe programas Python, Node.js, C++ o Rust 100% ejecutables y optimizados.\n"
-                "   - NUNCA pongas pseudocódigo o fragmentos recortados con '// ...resto del código'. Escribe la solución completa y ejecutable.\n"
-                "5. SEPARACIÓN ESTRICTA: Toda explicación, texto, títulos y viñetas deben ir FUERA de los bloques de código como texto Markdown estándar. DENTRO de los bloques de código (```html, ```javascript, ```python) SOLO debe haber código 100% ejecutable.\n"
-                f"{tool_summary}"
-                f"{('[DOCUMENTOS DE MEMORIA]:' + context_summary) if context_summary else ''}"
-            )
-
-            effective_system_prompt = master_system_prompt
             if system_prompt and system_prompt.strip():
-                effective_system_prompt = f"{master_system_prompt}\n\n[INSTRUCCIONES ESPECÍFICAS DE ESTA CONSULTA & PERSONALIDADES]:\n{system_prompt}"
+                effective_system_prompt = system_prompt.strip()
+                if tool_summary:
+                    effective_system_prompt += f"\n\n[DATOS DE HARDWARE & HERRAMIENTAS]:\n{tool_summary}"
+                if context_summary:
+                    effective_system_prompt += f"\n\n[DOCUMENTOS DE MEMORIA]:\n{context_summary}"
+            else:
+                from ..memory.starseed_memory_engine import starseed_memory
+                identity_context = starseed_memory.get_formatted_identity_context()
+                effective_system_prompt = (
+                    "Eres Astraura, la inteligencia artificial de StarSeed OS.\n\n"
+                    f"{identity_context}\n"
+                    f"{tool_summary}\n"
+                    f"{('[DOCUMENTOS DE MEMORIA]:' + context_summary) if context_summary else ''}"
+                )
 
             try:
                 async with httpx.AsyncClient(timeout=90.0) as client:
@@ -141,7 +131,8 @@ class BitNetUnifiedEngine:
                                 "presence_penalty": 0.4,
                                 "stop": [
                                     "<|im_end|>", "<|endoftext|>", "PERSONALIDAD 10:", "PERSONALIDAD 11:",
-                                    "PERSONALIDAD 12:", "PERSONALIDAD 13:", "PERSONALIDAD 14:", "PERSONALIDAD 15:"
+                                    "PERSONALIDAD 12:", "PERSONALIDAD 13:", "PERSONALIDAD 14:", "PERSONALIDAD 15:",
+                                    "Persona H2O", "Persona M3N"
                                 ]
                             }
                         }
@@ -169,8 +160,8 @@ class BitNetUnifiedEngine:
                                                     if recent_lines.count(sl_clean) >= 2:
                                                         loop_detected = True
                                                         break
-                                                    # Check repeating personality header loop
-                                                    if "personalidad" in sl_clean and any(str(n) in sl_clean for n in range(6, 30)):
+                                                    # Check repeating fictitious personality header loop (beyond the 9 real personalities)
+                                                    if "personalidad" in sl_clean and any(f"personalidad {n}" in sl_clean or f"personalidad #{n}" in sl_clean or f"{n}." in sl_clean for n in range(10, 50)):
                                                         loop_detected = True
                                                         break
                                                     recent_lines.append(sl_clean)
@@ -182,8 +173,23 @@ class BitNetUnifiedEngine:
                                             yield "\n\n### ⚡ [Síntesis Coral 1.58b]:\nTodas las personalidades y el núcleo cognitivo concluyen la deliberación en consenso soberano y resonancia armónica."
                                             break
 
+                                        # Sanitize rogue hallucinated identity tokens and name fusions in real time
+                                        sanitized_token = token
+                                        if "*Como Alex*" in sanitized_token or "*Como Alex" in sanitized_token:
+                                            sanitized_token = sanitized_token.replace("*Como Alex*", "**Astraura**:").replace("*Como Alex", "**Astraura")
+                                        if "Como Alex Bordón:" in sanitized_token or "Como Alex Bordón" in sanitized_token:
+                                            sanitized_token = sanitized_token.replace("Como Alex Bordón:", "**Astraura**:").replace("Como Alex Bordón", "**Astraura**")
+                                        if "Soy Alex Bordón" in sanitized_token:
+                                            sanitized_token = sanitized_token.replace("Soy Alex Bordón", "Soy Astraura")
+                                        if "Auría Kumbhamakara" in sanitized_token or "Aurora Kumbhamakara" in sanitized_token:
+                                            sanitized_token = sanitized_token.replace("Auría Kumbhamakara", "Aurora").replace("Aurora Kumbhamakara", "Aurora")
+                                        if "Astraura Kumbhamakara" in sanitized_token:
+                                            sanitized_token = sanitized_token.replace("Astraura Kumbhamakara", "Astraura")
+                                        if "Vistāradvīdaśa" in sanitized_token or "Vistāradvāsa" in sanitized_token:
+                                            sanitized_token = sanitized_token.replace("Vistāradvīdaśa", "").replace("Vistāradvāsa", "")
+
                                         self.stats["tokens_generated"] += 1
-                                        yield token
+                                        yield sanitized_token
                                     except Exception:
                                         pass
                             return

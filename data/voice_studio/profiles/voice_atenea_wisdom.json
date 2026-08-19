@@ -1,0 +1,29 @@
+{
+  "id": "voice_atenea_wisdom",
+  "name": "Atenea (Soberana Estratégica)",
+  "persona_id": "atenea",
+  "gender": "female",
+  "age_group": "adult",
+  "accent": "es-ES-regal",
+  "language": "es",
+  "pitch_base_hz": 190.0,
+  "warmth": 0.85,
+  "clarity": 0.96,
+  "breathiness": 0.18,
+  "emotion": "serene_commanding",
+  "formants": {
+    "f1": 500,
+    "f2": 1800,
+    "f3": 2700,
+    "f4": 3800
+  },
+  "dsp": {
+    "reverb": 0.2,
+    "eq_low_db": 2.0,
+    "eq_mid_db": 1.0,
+    "eq_high_db": 1.5,
+    "compression": 0.35
+  },
+  "is_factory": true,
+  "created_at": 1787112372.2029052
+}

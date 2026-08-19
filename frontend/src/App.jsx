@@ -31,7 +31,8 @@ import {
   Bell,
   ShieldCheck,
   Server,
-  Palette
+  Palette,
+  Headphones
 } from 'lucide-react';
 
 import ChatInterface from './components/ChatInterface';
@@ -55,6 +56,7 @@ import DreamStudioView from './components/DreamStudioView';
 import Sensorium360View from './components/Sensorium360View';
 import IntuitiveImaginationView from './components/IntuitiveImaginationView';
 import CreationsView from './components/CreationsView';
+import VoiceStudioView from './components/VoiceStudioView';
 import StorageRoutingView from './components/StorageRoutingView';
 import NotificationsLogsView from './components/NotificationsLogsView';
 import PrivacySecurityControlView from './components/PrivacySecurityControlView';
@@ -229,6 +231,7 @@ export default function App() {
         if (data.swarm_status) setSwarmData(data.swarm_status);
         if (data.dream_status) setDreamData(data.dream_status);
         if (data.skills_active) setSkillsCount(data.skills_active);
+        omniVoice.fetchVoiceStudioProfiles().catch(() => {});
       })
       .catch((err) => console.warn('Backend offline, running in in-browser cognitive mode:', err));
 
@@ -516,6 +519,7 @@ export default function App() {
 
   const navTabs = [
     { id: 'chat', label: 'Chat Multiagéntico & Voz', icon: MessageSquare, color: 'cyan' },
+    { id: 'voice_studio', label: 'VoiceStudio & Forja de Sonido', icon: Headphones, color: 'purple', badge: '646 Idiomas' },
     { id: 'creations', label: 'Creaciones & Evolución Progresiva', icon: Sparkles, color: 'pink', badge: '5 Forjadas' },
     { id: 'imagination', label: 'Imaginación Intuitiva (Always-On)', icon: Sparkles, color: 'purple', badge: imaginationBadge },
     { id: 'storage', label: 'Enrutamiento de Almacenamiento & Medios', icon: HardDrive, color: 'cyan' },
@@ -706,7 +710,20 @@ export default function App() {
               )}
             </button>
 
-            {/* Quick Shortcuts: Creaciones, Cerebros (Responsive) */}
+            {/* Quick Shortcuts: VoiceStudio, Creaciones, Cerebros (Responsive) */}
+            <button
+              onClick={() => setActiveTab('voice_studio')}
+              className={`text-xs px-2.5 py-1 rounded-lg font-mono transition-colors flex items-center gap-1.5 font-bold whitespace-nowrap ${
+                activeTab === 'voice_studio'
+                  ? 'bg-cyan-500/30 border border-cyan-400 text-cyan-200'
+                  : 'bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-300'
+              }`}
+              title="VoiceStudio 1.58b • Clonación, Diseño de Voces y SFX"
+            >
+              <Headphones className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              <span className="hidden md:inline">VoiceStudio</span>
+            </button>
+
             <button
               onClick={() => setActiveTab('creations')}
               className={`text-xs px-2.5 py-1 rounded-lg font-mono transition-colors flex items-center gap-1.5 font-bold whitespace-nowrap ${
@@ -790,6 +807,7 @@ export default function App() {
             />
           )}
 
+          {activeTab === 'voice_studio' && <VoiceStudioView onBackToChat={() => setActiveTab('chat')} />}
           {activeTab === 'creations' && <CreationsView />}
           {activeTab === 'sensorium' && <Sensorium360View />}
           {(activeTab === 'imagination' || activeTab === 'dream') && <IntuitiveImaginationView />}

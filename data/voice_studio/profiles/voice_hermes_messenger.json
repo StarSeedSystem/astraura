@@ -1,0 +1,29 @@
+{
+  "id": "voice_hermes_messenger",
+  "name": "Hermes (Rápido & Dinámico)",
+  "persona_id": "hermes",
+  "gender": "male",
+  "age_group": "young",
+  "accent": "es-AR-lively",
+  "language": "es",
+  "pitch_base_hz": 145.0,
+  "warmth": 0.78,
+  "clarity": 0.94,
+  "breathiness": 0.12,
+  "emotion": "energetic_curious",
+  "formants": {
+    "f1": 460,
+    "f2": 1550,
+    "f3": 2450,
+    "f4": 3500
+  },
+  "dsp": {
+    "reverb": 0.1,
+    "eq_low_db": 0.5,
+    "eq_mid_db": 1.5,
+    "eq_high_db": 2.5,
+    "compression": 0.4
+  },
+  "is_factory": true,
+  "created_at": 1787112372.2029052
+}

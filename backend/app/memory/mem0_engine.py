@@ -108,6 +108,25 @@ class Mem0UniversalMemoryEngine:
         except Exception as e:
             print(f"[Mem0Engine] Error saving store: {e}")
 
+    @staticmethod
+    def is_valid_memory(text: str) -> bool:
+        if not text or len(text.strip()) < 5:
+            return False
+        t_lower = text.lower()
+        bad_patterns = [
+            r"como alex bord[oó]n garrig[oó]s",
+            r"me llamo alex bord[oó]n garrig[oó]s",
+            r"demuestra la capacidad",
+            r"atracongada",
+            r"personalidad \d+:",
+            r"desde el pasado del 24 dc",
+            r"sin signos sexuales ni sugerencias sensuales"
+        ]
+        for p in bad_patterns:
+            if re.search(p, t_lower):
+                return False
+        return True
+
     def add_memory(
         self,
         memory_text: str,
@@ -116,12 +135,15 @@ class Mem0UniversalMemoryEngine:
         run_id: str = "default",
         category: str = "general",
         metadata: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+    ) -> Optional[Dict[str, Any]]:
         """
         Adds a new semantic memory to Mem0 with auto-deduplication and confidence scoring.
         """
-        # Simple similarity check to avoid exact duplicates
         text_clean = memory_text.strip()
+        if not self.is_valid_memory(text_clean):
+            return None
+
+        # Simple similarity check to avoid exact duplicates
         for existing in self.memories:
             if existing["memory"].lower() == text_clean.lower():
                 existing["updated_at"] = time.time()

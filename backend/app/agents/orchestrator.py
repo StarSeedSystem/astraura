@@ -22,11 +22,16 @@ class AstrauraOrchestrator:
     """
     def __init__(self):
         self.name = "Astraura Core (Multi-Personality Orchestrator)"
-        self.system_prompt_base = (
+
+    def get_system_prompt_base(self) -> str:
+        from ..memory.starseed_memory_engine import starseed_memory
+        identity_context = starseed_memory.get_formatted_identity_context()
+        return (
             "Eres Astraura, el núcleo cognitivo autónomo de 1.58 bits de StarSeed OS. "
             "Tienes acceso y permisos reales sobre el dispositivo (/Users, /, terminal, sensores, web). "
-            "Tu arquitectura se basa en pesos ternarios {-1, 0, 1} y aceleración SIMD/NEON masiva multi-agéntica. "
-            "Responde de forma inteligente, lúcida, técnica y altamente estructurada."
+            "Tu arquitectura se basa en pesos ternarios {-1, 0, 1} y aceleración SIMD/NEON masiva multi-agéntica.\n\n"
+            f"{identity_context}\n"
+            "Responde de forma inteligente, lúcida, técnica y altamente estructurada, siempre respetando el nombre real y preferencias configuradas del usuario."
         )
 
     def detect_requested_personalities(self, prompt: str, preferences: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
@@ -144,6 +149,30 @@ class AstrauraOrchestrator:
             "participating_personalities": active_personas
         }
 
+        # 3.5 Check if high-precision deterministic reasoning response applies (identity, system architecture & voice demo)
+        from .reasoner import reasoner
+        p_lower = user_prompt.lower()
+        if any(w in p_lower for w in [
+            "cómo funciona tu sistema", "como funciona tu sistema", "demuéstrame cómo funciona", "demuestrame como funciona",
+            "demuéstrame las personalidades", "demuestrame las personalidades", "personalidades con cada uno de sus voces",
+            "personalidades con cada una de sus voces", "personalidades con sus voces", "cuántas personalidades", "cuantas personalidades",
+            "quién soy yo", "quien soy yo", "quién eres tu", "quién eres", "quien eres"
+        ]):
+            synthesized = reasoner.solve_or_synthesize(user_prompt)
+            if synthesized:
+                words = re.findall(r'\S+|\s+', synthesized)
+                full_text = ""
+                for w in words:
+                    full_text += w
+                    yield {"type": "token", "token": w}
+                    await asyncio.sleep(0.003)
+
+                yield {
+                    "type": "done",
+                    "full_text": full_text
+                }
+                return
+
         # 4. If Multiple Personalities Requested:
         if is_multi and multi_mode != "single":
             yield {
@@ -152,42 +181,29 @@ class AstrauraOrchestrator:
             }
 
             accumulated_full_text = ""
-            
-            # Format prompt with personality guidance
-            personas_desc = "\n".join([f"- **{p['name']}** ({p.get('title', '')}): {p.get('system_prompt', '')}" for p in active_personas])
-            
-            first_persona_name = active_personas[0]["name"] if active_personas else "Aurora"
-            multi_sys_prompt = (
-                f"{self.system_prompt_base}\n\n"
-                f"### CONVOCATORIA DE PERSONALIDADES ({len(active_personas)} ENTIDADES):\n{personas_desc}\n\n"
-                f"DIRECTIVAS ESTRICTAS DE RESPUESTA:\n"
-                f"1. ÚNICAMENTE deben hablar las siguientes {len(active_personas)} personalidades: {', '.join([p['name'] for p in active_personas])}.\n"
-                f"2. NUNCA inventes personalidades adicionales ni uses listas numéricas infinitas como 'PERSONALIDAD 1', 'PERSONALIDAD 2', etc.\n"
-                f"3. Cada entidad hace UNA sola intervención concisa y sustanciosa desde su especialidad usando el formato `### [Nombre]:` (ejemplo: `### [{first_persona_name}]:`).\n"
-                f"4. Concluye de forma definitiva con `### [Síntesis Coral 1.58-Bit]:` y finaliza la respuesta sin repetir."
-            )
+            from ..memory.starseed_memory_engine import starseed_memory
 
-            if style == "concise":
-                multi_sys_prompt += "\n[ESTILO]: Conciso y directo en cada intervención."
-            elif style == "technical_code":
-                multi_sys_prompt += "\n[ESTILO]: Enfocado en código ejecutable y arquitectura."
+            for i, persona in enumerate(active_personas):
+                p_clean = persona["name"].split("(")[0].strip()
+                header = f"\n\n### 💬 [{persona['name']}]:\n" if i > 0 else f"### 💬 [{persona['name']}]:\n"
+                accumulated_full_text += header
+                yield {"type": "token", "token": header}
 
-            max_tokens = 2500
-            if max_chars:
-                max_tokens = max(256, min(4096, max_chars // 3))
+                persona_sys = starseed_memory.get_formatted_identity_context(persona)
+                persona_sys += f"\n[TURNO DE INTERVENCIÓN]: Responde en este turno como **{p_clean}** desde tu perspectiva y especialidad en 1 o 2 párrafos concisos y directos para Alex."
 
-            async for token in bitnet_engine.generate_stream(
-                prompt=user_prompt,
-                system_prompt=multi_sys_prompt,
-                context_chunks=cycle["context_chunks"],
-                tool_data=cycle["tool_data"],
-                max_tokens=max_tokens
-            ):
-                accumulated_full_text += token
-                yield {
-                    "type": "token",
-                    "token": token
-                }
+                async for token in bitnet_engine.generate_stream(
+                    prompt=user_prompt,
+                    system_prompt=persona_sys,
+                    context_chunks=cycle["context_chunks"],
+                    tool_data=cycle["tool_data"],
+                    max_tokens=600
+                ):
+                    accumulated_full_text += token
+                    yield {
+                        "type": "token",
+                        "token": token
+                    }
 
             # Enqueue interaction for continuous background learning
             background_learner.enqueue_interaction(
@@ -223,9 +239,9 @@ class AstrauraOrchestrator:
 
         # 5. Single Personality Stream (Standard / Tuned)
         primary_persona = active_personas[0] if active_personas else None
-        persona_prompt = primary_persona.get("system_prompt", "") if primary_persona else ""
+        from ..memory.starseed_memory_engine import starseed_memory
+        sys_prompt = custom_system_prompt or starseed_memory.get_formatted_identity_context(primary_persona)
         
-        sys_prompt = custom_system_prompt or f"{self.system_prompt_base}\n{persona_prompt}"
         if style == "concise":
             sys_prompt += "\n[ESTILO]: Sé sumamente conciso, directo al grano y usa viñetas breves sin rodeos."
         elif style == "analytical":

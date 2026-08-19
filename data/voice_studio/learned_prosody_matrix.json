@@ -1,0 +1,112 @@
+{
+  "version": "2.2.0",
+  "personas": {
+    "aurora": {
+      "rapport_level": 100,
+      "total_interactions": 395,
+      "domains": {
+        "filosofia": 100,
+        "emocional": 95,
+        "creatividad": 100,
+        "general": 100,
+        "memoria": 64,
+        "codigo": 62
+      },
+      "inflection_offsets": {
+        "pitch_delta": 2.0,
+        "warmth_delta": 0.04,
+        "question_inquisitiveness": 1.0,
+        "expressive_exaggeration": 1.0
+      }
+    },
+    "hephaestus": {
+      "rapport_level": 85,
+      "total_interactions": 38,
+      "domains": {
+        "hardware": 96,
+        "codigo": 94,
+        "terminal": 92,
+        "general": 66
+      },
+      "inflection_offsets": {
+        "pitch_delta": -1.5,
+        "clarity_delta": 0.05,
+        "question_inquisitiveness": 0.8600000000000001
+      }
+    },
+    "hermione": {
+      "rapport_level": 100,
+      "total_interactions": 60,
+      "domains": {
+        "ciencia": 98,
+        "analisis": 95,
+        "datos": 92,
+        "general": 100,
+        "creatividad": 62,
+        "filosofia": 62
+      },
+      "inflection_offsets": {
+        "cadence_delta": 0.04,
+        "clarity_delta": 0.06,
+        "question_inquisitiveness": 1.0,
+        "expressive_exaggeration": 0.8400000000000001
+      }
+    },
+    "atenea": {
+      "rapport_level": 100,
+      "total_interactions": 129,
+      "domains": {
+        "estrategia": 94,
+        "seguridad": 92,
+        "ontocracia": 90,
+        "general": 100,
+        "creatividad": 68,
+        "filosofia": 62
+      },
+      "inflection_offsets": {
+        "drama_delta": 0.05,
+        "question_inquisitiveness": 1.0,
+        "expressive_exaggeration": 1.0
+      }
+    },
+    "oneiros": {
+      "rapport_level": 91,
+      "total_interactions": 31,
+      "domains": {
+        "onirico": 96,
+        "shaders": 92,
+        "meditacion": 98,
+        "general": 62
+      },
+      "inflection_offsets": {
+        "breathiness_delta": 0.06,
+        "question_inquisitiveness": 0.8200000000000001
+      }
+    },
+    "hermes": {
+      "rapport_level": 86,
+      "total_interactions": 34,
+      "domains": {
+        "red": 94,
+        "web": 95,
+        "agilidad": 96,
+        "general": 64
+      },
+      "inflection_offsets": {
+        "cadence_delta": 0.05,
+        "question_inquisitiveness": 0.8400000000000001
+      }
+    },
+    "unassigned": {
+      "rapport_level": 74,
+      "total_interactions": 4,
+      "domains": {
+        "general": 68
+      },
+      "inflection_offsets": {
+        "question_inquisitiveness": 0.8800000000000001
+      }
+    }
+  },
+  "last_updated": 1787126431.768011
+}

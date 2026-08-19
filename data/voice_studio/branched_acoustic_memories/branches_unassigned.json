@@ -1,0 +1,157 @@
+{
+  "persona_id": "unassigned",
+  "total_branches": 4,
+  "rapport_index": 74,
+  "branches": {
+    "rapport_entrainment": [],
+    "domain_prosody": {
+      "general": {
+        "interactions_count": 4,
+        "learned_pitch_offset": 0.6,
+        "learned_cadence_mult": 1.0,
+        "learned_warmth_offset": 0.0,
+        "preferred_expressions": [
+          "micro_breaths",
+          "emphasis_clicks"
+        ]
+      }
+    },
+    "ternary_affective_vectors": [
+      {
+        "node_id": "node_1787119985529",
+        "timestamp": 1787119985.529119,
+        "domain": "general",
+        "user_sentiment": "cuestionamiento",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "¿Cómo sientes la entonación cuando formulo una pregunta reflexiva? ¿Percibes cóm",
+        "ternary_vector_158": [
+          0,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          1,
+          2,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 120,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787120727256",
+        "timestamp": 1787120727.256921,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "La estructura se mantiene firme y verificada. El núcleo de procesamiento opera c",
+        "ternary_vector_158": [
+          0,
+          1,
+          0,
+          -1,
+          1,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          -1,
+          -1,
+          1,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 120,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787120729812",
+        "timestamp": 1787120729.812774,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "La estructura se mantiene firme y verificada. El núcleo de procesamiento opera c",
+        "ternary_vector_158": [
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          1,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 120,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787120731124",
+        "timestamp": 1787120731.124513,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "La estructura se mantiene firme y verificada. El núcleo de procesamiento opera c",
+        "ternary_vector_158": [
+          1,
+          0,
+          -1,
+          -1,
+          -1,
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          -1,
+          1,
+          2,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 120,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      }
+    ],
+    "synaptic_cross_bridges": []
+  },
+  "last_synaptic_pulse": 1787119985.5289972,
+  "interactions": []
+}

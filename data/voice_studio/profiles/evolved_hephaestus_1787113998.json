@@ -1,0 +1,39 @@
+{
+  "name": "Hephaestus • Barítono de la Forja",
+  "gender": "male",
+  "style": "epic_narrative",
+  "age_group": "adult",
+  "pitch_base_hz": 112.0,
+  "cadence_rate": 0.96,
+  "warmth": 0.95,
+  "clarity": 0.92,
+  "breathiness": 0.08,
+  "prosody_dynamics": 0.75,
+  "formants": {
+    "f1": 410,
+    "f2": 1380,
+    "f3": 2250,
+    "f4": 3350
+  },
+  "dsp": {
+    "reverb": 0.24,
+    "eq_low_db": 4.5,
+    "eq_mid_db": -0.5,
+    "eq_high_db": 1.2,
+    "compression": 0.52
+  },
+  "preferred_voices": [
+    "jorge",
+    "alvaro",
+    "álvaro",
+    "diego",
+    "juan",
+    "carlos",
+    "siri voz 2"
+  ],
+  "rationale": "Ecualización torácica profunda en 112Hz con compresión de presencia de estudio para autoridad y calma estoica.",
+  "id": "evolved_hephaestus_1787113998",
+  "persona_id": "unassigned",
+  "is_evolved": true,
+  "created_at": 1787113998.476597
+}

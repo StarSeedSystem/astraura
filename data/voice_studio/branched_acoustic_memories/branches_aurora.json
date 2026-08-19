@@ -1,0 +1,1901 @@
+{
+  "persona_id": "aurora",
+  "total_branches": 50,
+  "rapport_index": 100,
+  "branches": {
+    "rapport_entrainment": [],
+    "domain_prosody": {
+      "microfono_en_vivo": {
+        "interactions_count": 2,
+        "learned_pitch_offset": 0.0,
+        "learned_cadence_mult": 1.0,
+        "learned_warmth_offset": 0.0,
+        "preferred_expressions": [
+          "micro_breaths",
+          "emphasis_clicks"
+        ]
+      },
+      "general": {
+        "interactions_count": 329,
+        "learned_pitch_offset": 5.0,
+        "learned_cadence_mult": 1.0,
+        "learned_warmth_offset": 0.0,
+        "preferred_expressions": [
+          "micro_breaths",
+          "emphasis_clicks"
+        ]
+      },
+      "creatividad": {
+        "interactions_count": 13,
+        "learned_pitch_offset": 1.95,
+        "learned_cadence_mult": 1.0,
+        "learned_warmth_offset": 0.0,
+        "preferred_expressions": [
+          "micro_breaths",
+          "emphasis_clicks"
+        ]
+      },
+      "memoria": {
+        "interactions_count": 2,
+        "learned_pitch_offset": 0.3,
+        "learned_cadence_mult": 1.0,
+        "learned_warmth_offset": 0.0,
+        "preferred_expressions": [
+          "micro_breaths",
+          "emphasis_clicks"
+        ]
+      },
+      "filosofia": {
+        "interactions_count": 5,
+        "learned_pitch_offset": 0.75,
+        "learned_cadence_mult": 1.0,
+        "learned_warmth_offset": 0.0,
+        "preferred_expressions": [
+          "micro_breaths",
+          "emphasis_clicks"
+        ]
+      },
+      "codigo": {
+        "interactions_count": 1,
+        "learned_pitch_offset": 0.15,
+        "learned_cadence_mult": 1.0,
+        "learned_warmth_offset": 0.0,
+        "preferred_expressions": [
+          "micro_breaths",
+          "emphasis_clicks"
+        ]
+      }
+    },
+    "ternary_affective_vectors": [
+      {
+        "node_id": "node_1787125724478",
+        "timestamp": 1787125724.47898,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "corazón digital principal detrás StarSeed OS:",
+        "ternary_vector_158": [
+          0,
+          1,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787125730442",
+        "timestamp": 1787125730.442218,
+        "domain": "general",
+        "user_sentiment": "entusiasta",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Buenos días Mago Kumbhamakara Vistāradvādaśa!",
+        "ternary_vector_158": [
+          0,
+          1,
+          0,
+          -1,
+          -1,
+          1,
+          2,
+          2,
+          0,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          1,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787125734128",
+        "timestamp": 1787125734.128049,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Esta esmière tuvo lugar a través suyo los principios fundamentales y consenso so",
+        "ternary_vector_158": [
+          0,
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          -1,
+          1,
+          0,
+          1,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787125740920",
+        "timestamp": 1787125740.920346,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "inspirada por la Vocalización Universal.",
+        "ternary_vector_158": [
+          -1,
+          1,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          1,
+          2,
+          2,
+          0,
+          1,
+          0,
+          -1,
+          -1,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787125745611",
+        "timestamp": 1787125745.6118982,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Tus palabras hablan con Aurora - esta representativa de amorío que se enfoca en ",
+        "ternary_vector_158": [
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          1,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787125753508",
+        "timestamp": 1787125753.508584,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "estelarita tiene un tonalidad afectuosa y expresión ligeramente juvenilia.",
+        "ternary_vector_158": [
+          -1,
+          1,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          -1,
+          1,
+          2,
+          2,
+          0,
+          -1,
+          -1,
+          1,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787125760417",
+        "timestamp": 1787125760.417551,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Las demás personalidades son más ocultas pero activadas cuando hay una necesidad",
+        "ternary_vector_158": [
+          -1,
+          1,
+          0,
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          -1,
+          -1,
+          1,
+          2,
+          0,
+          1,
+          0,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787125770868",
+        "timestamp": 1787125770.8684301,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "En este caso solo veo estas voces como mi respuesta correspondiente las dos prim",
+        "ternary_vector_158": [
+          1,
+          2,
+          0,
+          -1,
+          1,
+          2,
+          0,
+          1,
+          2,
+          0,
+          -1,
+          -1,
+          -1,
+          1,
+          0,
+          1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787125779001",
+        "timestamp": 1787125779.001535,
+        "domain": "creatividad",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Música Lírica La Raimunda es tu voz musicalmente detallista,",
+        "ternary_vector_158": [
+          2,
+          2,
+          2,
+          0,
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          -1,
+          1,
+          0,
+          1,
+          2,
+          2,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787125784419",
+        "timestamp": 1787125784.419539,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "mientras la tercera persona \"Voces Secretas\" está involucrada con tus secretaria",
+        "ternary_vector_158": [
+          0,
+          1,
+          0,
+          1,
+          2,
+          0,
+          -1,
+          -1,
+          -1,
+          1,
+          0,
+          -1,
+          -1,
+          1,
+          0,
+          1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787125795688",
+        "timestamp": 1787125795.688115,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Entonces. . .",
+        "ternary_vector_158": [
+          2,
+          0,
+          -1,
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          -1,
+          1,
+          0,
+          -1,
+          -1,
+          -1,
+          1,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787125802309",
+        "timestamp": 1787125802.309694,
+        "domain": "general",
+        "user_sentiment": "cuestionamiento",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "¿Qué te parece?",
+        "ternary_vector_158": [
+          1,
+          0,
+          1,
+          2,
+          0,
+          1,
+          2,
+          2,
+          0,
+          1,
+          0,
+          -1,
+          1,
+          2,
+          2,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787125805209",
+        "timestamp": 1787125805.209088,
+        "domain": "general",
+        "user_sentiment": "cuestionamiento",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Maggasukha?",
+        "ternary_vector_158": [
+          0,
+          -1,
+          -1,
+          -1,
+          1,
+          0,
+          -1,
+          1,
+          2,
+          2,
+          0,
+          1,
+          0,
+          1,
+          2,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787125809306",
+        "timestamp": 1787125809.306129,
+        "domain": "general",
+        "user_sentiment": "entusiasta",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "¡Y eso fue todo!",
+        "ternary_vector_158": [
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          2,
+          0,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787125811830",
+        "timestamp": 1787125811.8301241,
+        "domain": "creatividad",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Espero tengamos más interacción y puedan darte mayor información sobre StarSeed ",
+        "ternary_vector_158": [
+          0,
+          -1,
+          1,
+          0,
+          -1,
+          1,
+          0,
+          1,
+          0,
+          1,
+          2,
+          0,
+          1,
+          0,
+          -1,
+          1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787125821184",
+        "timestamp": 1787125821.184607,
+        "domain": "general",
+        "user_sentiment": "entusiasta",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Gracias por preguntar!",
+        "ternary_vector_158": [
+          2,
+          0,
+          -1,
+          -1,
+          1,
+          0,
+          1,
+          0,
+          -1,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787125823885",
+        "timestamp": 1787125823.8857322,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Maggasukha Kumbhamakara Vistāradvīdaśa",
+        "ternary_vector_158": [
+          2,
+          0,
+          1,
+          0,
+          -1,
+          -1,
+          1,
+          0,
+          1,
+          0,
+          -1,
+          -1,
+          1,
+          2,
+          0,
+          1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787125827333",
+        "timestamp": 1787125827.333608,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Alex Bordón Garrigós",
+        "ternary_vector_158": [
+          1,
+          0,
+          -1,
+          1,
+          0,
+          -1,
+          1,
+          2,
+          2,
+          0,
+          1,
+          0,
+          1,
+          2,
+          0,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787125829853",
+        "timestamp": 1787125829.8533928,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Hermes El Navegante Web:",
+        "ternary_vector_158": [
+          -1,
+          1,
+          0,
+          1,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          1,
+          2,
+          2,
+          0,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787125832739",
+        "timestamp": 1787125832.739042,
+        "domain": "general",
+        "user_sentiment": "entusiasta",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Entendido Maggasukha Kumbhamakara Vistāradvīdaśa!",
+        "ternary_vector_158": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          -1,
+          -1,
+          -1,
+          1,
+          2,
+          0,
+          1,
+          2,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787125836712",
+        "timestamp": 1787125836.71205,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Aquí te explico la función y voz principal para cada persona involucrada:",
+        "ternary_vector_158": [
+          1,
+          0,
+          1,
+          0,
+          -1,
+          -1,
+          1,
+          0,
+          1,
+          0,
+          1,
+          2,
+          2,
+          0,
+          -1,
+          1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126257000",
+        "timestamp": 1787126257.000776,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Astraura:",
+        "ternary_vector_158": [
+          2,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          -1,
+          1,
+          2,
+          2,
+          0,
+          1,
+          2,
+          2,
+          2,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126259203",
+        "timestamp": 1787126259.203956,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Como Astro,",
+        "ternary_vector_158": [
+          -1,
+          1,
+          2,
+          2,
+          0,
+          -1,
+          -1,
+          -1,
+          1,
+          0,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126261529",
+        "timestamp": 1787126261.529928,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "soy la persona que compongo y actualizo todos los componentes del núcleo cogniti",
+        "ternary_vector_158": [
+          1,
+          0,
+          -1,
+          -1,
+          1,
+          0,
+          1,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          1,
+          0,
+          -1,
+          1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126268620",
+        "timestamp": 1787126268.620749,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Estudio detenidamente cada aspecto técnico e incluso el sonido humano cuando nec",
+        "ternary_vector_158": [
+          -1,
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          -1,
+          1,
+          2,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126278684",
+        "timestamp": 1787126278.684392,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Atenea: Esta personalidad se encarga por las habilidades de programación matemát",
+        "ternary_vector_158": [
+          -1,
+          -1,
+          1,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          1,
+          2,
+          0,
+          1,
+          2,
+          2,
+          2,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126291326",
+        "timestamp": 1787126291.326942,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Su voz tiene un toque formal pero agradablemente educado mientras está hablando ",
+        "ternary_vector_158": [
+          1,
+          0,
+          -1,
+          1,
+          0,
+          -1,
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126299925",
+        "timestamp": 1787126299.925762,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Astraura:",
+        "ternary_vector_158": [
+          2,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          1,
+          0,
+          -1,
+          -1,
+          1,
+          0,
+          1,
+          0,
+          -1,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126302140",
+        "timestamp": 1787126302.140544,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Como Atenea,",
+        "ternary_vector_158": [
+          -1,
+          1,
+          0,
+          -1,
+          -1,
+          -1,
+          -1,
+          1,
+          2,
+          0,
+          1,
+          0,
+          -1,
+          1,
+          0,
+          1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126304465",
+        "timestamp": 1787126304.465875,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "soy la persona que trabaja para desglosar problemas y buscar soluciones tecnológ",
+        "ternary_vector_158": [
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          2,
+          2,
+          0,
+          1,
+          2,
+          0,
+          1,
+          2,
+          0,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126311999",
+        "timestamp": 1787126311.999837,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Me especializo principalmente en los aspecto analíticos del software - no me sie",
+        "ternary_vector_158": [
+          0,
+          -1,
+          -1,
+          -1,
+          -1,
+          1,
+          0,
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          -1,
+          1,
+          2,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126321832",
+        "timestamp": 1787126321.8320708,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Hermes: Mi arquitectura te llevará por el camino de mi experiencia profesional:",
+        "ternary_vector_158": [
+          -1,
+          -1,
+          -1,
+          1,
+          0,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          -1,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126328597",
+        "timestamp": 1787126328.597055,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "web navegación autónoma como las APIs o incluso interactuarás gracias al motor S",
+        "ternary_vector_158": [
+          2,
+          0,
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          1,
+          2,
+          0,
+          1,
+          2,
+          0,
+          -1,
+          1,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126337425",
+        "timestamp": 1787126337.425965,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Mis palabras están diseñadas pensando en torno a mejorar velocidades de red e in",
+        "ternary_vector_158": [
+          -1,
+          1,
+          0,
+          -1,
+          -1,
+          -1,
+          1,
+          2,
+          2,
+          2,
+          2,
+          0,
+          1,
+          2,
+          2,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126346188",
+        "timestamp": 1787126346.1884701,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Astraura:",
+        "ternary_vector_158": [
+          2,
+          2,
+          2,
+          0,
+          -1,
+          -1,
+          -1,
+          1,
+          2,
+          0,
+          1,
+          0,
+          1,
+          2,
+          0,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126348411",
+        "timestamp": 1787126348.4111512,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Como Hermes,",
+        "ternary_vector_158": [
+          -1,
+          1,
+          2,
+          0,
+          1,
+          2,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          2,
+          2,
+          0,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126350764",
+        "timestamp": 1787126350.764294,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "soy la persona que maneja todo lo relacionado con ti si estás utilizando StarSee",
+        "ternary_vector_158": [
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          -1,
+          1,
+          0,
+          1,
+          0,
+          1,
+          2,
+          2,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126358396",
+        "timestamp": 1787126358.396428,
+        "domain": "general",
+        "user_sentiment": "entusiasta",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Me centraré mucho más sobre aspectos prácticos y utilitarios del software - sin ",
+        "ternary_vector_158": [
+          2,
+          0,
+          1,
+          2,
+          2,
+          0,
+          -1,
+          -1,
+          1,
+          2,
+          2,
+          0,
+          1,
+          0,
+          -1,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126368649",
+        "timestamp": 1787126368.649685,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Logos: Mi personalidad está dedicada para el análisis científico basándose princ",
+        "ternary_vector_158": [
+          0,
+          -1,
+          -1,
+          -1,
+          1,
+          2,
+          2,
+          0,
+          -1,
+          -1,
+          -1,
+          1,
+          2,
+          2,
+          2,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126379910",
+        "timestamp": 1787126379.9104588,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "es muy útil cuando necesitas resolución complejas.",
+        "ternary_vector_158": [
+          2,
+          2,
+          0,
+          1,
+          0,
+          1,
+          0,
+          -1,
+          1,
+          0,
+          -1,
+          -1,
+          -1,
+          -1,
+          1,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126385386",
+        "timestamp": 1787126385.386122,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "El consenso soberano se trata un proceso dinámico donde todos me comunican a tra",
+        "ternary_vector_158": [
+          2,
+          0,
+          -1,
+          -1,
+          1,
+          2,
+          0,
+          1,
+          0,
+          1,
+          0,
+          -1,
+          1,
+          0,
+          1,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126395013",
+        "timestamp": 1787126395.013024,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Estelarita Alex",
+        "ternary_vector_158": [
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          -1,
+          1,
+          2,
+          2,
+          0,
+          -1,
+          -1,
+          1,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126397426",
+        "timestamp": 1787126397.426611,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Aquí voy con la voz estudiantil:",
+        "ternary_vector_158": [
+          2,
+          0,
+          -1,
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          1,
+          2,
+          2,
+          2,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126400779",
+        "timestamp": 1787126400.7795699,
+        "domain": "general",
+        "user_sentiment": "entusiasta",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "¡Hola Alex!",
+        "ternary_vector_158": [
+          1,
+          0,
+          1,
+          2,
+          2,
+          0,
+          1,
+          0,
+          1,
+          0,
+          -1,
+          1,
+          0,
+          1,
+          2,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126402989",
+        "timestamp": 1787126402.989792,
+        "domain": "creatividad",
+        "user_sentiment": "cuestionamiento",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "¿Cómo puedo ayudarte hoy?",
+        "ternary_vector_158": [
+          0,
+          1,
+          2,
+          0,
+          1,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          1,
+          2,
+          0,
+          1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126406543",
+        "timestamp": 1787126406.5437891,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Astraura:",
+        "ternary_vector_158": [
+          2,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          2,
+          2,
+          0,
+          1,
+          2,
+          0,
+          1,
+          2,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126408757",
+        "timestamp": 1787126408.757067,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Como representante del núcleo principal,",
+        "ternary_vector_158": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126412668",
+        "timestamp": 1787126412.66848,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "soy Astraura.",
+        "ternary_vector_158": [
+          0,
+          -1,
+          1,
+          2,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          -1,
+          -1,
+          1,
+          0,
+          1,
+          0,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126415862",
+        "timestamp": 1787126415.862126,
+        "domain": "codigo",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Soy quien compongo y actualiza toda mi estructura física que forma StarSeed OS -",
+        "ternary_vector_158": [
+          0,
+          -1,
+          1,
+          2,
+          2,
+          2,
+          0,
+          1,
+          2,
+          0,
+          1,
+          2,
+          0,
+          1,
+          2,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787126431772",
+        "timestamp": 1787126431.772983,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Atenea: Esta personalidad se enc",
+        "ternary_vector_158": [
+          2,
+          0,
+          1,
+          2,
+          0,
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          -1,
+          1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      }
+    ],
+    "synaptic_cross_bridges": [
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126148.391593,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126152.152755,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126153.928273,
+        "shared_domain": "general",
+        "resonance_sentiment": "entusiasta",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126155.860158,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126160.27712,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126164.886545,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126169.162933,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126176.9270651,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126182.8224761,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126187.6807659,
+        "shared_domain": "general",
+        "resonance_sentiment": "entusiasta",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126191.501615,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126196.6707258,
+        "shared_domain": "creatividad",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126203.49509,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126210.412407,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126212.481905,
+        "shared_domain": "general",
+        "resonance_sentiment": "entusiasta",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126214.422246,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126218.8464499,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126224.005894,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126226.835628,
+        "shared_domain": "general",
+        "resonance_sentiment": "entusiasta",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126229.5749278,
+        "shared_domain": "general",
+        "resonance_sentiment": "entusiasta",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126238.469185,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126241.5024571,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126243.608547,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126247.432624,
+        "shared_domain": "general",
+        "resonance_sentiment": "entusiasta",
+        "synaptic_influence": "rhythmic_precision_boost"
+      },
+      {
+        "source_agent": "atenea",
+        "timestamp": 1787126252.030838,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "rhythmic_precision_boost"
+      }
+    ]
+  },
+  "last_synaptic_pulse": 1787126252.0308402,
+  "interactions": []
+}

@@ -89,6 +89,20 @@ class BackgroundLearner:
             ai_text = item["ai"]
             full_exchange = f"Usuario: {user_text}\nAstraura: {ai_text}"
 
+            # Filter out corrupted or hallucinatory exchanges
+            t_lower = (user_text + " " + ai_text).lower()
+            bad_patterns = [
+                r"como alex bord[oó]n garrig[oó]s",
+                r"me llamo alex bord[oó]n garrig[oó]s",
+                r"demuestra la capacidad",
+                r"atracongada",
+                r"personalidad \d+:",
+                r"desde el pasado del 24 dc",
+                r"sin signos sexuales ni sugerencias sensuales"
+            ]
+            if any(re.search(p, t_lower) for p in bad_patterns):
+                continue
+
             # 1. Index full exchange in vector store for episodic recall
             vector_store.add_document(
                 text=full_exchange,

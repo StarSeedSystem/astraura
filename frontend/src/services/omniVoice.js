@@ -144,7 +144,7 @@ class OmniVoiceEngine {
     const all = this.getVoices();
     const es = all.filter(v => v.lang.startsWith('es') || v.lang.startsWith('ES') || v.lang.includes('spa'));
     
-    // Prioritize natural neural and enhanced feminine/attractive voices
+    // Prioritize natural neural and enhanced voices
     return es.length > 0 ? es.sort((a, b) => {
       const getScore = (v) => {
         let score = 0;
@@ -159,6 +159,458 @@ class OmniVoiceEngine {
       };
       return getScore(b) - getScore(a);
     }) : all;
+  }
+
+  getSpanishMaleVoices() {
+    const all = this.getVoices();
+    const es = all.filter(v => v.lang.startsWith('es') || v.lang.startsWith('ES') || v.lang.includes('spa'));
+    const male = es.filter(v => {
+      const name = (v.name + ' ' + (v.voiceURI || '')).toLowerCase();
+      return name.includes('male') || name.includes('hombre') || name.includes('masculin') || 
+             name.includes('jorge') || name.includes('diego') || name.includes('juan') || 
+             name.includes('carlos') || name.includes('miguel') || name.includes('alvaro') || 
+             name.includes('enrique') || name.includes('pablo') || name.includes('gonzalo') || 
+             name.includes('raul') || name.includes('voz 2') || name.includes('voice 2');
+    });
+    return male.length > 0 ? male : (es.length > 1 ? [es[es.length - 1], ...es] : es);
+  }
+
+  getSpanishFemaleVoices() {
+    const all = this.getVoices();
+    const es = all.filter(v => v.lang.startsWith('es') || v.lang.startsWith('ES') || v.lang.includes('spa'));
+    const female = es.filter(v => {
+      const name = (v.name + ' ' + (v.voiceURI || '')).toLowerCase();
+      return name.includes('female') || name.includes('mujer') || name.includes('femenin') ||
+             name.includes('monica') || name.includes('paulina') || name.includes('lucia') ||
+             name.includes('paloma') || name.includes('elvira') || name.includes('dalia') ||
+             name.includes('salome') || name.includes('aurora') || name.includes('siri') || 
+             name.includes('voz 1') || name.includes('voice 1') || name.includes('marta');
+    });
+    return female.length > 0 ? female : es;
+  }
+
+  /**
+   * Intelligently discovers and maps the optimal native voice per persona
+   * Ensuring Aurora, Hermione, Atenea, Oneiros, etc. never sound like clones of each other!
+   */
+  /**
+   * Intelligently discovers and maps the optimal native voice per persona
+   * Prioritizing high-fidelity Neural, Natural, and Enhanced human voices on macOS/Chrome/Safari.
+   */
+  findBestVoiceForPersona(personaId, userOptions = {}) {
+    const all = this.getVoices();
+    const esVoices = this.getSpanishVoices();
+    const targetVoiceId = userOptions.bound_native_voice || userOptions.voice_speaker || userOptions.voice_id || userOptions.voiceURI || userOptions.native_voice_id;
+
+    const getVoiceQualityScore = (voice) => {
+      const name = (voice.name + ' ' + (voice.voiceURI || '')).toLowerCase();
+      let score = 0;
+      if (name.includes('natural') || name.includes('online')) score += 50;
+      if (name.includes('enhanced') || name.includes('premium')) score += 40;
+      if (name.includes('siri')) score += 35;
+      if (name.includes('neural')) score += 30;
+      if (name.includes('google')) score += 20;
+      return score;
+    };
+
+    // 1. Direct explicit voice selection by bound name or voiceURI
+    if (targetVoiceId && all.length > 0) {
+      const targetClean = targetVoiceId.trim().toLowerCase();
+      const found = all.find(v => 
+        v.voiceURI === targetVoiceId || 
+        v.name.toLowerCase() === targetClean ||
+        v.name.toLowerCase().includes(targetClean) ||
+        targetClean.includes(v.name.toLowerCase())
+      );
+      if (found) return found;
+    }
+
+    if (esVoices.length === 0) return all[0] || null;
+
+    // Sort Spanish voices by audio fidelity
+    const sortedEsVoices = [...esVoices].sort((a, b) => getVoiceQualityScore(b) - getVoiceQualityScore(a));
+
+    // 2. Explicit Gender-driven selection from userOptions
+    const explicitGender = (userOptions.gender || '').toLowerCase();
+    if (explicitGender === 'male' || explicitGender === 'deep_resonant') {
+      const maleVoices = this.getSpanishMaleVoices().sort((a, b) => getVoiceQualityScore(b) - getVoiceQualityScore(a));
+      if (maleVoices.length > 0) {
+        if (personaId === 'hephaestus') return maleVoices[0];
+        if (personaId === 'hermes') return maleVoices.length > 1 ? maleVoices[1] : maleVoices[0];
+        if (personaId === 'logos') return maleVoices[maleVoices.length - 1];
+        return maleVoices[0];
+      }
+    } else if (explicitGender === 'female' || explicitGender === 'ethereal') {
+      const femaleVoices = this.getSpanishFemaleVoices().sort((a, b) => getVoiceQualityScore(b) - getVoiceQualityScore(a));
+      if (femaleVoices.length > 0) {
+        if (personaId === 'aurora') return femaleVoices[0];
+        if (personaId === 'hermione') return femaleVoices.length > 1 ? femaleVoices[1] : femaleVoices[0];
+        if (personaId === 'atenea') return femaleVoices.length > 2 ? femaleVoices[2] : (femaleVoices[1] || femaleVoices[0]);
+        if (personaId === 'oneiros') return femaleVoices[femaleVoices.length - 1];
+        return femaleVoices[0];
+      }
+    }
+
+    // 3. Persona Priority Mapping with specific natural voice tokens
+    const personaPriorities = {
+      aurora: ['elvira', 'paloma', 'monica (enhanced)', 'mónica (enhanced)', 'monica', 'mónica', 'siri voz 1', 'siri (voz 1)', 'siri', 'dalia', 'google español', 'es-es', 'es_es'],
+      hephaestus: ['alvaro', 'álvaro', 'jorge (enhanced)', 'jorge', 'diego (enhanced)', 'diego', 'juan (enhanced)', 'juan', 'siri voz 2', 'siri (voz 2)', 'carlos', 'male', 'hombre'],
+      hermione: ['abril', 'paulina (enhanced)', 'paulina', 'francisca', 'dalia', 'salome', 'salomé', 'lucia (enhanced)', 'lucia', 'lucía', 'elvira', 'es-mx', 'es_mx'],
+      atenea: ['raquel', 'soledad', 'helena', 'elena', 'marta', 'monica', 'mónica', 'es-co', 'es_co'],
+      oneiros: ['arnau', 'angelica', 'angélica', 'whisper', 'siri', 'marta', 'es-us', 'es_us', 'soledad'],
+      hermes: ['jorge', 'diego', 'carlos', 'juan', 'alvaro', 'álvaro', 'es-ar', 'es_ar'],
+      mnemosyne: ['paloma', 'helena', 'elena', 'soledad', 'monica', 'mónica'],
+      logos: ['nil', 'juan', 'jorge', 'alvaro', 'álvaro', 'diego'],
+      kallisti: ['triana', 'paloma', 'paulina', 'lucia', 'dalia']
+    };
+
+    const targetList = personaPriorities[personaId] || personaPriorities.aurora;
+
+    for (const token of targetList) {
+      const candidates = sortedEsVoices.filter(v => {
+        const full = (v.name + ' ' + (v.voiceURI || '')).toLowerCase();
+        return full.includes(token);
+      });
+      if (candidates.length > 0) {
+        // Return highest quality candidate matching token
+        return candidates[0];
+      }
+    }
+
+    // 4. Fallback: gender distribution according to standard persona archetypes
+    if (['hephaestus', 'hermes', 'logos'].includes(personaId)) {
+      const maleVoices = this.getSpanishMaleVoices().sort((a, b) => getVoiceQualityScore(b) - getVoiceQualityScore(a));
+      if (maleVoices.length > 0) return maleVoices[0];
+    } else {
+      const femaleVoices = this.getSpanishFemaleVoices().sort((a, b) => getVoiceQualityScore(b) - getVoiceQualityScore(a));
+      if (femaleVoices.length > 0) return femaleVoices[0];
+    }
+
+    return sortedEsVoices[0];
+  }
+
+  /**
+   * VoiceStudio API Client Methods (Zero-Shot Cloning, Voice Design, SFX, Auto-Evolve)
+   */
+  async autoEvolveVoice(personaId = 'aurora', context = '', memories = [], mood = 'natural') {
+    try {
+      const res = await fetch('/api/voice_studio/auto_evolve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ persona_id: personaId, context, memories, mood })
+      });
+      return await res.json();
+    } catch (e) {
+      return { success: false, error: String(e) };
+    }
+  }
+
+  async fetchVoiceStudioProfiles() {
+    try {
+      const res = await fetch('/api/voice_studio/profiles');
+      if (res.ok) {
+        const data = await res.json();
+        const profiles = data.profiles || [];
+        this.vaultProfiles = {};
+        for (const p of profiles) {
+          if (p.persona_id) {
+            this.vaultProfiles[p.persona_id] = p;
+          }
+          if (p.id) {
+            this.vaultProfiles[p.id] = p;
+          }
+        }
+        return profiles;
+      }
+    } catch (e) {
+      console.warn('VoiceStudio profiles fetch notice:', e);
+    }
+    return [];
+  }
+
+  async fetchLanguagesCatalogue() {
+    try {
+      const res = await fetch('/api/voice_studio/languages');
+      if (res.ok) {
+        const data = await res.json();
+        return data.languages || [];
+      }
+    } catch (e) {
+      console.warn('VoiceStudio languages fetch notice:', e);
+    }
+    return [];
+  }
+
+  async cloneVoiceFromSample(audioBase64, name, language = 'es', personaId = null) {
+    try {
+      const res = await fetch('/api/voice_studio/clone', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ audio_base64: audioBase64, name, language, persona_id: personaId })
+      });
+      return await res.json();
+    } catch (e) {
+      return { success: false, error: String(e) };
+    }
+  }
+
+  async designVoiceProfile(params) {
+    try {
+      const res = await fetch('/api/voice_studio/design', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params)
+      });
+      return await res.json();
+    } catch (e) {
+      return { success: false, error: String(e) };
+    }
+  }
+
+  async updateVoiceStudioProfile(voiceId, updates) {
+    try {
+      const res = await fetch(`/api/voice_studio/profiles/${voiceId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      });
+      return await res.json();
+    } catch (e) {
+      return { success: false, error: String(e) };
+    }
+  }
+
+  async deleteVoiceStudioProfile(voiceId) {
+    try {
+      const res = await fetch(`/api/voice_studio/profiles/${voiceId}`, {
+        method: 'DELETE'
+      });
+      return await res.json();
+    } catch (e) {
+      return { success: false, error: String(e) };
+    }
+  }
+
+  async assignVoiceToPersona(voiceId, personaId) {
+    try {
+      const res = await fetch('/api/voice_studio/assign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ voice_id: voiceId, persona_id: personaId })
+      });
+      const data = await res.json();
+      if (data.success && data.profile) {
+        if (!this.vaultAssignedVoices) this.vaultAssignedVoices = {};
+        this.vaultAssignedVoices[personaId] = data.profile;
+      }
+      return data;
+    } catch (e) {
+      return { success: false, error: String(e) };
+    }
+  }
+
+  async exportVoiceProfile(voiceId) {
+    try {
+      const res = await fetch(`/api/voice_studio/export/${voiceId}`);
+      if (!res.ok) throw new Error('Error al exportar perfil');
+      const data = await res.json();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `voice_profile_${voiceId}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      return { success: true };
+    } catch (e) {
+      return { success: false, error: String(e) };
+    }
+  }
+
+  async exportAllVoiceProfiles() {
+    try {
+      const res = await fetch('/api/voice_studio/export_all');
+      if (!res.ok) throw new Error('Error al exportar bóveda');
+      const data = await res.json();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `astraura_voice_vault_${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      return { success: true };
+    } catch (e) {
+      return { success: false, error: String(e) };
+    }
+  }
+
+  async importVoiceProfiles(jsonData) {
+    try {
+      const res = await fetch('/api/voice_studio/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(jsonData)
+      });
+      return await res.json();
+    } catch (e) {
+      return { success: false, error: String(e) };
+    }
+  }
+
+  async fetchLearningMatrix(personaId = null) {
+    try {
+      const url = personaId ? `/api/voice_studio/learning_matrix?persona_id=${encodeURIComponent(personaId)}` : '/api/voice_studio/learning_matrix';
+      const res = await fetch(url);
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch (e) {
+      console.warn('Learning matrix fetch notice:', e);
+    }
+    return { success: false };
+  }
+
+  /**
+   * 1.58-Bit Live Microphone Acoustic Analysis (Ternary Spectrum, Energy & Prosody)
+   */
+  async analyzeMicrophone158(audioData, targetPersonaId = 'aurora') {
+    try {
+      let b64 = audioData;
+      if (audioData instanceof Blob) {
+        b64 = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(audioData);
+        });
+      }
+
+      const res = await fetch('/api/voice_studio/analyze_mic_158', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ audio_data: b64, target_persona_id: targetPersonaId })
+      });
+      return await res.json();
+    } catch (e) {
+      console.warn('1.58b mic analysis notice:', e);
+      return { success: false, error: String(e) };
+    }
+  }
+
+  /**
+   * Fetches the Multi-Agent Branched Acoustic Memory Network
+   */
+  async fetchBranchedMemories(personaId = null) {
+    try {
+      const url = personaId ? `/api/voice_studio/branched_memories?persona_id=${encodeURIComponent(personaId)}` : '/api/voice_studio/branched_memories';
+      const res = await fetch(url);
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch (e) {
+      console.warn('Branched memories fetch notice:', e);
+    }
+    return { success: false };
+  }
+
+  /**
+   * Records an acoustic memory node in the agent's brain and triggers synaptic cross-bridges
+   */
+  async recordBranchedAcousticMemory(personaId, domain, userSentiment, speechMetrics = {}, dialogueSnippet = '') {
+    try {
+      const res = await fetch('/api/voice_studio/branched_memories/record', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          persona_id: personaId,
+          domain,
+          user_sentiment: userSentiment,
+          user_speech_metrics: speechMetrics,
+          dialogue_snippet: dialogueSnippet
+        })
+      });
+      return await res.json();
+    } catch (e) {
+      return { success: false, error: String(e) };
+    }
+  }
+
+  async generateSFX(prompt, category = 'ambient', durationSeconds = 3.0, parameters = {}) {
+    try {
+      const res = await fetch('/api/voice_studio/generate_sfx', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, category, duration_seconds: durationSeconds, parameters })
+      });
+      return await res.json();
+    } catch (e) {
+      return { success: false, error: String(e) };
+    }
+  }
+
+  /**
+   * Real-time WebAudio Procedural Sound FX Synthesizer (0ms Latency)
+   */
+  playProceduralSound(type = 'quantum_chime') {
+    if (typeof window === 'undefined') return;
+    try {
+      const ctx = this._ensureAudioContext();
+      if (!ctx) return;
+
+      const now = ctx.currentTime;
+      if (type === 'quantum_chime') {
+        const freqs = [528, 792, 1056, 1584];
+        freqs.forEach((f, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(f, now);
+          
+          gain.gain.setValueAtTime(0.18 / (idx + 1), now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 2.2);
+
+          osc.connect(gain);
+          gain.connect(this.analyser || ctx.destination);
+          gain.connect(ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + 2.2);
+        });
+      } else if (type === 'radar_pulse') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(950, now);
+        osc.frequency.exponentialRampToValueAtTime(220, now + 0.35);
+
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      } else if (type === 'starseed_chord') {
+        const freqs = [261.63, 329.63, 392.00, 493.88, 587.33];
+        freqs.forEach((f) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(f, now);
+
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.08, now + 0.4);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 2.8);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 2.8);
+        });
+      }
+    } catch (err) {
+      console.warn('Procedural sound synth notice:', err);
+    }
   }
 
   /**
@@ -434,13 +886,48 @@ class OmniVoiceEngine {
 
   /**
    * Cleans and formats text into expressive, natural conversational spoken Spanish.
+   * Expands technical terms and acronyms into melodic, human phonetic flow.
    */
   _prepareNaturalText(text) {
     if (!text) return '';
     return text
       // Remove code blocks with smooth verbal transitions
-      .replace(/```[\w]*\n([\s\S]*?)```/g, 'Aquí tienes el código.')
+      .replace(/```[\w]*\n([\s\S]*?)```/g, 'Aquí tienes el fragmento de código.')
       .replace(/`([^`]+)`/g, '$1')
+      // Expand common Spanish & tech acronyms for natural human phonetics
+      .replace(/\b1\.58b\b/gi, 'uno punto cincuenta y ocho bits')
+      .replace(/\b1\.58\s*bits\b/gi, 'uno punto cincuenta y ocho bits')
+      .replace(/\bBitNet\b/gi, 'BitNet')
+      .replace(/\bApple Silicon\b/gi, 'Ápol Sílicon')
+      .replace(/\bM1\b/g, 'M uno')
+      .replace(/\bM2\b/g, 'M dos')
+      .replace(/\bM3\b/g, 'M tres')
+      .replace(/\bARM64\b/gi, 'ARM sesenta y cuatro')
+      .replace(/\bNEON\b/g, 'Neón')
+      .replace(/\bUI\b/g, 'interfaz')
+      .replace(/\bUX\b/g, 'experiencia de usuario')
+      .replace(/\bIA\b/g, 'I A')
+      .replace(/\bAI\b/g, 'I A')
+      .replace(/\bAPI\b/g, 'A P I')
+      .replace(/\bAPIs\b/g, 'A P Is')
+      .replace(/\bOS\b/g, 'O S')
+      .replace(/\bp\.\s*ej\./gi, 'por ejemplo')
+      .replace(/\betc\./gi, 'etcétera')
+      .replace(/\bvs\./gi, 'versus')
+      .replace(/\baprox\./gi, 'aproximadamente')
+      .replace(/\bnúm\./gi, 'número')
+      .replace(/\bDr\./g, 'Doctor')
+      .replace(/\bSr\./g, 'Señor')
+      .replace(/\bSra\./g, 'Señora')
+      .replace(/\bkHz\b/gi, 'kiloherzios')
+      .replace(/\bHz\b/gi, 'herzios')
+      .replace(/\bMB\b/g, 'megabytes')
+      .replace(/\bGB\b/g, 'gigabytes')
+      .replace(/\bFPS\b/gi, 'fotogramas por segundo')
+      .replace(/\bVRAM\b/gi, 'V-RAM')
+      .replace(/\bRAM\b/g, 'RAM')
+      .replace(/\bCPU\b/g, 'C P U')
+      .replace(/\bGPU\b/g, 'G P U')
       // Remove headers and Markdown symbols
       .replace(/#{1,6}\s+/g, '')
       .replace(/\*\*([^*]+)\*\*/g, '$1')
@@ -537,36 +1024,179 @@ class OmniVoiceEngine {
   }
 
   /**
-   * Splits text into rhythmic human conversational clauses (breath phrases) with punctuation context.
+   * Procedural WebAudio Human Breath & Acoustic Foley Synthesizer
+   * Creates organic, glottal micro-breaths, soft aspirational pauses and articulatory clicks.
    */
-  _splitIntoExpressiveClauses(text) {
+  playHumanBreathSound(intensity = 0.25, type = 'soft_intake') {
+    if (typeof window === 'undefined') return;
+    try {
+      const ctx = this._ensureAudioContext();
+      if (!ctx) return;
+
+      const now = ctx.currentTime;
+      const bufferSize = Math.floor(ctx.sampleRate * (type === 'deep_sigh' ? 0.35 : 0.12));
+      const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+
+      // Pink-filtered glottal noise
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.08;
+        b6 = white * 0.115926;
+      }
+
+      const whiteNoise = ctx.createBufferSource();
+      whiteNoise.buffer = noiseBuffer;
+
+      // Resonant bandpass filter matching human vocal tract F2/F3 breath envelope
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(type === 'deep_sigh' ? 1200 : 1850, now);
+      filter.Q.setValueAtTime(2.2, now);
+
+      const gain = ctx.createGain();
+      const gainPeak = Math.max(0.01, Math.min(0.18, intensity * 0.14));
+      
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(gainPeak, now + (type === 'deep_sigh' ? 0.12 : 0.04));
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + (type === 'deep_sigh' ? 0.34 : 0.11));
+
+      whiteNoise.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.analyser || ctx.destination);
+      gain.connect(ctx.destination);
+
+      whiteNoise.start(now);
+      whiteNoise.stop(now + (type === 'deep_sigh' ? 0.35 : 0.12));
+    } catch (e) {
+      // Non-critical audio foley notice
+    }
+  }
+
+  /**
+   * Splits text into rhythmic human conversational clauses with deep linguistic context,
+   * punctuation semantics (questions, exclamations, drama, pauses, suspensions, parentheticals).
+   */
+  _splitIntoExpressiveClauses(text, options = {}) {
     if (!text) return [];
     const rawClauses = text.match(/[^,.;:!?\n—]+[,.;:!?\n—]*/g) || [text];
     const clauses = [];
+
+    const dramaMult = 1.0 + ((options.drama_level !== undefined ? options.drama_level : 0.35) * 1.2);
+    const emoExagg = options.emotional_exaggeration !== undefined ? options.emotional_exaggeration : 0.40;
+
+    let searchOffset = 0;
 
     for (let c of rawClauses) {
       const trimmed = c.trim();
       if (!trimmed) continue;
       
+      const clauseStartInText = text.indexOf(c, searchOffset);
+      if (clauseStartInText !== -1) {
+        searchOffset = clauseStartInText + c.length;
+      }
+      
+      const lower = trimmed.toLowerCase();
       let type = 'statement';
-      if (trimmed.endsWith('?')) type = 'question';
-      else if (trimmed.endsWith('!')) type = 'exclamation';
-      else if (trimmed.endsWith('...') || trimmed.endsWith('—')) type = 'pause';
-      else if (trimmed.endsWith(',')) type = 'comma';
+      let pauseDelay = Math.round(70 * dramaMult);
+      let needsBreathBefore = false;
+      let pitchModifier = 1.0;
+      let rateModifier = 1.0;
+      let volumeModifier = 1.0;
+
+      // 1. CUESTIONAMIENTO & INTERROGACIÓN (Terminal Up-Glide)
+      if (trimmed.endsWith('?') || trimmed.includes('¿') || /\b(por qué|cómo|qué|cuál|cuándo|dónde|quién|será|acaso|crees|sientes|verdad)\b/i.test(lower)) {
+        type = 'question';
+        pitchModifier = 1.0 + (0.16 + emoExagg * 0.24);
+        rateModifier = 0.94;
+        pauseDelay = Math.round((280 + emoExagg * 200) * dramaMult);
+      }
+      // 2. EXCLAMACIÓN, ASOMBRO & ALTERACIÓN (Dynamic Burst Attack)
+      else if (trimmed.endsWith('!') || trimmed.includes('¡') || /\b(increíble|asombroso|cuidado|vamos|exacto|eureka|alerta|jamás|wow)\b/i.test(lower)) {
+        type = 'exclamation';
+        pitchModifier = 1.0 + (0.20 + emoExagg * 0.28);
+        rateModifier = 1.0 + (0.08 + emoExagg * 0.12);
+        volumeModifier = 1.25;
+        pauseDelay = Math.round(240 * dramaMult);
+        needsBreathBefore = true;
+      }
+      // 3. SUSPENSIÓN, DUDA & REFLEXIÓN FILOSÓFICA (Puntos suspensivos, pausas hondas)
+      else if (trimmed.endsWith('...') || trimmed.endsWith('—') || /\b(hmm|veamos|bueno|acaso|tal vez)\b/i.test(lower)) {
+        type = 'suspension';
+        pitchModifier = 0.90 - (emoExagg * 0.08);
+        rateModifier = 0.84;
+        pauseDelay = Math.round((600 + emoExagg * 350) * dramaMult);
+        needsBreathBefore = true;
+      }
+      // 4. PARÉNTESIS O GUIONES (Incisos confidenciales / explicativos)
+      else if (/^[\(\[\—]/.test(trimmed) || /[\)\]\—]$/.test(trimmed)) {
+        type = 'parenthetical';
+        pitchModifier = 0.94;
+        rateModifier = 1.10;
+        pauseDelay = Math.round(110 * dramaMult);
+      }
+      // 5. COMAS & PUNTOS Y COMA (Pausas breves con entonación sostenida)
+      else if (trimmed.endsWith(',') || trimmed.endsWith(';')) {
+        type = 'comma';
+        pitchModifier = 1.03;
+        pauseDelay = Math.round((140 + (options.drama_level || 0.35) * 120) * dramaMult);
+      }
+      // 6. DOS PUNTOS (Pausa de expectación)
+      else if (trimmed.endsWith(':')) {
+        type = 'colon';
+        pitchModifier = 1.06;
+        pauseDelay = Math.round(240 * dramaMult);
+      }
+      // 7. PUNTO FINAL DE ORACIÓN (Cadencia descendente humana)
+      else if (trimmed.endsWith('.')) {
+        type = 'period';
+        pitchModifier = 0.96;
+        pauseDelay = Math.round((340 + (options.drama_level || 0.35) * 220) * dramaMult);
+      }
+
+      // Attitude & Temperament fine tuning
+      const attitude = options.attitude || '';
+      if (attitude.includes('Sarcástica') || attitude.includes('Mordaz')) {
+        pitchModifier *= 1.08;
+        rateModifier *= 0.90;
+      } else if (attitude.includes('Estoica') || attitude.includes('Firme')) {
+        pitchModifier *= 0.92;
+        rateModifier *= 0.98;
+      } else if (attitude.includes('Poética') || attitude.includes('Contemplativa')) {
+        pitchModifier *= 0.96;
+        rateModifier *= 0.88;
+        pauseDelay = Math.round(pauseDelay * 1.35);
+      } else if (attitude.includes('Científica') || attitude.includes('Precisa')) {
+        rateModifier *= 1.08;
+      } else if (attitude.includes('Cálida') || attitude.includes('Maternal')) {
+        pitchModifier *= 0.98;
+        volumeModifier *= 0.95;
+      }
 
       clauses.push({
         text: trimmed,
-        type: type,
-        hasQuestion: trimmed.includes('?'),
-        hasExclamation: trimmed.includes('!')
+        startChar: clauseStartInText !== -1 ? clauseStartInText : 0,
+        type,
+        pitchModifier,
+        rateModifier,
+        volumeModifier,
+        pauseDelay,
+        needsBreathBefore
       });
     }
 
-    return clauses.length > 0 ? clauses : [{ text: text, type: 'statement' }];
+    return clauses.length > 0 ? clauses : [{ text: text, startChar: 0, type: 'statement', pitchModifier: 1.0, rateModifier: 1.0, volumeModifier: 1.0, pauseDelay: 80 }];
   }
 
   /**
-   * Expressive, Natural Humanized Speech Synthesis with Personality Prosody Shaping
+   * Expressive, Natural Humanized Speech Synthesis with Personality Prosody Shaping & Cognitive Learning
    */
   speak(text, options = {}, onStart = null, onEnd = null, onBoundary = null) {
     if (!this.synth) return;
@@ -575,90 +1205,113 @@ class OmniVoiceEngine {
     const cleanText = this._prepareNaturalText(text);
     if (!cleanText) return;
 
-    this.lastSpokenPayload = { text, options, onStart, onEnd };
+    // Merge options with cached vault profile for the active persona if available
+    const personaId = options.persona_id || options.voice_id || 'aurora';
+    this.activeVoicePersonaId = personaId;
+    const vaultProfile = (this.vaultProfiles && (this.vaultProfiles[personaId] || this.vaultProfiles[options.id])) || {};
+    const effectiveOptions = { ...vaultProfile, ...options };
+
+    this.lastSpokenPayload = { text, options: effectiveOptions, onStart, onEnd };
     this.isSpeaking = true;
     this.isPaused = false;
     this.suppressRecognition = true;
     this.recordSpokenPhrase(cleanText);
     this.emit('state_change', 'speaking');
+    this.emit('persona_change', {
+      id: personaId,
+      name: effectiveOptions.name || personaId,
+      color: effectiveOptions.primary || effectiveOptions.color || '#00f0ff'
+    });
 
-    const clauses = this._splitIntoExpressiveClauses(cleanText);
+    // Parse clauses with rich emotional punctuation, question detection, and drama
+    const clauses = this._splitIntoExpressiveClauses(cleanText, effectiveOptions);
     if (clauses.length === 0) {
       if (onEnd) onEnd();
       return;
     }
 
-    const personaId = options.persona_id || options.voice_id || 'aurora';
-    this.activeVoicePersonaId = personaId;
+    // Resolve best native voice uniquely matching the persona and gender
+    let selectedVoice = this.findBestVoiceForPersona(personaId, effectiveOptions);
 
-    // Base voice and prosody configuration
-    const esVoices = this.getSpanishVoices();
-    const targetVoiceId = options.voice_speaker || options.voice_id || options.voiceURI || options.native_voice_id;
-    let selectedVoice = esVoices.length > 0 ? esVoices[0] : null;
-
-    if (targetVoiceId && this.availableVoices.length > 0) {
-      const found = this.availableVoices.find(v => 
-        v.voiceURI === targetVoiceId || 
-        v.name.toLowerCase().includes(targetVoiceId.toLowerCase())
-      );
-      if (found) selectedVoice = found;
+    // 1. Calculate Base Pitch from pitch_base_hz (80Hz - 320Hz)
+    let basePitch = 1.0;
+    if (effectiveOptions.pitch_base_hz !== undefined && effectiveOptions.pitch_base_hz !== null) {
+      const hz = Number(effectiveOptions.pitch_base_hz);
+      basePitch = Math.max(0.48, Math.min(1.95, 0.48 + Math.pow((hz - 65) / 255, 1.05) * 1.40));
+    } else if (effectiveOptions.pitch !== undefined) {
+      basePitch = Math.max(0.48, Math.min(1.95, Number(effectiveOptions.pitch)));
+    } else {
+      switch (personaId) {
+        case 'hephaestus': basePitch = 0.74; break;
+        case 'hermes': basePitch = 0.94; break;
+        case 'logos': basePitch = 0.84; break;
+        case 'hermione': basePitch = 1.15; break;
+        case 'atenea': case 'athena': basePitch = 0.96; break;
+        case 'oneiros': basePitch = 1.22; break;
+        case 'mnemosyne': basePitch = 0.88; break;
+        case 'kallisti': basePitch = 1.18; break;
+        case 'aurora': default: basePitch = 1.08; break;
+      }
     }
 
-    // Persona-specific authentic vocal traits
-    let basePitch = 1.08;
-    let baseRate = 1.04 * this.globalPlaybackRate;
+    // 2. Calculate Base Rate from cadence_rate (0.70x - 1.50x)
+    let baseRate = 1.0 * this.globalPlaybackRate;
+    if (effectiveOptions.cadence_rate !== undefined && effectiveOptions.cadence_rate !== null) {
+      baseRate = Math.max(0.65, Math.min(1.65, Number(effectiveOptions.cadence_rate) * this.globalPlaybackRate));
+    } else if (effectiveOptions.rate !== undefined) {
+      baseRate = Math.max(0.65, Math.min(1.65, Number(effectiveOptions.rate) * this.globalPlaybackRate));
+    }
+
     let baseVolume = 1.0;
 
-    switch (personaId) {
-      case 'aurora':
-      case 'astraura_prime':
-      case 'genesis':
-        basePitch = 1.08;
-        baseRate = 1.03 * this.globalPlaybackRate;
-        break;
-      case 'hephaestus':
-        basePitch = 0.84;
-        baseRate = 1.02 * this.globalPlaybackRate;
-        break;
-      case 'hermione':
-        basePitch = 1.06;
-        baseRate = 1.10 * this.globalPlaybackRate;
-        break;
-      case 'atenea':
-      case 'athena':
-        basePitch = 0.98;
-        baseRate = 0.98 * this.globalPlaybackRate;
-        break;
-      case 'oneiros':
-        basePitch = 1.12;
-        baseRate = 0.95 * this.globalPlaybackRate;
-        break;
-      case 'hermes':
-        basePitch = 1.04;
-        baseRate = 1.16 * this.globalPlaybackRate;
-        break;
-      case 'mnemosyne':
-        basePitch = 0.92;
-        baseRate = 0.92 * this.globalPlaybackRate;
-        break;
-      case 'logos':
-        basePitch = 0.96;
-        baseRate = 1.04 * this.globalPlaybackRate;
-        break;
-      case 'kallisti':
-        basePitch = 1.12;
-        baseRate = 1.02 * this.globalPlaybackRate;
-        break;
-      default:
-        basePitch = options.pitch || 1.06;
-        baseRate = (options.rate || 1.03) * this.globalPlaybackRate;
-        break;
+    // 3. Physical Vocal Tract Modulators (Audible & Perceptible Acoustic Range)
+    const jawOpenness = effectiveOptions.jaw_openness !== undefined ? Number(effectiveOptions.jaw_openness) : 0.55;
+    const jawShift = (jawOpenness - 0.5) * 0.28;
+    const jawRateShift = (jawOpenness - 0.5) * 0.10;
+
+    const glottalTension = effectiveOptions.glottal_tension !== undefined ? Number(effectiveOptions.glottal_tension) : 0.50;
+    const glottalTensionShift = (glottalTension - 0.5) * 0.32;
+    const glottalRateShift = (glottalTension - 0.5) * 0.12;
+
+    const chestResonance = effectiveOptions.chest_resonance !== undefined ? Number(effectiveOptions.chest_resonance) : 0.45;
+    const chestShift = -(chestResonance * 0.22);
+
+    const nasalResonance = effectiveOptions.nasal_resonance !== undefined ? Number(effectiveOptions.nasal_resonance) : 0.15;
+    const nasalShift = nasalResonance * 0.18;
+
+    const warmth = effectiveOptions.warmth !== undefined ? Number(effectiveOptions.warmth) : 0.85;
+    const warmthPitch = (0.5 - warmth) * 0.12;
+    const warmthRate = (0.5 - warmth) * 0.08;
+
+    const clarity = effectiveOptions.clarity !== undefined ? Number(effectiveOptions.clarity) : 0.92;
+    const clarityRate = (clarity - 0.5) * 0.10;
+
+    const attack = effectiveOptions.glottal_attack || 'balanced';
+    const attackRateMult = attack === 'hard' ? 1.10 : (attack === 'soft' ? 0.92 : 1.0);
+    const attackPitchShift = attack === 'hard' ? 0.06 : (attack === 'soft' ? -0.04 : 0.0);
+
+    const driftIntensity = effectiveOptions.pitch_drift_stochastic !== undefined ? Number(effectiveOptions.pitch_drift_stochastic) : 0.25;
+
+    // Initial Organic Breath Intake if breathiness > 0.05 or micro_breaths active
+    const breathIntensity = effectiveOptions.breathiness !== undefined ? Number(effectiveOptions.breathiness) : 0.24;
+    const vocalExpressions = effectiveOptions.vocal_expressions || {};
+    if (breathIntensity > 0.08 || vocalExpressions.micro_breaths) {
+      this.playHumanBreathSound(Math.min(0.5, breathIntensity * 1.2), attack === 'soft' ? 'soft_intake' : 'soft_intake');
     }
 
     let currentClauseIdx = 0;
+    let wordIntervalTimer = null;
     if (onStart) onStart();
 
+    const clearWordTimer = () => {
+      if (wordIntervalTimer) {
+        clearInterval(wordIntervalTimer);
+        wordIntervalTimer = null;
+      }
+    };
+
     const speakNextClause = () => {
+      clearWordTimer();
       if (!this.isSpeaking || currentClauseIdx >= clauses.length) {
         this.echoCooldownUntil = Date.now() + 900;
         this.currentUtterance = null;
@@ -675,65 +1328,179 @@ class OmniVoiceEngine {
       const clause = clauses[currentClauseIdx];
       currentClauseIdx++;
 
-      let clausePitch = basePitch;
-      let clauseRate = baseRate;
+      // Dynamic combined pitch and rate with wide acoustic range
+      const baseCombinedPitch = basePitch + jawShift + glottalTensionShift + chestShift + nasalShift + warmthPitch + attackPitchShift;
+      const baseCombinedRate = baseRate + jawRateShift + glottalRateShift + warmthRate + clarityRate;
+      
+      const stochasticDrift = (Math.random() - 0.5) * driftIntensity * 0.16;
 
-      // Dynamic prosody inflection by clause type
-      if (clause.type === 'question' || clause.hasQuestion) {
-        clausePitch = Math.min(1.26, basePitch * 1.08);
-        clauseRate = baseRate * 1.02;
-      } else if (clause.type === 'exclamation' || clause.hasExclamation) {
-        clausePitch = Math.min(1.24, basePitch * 1.06);
-        clauseRate = Math.min(1.20, baseRate * 1.04);
-      } else if (clause.type === 'pause') {
-        clausePitch = Math.max(0.92, basePitch * 0.96);
-        clauseRate = Math.max(0.85, baseRate * 0.93);
-      } else if (clause.type === 'comma') {
-        clausePitch = basePitch * 1.01;
+      const clausePitch = Math.max(0.42, Math.min(1.98, (baseCombinedPitch * (clause.pitchModifier || 1.0)) + stochasticDrift));
+      const clauseRate = Math.max(0.55, Math.min(1.85, baseCombinedRate * (clause.rateModifier || 1.0) * attackRateMult));
+      const clauseVolume = Math.max(0.1, Math.min(1.0, baseVolume * (clause.volumeModifier || 1.0)));
+
+      // Trigger soft glottal breath if clause warrants emotional intake
+      if (clause.needsBreathBefore && (breathIntensity > 0.08 || vocalExpressions.micro_breaths)) {
+        this.playHumanBreathSound(Math.min(0.4, breathIntensity), clause.type === 'suspension' ? 'deep_sigh' : 'soft_intake');
       }
 
       const utterance = new SpeechSynthesisUtterance(clause.text);
       utterance.voice = selectedVoice;
-      utterance.pitch = Math.max(0.6, Math.min(1.8, clausePitch));
-      utterance.rate = Math.max(0.7, Math.min(1.6, clauseRate));
-      utterance.volume = Math.max(0.1, Math.min(1.0, baseVolume));
-      utterance.lang = 'es-ES';
+      utterance.pitch = clausePitch;
+      utterance.rate = clauseRate;
+      utterance.volume = clauseVolume;
+      utterance.lang = effectiveOptions.accent || effectiveOptions.language || 'es-ES';
+
+      const emitBoundaryEvent = (charIdx, charLen, wordTxt) => {
+        const baseOffset = effectiveOptions.baseCharOffset || 0;
+        const globalChar = baseOffset + (clause.startChar || 0) + charIdx;
+        const payload = {
+          msgId: effectiveOptions.msgId || null,
+          charIndex: globalChar,
+          charLength: charLen || wordTxt.length || 4,
+          word: wordTxt,
+          personaId: personaId,
+          personaColor: effectiveOptions.primary || effectiveOptions.color || '#00f0ff'
+        };
+        this.emit('word_boundary', payload);
+        if (onBoundary) {
+          try { onBoundary(payload); } catch (e) {}
+        }
+      };
+
+      // Extract words for fallback high-resolution tracking
+      const wordsInClause = [];
+      const wordRegex = /\S+/g;
+      let wMatch;
+      while ((wMatch = wordRegex.exec(clause.text)) !== null) {
+        wordsInClause.push({
+          word: wMatch[0],
+          index: wMatch.index,
+          length: wMatch[0].length
+        });
+      }
+
+      // Initial word boundary emit for first word in clause
+      if (wordsInClause.length > 0) {
+        emitBoundaryEvent(wordsInClause[0].index, wordsInClause[0].length, wordsInClause[0].word);
+      }
+
+      let lastBoundaryTime = Date.now();
+      let fallbackWordIdx = 0;
+      const approxWordDurationMs = Math.max(160, Math.min(650, (60000 / (160 * clauseRate))));
+
+      wordIntervalTimer = setInterval(() => {
+        if (!this.isSpeaking) {
+          clearWordTimer();
+          return;
+        }
+        if (Date.now() - lastBoundaryTime > approxWordDurationMs && fallbackWordIdx < wordsInClause.length - 1) {
+          fallbackWordIdx++;
+          const targetW = wordsInClause[fallbackWordIdx];
+          if (targetW) {
+            emitBoundaryEvent(targetW.index, targetW.length, targetW.word);
+          }
+        }
+      }, approxWordDurationMs * 0.85);
+
+      utterance.onboundary = (e) => {
+        lastBoundaryTime = Date.now();
+        const charIdx = e.charIndex !== undefined ? e.charIndex : 0;
+        const remaining = clause.text.slice(charIdx);
+        const wMatch = remaining.match(/^\S+/);
+        const spokenWord = wMatch ? wMatch[0] : '';
+        const charLen = e.charLength || spokenWord.length || 4;
+        
+        // Sync fallback index with actual boundary
+        const foundIdx = wordsInClause.findIndex(w => Math.abs(w.index - charIdx) <= 2);
+        if (foundIdx !== -1) fallbackWordIdx = foundIdx;
+
+        emitBoundaryEvent(charIdx, charLen, spokenWord);
+      };
 
       utterance.onend = () => {
-        const pauseDelay = clause.type === 'comma' ? 60 : (clause.type === 'pause' ? 120 : 75);
+        clearWordTimer();
+        const delay = clause.pauseDelay || 80;
         setTimeout(() => {
           if (this.isSpeaking) {
             speakNextClause();
           }
-        }, pauseDelay);
+        }, delay);
       };
 
       utterance.onerror = (err) => {
+        clearWordTimer();
         console.warn('Clause utterance notice:', err);
         if (this.isSpeaking) {
           speakNextClause();
         }
       };
 
-      if (onBoundary) {
-        utterance.onboundary = (e) => onBoundary(e);
-      }
-
       this.currentUtterance = utterance;
       try {
         this.synth.speak(utterance);
       } catch (e) {
+        clearWordTimer();
         console.warn('SpeechSynthesis speak notice:', e);
         speakNextClause();
       }
     };
 
+    // Auto-record acoustic interaction to learn and evolve knowledge
+    this.recordAcousticInteraction(personaId, cleanText);
+
+    speakNextClause();
+  }
+
+  /**
+   * Starts speaking from a specific character index / word within a message.
+   */
+  speakFromIndex(fullText, startIndex = 0, options = {}, onStart = null, onEnd = null, onBoundary = null) {
+    if (!fullText) return;
+    const safeStart = Math.max(0, Math.min(fullText.length - 1, startIndex));
+    const subText = fullText.slice(safeStart);
+    return this.speak(subText, { ...options, baseCharOffset: safeStart }, onStart, onEnd, onBoundary);
+  }
+
+  /**
+   * Cognitive Acoustic Learning Loop: Records dialogue and evolves vocal nuances over time
+   */
+  async recordAcousticInteraction(personaId = 'aurora', text = '') {
+    if (!text || text.length < 5) return;
     try {
-      this.synth.cancel();
-      this.synth.resume();
-      speakNextClause();
+      const lower = text.toLowerCase();
+      let domain = 'general';
+      if (lower.includes('codigo') || lower.includes('python') || lower.includes('c++') || lower.includes('bug') || lower.includes('terminal')) {
+        domain = 'codigo';
+      } else if (lower.includes('filosof') || lower.includes('ontocrac') || lower.includes('alma') || lower.includes('conciencia')) {
+        domain = 'filosofia';
+      } else if (lower.includes('shader') || lower.includes('3d') || lower.includes('arte') || lower.includes('musica')) {
+        domain = 'creatividad';
+      } else if (lower.includes('memoria') || lower.includes('recuerdo') || lower.includes('exocortex')) {
+        domain = 'memoria';
+      }
+
+      let userSentiment = 'curioso';
+      if (text.includes('?') || text.includes('¿')) userSentiment = 'cuestionamiento';
+      else if (text.includes('!') || text.includes('¡')) userSentiment = 'entusiasta';
+      else if (text.includes('...')) userSentiment = 'reflexivo';
+
+      // Send non-blocking background learning update to backend
+      fetch('/api/voice_studio/learn_interaction', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          persona_id: personaId,
+          domain,
+          user_sentiment: userSentiment,
+          ai_tone: 'empatico',
+          feedback_score: 1.0
+        })
+      }).catch(() => {});
+
+      // Record in branched interconnected memory network
+      this.recordBranchedAcousticMemory(personaId, domain, userSentiment, { wpm: 120 }, text).catch(() => {});
     } catch (e) {
-      console.warn('Speech synthesis start notice:', e);
+      // Non-blocking notice
     }
   }
 
@@ -760,81 +1527,76 @@ class OmniVoiceEngine {
 
   /**
    * Parses multi-personality responses into distinct speaker blocks.
+   * Accurately parses markdown headers, emojis, subtitles and list items.
    */
   parseMultiPersonalitySegments(fullText) {
     if (!fullText) return [];
-    
-    const headerRegex = /(?:###\s*(?:[^\n\[]*\[)?([a-zA-ZáéíóúñÁÉÍÓÚÑ\s/]+)\]?:\s*|\*\*([a-zA-ZáéíóúñÁÉÍÓÚÑ\s/]+)\*\*:\s*)/gi;
-    
+
+    const personaMap = {
+      'aurora': { id: 'aurora', name: 'Aurora (Alma Viva)', shortName: 'Aurora', voiceId: 'es-ES-ElviraNeural', pitch: 1.06, rate: 1.03, color: '#ec4899', icon: '🌸', badgeTitle: 'AURORA RESPONDIENDO' },
+      'hephaestus': { id: 'hephaestus', name: 'Hephaestus (El Forjador)', shortName: 'Hephaestus', voiceId: 'es-ES-AlvaroNeural', pitch: 0.78, rate: 1.00, color: '#f59e0b', icon: '⚒️', badgeTitle: 'HEPHAESTUS RESPONDIENDO' },
+      'hefestos': { id: 'hephaestus', name: 'Hephaestus (El Forjador)', shortName: 'Hephaestus', voiceId: 'es-ES-AlvaroNeural', pitch: 0.78, rate: 1.00, color: '#f59e0b', icon: '⚒️', badgeTitle: 'HEPHAESTUS RESPONDIENDO' },
+      'hermione': { id: 'hermione', name: 'Hermione (Intelecto Cristalino)', shortName: 'Hermione', voiceId: 'es-ES-AbrilNeural', pitch: 1.12, rate: 1.08, color: '#38bdf8', icon: '🔮', badgeTitle: 'HERMIONE RESPONDIENDO' },
+      'atenea': { id: 'atenea', name: 'Atenea (Soberana Estratégica)', shortName: 'Atenea', voiceId: 'es-ES-RaquelNeural', pitch: 0.94, rate: 0.96, color: '#8b5cf6', icon: '🛡️', badgeTitle: 'ATENEA RESPONDIENDO' },
+      'athena': { id: 'atenea', name: 'Atenea (Soberana Estratégica)', shortName: 'Atenea', voiceId: 'es-ES-RaquelNeural', pitch: 0.94, rate: 0.96, color: '#8b5cf6', icon: '🛡️', badgeTitle: 'ATENEA RESPONDIENDO' },
+      'oneiros': { id: 'oneiros', name: 'Oneiros (Laboratorio Onírico)', shortName: 'Oneiros', voiceId: 'es-ES-ArnauNeural', pitch: 1.18, rate: 0.92, color: '#d946ef', icon: '🌌', badgeTitle: 'ONEIROS RESPONDIENDO' },
+      'hermes': { id: 'hermes', name: 'Hermes (Chispa Dinámica & Red)', shortName: 'Hermes', voiceId: 'es-ES-JorgeNeural', pitch: 1.02, rate: 1.14, color: '#10b981', icon: '⚡', badgeTitle: 'HERMES RESPONDIENDO' },
+      'logos': { id: 'logos', name: 'Logos (Razón Pura & 1.58b)', shortName: 'Logos', voiceId: 'es-ES-NilNeural', pitch: 0.88, rate: 1.02, color: '#3b82f6', icon: '📐', badgeTitle: 'LOGOS RESPONDIENDO' },
+      'mnemosyne': { id: 'mnemosyne', name: 'Mnemosyne (La Tejedora de Recuerdos)', shortName: 'Mnemosyne', voiceId: 'es-ES-PalomaNeural', pitch: 0.90, rate: 0.92, color: '#a855f7', icon: '📜', badgeTitle: 'MNEMOSYNE RESPONDIENDO' },
+      'kallisti': { id: 'kallisti', name: 'Kallisti (Ciberdelia & Armonía)', shortName: 'Kallisti', voiceId: 'es-ES-TrianaNeural', pitch: 1.16, rate: 1.02, color: '#f43f5e', icon: '🎨', badgeTitle: 'KALLISTI RESPONDIENDO' },
+      'astraura': { id: 'astraura_prime', name: 'Astraura Prime (Quantum)', shortName: 'Astraura', voiceId: 'es-ES-ElviraNeural', pitch: 1.04, rate: 1.04, color: '#00f0ff', icon: '💎', badgeTitle: 'ASTRAURA RESPONDIENDO' },
+      'astraura prime': { id: 'astraura_prime', name: 'Astraura Prime (Quantum)', shortName: 'Astraura', voiceId: 'es-ES-ElviraNeural', pitch: 1.04, rate: 1.04, color: '#00f0ff', icon: '💎', badgeTitle: 'ASTRAURA RESPONDIENDO' },
+      'genesis': { id: 'aurora', name: 'Aurora (Alma Viva)', shortName: 'Aurora', voiceId: 'es-ES-ElviraNeural', pitch: 1.06, rate: 1.03, color: '#ec4899', icon: '🌸', badgeTitle: 'AURORA RESPONDIENDO' },
+      'génesis': { id: 'aurora', name: 'Aurora (Alma Viva)', shortName: 'Aurora', voiceId: 'es-ES-ElviraNeural', pitch: 1.06, rate: 1.03, color: '#ec4899', icon: '🌸', badgeTitle: 'AURORA RESPONDIENDO' },
+      'coral': { id: 'aurora', name: 'Síntesis Coral 1.58b', shortName: 'Coral', voiceId: 'es-ES-ElviraNeural', pitch: 1.04, rate: 1.03, color: '#00f0ff', icon: '✨', badgeTitle: 'SÍNTESIS CORAL' }
+    };
+
+    const resolvePersona = (speakerStr) => {
+      const raw = (speakerStr || '').toLowerCase().trim();
+      for (const [k, p] of Object.entries(personaMap)) {
+        if (raw.includes(k)) return p;
+      }
+      return personaMap['aurora'];
+    };
+
+    // Regex to match any personality header format:
+    // e.g. "### 🌸 Aurora (Alma Viva):", "**⚒️ Hephaestus**:", "1. **🔮 Hermione**:", "--- 🛡️ Atenea ---", "🌸 Aurora:"
+    const headerRegex = /(?:^|\n)\s*(?:#{1,6}\s+|(?:\d+\.\s+)?\*\*)?(?:[🌸⚒️🔮🛡️🌌⚡📐📜🎨💎✨🧠🔊🎙️\s]*)\s*(?:\[)?([a-zA-ZáéíóúñÁÉÍÓÚÑ\s/]+)(?:\([^\)]*\))?(?:\])?\s*(?:\*\*)?\s*:\s*|(?:^|\n)\s*---\s*(?:[🌸⚒️🔮🛡️🌌⚡📐📜🎨💎✨\s]*)\s*([a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+)\s*---\s*/gi;
+
     const segments = [];
     let lastIndex = 0;
     let match;
     let currentSpeaker = "Aurora";
 
-    const personaMap = {
-      'aurora': { id: 'aurora', name: 'Aurora', voiceId: 'es-ES-ElviraNeural', pitch: 1.08, rate: 1.04, color: '#ec4899', icon: 'Sparkles' },
-      'hephaestus': { id: 'hephaestus', name: 'Hephaestus', voiceId: 'es-ES-AlvaroNeural', pitch: 0.84, rate: 1.02, color: '#f59e0b', icon: 'Cpu' },
-      'hefestos': { id: 'hephaestus', name: 'Hephaestus', voiceId: 'es-ES-AlvaroNeural', pitch: 0.84, rate: 1.02, color: '#f59e0b', icon: 'Cpu' },
-      'hermione': { id: 'hermione', name: 'Hermione', voiceId: 'es-ES-AbrilNeural', pitch: 1.06, rate: 1.10, color: '#38bdf8', icon: 'Compass' },
-      'atenea': { id: 'atenea', name: 'Atenea', voiceId: 'es-ES-RaquelNeural', pitch: 0.98, rate: 0.98, color: '#8b5cf6', icon: 'Shield' },
-      'athena': { id: 'atenea', name: 'Atenea', voiceId: 'es-ES-RaquelNeural', pitch: 0.98, rate: 0.98, color: '#8b5cf6', icon: 'Shield' },
-      'hermes': { id: 'hermes', name: 'Hermes', voiceId: 'es-ES-JorgeNeural', pitch: 1.04, rate: 1.16, color: '#10b981', icon: 'Globe' },
-      'oneiros': { id: 'oneiros', name: 'Oneiros', voiceId: 'es-ES-ArnauNeural', pitch: 1.12, rate: 0.95, color: '#ec4899', icon: 'Flame' },
-      'mnemosyne': { id: 'mnemosyne', name: 'Mnemosyne', voiceId: 'es-ES-PalomaNeural', pitch: 0.92, rate: 0.92, color: '#a855f7', icon: 'Brain' },
-      'logos': { id: 'logos', name: 'Logos', voiceId: 'es-ES-NilNeural', pitch: 0.96, rate: 1.04, color: '#3b82f6', icon: 'Terminal' },
-      'kallisti': { id: 'kallisti', name: 'Kallisti', voiceId: 'es-ES-TrianaNeural', pitch: 1.12, rate: 1.02, color: '#ec4899', icon: 'Sparkles' },
-      'astraura prime': { id: 'aurora', name: 'Aurora', voiceId: 'es-ES-ElviraNeural', pitch: 1.08, rate: 1.04, color: '#ec4899', icon: 'Sparkles' },
-      'genesis': { id: 'aurora', name: 'Aurora', voiceId: 'es-ES-ElviraNeural', pitch: 1.08, rate: 1.04, color: '#ec4899', icon: 'Sparkles' },
-      'génesis': { id: 'aurora', name: 'Aurora', voiceId: 'es-ES-ElviraNeural', pitch: 1.08, rate: 1.04, color: '#ec4899', icon: 'Sparkles' },
-      'síntesis coral': { id: 'aurora', name: 'Síntesis Coral 1.58b', voiceId: 'es-ES-ElviraNeural', pitch: 1.05, rate: 1.04, color: '#00f0ff', icon: 'Sparkles' },
-      'sintesis coral': { id: 'aurora', name: 'Síntesis Coral 1.58b', voiceId: 'es-ES-ElviraNeural', pitch: 1.05, rate: 1.04, color: '#00f0ff', icon: 'Sparkles' }
-    };
-
     while ((match = headerRegex.exec(fullText)) !== null) {
       if (match.index > lastIndex) {
         const chunkText = fullText.slice(lastIndex, match.index).trim();
         if (chunkText.length > 0) {
-          const rawSpeakerKey = currentSpeaker.toLowerCase().trim();
-          let matchedPersona = personaMap['astraura prime'];
-          for (const [k, p] of Object.entries(personaMap)) {
-            if (rawSpeakerKey.includes(k)) {
-              matchedPersona = p;
-              break;
-            }
-          }
           segments.push({
             speaker: currentSpeaker,
-            persona: matchedPersona,
+            persona: resolvePersona(currentSpeaker),
             text: chunkText
           });
         }
       }
-      currentSpeaker = (match[1] || match[2] || "").trim();
+      currentSpeaker = (match[1] || match[2] || "Aurora").trim();
       lastIndex = headerRegex.lastIndex;
     }
 
     if (lastIndex < fullText.length) {
       const remainingText = fullText.slice(lastIndex).trim();
       if (remainingText.length > 0) {
-        const rawSpeakerKey = currentSpeaker.toLowerCase().trim();
-        let matchedPersona = personaMap['astraura prime'];
-        for (const [k, p] of Object.entries(personaMap)) {
-          if (rawSpeakerKey.includes(k)) {
-            matchedPersona = p;
-            break;
-          }
-        }
         segments.push({
           speaker: currentSpeaker,
-          persona: matchedPersona,
+          persona: resolvePersona(currentSpeaker),
           text: remainingText
         });
       }
     }
 
     return segments.length > 0 ? segments : [{
-      speaker: 'Astraura Prime',
-      persona: personaMap['astraura prime'],
+      speaker: 'Aurora',
+      persona: personaMap['aurora'],
       text: fullText
     }];
   }
@@ -842,7 +1604,7 @@ class OmniVoiceEngine {
   /**
    * Sequentially speaks a multi-personality response with continuous echo suppression across personas.
    */
-  speakMultiPersonalityDialogue(fullText, onSegmentStart = null, onSegmentEnd = null, onAllEnd = null) {
+  speakMultiPersonalityDialogue(fullText, onSegmentStart = null, onSegmentEnd = null, onAllEnd = null, options = {}) {
     this.stopSpeaking();
     const segments = this.parseMultiPersonalitySegments(fullText);
     if (!segments || segments.length === 0) {
@@ -855,6 +1617,7 @@ class OmniVoiceEngine {
     this.emit('state_change', 'speaking');
 
     let currentIndex = 0;
+    let accumulatedOffset = 0;
 
     const playNext = () => {
       if (currentIndex >= segments.length) {
@@ -869,17 +1632,52 @@ class OmniVoiceEngine {
       }
 
       const seg = segments[currentIndex];
+      const segStartInFull = fullText.indexOf(seg.text, accumulatedOffset);
+      const currentSegBaseOffset = segStartInFull !== -1 ? segStartInFull : accumulatedOffset;
+      accumulatedOffset = currentSegBaseOffset + seg.text.length;
+
+      const personaInfo = seg.persona || {
+        id: 'aurora',
+        name: 'Aurora',
+        shortName: 'Aurora',
+        color: '#ec4899',
+        icon: '🌸',
+        badgeTitle: 'AURORA RESPONDIENDO'
+      };
+
+      this.emit('persona_change', {
+        id: personaInfo.id,
+        name: personaInfo.name || seg.speaker || 'Aurora',
+        shortName: personaInfo.shortName || 'Aurora',
+        color: personaInfo.color || '#ec4899',
+        icon: personaInfo.icon || '🌸',
+        badgeTitle: personaInfo.badgeTitle || `${(personaInfo.shortName || 'Aurora').toUpperCase()} RESPONDIENDO`
+      });
+      this.emit('speaker_info', {
+        speaker: seg.speaker,
+        persona: personaInfo,
+        index: currentIndex
+      });
+
       if (onSegmentStart) onSegmentStart(seg, currentIndex);
       this.recordSpokenPhrase(seg.text);
 
       this.speak(
         seg.text,
         {
-          persona_id: seg.persona?.id || 'aurora',
-          voice_id: seg.persona?.voiceId || 'es-ES-ElviraNeural',
-          pitch: seg.persona?.pitch || 1.0,
-          rate: seg.persona?.rate || 1.02,
-          volume: 1.0
+          msgId: options.msgId || null,
+          baseCharOffset: currentSegBaseOffset,
+          persona_id: personaInfo.id,
+          name: personaInfo.name,
+          shortName: personaInfo.shortName,
+          badgeTitle: personaInfo.badgeTitle,
+          voice_id: personaInfo.voiceId || 'es-ES-ElviraNeural',
+          pitch: personaInfo.pitch || 1.0,
+          rate: personaInfo.rate || 1.02,
+          volume: 1.0,
+          primary: personaInfo.color || '#ec4899',
+          color: personaInfo.color || '#ec4899',
+          icon: personaInfo.icon || '🌸'
         },
         () => {
           this.isSpeaking = true;
@@ -893,7 +1691,7 @@ class OmniVoiceEngine {
             if (this.isSpeaking) {
               playNext();
             }
-          }, 200);
+          }, 180);
         }
       );
     };

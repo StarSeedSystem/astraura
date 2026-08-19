@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import InteractiveCodeRuntime from './InteractiveCodeRuntime';
@@ -41,8 +41,182 @@ function isRealCodeBlock(codeString, rawLang) {
   return codePatterns.some(pat => pat.test(trimmed));
 }
 
-export default function MultimodalMessageRenderer({ text }) {
+/**
+ * Individual Word Item with Auto-Scroll Tracking, Karaoke Glow & Seek triggers
+ */
+function InteractiveWordItem({
+  tok,
+  start,
+  isHighlighted,
+  highlightColor,
+  messageId,
+  fullText,
+  activePersonaId,
+  onSpeakFromWord
+}) {
+  const spanRef = useRef(null);
+  const pressTimerRef = useRef(null);
+
+  useEffect(() => {
+    if (isHighlighted && spanRef.current) {
+      spanRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'nearest'
+      });
+    }
+  }, [isHighlighted]);
+
+  const handleStartPress = () => {
+    if (pressTimerRef.current) clearTimeout(pressTimerRef.current);
+    pressTimerRef.current = setTimeout(() => {
+      if (onSpeakFromWord) {
+        onSpeakFromWord(messageId, fullText, start, activePersonaId);
+      }
+    }, 450);
+  };
+
+  const handleEndPress = () => {
+    if (pressTimerRef.current) {
+      clearTimeout(pressTimerRef.current);
+      pressTimerRef.current = null;
+    }
+  };
+
+  return (
+    <span
+      ref={spanRef}
+      onDoubleClick={(e) => {
+        e.stopPropagation();
+        if (onSpeakFromWord) {
+          onSpeakFromWord(messageId, fullText, start, activePersonaId);
+        }
+      }}
+      onMouseDown={handleStartPress}
+      onMouseUp={handleEndPress}
+      onMouseLeave={handleEndPress}
+      onTouchStart={handleStartPress}
+      onTouchEnd={handleEndPress}
+      onTouchCancel={handleEndPress}
+      className={`inline-block transition-all duration-100 rounded px-0.5 cursor-pointer select-text ${
+        isHighlighted
+          ? 'font-bold text-white scale-105 ring-1 ring-white/80 shadow-md active-spoken-word'
+          : 'hover:bg-cyan-500/15 hover:text-cyan-200'
+      }`}
+      style={
+        isHighlighted
+          ? {
+              backgroundColor: `${highlightColor}50`,
+              boxShadow: `0 0 12px ${highlightColor}95`,
+              borderBottom: `2px solid ${highlightColor}`
+            }
+          : undefined
+      }
+      title="Doble clic o mantén presionado para reproducir voz desde aquí"
+    >
+      {tok}
+    </span>
+  );
+}
+
+/**
+ * Interactive word-by-word token span with Real-Time Karaoke Selection Glow & Double-Click/Long-Press Seek
+ */
+function WordHighlightSpan({ 
+  textSegment, 
+  baseCharOffset = 0, 
+  fullText = '', 
+  messageId = '', 
+  activeSpeechHighlight = null, 
+  onSpeakFromWord = null, 
+  activePersonaId = 'aurora' 
+}) {
+  if (typeof textSegment !== 'string' || !textSegment) {
+    return textSegment;
+  }
+
+  const isMsgActive = activeSpeechHighlight?.msgId === messageId && activeSpeechHighlight?.isSpeaking;
+  const activeChar = isMsgActive ? (activeSpeechHighlight?.charIndex ?? -1) : -1;
+  const highlightColor = activeSpeechHighlight?.personaColor || '#00f0ff';
+
+  const tokens = textSegment.split(/(\s+)/);
+  let currentOffset = baseCharOffset;
+
+  return (
+    <>
+      {tokens.map((tok, i) => {
+        const start = currentOffset;
+        const end = start + tok.length;
+        currentOffset += tok.length;
+
+        if (/^\s+$/.test(tok)) {
+          return <span key={i}>{tok}</span>;
+        }
+
+        const isHighlighted = isMsgActive && (activeChar >= start - 2 && activeChar < end + 2);
+
+        return (
+          <InteractiveWordItem
+            key={i}
+            tok={tok}
+            start={start}
+            isHighlighted={isHighlighted}
+            highlightColor={highlightColor}
+            messageId={messageId}
+            fullText={fullText}
+            activePersonaId={activePersonaId}
+            onSpeakFromWord={onSpeakFromWord}
+          />
+        );
+      })}
+    </>
+  );
+}
+
+function renderInteractiveChildren(children, fullText, messageId, activeSpeechHighlight, onSpeakFromWord, activePersonaId) {
+  let searchOffset = 0;
+
+  const traverse = (node) => {
+    if (typeof node === 'string') {
+      const idx = fullText.indexOf(node, searchOffset);
+      const base = idx !== -1 ? idx : searchOffset;
+      if (idx !== -1) searchOffset = idx + node.length;
+      return (
+        <WordHighlightSpan
+          textSegment={node}
+          baseCharOffset={base}
+          fullText={fullText}
+          messageId={messageId}
+          activeSpeechHighlight={activeSpeechHighlight}
+          onSpeakFromWord={onSpeakFromWord}
+          activePersonaId={activePersonaId}
+        />
+      );
+    }
+    if (Array.isArray(node)) {
+      return node.map((child, index) => <React.Fragment key={index}>{traverse(child)}</React.Fragment>);
+    }
+    if (React.isValidElement(node) && node.props && node.props.children) {
+      return React.cloneElement(node, {
+        children: traverse(node.props.children)
+      });
+    }
+    return node;
+  };
+
+  return traverse(children);
+}
+
+export default function MultimodalMessageRenderer({ 
+  text, 
+  messageId = '', 
+  activeSpeechHighlight = null, 
+  onSpeakFromWord = null, 
+  activePersonaId = 'aurora' 
+}) {
   if (!text) return null;
+
+  const wrap = (children) => renderInteractiveChildren(children, text, messageId, activeSpeechHighlight, onSpeakFromWord, activePersonaId);
 
   // Custom Components for ReactMarkdown
   const components = {
@@ -95,21 +269,21 @@ export default function MultimodalMessageRenderer({ text }) {
     th({ children }) {
       return (
         <th className="px-3 py-2 bg-white/5 font-mono text-[11px] font-bold text-cyan-300 uppercase tracking-wider">
-          {children}
+          {wrap(children)}
         </th>
       );
     },
     td({ children }) {
       return (
         <td className="px-3 py-2 text-slate-300 border-t border-white/5">
-          {children}
+          {wrap(children)}
         </td>
       );
     },
     blockquote({ children }) {
       return (
         <blockquote className="border-l-2 border-cyan-400 pl-3 my-2 text-slate-400 italic text-xs bg-cyan-500/5 py-1 rounded-r-lg">
-          {children}
+          {wrap(children)}
         </blockquote>
       );
     },
@@ -132,19 +306,19 @@ export default function MultimodalMessageRenderer({ text }) {
       return <ol className="list-decimal list-inside my-2 space-y-1 text-slate-300">{children}</ol>;
     },
     li({ children }) {
-      return <li className="leading-relaxed">{children}</li>;
+      return <li className="leading-relaxed">{wrap(children)}</li>;
     },
     p({ children }) {
-      return <p className="my-1.5 leading-relaxed text-slate-200">{children}</p>;
+      return <p className="my-1.5 leading-relaxed text-slate-200">{wrap(children)}</p>;
     },
     h1({ children }) {
-      return <h1 className="text-base font-bold text-white mt-3 mb-1.5 font-display flex items-center gap-2">{children}</h1>;
+      return <h1 className="text-base font-bold text-white mt-3 mb-1.5 font-display flex items-center gap-2">{wrap(children)}</h1>;
     },
     h2({ children }) {
-      return <h2 className="text-sm font-bold text-cyan-300 mt-2.5 mb-1 font-display">{children}</h2>;
+      return <h2 className="text-sm font-bold text-cyan-300 mt-2.5 mb-1 font-display">{wrap(children)}</h2>;
     },
     h3({ children }) {
-      return <h3 className="text-xs font-bold text-purple-300 mt-2 mb-1 uppercase tracking-wider">{children}</h3>;
+      return <h3 className="text-xs font-bold text-purple-300 mt-2 mb-1 uppercase tracking-wider">{wrap(children)}</h3>;
     }
   };
 

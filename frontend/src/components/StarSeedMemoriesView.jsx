@@ -1413,13 +1413,24 @@ export default function StarSeedMemoriesView() {
             </div>
 
             {isEditingUserPrefs ? (
-              <div className="space-y-2.5">
+              <div className="space-y-2.5 max-h-[480px] overflow-y-auto pr-1">
                 <div>
-                  <label className="text-[11px] text-slate-400 font-mono block">Nombre Preferido</label>
+                  <label className="text-[11px] text-slate-400 font-mono block">Nombre Real y Preferido (Obligatorio para la IA)</label>
                   <input
                     type="text"
                     value={userPrefsForm.preferred_name || ''}
                     onChange={(e) => setUserPrefsForm({ ...userPrefsForm, preferred_name: e.target.value })}
+                    placeholder="ej: Maggasukha Kumbhamakara Vistāradvādaśa"
+                    className="w-full p-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] text-slate-400 font-mono block">Apodo / Nombre Corto Familiar</label>
+                  <input
+                    type="text"
+                    value={userPrefsForm.nickname || ''}
+                    onChange={(e) => setUserPrefsForm({ ...userPrefsForm, nickname: e.target.value })}
+                    placeholder="ej: Alex"
                     className="w-full p-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white"
                   />
                 </div>
@@ -1429,39 +1440,105 @@ export default function StarSeedMemoriesView() {
                     type="text"
                     value={userPrefsForm.role_title || ''}
                     onChange={(e) => setUserPrefsForm({ ...userPrefsForm, role_title: e.target.value })}
+                    placeholder="ej: Creador & Arquitecto de StarSeed OS y Astraura"
                     className="w-full p-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white"
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] text-slate-400 font-mono block">Tono de Comunicación</label>
+                  <label className="text-[11px] text-slate-400 font-mono block">Profesión / Especialidad</label>
+                  <input
+                    type="text"
+                    value={userPrefsForm.profession || ''}
+                    onChange={(e) => setUserPrefsForm({ ...userPrefsForm, profession: e.target.value })}
+                    placeholder="ej: Ingeniero en Sistemas Ternarios 1.58b, Diseñador, Investigador"
+                    className="w-full p-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] text-slate-400 font-mono block">Intereses & Pasiones</label>
+                  <input
+                    type="text"
+                    value={userPrefsForm.interests || ''}
+                    onChange={(e) => setUserPrefsForm({ ...userPrefsForm, interests: e.target.value })}
+                    placeholder="ej: Ontocracia, Ciberdelia, Computación Ternaria, Música, Física Cuántica"
+                    className="w-full p-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] text-slate-400 font-mono block">Tono de Comunicación Deseado</label>
                   <input
                     type="text"
                     value={userPrefsForm.communication_tone || ''}
                     onChange={(e) => setUserPrefsForm({ ...userPrefsForm, communication_tone: e.target.value })}
+                    placeholder="ej: Lúcido, elocuente, cálido, directo y colaborativo"
                     className="w-full p-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] text-slate-400 font-mono block">Instrucciones Fijas de Contexto (La IA recordará siempre)</label>
+                  <textarea
+                    rows={2}
+                    value={userPrefsForm.custom_instructions || ''}
+                    onChange={(e) => setUserPrefsForm({ ...userPrefsForm, custom_instructions: e.target.value })}
+                    placeholder="ej: Siempre trátame con mi nombre preferido y ten presente mis proyectos activos..."
+                    className="w-full p-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white resize-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] text-slate-400 font-mono block">Hechos Biográficos Relevantes</label>
+                  <textarea
+                    rows={2}
+                    value={userPrefsForm.bio_facts || ''}
+                    onChange={(e) => setUserPrefsForm({ ...userPrefsForm, bio_facts: e.target.value })}
+                    placeholder="ej: Diseñador del modelo Astraura de 1.58 bits en Apple Silicon M1..."
+                    className="w-full p-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white resize-none"
                   />
                 </div>
                 <button
                   onClick={handleSaveUserPrefs}
-                  className="w-full py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-bold"
+                  className="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-bold shadow-lg shadow-cyan-500/20"
                 >
-                  Guardar Preferencias de Usuario
+                  ⚡ Guardar Identidad & Sincronizar en Todos los Chats
                 </button>
               </div>
             ) : (
               <div className="space-y-2 text-xs">
                 <div className="p-2.5 bg-white/5 rounded-xl border border-white/5">
-                  <span className="text-[10px] text-slate-400 font-mono block">Nombre:</span>
-                  <span className="font-bold text-white">{recuerdos.user_preferences?.preferred_name}</span>
+                  <span className="text-[10px] text-cyan-400 font-mono block">Nombre Real / Preferido (Activo):</span>
+                  <span className="font-bold text-white text-sm">{recuerdos.user_preferences?.preferred_name || 'No configurado'}</span>
                 </div>
+                {recuerdos.user_preferences?.nickname && (
+                  <div className="p-2.5 bg-white/5 rounded-xl border border-white/5">
+                    <span className="text-[10px] text-slate-400 font-mono block">Apodo / Corto:</span>
+                    <span className="font-semibold text-white">{recuerdos.user_preferences.nickname}</span>
+                  </div>
+                )}
                 <div className="p-2.5 bg-white/5 rounded-xl border border-white/5">
-                  <span className="text-[10px] text-slate-400 font-mono block">Rol:</span>
-                  <span className="text-cyan-300 font-semibold">{recuerdos.user_preferences?.role_title}</span>
+                  <span className="text-[10px] text-slate-400 font-mono block">Rol / Título:</span>
+                  <span className="text-cyan-300 font-semibold">{recuerdos.user_preferences?.role_title || 'Creador StarSeed OS'}</span>
                 </div>
+                {recuerdos.user_preferences?.profession && (
+                  <div className="p-2.5 bg-white/5 rounded-xl border border-white/5">
+                    <span className="text-[10px] text-slate-400 font-mono block">Profesión:</span>
+                    <span className="text-purple-300">{recuerdos.user_preferences.profession}</span>
+                  </div>
+                )}
+                {recuerdos.user_preferences?.interests && (
+                  <div className="p-2.5 bg-white/5 rounded-xl border border-white/5">
+                    <span className="text-[10px] text-slate-400 font-mono block">Intereses:</span>
+                    <span className="text-emerald-300">{recuerdos.user_preferences.interests}</span>
+                  </div>
+                )}
                 <div className="p-2.5 bg-white/5 rounded-xl border border-white/5">
                   <span className="text-[10px] text-slate-400 font-mono block">Tono de Respuestas:</span>
                   <span className="text-slate-300">{recuerdos.user_preferences?.communication_tone}</span>
                 </div>
+                {recuerdos.user_preferences?.custom_instructions && (
+                  <div className="p-2.5 bg-white/5 rounded-xl border border-white/5">
+                    <span className="text-[10px] text-amber-400 font-mono block">Instrucciones de Contexto Fijo:</span>
+                    <span className="text-slate-300 italic">{recuerdos.user_preferences.custom_instructions}</span>
+                  </div>
+                )}
               </div>
             )}
 

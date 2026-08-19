@@ -86,6 +86,15 @@ export default function ChatInterface({
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [showVoiceSettings, setShowVoiceSettings] = useState(false);
   const [isMsgPrefsOpen, setIsMsgPrefsOpen] = useState(false);
+  const [activeSpeechHighlight, setActiveSpeechHighlight] = useState({
+    msgId: null,
+    charIndex: -1,
+    charLength: 0,
+    word: '',
+    personaId: 'aurora',
+    personaColor: '#ec4899',
+    isSpeaking: false
+  });
 
   // Live Conversational Voice State (Full-Duplex / Vibrational 1.58b)
   const [isFullDuplexVoiceActive, setIsFullDuplexVoiceActive] = useState(false);
@@ -216,8 +225,11 @@ export default function ChatInterface({
     const unsubState = omniVoice.on('state_change', (st) => {
       if (st === 'speaking') {
         setDuplexVoiceStatus('speaking');
-      } else if (st === 'idle' && isFullDuplexVoiceActive) {
-        setDuplexVoiceStatus('listening');
+      } else if (st === 'idle') {
+        if (isFullDuplexVoiceActive) {
+          setDuplexVoiceStatus('listening');
+        }
+        setActiveSpeechHighlight((prev) => ({ ...prev, isSpeaking: false, charIndex: -1, clauseText: '', word: '' }));
       }
     });
 
@@ -225,15 +237,53 @@ export default function ChatInterface({
       setDuplexVoiceStatus(st);
     });
 
+    const unsubClause = omniVoice.on('clause_start', (data) => {
+      if (data) {
+        setActiveSpeechHighlight((prev) => ({
+          ...prev,
+          msgId: data.msgId || speakingMessageId,
+          clauseText: data.clauseText || '',
+          clauseIndex: data.clauseIndex || 0,
+          personaId: data.personaId || prev.personaId || 'aurora',
+          personaName: data.personaName || prev.personaName || 'Aurora',
+          personaColor: data.personaColor || prev.personaColor || '#ec4899',
+          personaIcon: data.personaIcon || prev.personaIcon || '🌸',
+          badgeTitle: data.badgeTitle || `${(data.personaName || 'Aurora').toUpperCase()} RESPONDIENDO`,
+          isSpeaking: true
+        }));
+      }
+    });
+
+    const unsubBoundary = omniVoice.on('word_boundary', (data) => {
+      if (data) {
+        setActiveSpeechHighlight({
+          msgId: data.msgId || speakingMessageId,
+          charIndex: data.charIndex !== undefined ? data.charIndex : -1,
+          charLength: data.charLength || (data.word ? data.word.length : 4),
+          word: data.word || '',
+          clauseText: data.clauseText || '',
+          clauseIndex: data.clauseIndex || 0,
+          personaId: data.personaId || 'aurora',
+          personaName: data.personaName || 'Aurora',
+          personaColor: data.personaColor || '#ec4899',
+          personaIcon: data.personaIcon || '🌸',
+          badgeTitle: data.badgeTitle || `${(data.personaName || 'Aurora').toUpperCase()} RESPONDIENDO`,
+          isSpeaking: true
+        });
+      }
+    });
+
     return () => {
       unsubState();
       unsubDuplex();
+      unsubClause();
+      unsubBoundary();
       if (isFullDuplexVoiceActive) {
         omniVoice.stopFullDuplexConversation();
       }
       omniVoice.stopSpeaking();
     };
-  }, [isFullDuplexVoiceActive]);
+  }, [isFullDuplexVoiceActive, speakingMessageId]);
 
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -339,6 +389,7 @@ export default function ChatInterface({
       setSpeakingMessageId(null);
       setCurrentlySpeakingSegment(null);
       setActiveSpeakingPersona(null);
+      setActiveSpeechHighlight((prev) => ({ ...prev, isSpeaking: false, charIndex: -1 }));
       return;
     }
 
@@ -354,6 +405,29 @@ export default function ChatInterface({
         setSpeakingMessageId(null);
         setCurrentlySpeakingSegment(null);
         setActiveSpeakingPersona(null);
+        setActiveSpeechHighlight((prev) => ({ ...prev, isSpeaking: false, charIndex: -1 }));
+      },
+      { msgId }
+    );
+  };
+
+  // Speak from exact word on double-click or long-press
+  const handleSpeakFromWord = (msgId, fullText, wordCharIndex, personaId) => {
+    setSpeakingMessageId(msgId);
+    omniVoice.stopSpeaking();
+    omniVoice.speakFromIndex(
+      fullText,
+      wordCharIndex,
+      {
+        msgId,
+        persona_id: personaId || activePersona?.id || 'aurora'
+      },
+      () => {
+        setSpeakingMessageId(msgId);
+      },
+      () => {
+        setSpeakingMessageId(null);
+        setActiveSpeechHighlight((prev) => ({ ...prev, isSpeaking: false, charIndex: -1 }));
       }
     );
   };
@@ -565,7 +639,75 @@ export default function ChatInterface({
         )}
 
         {/* Messages Scroll Area */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar relative">
+          {/* FLOATING REAL-TIME SMART SUBTITLE BANNER (AUTONOMOUS PERSONALITY SYNCHRONIZATION) */}
+          {activeSpeechHighlight.isSpeaking && (activeSpeechHighlight.clauseText || activeSpeechHighlight.word) && (
+            <div 
+              className="sticky top-0 z-30 mx-auto max-w-2xl w-full p-2.5 rounded-2xl bg-[#090d16]/95 backdrop-blur-xl border shadow-2xl flex items-center gap-3 animate-fade-in transition-all duration-300 mb-2"
+              style={{
+                borderColor: `${activeSpeechHighlight.personaColor}60`,
+                boxShadow: `0 8px 32px ${activeSpeechHighlight.personaColor}35`
+              }}
+            >
+              {/* Persona Badge */}
+              <div 
+                className="px-2.5 py-1 rounded-xl text-[10px] font-bold font-mono flex items-center gap-1.5 shrink-0 border"
+                style={{
+                  backgroundColor: `${activeSpeechHighlight.personaColor}20`,
+                  borderColor: `${activeSpeechHighlight.personaColor}50`,
+                  color: activeSpeechHighlight.personaColor
+                }}
+              >
+                <span className="text-xs">{activeSpeechHighlight.personaIcon || '🌸'}</span>
+                <span>{activeSpeechHighlight.personaName || 'Aurora'}</span>
+                <span className="w-1.5 h-1.5 rounded-full animate-ping ml-0.5" style={{ backgroundColor: activeSpeechHighlight.personaColor }} />
+              </div>
+
+              {/* Karaoke Live Subtitle Text with Active Word Highlight */}
+              <div className="flex-1 min-w-0 text-xs font-sans text-slate-200 truncate leading-snug">
+                {(activeSpeechHighlight.clauseText || activeSpeechHighlight.word).split(/(\s+)/).map((tok, idx) => {
+                  if (/^\s+$/.test(tok)) return <span key={idx}>{tok}</span>;
+                  const cleanTok = tok.toLowerCase().replace(/[^a-záéíóúñ]/gi, '');
+                  const cleanWord = (activeSpeechHighlight.word || '').toLowerCase().replace(/[^a-záéíóúñ]/gi, '');
+                  const isCurrent = cleanWord && (cleanTok === cleanWord || cleanTok.startsWith(cleanWord) || cleanWord.startsWith(cleanTok));
+                  return (
+                    <span
+                      key={idx}
+                      className={`inline-block px-1 rounded transition-all duration-100 ${
+                        isCurrent
+                          ? 'font-bold text-white scale-105 ring-1 ring-white/80 shadow-md'
+                          : 'text-slate-300'
+                      }`}
+                      style={
+                        isCurrent
+                          ? {
+                              backgroundColor: `${activeSpeechHighlight.personaColor}60`,
+                              boxShadow: `0 0 10px ${activeSpeechHighlight.personaColor}90`,
+                              borderBottom: `2px solid ${activeSpeechHighlight.personaColor}`
+                            }
+                          : undefined
+                      }
+                    >
+                      {tok}
+                    </span>
+                  );
+                })}
+              </div>
+
+              {/* Quick Stop Button */}
+              <button
+                onClick={() => {
+                  omniVoice.stopSpeaking();
+                  setSpeakingMessageId(null);
+                  setActiveSpeechHighlight(prev => ({ ...prev, isSpeaking: false, charIndex: -1, clauseText: '', word: '' }));
+                }}
+                className="p-1.5 rounded-lg bg-white/5 hover:bg-red-500/20 text-slate-400 hover:text-red-300 transition-colors shrink-0 cursor-pointer"
+                title="Detener voz"
+              >
+                <VolumeX className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
           {messages.length === 0 && (
             <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
               <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-cyan-500/20 via-purple-500/20 to-blue-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-2xl shadow-cyan-500/10">
@@ -663,15 +805,42 @@ export default function ChatInterface({
                 </div>
               )}
 
+              {/* Live Speaker Persona Tag */}
+              {speakingMessageId === msg.id && activeSpeechHighlight.isSpeaking && (
+                <div 
+                  className="px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold flex items-center gap-1.5 animate-pulse border backdrop-blur-md mb-0.5 shadow-sm"
+                  style={{
+                    backgroundColor: `${activeSpeechHighlight.personaColor}25`,
+                    borderColor: `${activeSpeechHighlight.personaColor}60`,
+                    color: activeSpeechHighlight.personaColor
+                  }}
+                >
+                  <span>{activeSpeechHighlight.personaIcon || '🌸'}</span>
+                  <span>{activeSpeechHighlight.personaName || 'Aurora'} locutando en vivo...</span>
+                  <span className="w-1 h-1 rounded-full animate-ping" style={{ backgroundColor: activeSpeechHighlight.personaColor }} />
+                </div>
+              )}
+
               {/* Message Bubble */}
               <div
-                className={`p-4 rounded-2xl max-w-3xl w-full text-xs sm:text-sm leading-relaxed overflow-hidden ${
+                className={`p-4 rounded-2xl max-w-3xl w-full text-xs sm:text-sm leading-relaxed overflow-hidden transition-all duration-300 ${
                   msg.sender === 'user'
                     ? 'bg-gradient-to-r from-cyan-500/25 to-blue-500/25 border border-cyan-500/40 text-white rounded-br-none shadow-lg'
                     : 'bg-[#0e121c] border border-white/10 text-slate-200 rounded-bl-none shadow-md'
-                }`}
+                } ${speakingMessageId === msg.id && activeSpeechHighlight.isSpeaking ? 'ring-1' : ''}`}
+                style={
+                  speakingMessageId === msg.id && activeSpeechHighlight.isSpeaking
+                    ? { borderColor: `${activeSpeechHighlight.personaColor}70`, boxShadow: `0 0 16px ${activeSpeechHighlight.personaColor}25` }
+                    : undefined
+                }
               >
-                <MultimodalMessageRenderer text={msg.text} />
+                <MultimodalMessageRenderer 
+                  text={msg.text} 
+                  messageId={msg.id}
+                  activeSpeechHighlight={activeSpeechHighlight}
+                  onSpeakFromWord={handleSpeakFromWord}
+                  activePersonaId={activePersona?.id || 'aurora'}
+                />
               </div>
             </div>
           ))}
@@ -695,7 +864,13 @@ export default function ChatInterface({
               )}
 
               <div className="p-4 rounded-2xl max-w-3xl w-full bg-[#0e121c] border border-cyan-500/30 text-slate-200 text-xs sm:text-sm rounded-bl-none shadow-md animate-fade-in overflow-hidden">
-                <MultimodalMessageRenderer text={currentStreamText || "Generando respuesta multiagéntica..."} />
+                <MultimodalMessageRenderer 
+                  text={currentStreamText || "Generando respuesta multiagéntica..."} 
+                  messageId="streaming"
+                  activeSpeechHighlight={activeSpeechHighlight}
+                  onSpeakFromWord={handleSpeakFromWord}
+                  activePersonaId={activePersona?.id || 'aurora'}
+                />
               </div>
             </div>
           )}

@@ -1,0 +1,58 @@
+{
+  "id": "designed_1787120705_aurora_•_resonan",
+  "name": "Aurora • Resonancia Álmica",
+  "persona_id": "aurora",
+  "gender": "ethereal",
+  "age_group": "young_adult",
+  "style": "empathic_warm",
+  "attitude": "Rebelde & Provocativa",
+  "character": "Carismático",
+  "drama_level": 1.0,
+  "emotional_exaggeration": 1.0,
+  "expressiveness": 1.0,
+  "context_fusion": true,
+  "vocal_expressions": {
+    "micro_breaths": true,
+    "subtle_laughs": true,
+    "sighs_of_relief": true,
+    "chime_accent": true,
+    "emphasis_clicks": true
+  },
+  "accent": "es-ES",
+  "language": "es",
+  "pitch_base_hz": 217.0,
+  "cadence_rate": 1.03,
+  "warmth": 1.0,
+  "clarity": 0.96,
+  "breathiness": 0.6,
+  "prosody_dynamics": 0.92,
+  "bound_native_voice": "",
+  "formants": {
+    "f1": 560.0,
+    "f2": 1980.0,
+    "f3": 2800.0,
+    "f4": 3900.0
+  },
+  "jaw_openness": 0.55,
+  "lip_rounding": 0.4,
+  "glottal_tension": 0.5,
+  "nasal_resonance": 0.15,
+  "chest_resonance": 0.35,
+  "glottal_attack": "balanced",
+  "vibrato": {
+    "rate_hz": 5.2,
+    "depth": 0.3,
+    "delay_sec": 0.35
+  },
+  "pitch_drift_stochastic": 0.25,
+  "dsp": {
+    "reverb": 0.16,
+    "compression": 0.32,
+    "eq_low_db": 1.5,
+    "eq_mid_db": 0.5,
+    "eq_high_db": 2.5
+  },
+  "is_factory": false,
+  "is_designed": true,
+  "created_at": 1787120705.849647
+}

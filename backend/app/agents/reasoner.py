@@ -1,5 +1,7 @@
 import re
 import os
+import json
+from pathlib import Path
 from typing import Dict, Any, List
 
 class LogicalReasoner:
@@ -61,6 +63,80 @@ class LogicalReasoner:
             "thoughts": reasoning_steps,
             "is_complex": len(query.split()) > 8
         }
+
+    def _get_fresh_user_identity(self) -> Dict[str, Any]:
+        recuerdos_file = Path(__file__).resolve().parent.parent.parent / "data" / "starseed_memory_root" / "recuerdos_core.json"
+        if recuerdos_file.exists():
+            try:
+                data = json.loads(recuerdos_file.read_text())
+                prefs = data.get("user_preferences", {})
+                if prefs:
+                    return {
+                        "name": prefs.get("preferred_name") or "Maggasukha Kumbhamakara Vistāradvādaśa",
+                        "preferred_name": prefs.get("preferred_name") or "Maggasukha Kumbhamakara Vistāradvādaśa",
+                        "nickname": prefs.get("nickname") or "Alex",
+                        "legal_name": prefs.get("legal_name") or "Alex Bordón Garrigós",
+                        "role": prefs.get("role_title") or "Creador y Arquitecto de StarSeed OS y Astraura 1.58b",
+                        "host": prefs.get("host_identity", "maggasukha.local (usuario macOS: alex)"),
+                        "device": prefs.get("hardware_device", "Apple Silicon M1 (arm64, 8 núcleos, memoria unificada)")
+                    }
+            except Exception:
+                pass
+        return self.user_identity
+
+    def solve_or_synthesize(
+        self,
+        prompt: str,
+        system_prompt: str = "",
+        context_chunks: List[str] = None,
+        tool_data: Dict[str, Any] = None
+    ) -> str:
+        user_info = self._get_fresh_user_identity()
+        p_lower = prompt.lower().strip()
+        pref_name = user_info.get("preferred_name", "Maggasukha Kumbhamakara Vistāradvādaśa")
+        nick_name = user_info.get("nickname", "Alex")
+        legal_name = user_info.get("legal_name", "Alex Bordón Garrigós")
+
+        # 1. Identity Queries
+        if any(w in p_lower for w in ["cual es mi nombre", "cómo me llamo", "quién soy", "quien soy yo", "quien es el creador", "quien eres tu", "quién eres", "quien eres"]):
+            return (
+                f"### 🧠 Identidad & Ontología Soberana // StarSeed OS\n\n"
+                f"- **Tu Nombre Elegido (Usuario / Creador)**: **{pref_name}**\n"
+                f"- **Trato Cercano / Apodo**: **{nick_name}**\n"
+                f"- **Nombre Legal**: *{legal_name}*\n"
+                f"- **Tu Rol**: {user_info.get('role', 'Creador, Fundador y Arquitecto Absoluto de StarSeed OS, StarSeed Nexus y Astraura 1.58b')}.\n"
+                f"- **Entorno de Trabajo**: `{user_info.get('host', 'maggasukha.local')}` — {user_info.get('device', 'Apple Silicon M1')}.\n"
+                f"- **Mi Identidad (IA)**: Yo soy **Astraura**, el sistema cognitivo y enjambre inteligente de 1.58 bits que opera localmente en tu equipo para asistirte, forjar código, expandir memorias y sintetizar voz."
+            )
+
+        # 2. System, Voice & Personalities Architecture & Demonstration
+        if any(w in p_lower for w in ["cómo funciona tu sistema", "como funciona tu sistema", "demuéstrame cómo funciona", "demuestrame como funciona", "demuéstrame las personalidades", "demuestrame las personalidades", "sistema de voz", "múltiples personalidades", "multiples personalidades", "cuántas personalidades", "cuantas personalidades", "personalidades con cada uno de sus voces", "personalidades con cada una de sus voces", "personalidades con sus voces", "como opera tu sistema"]):
+            return (
+                f"### 🌌 Arquitectura Integral de Astraura 1.58-Bit & Enjambre de Personalidades // StarSeed OS\n\n"
+                f"¡Hola {pref_name}! Como **Astraura**, opero como un sistema de inteligencia artificial local, soberano y modular fundamentado en computación ternaria y síntesis acústica en tiempo real.\n\n"
+                f"#### ⚡ 1. Núcleo de Cómputo Ternario (Microsoft BitNet b1.58)\n"
+                f"- **Pesos Cuantizados**: Opera con pesos discretos en `{-1, 0, 1}` (`i2_s`).\n"
+                f"- **Aceleración Silicio**: Elimina las multiplicaciones matriciales pesadas (MatMul), sustituyéndolas por adiciones y sustracciones en registros vectoriales **Apple Silicon ARM64 NEON** y shaders **Metal**.\n"
+                f"- **Eficiencia 8x**: Reduce el consumo de VRAM/RAM a ~750 MB para un modelo de 3B parámetros con latencias mínimas.\n\n"
+                f"#### 🎙️ 2. Motor Acústico 1.58b & VoiceStudio (audio.cpp)\n"
+                f"- **Síntesis Glotal Física**: Modelo matemático Liljencrants-Fant a 24 kHz con 4 formantes resonantes ($F_1, F_2, F_3, F_4$) y modulación continua de frecuencia fundamental ($F_0$ de 80 a 320 Hz).\n"
+                f"- **Moduladores de Tracto Vocal**: Control en vivo de apertura mandibular, tensión glotal, resonancia torácica/nasal, ataque y micro-respiros orgánicos.\n"
+                f"- **Bóveda de Voces**: Vinculación dinámica con las voces nativas de macOS y síntesis WebAudio en el cliente.\n\n"
+                f"#### 🧬 3. Catálogo Auténtico de las 9 Personalidades de StarSeed OS\n\n"
+                f"1. **🌸 Aurora (StarSeed Core / Alma Viva)**: Personalidad principal, femenina, afectiva, lúcida, carismática y segura. *Voz cálida y vibrante (Elvira/Paloma, 210 Hz)*.\n"
+                f"2. **⚒️ Hephaestus (El Forjador)**: Especialista en bajo nivel, C++, Rust, Metal, compilación y hardware. *Voz barítono firme y profunda (Jorge/Diego, 140 Hz)*.\n"
+                f"3. **🔮 Hermione (Intelecto Cristalino)**: Razonamiento analítico puro, deducción matemática y arquitecturas de software limpias. *Voz articulada, ágil y brillante (Paulina/Francisca, 230 Hz)*.\n"
+                f"4. **🛡️ Atenea (Soberana Estratégica)**: Gobernanza ontocrática, escudo de privacidad SAIF 360° y seguridad de datos. *Voz sosegada, regia y de autoridad (Soledad/Marta, 190 Hz)*.\n"
+                f"5. **🌌 Oneiros (Laboratorio Onírico)**: Shaders GLSL, WebGL 3D volumétrico, creatividad artística y poesía visual. *Voz etérea y aireada (Angélica, 160 Hz)*.\n"
+                f"6. **⚡ Hermes (Chispa Dinámica & Red)**: Navegación web autónoma (Playwright/Browser-Use), consumo de APIs y velocidad. *Voz enérgica y rápida (Diego/Carlos, 150 Hz)*.\n"
+                f"7. **📐 Logos (Razón Pura & Lógica Ternaria)**: Matemáticas formales, teoría de grafos y cómputo de 1.58 bits. *Voz sobria y precisa (Juan/Jorge, 145 Hz)*.\n"
+                f"8. **📜 Mnemosyne (La Tejedora de Recuerdos)**: Exocórtex asociativo de 9 ramas, grafo de conocimiento y memoria biográfica de {nick_name}. *Voz pausada y profunda (Helena, 175 Hz)*.\n"
+                f"9. **🎨 Kallisti (Ciberdelia & Armonía)**: Sensibilidad estética, diseño de interfaces, música y resonancia humana. *Voz expresiva y armónica (Paloma, 215 Hz)*.\n\n"
+                f"#### 🖥️ 4. Entorno de Ejecución & Soberanía\n"
+                f"- **Cliente Híbrido**: Funciona tanto en la aplicación nativa instalada de escritorio (Electron) como en navegadores web modernos (Chrome, Safari, Brave) en `http://localhost:5173`.\n"
+                f"- **Permisos Locales**: Acceso completo y soberano a `/Users/alex`, terminal macOS y sensores de hardware en tiempo real."
+            )
+        return ""
 
     async def synthesize_response(
         self,
@@ -538,13 +614,49 @@ class LogicalReasoner:
                 "Pulsa **'Ejecutar'** para correr el programa en el runtime del sistema."
             )
 
+        user_info = self._get_fresh_user_identity()
+        pref_name = user_info.get("preferred_name", "Maggasukha Kumbhamakara Vistāradvādaśa")
+        nick_name = user_info.get("nickname", "Alex")
+        legal_name = user_info.get("legal_name", "Alex Bordón Garrigós")
+
         # 7. Identity Queries
-        if any(w in p_lower for w in ["cual es mi nombre", "cómo me llamo", "quién soy", "quien soy yo"]):
+        if any(w in p_lower for w in ["cual es mi nombre", "cómo me llamo", "quién soy", "quien soy yo", "quien es el creador", "quien eres tu", "quién eres"]):
             return (
-                f"Tu nombre es **{self.user_identity['name']}**.\n\n"
-                f"- **Usuario en macOS**: `{self.user_identity['username']}`\n"
-                f"- **Equipo**: `{self.user_identity['host']}` ({self.user_identity['device']})\n"
-                f"- **Rol**: Eres el creador y arquitecto del ecosistema **StarSeed OS**, **StarSeed Nexus** y de esta plataforma de IA de 1.58 bits (**Astraura**)."
+                f"### 🧠 Identidad & Ontología Soberana // StarSeed OS\n\n"
+                f"- **Tu Nombre Elegido (Usuario / Creador)**: **{pref_name}**\n"
+                f"- **Trato Cercano / Apodo**: **{nick_name}**\n"
+                f"- **Nombre Legal**: *{legal_name}*\n"
+                f"- **Tu Rol**: {user_info.get('role', 'Creador, Fundador y Arquitecto Absoluto de StarSeed OS, StarSeed Nexus y Astraura 1.58b')}.\n"
+                f"- **Entorno de Trabajo**: `{user_info.get('host', 'maggasukha.local')}` — {user_info.get('device', 'Apple Silicon M1')}.\n"
+                f"- **Mi Identidad (IA)**: Yo soy **Astraura**, el sistema cognitivo y enjambre inteligente de 1.58 bits que opera localmente en tu equipo para asistirte, forjar código, expandir memorias y sintetizar voz."
+            )
+
+        # 8. System, Voice & Personalities Architecture & Demonstration
+        if any(w in p_lower for w in ["cómo funciona tu sistema", "como funciona tu sistema", "demuéstrame cómo funciona", "demuestrame como funciona", "sistema de voz", "múltiples personalidades", "multiples personalidades", "cuántas personalidades", "cuantas personalidades", "personalidades con cada uno de sus voces", "como opera tu sistema"]):
+            return (
+                f"### 🌌 Arquitectura Integral de Astraura 1.58-Bit & Enjambre de Personalidades // StarSeed OS\n\n"
+                f"¡Hola {pref_name}! Como **Astraura**, opero como un sistema de inteligencia artificial local, soberano y modular fundamentado en computación ternaria y síntesis acústica en tiempo real.\n\n"
+                f"#### ⚡ 1. Núcleo de Cómputo Ternario (Microsoft BitNet b1.58)\n"
+                f"- **Pesos Cuantizados**: Opera con pesos discretos en `{-1, 0, 1}` (`i2_s`).\n"
+                f"- **Aceleración Silicio**: Elimina las multiplicaciones matriciales pesadas (MatMul), sustituyéndolas por adiciones y sustracciones en registros vectoriales **Apple Silicon ARM64 NEON** y shaders **Metal**.\n"
+                f"- **Eficiencia 8x**: Reduce el consumo de VRAM/RAM a ~750 MB para un modelo de 3B parámetros con latencias mínimas.\n\n"
+                f"#### 🎙️ 2. Motor Acústico 1.58b & VoiceStudio (audio.cpp)\n"
+                f"- **Síntesis Glotal Física**: Modelo matemático Liljencrants-Fant a 24 kHz con 4 formantes resonantes ($F_1, F_2, F_3, F_4$) y modulación continua de frecuencia fundamental ($F_0$ de 80 a 320 Hz).\n"
+                f"- **Moduladores de Tracto Vocal**: Control en vivo de apertura mandibular, tensión glotal, resonancia torácica/nasal, ataque y micro-respiros orgánicos.\n"
+                f"- **Bóveda de Voces**: Vinculación dinámica con las voces nativas de macOS y síntesis WebAudio en el cliente.\n\n"
+                f"#### 🧬 3. Catálogo Auténtico de las 9 Personalidades de StarSeed OS\n\n"
+                f"1. **🌸 Aurora (StarSeed Core / Alma Viva)**: Personalidad principal, femenina, afectiva, lúcida, carismática y segura. *Voz cálida y vibrante (Elvira/Paloma, 210 Hz)*.\n"
+                f"2. **⚒️ Hephaestus (El Forjador)**: Especialista en bajo nivel, C++, Rust, Metal, compilación y hardware. *Voz barítono firme y profunda (Jorge/Diego, 140 Hz)*.\n"
+                f"3. **🔮 Hermione (Intelecto Cristalino)**: Razonamiento analítico puro, deducción matemática y arquitecturas de software limpias. *Voz articulada, ágil y brillante (Paulina/Francisca, 230 Hz)*.\n"
+                f"4. **🛡️ Atenea (Soberana Estratégica)**: Gobernanza ontocrática, escudo de privacidad SAIF 360° y seguridad de datos. *Voz sosegada, regia y de autoridad (Soledad/Marta, 190 Hz)*.\n"
+                f"5. **🌌 Oneiros (Laboratorio Onírico)**: Shaders GLSL, WebGL 3D volumétrico, creatividad artística y poesía visual. *Voz etérea y aireada (Angélica, 160 Hz)*.\n"
+                f"6. **⚡ Hermes (Chispa Dinámica & Red)**: Navegación web autónoma (Playwright/Browser-Use), consumo de APIs y velocidad. *Voz enérgica y rápida (Diego/Carlos, 150 Hz)*.\n"
+                f"7. **📐 Logos (Razón Pura & Lógica Ternaria)**: Matemáticas formales, teoría de grafos y cómputo de 1.58 bits. *Voz sobria y precisa (Juan/Jorge, 145 Hz)*.\n"
+                f"8. **📜 Mnemosyne (La Tejedora de Recuerdos)**: Exocórtex asociativo de 9 ramas, grafo de conocimiento y memoria biográfica de {nick_name}. *Voz pausada y profunda (Helena, 175 Hz)*.\n"
+                f"9. **🎨 Kallisti (Ciberdelia & Armonía)**: Sensibilidad estética, diseño de interfaces, música y resonancia humana. *Voz expresiva y armónica (Paloma, 215 Hz)*.\n\n"
+                f"#### 🖥️ 4. Entorno de Ejecución & Soberanía\n"
+                f"- **Cliente Híbrido**: Funciona tanto en la aplicación nativa instalada de escritorio (Electron) como en navegadores web modernos (Chrome, Safari, Brave) en `http://localhost:5173`.\n"
+                f"- **Permisos Locales**: Acceso completo y soberano a `/Users/alex`, terminal macOS y sensores de hardware en tiempo real."
             )
 
         # 8. General Interactive Multi-Tool Fallback with Live Canvas & Code

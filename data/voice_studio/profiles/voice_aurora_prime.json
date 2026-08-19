@@ -1,0 +1,29 @@
+{
+  "id": "voice_aurora_prime",
+  "name": "Aurora (Alma Viva)",
+  "persona_id": "unassigned",
+  "gender": "female",
+  "age_group": "young_adult",
+  "accent": "es-ES-castilian",
+  "language": "es",
+  "pitch_base_hz": 215.0,
+  "warmth": 0.88,
+  "clarity": 0.95,
+  "breathiness": 0.22,
+  "emotion": "warm_empathic",
+  "formants": {
+    "f1": 550,
+    "f2": 1950,
+    "f3": 2800,
+    "f4": 3900
+  },
+  "dsp": {
+    "reverb": 0.15,
+    "eq_low_db": 1.5,
+    "eq_mid_db": 0.5,
+    "eq_high_db": 2.0,
+    "compression": 0.3
+  },
+  "is_factory": true,
+  "created_at": 1787112372.202903
+}

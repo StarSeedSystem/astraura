@@ -1,0 +1,30 @@
+{
+  "id": "voice_hephaestus_forge",
+  "name": "Hephaestus (Forja Profunda)",
+  "persona_id": "hephaestus",
+  "gender": "male",
+  "age_group": "adult",
+  "accent": "es-ES-deep",
+  "language": "es",
+  "pitch_base_hz": 115.0,
+  "warmth": 0.92,
+  "clarity": 0.9,
+  "breathiness": 0.1,
+  "emotion": "authoritative_stoic",
+  "formants": {
+    "f1": 420,
+    "f2": 1400,
+    "f3": 2300,
+    "f4": 3400
+  },
+  "dsp": {
+    "reverb": 0.25,
+    "eq_low_db": 4.0,
+    "eq_mid_db": -1.0,
+    "eq_high_db": 1.0,
+    "compression": 0.5
+  },
+  "is_factory": true,
+  "created_at": 1787112372.202904,
+  "updated_at": 1787116074.448695
+}

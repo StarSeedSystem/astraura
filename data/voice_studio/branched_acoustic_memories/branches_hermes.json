@@ -1,0 +1,267 @@
+{
+  "persona_id": "hermes",
+  "total_branches": 2,
+  "rapport_index": 72,
+  "branches": {
+    "rapport_entrainment": [],
+    "domain_prosody": {
+      "general": {
+        "interactions_count": 2,
+        "learned_pitch_offset": 0.3,
+        "learned_cadence_mult": 1.0,
+        "learned_warmth_offset": 0.0,
+        "preferred_expressions": [
+          "micro_breaths",
+          "emphasis_clicks"
+        ]
+      }
+    },
+    "ternary_affective_vectors": [
+      {
+        "node_id": "node_1787119971213",
+        "timestamp": 1787119971.213703,
+        "domain": "general",
+        "user_sentiment": "cuestionamiento",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "¿Cómo sientes la entonación cuando formulo una pregunta reflexiva? ¿Percibes cóm",
+        "ternary_vector_158": [
+          2,
+          0,
+          1,
+          2,
+          0,
+          1,
+          0,
+          1,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          1,
+          2,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 120,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787120170151",
+        "timestamp": 1787120170.1513119,
+        "domain": "general",
+        "user_sentiment": "cuestionamiento",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "¿Cómo sientes la entonación cuando formulo una pregunta reflexiva? ¿Percibes cóm",
+        "ternary_vector_158": [
+          2,
+          0,
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          1,
+          0,
+          -1,
+          -1,
+          1,
+          0,
+          1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 120,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      }
+    ],
+    "synaptic_cross_bridges": [
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126278.707111,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126291.3478458,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126299.947968,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126302.1557171,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126304.490457,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126312.028209,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126321.855457,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126328.6050801,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126337.451104,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126346.214506,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126348.419512,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126350.778622,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126358.421555,
+        "shared_domain": "general",
+        "resonance_sentiment": "entusiasta",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126368.677078,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126379.9343832,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126385.39279,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126395.033655,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126397.448407,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126400.803529,
+        "shared_domain": "general",
+        "resonance_sentiment": "entusiasta",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126403.0165231,
+        "shared_domain": "creatividad",
+        "resonance_sentiment": "cuestionamiento",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126406.567474,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126408.764565,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126412.692847,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126415.8852491,
+        "shared_domain": "codigo",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      },
+      {
+        "source_agent": "aurora",
+        "timestamp": 1787126431.7955132,
+        "shared_domain": "general",
+        "resonance_sentiment": "curioso",
+        "synaptic_influence": "prosody_warmth_infusion"
+      }
+    ]
+  },
+  "last_synaptic_pulse": 1787126431.795516,
+  "interactions": []
+}

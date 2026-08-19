@@ -52,6 +52,7 @@ from .core.continuous_voice_daemon import continuous_voice_daemon
 from .core.needle_engine import needle_engine
 from .core.personality_api_engine import personality_api_engine
 from .core.agent_vault_engine import agent_vault_engine
+from .api.voice_studio import router as voice_studio_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -107,6 +108,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(voice_studio_router)
 
 class ConnectionManager:
     def __init__(self):
