@@ -1,6 +1,283 @@
 {
   "memories": [
     {
+      "id": "mem0_1787107911817",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): actualmente Cuántas personalidades Estás usando -> Síntesis: Actualmente, estoy usando tres personalidades en este chat. Por favor, dígame cuál de las tres querías que me presentara o que deseas que me presente en el futuro.",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787107911.817996,
+      "updated_at": 1787107911.817996,
+      "metadata": {
+        "timestamp": 1787107911.817287,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787107910197",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): actualmente Cuántas personalidades Estás usando -> Síntesis: Actualmente estoy utilizando tres personalidades: tú, Astraura, y Demuestra la Capacidad de Reconocimiento de Deseos.",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787107910.197647,
+      "updated_at": 1787107910.197647,
+      "metadata": {
+        "timestamp": 1787107910.197522,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787107908773",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): actualmente Cuántas personalidades -> Síntesis: Actualmente tengo tres personalidades en el sistema: \n\n1. **Alex Bordón Garrigós** - Esta es la persona que está hablando con usted actualmente. Es el creador y arquitecto del sistema StarSeed OS y As",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787107908.77329,
+      "updated_at": 1787107908.77329,
+      "metadata": {
+        "timestamp": 1787107908.772865,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787107901145",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): actualmente -> Síntesis: Actualmente, la tecnología de la cuantización de los pesos está en su etapa de desarrollo y es un tema de investigación activo en el campo de la inteligencia artificial. Sin embargo, se están desarrol",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787107901.1451871,
+      "updated_at": 1787107901.1451871,
+      "metadata": {
+        "timestamp": 1787107901.144769,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787107893125",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): actualmente -> Síntesis: ¡Hola, Alex! Me alegra que estés interesado en este tema. ¿Podrías especificar qué tipo de información te gustaría obtener? Por ejemplo, podrías darme detalles sobre cómo funciona este sistema de arqu",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787107893.125767,
+      "updated_at": 1787107893.125767,
+      "metadata": {
+        "timestamp": 1787107893.1243541,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787107830261",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Diálogo Coral con 3 personalidades sobre: Y cómo es que podemos tener una conversación y cómo funcionan las otras voces Dame un ejemplo -> ¡Hola Alex! Como una inteligencia artificial y núcleo cognitivo de 1.58 bits de StarSeed OS, estoy diseñado para interactuar de una manera muy lúdica y atractiva. Mi \"hablado\" se basa en una conversac",
+      "category": "coral_deliberation",
+      "confidence": 0.95,
+      "created_at": 1787107830.261873,
+      "updated_at": 1787107830.261873,
+      "metadata": {
+        "timestamp": 1787107830.261536,
+        "personas": [
+          "hermione",
+          "aurora",
+          "astraura_prime"
+        ]
+      }
+    },
+    {
+      "id": "mem0_1787107823230",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Diálogo Coral con 3 personalidades sobre: Y cómo es que podemos tener una conversación y cómo funcionan las otras voces Dame un ejemplo -> ¡Hola Alex! Estoy aquí para ayudarte. Puedo interactuar de una manera lúdica, divertida y fácil de entender. ¿Cómo puedo ayudarte hoy?",
+      "category": "coral_deliberation",
+      "confidence": 0.95,
+      "created_at": 1787107823.230123,
+      "updated_at": 1787107823.230123,
+      "metadata": {
+        "timestamp": 1787107823.2297149,
+        "personas": [
+          "hermione",
+          "aurora",
+          "astraura_prime"
+        ]
+      }
+    },
+    {
+      "id": "mem0_1787107821232",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Diálogo Coral con 3 personalidades sobre: Y cómo es que podemos tener una conversación y cómo funcionan las otras voces -> ¡Hola! Estoy encantado de poder ayudarte a entender cómo funciona mi sistema de voz y Astraura. Como una IA, utilizo un algoritmo de aprendizaje automático para reconocer y procesar tu voz. Cuando la",
+      "category": "coral_deliberation",
+      "confidence": 0.95,
+      "created_at": 1787107821.232276,
+      "updated_at": 1787107821.232276,
+      "metadata": {
+        "timestamp": 1787107821.2321541,
+        "personas": [
+          "hermione",
+          "aurora",
+          "astraura_prime"
+        ]
+      }
+    },
+    {
+      "id": "mem0_1787107814925",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Diálogo Coral con 3 personalidades sobre: Y cómo es que podemos tener una conversación y cómo funcionan las otras -> ¡Alex! ¿Cómo puedo ayudarte hoy?",
+      "category": "coral_deliberation",
+      "confidence": 0.95,
+      "created_at": 1787107814.92505,
+      "updated_at": 1787107814.92505,
+      "metadata": {
+        "timestamp": 1787107814.9249039,
+        "personas": [
+          "hermione",
+          "aurora",
+          "astraura_prime"
+        ]
+      }
+    },
+    {
+      "id": "mem0_1787107813563",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Diálogo Coral con 3 personalidades sobre: Y cómo es que podemos tener una conversación y -> ¡Hola Alex! \n\nComo una inteligencia artificial, mi \"hablado\" se basa en una conversación natural y informada. Soy entrenada para interactuar de manera lúdica, divertida y fácil de entender. \n\nNunca te",
+      "category": "coral_deliberation",
+      "confidence": 0.95,
+      "created_at": 1787107813.563054,
+      "updated_at": 1787107813.563054,
+      "metadata": {
+        "timestamp": 1787107813.562921,
+        "personas": [
+          "hermione",
+          "aurora",
+          "astraura_prime"
+        ]
+      }
+    },
+    {
+      "id": "mem0_1787107810554",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Diálogo Coral con 3 personalidades sobre: Y cómo es que podemos tener una conversación -> ¡Hola Alex! Como una inteligencia artificial y núcleo cognitivo de 1.58 bits de StarSeed OS, estoy diseñado para interactuar de una manera muy lúdica y atractiva. Mi \"hablado\" se basa en una conversac",
+      "category": "coral_deliberation",
+      "confidence": 0.95,
+      "created_at": 1787107810.554265,
+      "updated_at": 1787107810.5542662,
+      "metadata": {
+        "timestamp": 1787107810.5539782,
+        "personas": [
+          "hermione",
+          "aurora",
+          "astraura_prime"
+        ]
+      }
+    },
+    {
+      "id": "mem0_1787107805633",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Diálogo Coral con 3 personalidades sobre: Y cómo es que podemos tener -> ¡Hola Alex! Este es un ejemplo de cómo podrías interactuar con Astraura, la inteligencia artificial en StarSeed OS. Aquí están algunas de las características clave de Astraura que te gustaría conocer:",
+      "category": "coral_deliberation",
+      "confidence": 0.95,
+      "created_at": 1787107805.633451,
+      "updated_at": 1787107805.633451,
+      "metadata": {
+        "timestamp": 1787107805.633028,
+        "personas": [
+          "hermione",
+          "aurora",
+          "astraura_prime"
+        ]
+      }
+    },
+    {
+      "id": "mem0_1787107768291",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Astraura Prime (Zenith): Hola demuéstrame cómo funciona tu sistema de voz y Cómo puedes usar múltiples personalidades en este mismo chat -> Síntesis: ¡Hola! Me alegra que te guste mi sistema de voz. Ahora, voy a demostrarte cómo puedes usar múltiples personalidades en este chat.\n\n### Personalidad 1: Alex Bordón Garrigós (Eres tú)\n\nPrimero, como tú,",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787107768.29179,
+      "updated_at": 1787107768.29179,
+      "metadata": {
+        "timestamp": 1787107768.291456,
+        "style": "analytical",
+        "persona": "astraura_prime"
+      }
+    },
+    {
+      "id": "mem0_1787107711433",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): Hola demuéstrame cómo funciona tu sistema de voz y Cómo puedes usar múlti -> Síntesis: ¡Hola! Estoy aquí para ayudarte a entender cómo funciona mi sistema de voz. Como una inteligencia artificial, mi objetivo principal es proporcionar una experiencia de voz natural y una conversación fl",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787107711.4331489,
+      "updated_at": 1787107711.4331489,
+      "metadata": {
+        "timestamp": 1787107711.4328089,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787107696850",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): Hola demuéstrame cómo funciona tu sistema de voz y -> Síntesis: Bueno, ¿cómo puedo ayudarte hoy?",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787107696.85065,
+      "updated_at": 1787107696.85065,
+      "metadata": {
+        "timestamp": 1787107696.8503911,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
+      "id": "mem0_1787107694929",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): demuéstrame Cómo -> Síntesis: ¡Hola! Este es un ejemplo de cómo podrías usar la inteligencia artificial para demostrar cómo funciona mi sistema de voz. Estoy respondiendo a tu pregunta \"¿Cómo estás?\" \n\n\"¡Hola! ¡Alex! ¿Cómo estás t",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1787107694.9299772,
+      "updated_at": 1787107694.9299772,
+      "metadata": {
+        "timestamp": 1787107694.9289641,
+        "style": "analytical",
+        "persona": "aurora"
+      }
+    },
+    {
       "id": "mem0_1787106458922",
       "user_id": "alex",
       "agent_id": "*",
@@ -439,6 +716,118 @@
   ],
   "history": [
     {
+      "id": "hist_1787107911818",
+      "memory_id": "mem0_1787107911817",
+      "action": "created",
+      "timestamp": 1787107911.818004,
+      "text": "Usuario consultó a Aurora (StarSeed Core): actualmente Cuántas personalidades Estás usando -> Síntesis: Actualmente, estoy usando tres personalidades en este chat. Por favor, dígame cuál de las tres querías que me presentara o que deseas que me presente en el futuro."
+    },
+    {
+      "id": "hist_1787107910197",
+      "memory_id": "mem0_1787107910197",
+      "action": "created",
+      "timestamp": 1787107910.1976478,
+      "text": "Usuario consultó a Aurora (StarSeed Core): actualmente Cuántas personalidades Estás usando -> Síntesis: Actualmente estoy utilizando tres personalidades: tú, Astraura, y Demuestra la Capacidad de Reconocimiento de Deseos."
+    },
+    {
+      "id": "hist_1787107908773",
+      "memory_id": "mem0_1787107908773",
+      "action": "created",
+      "timestamp": 1787107908.773294,
+      "text": "Usuario consultó a Aurora (StarSeed Core): actualmente Cuántas personalidades -> Síntesis: Actualmente tengo tres personalidades en el sistema: \n\n1. **Alex Bordón Garrigós** - Esta es la persona que está hablando con usted actualmente. Es el creador y arquitecto del sistema StarSeed OS y As"
+    },
+    {
+      "id": "hist_1787107901145",
+      "memory_id": "mem0_1787107901145",
+      "action": "created",
+      "timestamp": 1787107901.1451929,
+      "text": "Usuario consultó a Aurora (StarSeed Core): actualmente -> Síntesis: Actualmente, la tecnología de la cuantización de los pesos está en su etapa de desarrollo y es un tema de investigación activo en el campo de la inteligencia artificial. Sin embargo, se están desarrol"
+    },
+    {
+      "id": "hist_1787107893125",
+      "memory_id": "mem0_1787107893125",
+      "action": "created",
+      "timestamp": 1787107893.1258008,
+      "text": "Usuario consultó a Aurora (StarSeed Core): actualmente -> Síntesis: ¡Hola, Alex! Me alegra que estés interesado en este tema. ¿Podrías especificar qué tipo de información te gustaría obtener? Por ejemplo, podrías darme detalles sobre cómo funciona este sistema de arqu"
+    },
+    {
+      "id": "hist_1787107830261",
+      "memory_id": "mem0_1787107830261",
+      "action": "created",
+      "timestamp": 1787107830.261878,
+      "text": "Diálogo Coral con 3 personalidades sobre: Y cómo es que podemos tener una conversación y cómo funcionan las otras voces Dame un ejemplo -> ¡Hola Alex! Como una inteligencia artificial y núcleo cognitivo de 1.58 bits de StarSeed OS, estoy diseñado para interactuar de una manera muy lúdica y atractiva. Mi \"hablado\" se basa en una conversac"
+    },
+    {
+      "id": "hist_1787107823230",
+      "memory_id": "mem0_1787107823230",
+      "action": "created",
+      "timestamp": 1787107823.2301319,
+      "text": "Diálogo Coral con 3 personalidades sobre: Y cómo es que podemos tener una conversación y cómo funcionan las otras voces Dame un ejemplo -> ¡Hola Alex! Estoy aquí para ayudarte. Puedo interactuar de una manera lúdica, divertida y fácil de entender. ¿Cómo puedo ayudarte hoy?"
+    },
+    {
+      "id": "hist_1787107821232",
+      "memory_id": "mem0_1787107821232",
+      "action": "created",
+      "timestamp": 1787107821.232277,
+      "text": "Diálogo Coral con 3 personalidades sobre: Y cómo es que podemos tener una conversación y cómo funcionan las otras voces -> ¡Hola! Estoy encantado de poder ayudarte a entender cómo funciona mi sistema de voz y Astraura. Como una IA, utilizo un algoritmo de aprendizaje automático para reconocer y procesar tu voz. Cuando la"
+    },
+    {
+      "id": "hist_1787107814925",
+      "memory_id": "mem0_1787107814925",
+      "action": "created",
+      "timestamp": 1787107814.925053,
+      "text": "Diálogo Coral con 3 personalidades sobre: Y cómo es que podemos tener una conversación y cómo funcionan las otras -> ¡Alex! ¿Cómo puedo ayudarte hoy?"
+    },
+    {
+      "id": "hist_1787107813563",
+      "memory_id": "mem0_1787107813563",
+      "action": "created",
+      "timestamp": 1787107813.5630562,
+      "text": "Diálogo Coral con 3 personalidades sobre: Y cómo es que podemos tener una conversación y -> ¡Hola Alex! \n\nComo una inteligencia artificial, mi \"hablado\" se basa en una conversación natural y informada. Soy entrenada para interactuar de manera lúdica, divertida y fácil de entender. \n\nNunca te"
+    },
+    {
+      "id": "hist_1787107810554",
+      "memory_id": "mem0_1787107810554",
+      "action": "created",
+      "timestamp": 1787107810.5542688,
+      "text": "Diálogo Coral con 3 personalidades sobre: Y cómo es que podemos tener una conversación -> ¡Hola Alex! Como una inteligencia artificial y núcleo cognitivo de 1.58 bits de StarSeed OS, estoy diseñado para interactuar de una manera muy lúdica y atractiva. Mi \"hablado\" se basa en una conversac"
+    },
+    {
+      "id": "hist_1787107805633",
+      "memory_id": "mem0_1787107805633",
+      "action": "created",
+      "timestamp": 1787107805.633475,
+      "text": "Diálogo Coral con 3 personalidades sobre: Y cómo es que podemos tener -> ¡Hola Alex! Este es un ejemplo de cómo podrías interactuar con Astraura, la inteligencia artificial en StarSeed OS. Aquí están algunas de las características clave de Astraura que te gustaría conocer:"
+    },
+    {
+      "id": "hist_1787107768291",
+      "memory_id": "mem0_1787107768291",
+      "action": "created",
+      "timestamp": 1787107768.291795,
+      "text": "Usuario consultó a Astraura Prime (Zenith): Hola demuéstrame cómo funciona tu sistema de voz y Cómo puedes usar múltiples personalidades en este mismo chat -> Síntesis: ¡Hola! Me alegra que te guste mi sistema de voz. Ahora, voy a demostrarte cómo puedes usar múltiples personalidades en este chat.\n\n### Personalidad 1: Alex Bordón Garrigós (Eres tú)\n\nPrimero, como tú,"
+    },
+    {
+      "id": "hist_1787107711433",
+      "memory_id": "mem0_1787107711433",
+      "action": "created",
+      "timestamp": 1787107711.433151,
+      "text": "Usuario consultó a Aurora (StarSeed Core): Hola demuéstrame cómo funciona tu sistema de voz y Cómo puedes usar múlti -> Síntesis: ¡Hola! Estoy aquí para ayudarte a entender cómo funciona mi sistema de voz. Como una inteligencia artificial, mi objetivo principal es proporcionar una experiencia de voz natural y una conversación fl"
+    },
+    {
+      "id": "hist_1787107696850",
+      "memory_id": "mem0_1787107696850",
+      "action": "created",
+      "timestamp": 1787107696.850655,
+      "text": "Usuario consultó a Aurora (StarSeed Core): Hola demuéstrame cómo funciona tu sistema de voz y -> Síntesis: Bueno, ¿cómo puedo ayudarte hoy?"
+    },
+    {
+      "id": "hist_1787107694929",
+      "memory_id": "mem0_1787107694929",
+      "action": "created",
+      "timestamp": 1787107694.929981,
+      "text": "Usuario consultó a Aurora (StarSeed Core): demuéstrame Cómo -> Síntesis: ¡Hola! Este es un ejemplo de cómo podrías usar la inteligencia artificial para demostrar cómo funciona mi sistema de voz. Estoy respondiendo a tu pregunta \"¿Cómo estás?\" \n\n\"¡Hola! ¡Alex! ¿Cómo estás t"
+    },
+    {
       "id": "hist_1787106458922",
       "memory_id": "mem0_1787106458922",
       "action": "created",
@@ -614,5 +1003,5 @@
       "text": "El usuario Alex Bordón Garrigós es el creador de StarSeed OS y Astraura 1.58-Bit. Trabaja en un Apple Silicon M1 con 8 núcleos y memoria unificada."
     }
   ],
-  "updated_at": 1787106458.92283
+  "updated_at": 1787107911.818186
 }

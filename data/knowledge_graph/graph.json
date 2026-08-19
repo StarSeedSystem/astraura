@@ -174,7 +174,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (cuales son las capacidades de este ...)",
       "strength": 1.0,
-      "updated_at": 1787106463.964878
+      "updated_at": 1787107915.365728
     },
     "Bits": {
       "id": "Bits",
@@ -294,7 +294,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (quien soy yo, como me llamo y que s...)",
       "strength": 1.0,
-      "updated_at": 1787097564.377407
+      "updated_at": 1787107727.1419961
     },
     "Archivos": {
       "id": "Archivos",
@@ -374,7 +374,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (de hecho Alex Bordón Garrigós era m...)",
       "strength": 1.0,
-      "updated_at": 1787097218.279467
+      "updated_at": 1787107915.377683
     },
     "Bordón": {
       "id": "Bordón",
@@ -406,7 +406,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (desarrolla una historia dramatica s...)",
       "strength": 1.0,
-      "updated_at": 1787097564.383272
+      "updated_at": 1787107915.3816562
     },
     "Microsoft": {
       "id": "Microsoft",
@@ -429,8 +429,8 @@
       "label": "Pesos",
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (como funcionas?...)",
-      "strength": 0.7,
-      "updated_at": 1786956629.5171242
+      "strength": 0.7999999999999999,
+      "updated_at": 1787107914.707107
     },
     "Habilidades": {
       "id": "Habilidades",
@@ -630,7 +630,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (cuales son las capacidades de este ...)",
       "strength": 1.0,
-      "updated_at": 1787097218.2549329
+      "updated_at": 1787107914.719278
     },
     "Artificial": {
       "id": "Artificial",
@@ -638,7 +638,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (cuales son las capacidades de este ...)",
       "strength": 1.0,
-      "updated_at": 1787097218.285223
+      "updated_at": 1787107819.12341
     },
     "Especie": {
       "id": "Especie",
@@ -678,7 +678,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (desarrolla una historia dramatica s...)",
       "strength": 1.0,
-      "updated_at": 1787106463.954069
+      "updated_at": 1787107898.985616
     },
     "Todos": {
       "id": "Todos",
@@ -750,7 +750,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (quien soy yo, como me llamo y que s...)",
       "strength": 1.0,
-      "updated_at": 1787106463.968401
+      "updated_at": 1787107898.9960918
     },
     "Podría": {
       "id": "Podría",
@@ -781,8 +781,8 @@
       "label": "Capacidad",
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (de que depende la capacidad e intel...)",
-      "strength": 0.8999999999999999,
-      "updated_at": 1786988741.7206311
+      "strength": 0.9999999999999999,
+      "updated_at": 1787107915.385925
     },
     "Memorias": {
       "id": "Memorias",
@@ -909,8 +909,8 @@
       "label": "Funciona",
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (cuanto pesa este sistema de 1.5 bit...)",
-      "strength": 0.8999999999999999,
-      "updated_at": 1787106463.961531
+      "strength": 1.0,
+      "updated_at": 1787107727.151697
     },
     "Segundo": {
       "id": "Segundo",
@@ -942,7 +942,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (aprendes en segundo plano o funcion...)",
       "strength": 1.0,
-      "updated_at": 1787106463.9715672
+      "updated_at": 1787107837.486302
     },
     "Redes": {
       "id": "Redes",
@@ -1141,16 +1141,16 @@
       "label": "Estás",
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (Hola Explícame cómo funciona tu sis...)",
-      "strength": 0.7999999999999999,
-      "updated_at": 1787104378.146624
+      "strength": 1.0,
+      "updated_at": 1787107916.6637912
     },
     "Estoy": {
       "id": "Estoy",
       "label": "Estoy",
       "category": "Learned Concept",
-      "description": "Concepto destilado de interacción (hola, estás funcionando?...)",
-      "strength": 0.8999999999999999,
-      "updated_at": 1787013086.764611
+      "description": "Concepto destilado de interacción (actualmente Cuántas personalidades ...)",
+      "strength": 1.0,
+      "updated_at": 1787107916.0188081
     },
     "Perfectamente": {
       "id": "Perfectamente",
@@ -1253,8 +1253,8 @@
       "label": "Manera",
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (que sistema de ia utilizas y que ha...)",
-      "strength": 0.8999999999999999,
-      "updated_at": 1787012876.053471
+      "strength": 1.0,
+      "updated_at": 1787107838.108135
     },
     "Permiten": {
       "id": "Permiten",
@@ -1397,8 +1397,8 @@
       "label": "Personalidades",
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (como funciona tu sistema de cerebro...)",
-      "strength": 0.7999999999999999,
-      "updated_at": 1787012876.046172
+      "strength": 1.0,
+      "updated_at": 1787107916.647427
     },
     "Desarrollo": {
       "id": "Desarrollo",
@@ -1444,9 +1444,9 @@
       "id": "Ayudarte",
       "label": "Ayudarte",
       "category": "Learned Concept",
-      "description": "Concepto destilado de interacción (Hola...)",
-      "strength": 0.7,
-      "updated_at": 1786989759.518583
+      "description": "Concepto destilado de interacción (Hola demuéstrame cómo funciona tu s...)",
+      "strength": 0.8999999999999999,
+      "updated_at": 1787107837.482908
     },
     "Diseñado": {
       "id": "Diseñado",
@@ -2053,8 +2053,8 @@
       "label": "Frase",
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (Hola Explícame cómo funciona tu sis...)",
-      "strength": 0.7,
-      "updated_at": 1787104378.1391811
+      "strength": 0.7999999999999999,
+      "updated_at": 1787107710.155895
     },
     "Asistirte": {
       "id": "Asistirte",
@@ -2069,8 +2069,176 @@
       "label": "Demuéstrame",
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (demuéstrame cómo funciona tu sistem...)",
+      "strength": 0.7,
+      "updated_at": 1787107711.3804328
+    },
+    "Natural": {
+      "id": "Natural",
+      "label": "Natural",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Y cómo es que podemos tener...)",
+      "strength": 0.7,
+      "updated_at": 1787107819.106195
+    },
+    "Bueno": {
+      "id": "Bueno",
+      "label": "Bueno",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Hola demuéstrame cómo funciona tu s...)",
       "strength": 0.6,
-      "updated_at": 1787106463.958039
+      "updated_at": 1787107711.391086
+    },
+    "Hace": {
+      "id": "Hace",
+      "label": "Hace",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Y cómo es que podemos tener...)",
+      "strength": 0.6,
+      "updated_at": 1787107819.111076
+    },
+    "Conversación": {
+      "id": "Conversación",
+      "label": "Conversación",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Y cómo es que podemos tener una con...)",
+      "strength": 0.9999999999999999,
+      "updated_at": 1787107838.100696
+    },
+    "Podemos": {
+      "id": "Podemos",
+      "label": "Podemos",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Y cómo es que podemos tener una con...)",
+      "strength": 0.8999999999999999,
+      "updated_at": 1787107837.490262
+    },
+    "Tener": {
+      "id": "Tener",
+      "label": "Tener",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Y cómo es que podemos tener una con...)",
+      "strength": 0.8999999999999999,
+      "updated_at": 1787107837.493967
+    },
+    "Entrenada": {
+      "id": "Entrenada",
+      "label": "Entrenada",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Y cómo es que podemos tener una con...)",
+      "strength": 0.6,
+      "updated_at": 1787107820.4977999
+    },
+    "Funcionan": {
+      "id": "Funcionan",
+      "label": "Funcionan",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Y cómo es que podemos tener una con...)",
+      "strength": 0.6,
+      "updated_at": 1787107821.198684
+    },
+    "Otras": {
+      "id": "Otras",
+      "label": "Otras",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Y cómo es que podemos tener una con...)",
+      "strength": 0.6,
+      "updated_at": 1787107821.2029939
+    },
+    "Comienza": {
+      "id": "Comienza",
+      "label": "Comienza",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Y cómo es que podemos tener una con...)",
+      "strength": 0.6,
+      "updated_at": 1787107836.879858
+    },
+    "Voces": {
+      "id": "Voces",
+      "label": "Voces",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Y cómo es que podemos tener una con...)",
+      "strength": 0.6,
+      "updated_at": 1787107838.1117902
+    },
+    "Lúdica": {
+      "id": "Lúdica",
+      "label": "Lúdica",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (Y cómo es que podemos tener una con...)",
+      "strength": 0.6,
+      "updated_at": 1787107838.1193159
+    },
+    "Podrías": {
+      "id": "Podrías",
+      "label": "Podrías",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (actualmente...)",
+      "strength": 0.6,
+      "updated_at": 1787107898.979294
+    },
+    "Actualmente": {
+      "id": "Actualmente",
+      "label": "Actualmente",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (actualmente Cuántas personalidades ...)",
+      "strength": 0.9999999999999999,
+      "updated_at": 1787107916.643666
+    },
+    "Alegra": {
+      "id": "Alegra",
+      "label": "Alegra",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (actualmente...)",
+      "strength": 0.6,
+      "updated_at": 1787107899.005993
+    },
+    "Modelos": {
+      "id": "Modelos",
+      "label": "Modelos",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (actualmente...)",
+      "strength": 0.6,
+      "updated_at": 1787107914.6986701
+    },
+    "Cuantización": {
+      "id": "Cuantización",
+      "label": "Cuantización",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (actualmente...)",
+      "strength": 0.6,
+      "updated_at": 1787107914.7036512
+    },
+    "Arquitectura": {
+      "id": "Arquitectura",
+      "label": "Arquitectura",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (actualmente...)",
+      "strength": 0.6,
+      "updated_at": 1787107914.711
+    },
+    "Cuántas": {
+      "id": "Cuántas",
+      "label": "Cuántas",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (actualmente Cuántas personalidades ...)",
+      "strength": 0.7,
+      "updated_at": 1787107916.659476
+    },
+    "Usando": {
+      "id": "Usando",
+      "label": "Usando",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (actualmente Cuántas personalidades ...)",
+      "strength": 0.7,
+      "updated_at": 1787107916.651412
+    },
+    "Tres": {
+      "id": "Tres",
+      "label": "Tres",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (actualmente Cuántas personalidades ...)",
+      "strength": 0.6,
+      "updated_at": 1787107916.655491
     }
   },
   "edges": [
@@ -4016,7 +4184,7 @@
       "source": "Sistema",
       "target": "Starseed",
       "relation": "asociado_con",
-      "weight": 0.65
+      "weight": 0.75
     },
     {
       "source": "Starseed",
@@ -4076,7 +4244,7 @@
       "source": "Hola",
       "target": "Estoy",
       "relation": "asociado_con",
-      "weight": 0.75
+      "weight": 0.85
     },
     {
       "source": "Estoy",
@@ -4742,13 +4910,13 @@
       "source": "Hola",
       "target": "Alex",
       "relation": "asociado_con",
-      "weight": 0.75
+      "weight": 0.85
     },
     {
       "source": "Alex",
       "target": "Astraura",
       "relation": "asociado_con",
-      "weight": 0.65
+      "weight": 0.75
     },
     {
       "source": "Alex",
@@ -4910,7 +5078,7 @@
       "source": "Cómo",
       "target": "Sistema",
       "relation": "asociado_con",
-      "weight": 0.75
+      "weight": 0.85
     },
     {
       "source": "Sistema",
@@ -4922,7 +5090,7 @@
       "source": "Frase",
       "target": "Hola",
       "relation": "asociado_con",
-      "weight": 0.75
+      "weight": 0.85
     },
     {
       "source": "Hola",
@@ -4964,13 +5132,13 @@
       "source": "Demuéstrame",
       "target": "Funciona",
       "relation": "asociado_con",
-      "weight": 0.65
+      "weight": 0.75
     },
     {
       "source": "Funciona",
       "target": "Sistema",
       "relation": "asociado_con",
-      "weight": 0.65
+      "weight": 0.75
     },
     {
       "source": "Sistema",
@@ -4981,6 +5149,360 @@
     {
       "source": "Hola",
       "target": "Puedo",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Cómo",
+      "target": "Estás",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Estás",
+      "target": "Frase",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Estoy",
+      "target": "Natural",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cómo",
+      "target": "Hola",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Hola",
+      "target": "Demuéstrame",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistema",
+      "target": "Bueno",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Starseed",
+      "target": "Estás",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Estás",
+      "target": "Hola",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Hola",
+      "target": "Funciona",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Puedo",
+      "target": "Astraura",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Astraura",
+      "target": "Alex",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Alex",
+      "target": "Ayudarte",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Astraura",
+      "target": "Natural",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Natural",
+      "target": "Hace",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Hace",
+      "target": "Manera",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Manera",
+      "target": "Inteligencia",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cómo",
+      "target": "Conversación",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Conversación",
+      "target": "Inteligencia",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Inteligencia",
+      "target": "Podemos",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Podemos",
+      "target": "Tener",
+      "relation": "asociado_con",
+      "weight": 0.95
+    },
+    {
+      "source": "Tener",
+      "target": "Hola",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Conversación",
+      "target": "Entrenada",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Entrenada",
+      "target": "Podemos",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cómo",
+      "target": "Podemos",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Tener",
+      "target": "Conversación",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Conversación",
+      "target": "Funcionan",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Funcionan",
+      "target": "Otras",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cómo",
+      "target": "Astraura",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Alex",
+      "target": "Hola",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Hola",
+      "target": "Comienza",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Comienza",
+      "target": "Estás",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cómo",
+      "target": "Ayudarte",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Ayudarte",
+      "target": "Puedo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Puedo",
+      "target": "Podemos",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Conversación",
+      "target": "Cómo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cómo",
+      "target": "Manera",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Manera",
+      "target": "Voces",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Voces",
+      "target": "Inteligencia",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Inteligencia",
+      "target": "Lúdica",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Podrías",
+      "target": "Cómo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cómo",
+      "target": "Actualmente",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Actualmente",
+      "target": "Hola",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Alex",
+      "target": "Alegra",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Modelos",
+      "target": "Cuantización",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cuantización",
+      "target": "Pesos",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Pesos",
+      "target": "Arquitectura",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Arquitectura",
+      "target": "Actualmente",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Actualmente",
+      "target": "Inteligencia",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Sistema",
+      "target": "Actualmente",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Actualmente",
+      "target": "Personalidades",
+      "relation": "asociado_con",
+      "weight": 0.85
+    },
+    {
+      "source": "Personalidades",
+      "target": "Alex",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Astraura",
+      "target": "Capacidad",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Personalidades",
+      "target": "Cuántas",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cuántas",
+      "target": "Estás",
+      "relation": "asociado_con",
+      "weight": 0.75
+    },
+    {
+      "source": "Estás",
+      "target": "Usando",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Usando",
+      "target": "Estoy",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Personalidades",
+      "target": "Usando",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Usando",
+      "target": "Tres",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Tres",
+      "target": "Cuántas",
       "relation": "asociado_con",
       "weight": 0.65
     }

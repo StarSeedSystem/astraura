@@ -2,19 +2,25 @@
  * Astraura OmniVoice & audio.cpp 1.58-Bit Speech Engine (StarSeed OS)
  * Pure open-source, local, quantized and affective voice system.
  * Supports audio.cpp backend synthesis, WebAudio DSP formant styling, real-time Siri-style Orb telemetry,
- * ultra-low latency Direct Full-Duplex 1.58-Bit Conversational streaming, and clause prosody shaping.
+ * ultra-low latency Direct Full-Duplex 1.58-Bit Conversational streaming, clause prosody shaping,
+ * multi-personality dialogue routing, and continuous ambient perception.
  */
 
 class OmniVoiceEngine {
   constructor() {
     this.synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
     this.recognition = null;
+    this.ambientRecognition = null;
+    this.convRecognition = null;
     this.audioCtx = null;
     this.currentAudioElement = null;
     this.isSpeaking = false;
     this.isPaused = false;
     this.isListening = false;
+    this.isContinuousListening = false;
     this.isConversationActive = false;
+    this.suppressRecognition = false;
+    this.lastSpokenText = '';
     this.currentUtterance = null;
     this.availableVoices = [];
     this.analyser = null;
@@ -307,7 +313,6 @@ class OmniVoiceEngine {
    */
   _splitIntoExpressiveClauses(text) {
     if (!text) return [];
-    // Match clauses by sentence endings and natural clause pauses
     const rawClauses = text.match(/[^,.;:!?\n—]+[,.;:!?\n—]*/g) || [text];
     const clauses = [];
 
@@ -455,13 +460,13 @@ class OmniVoiceEngine {
 
       // Dynamic prosody inflection by clause type
       if (clause.type === 'question' || clause.hasQuestion) {
-        clausePitch = Math.min(1.26, basePitch * 1.08); // Melodic upward curve for question
+        clausePitch = Math.min(1.26, basePitch * 1.08);
         clauseRate = baseRate * 1.02;
       } else if (clause.type === 'exclamation' || clause.hasExclamation) {
-        clausePitch = Math.min(1.24, basePitch * 1.06); // Bright joyful inflection
+        clausePitch = Math.min(1.24, basePitch * 1.06);
         clauseRate = Math.min(1.20, baseRate * 1.04);
       } else if (clause.type === 'pause') {
-        clausePitch = Math.max(0.92, basePitch * 0.96); // Warm intimate drop
+        clausePitch = Math.max(0.92, basePitch * 0.96);
         clauseRate = Math.max(0.85, baseRate * 0.93);
       } else if (clause.type === 'comma') {
         clausePitch = basePitch * 1.01;
@@ -475,7 +480,6 @@ class OmniVoiceEngine {
       utterance.lang = 'es-ES';
 
       utterance.onend = () => {
-        // Natural human breath pause (60ms - 120ms)
         const pauseDelay = clause.type === 'comma' ? 60 : (clause.type === 'pause' ? 120 : 75);
         setTimeout(() => {
           speakNextClause();
@@ -526,6 +530,292 @@ class OmniVoiceEngine {
     this.isPaused = false;
     this.currentUtterance = null;
     this.emit('state_change', 'idle');
+  }
+
+  /**
+   * Parses multi-personality responses into distinct speaker blocks.
+   */
+  parseMultiPersonalitySegments(fullText) {
+    if (!fullText) return [];
+    
+    const headerRegex = /(?:###\s*(?:[^\n\[]*\[)?([a-zA-ZáéíóúñÁÉÍÓÚÑ\s/]+)\]?:\s*|\*\*([a-zA-ZáéíóúñÁÉÍÓÚÑ\s/]+)\*\*:\s*)/gi;
+    
+    const segments = [];
+    let lastIndex = 0;
+    let match;
+    let currentSpeaker = "Aurora";
+
+    const personaMap = {
+      'aurora': { id: 'aurora', name: 'Aurora', voiceId: 'es-ES-ElviraNeural', pitch: 1.08, rate: 1.04, color: '#ec4899', icon: 'Sparkles' },
+      'hephaestus': { id: 'hephaestus', name: 'Hephaestus', voiceId: 'es-ES-AlvaroNeural', pitch: 0.84, rate: 1.02, color: '#f59e0b', icon: 'Cpu' },
+      'hefestos': { id: 'hephaestus', name: 'Hephaestus', voiceId: 'es-ES-AlvaroNeural', pitch: 0.84, rate: 1.02, color: '#f59e0b', icon: 'Cpu' },
+      'hermione': { id: 'hermione', name: 'Hermione', voiceId: 'es-ES-AbrilNeural', pitch: 1.06, rate: 1.10, color: '#38bdf8', icon: 'Compass' },
+      'atenea': { id: 'atenea', name: 'Atenea', voiceId: 'es-ES-RaquelNeural', pitch: 0.98, rate: 0.98, color: '#8b5cf6', icon: 'Shield' },
+      'athena': { id: 'atenea', name: 'Atenea', voiceId: 'es-ES-RaquelNeural', pitch: 0.98, rate: 0.98, color: '#8b5cf6', icon: 'Shield' },
+      'hermes': { id: 'hermes', name: 'Hermes', voiceId: 'es-ES-JorgeNeural', pitch: 1.04, rate: 1.16, color: '#10b981', icon: 'Globe' },
+      'oneiros': { id: 'oneiros', name: 'Oneiros', voiceId: 'es-ES-ArnauNeural', pitch: 1.12, rate: 0.95, color: '#ec4899', icon: 'Flame' },
+      'mnemosyne': { id: 'mnemosyne', name: 'Mnemosyne', voiceId: 'es-ES-PalomaNeural', pitch: 0.92, rate: 0.92, color: '#a855f7', icon: 'Brain' },
+      'logos': { id: 'logos', name: 'Logos', voiceId: 'es-ES-NilNeural', pitch: 0.96, rate: 1.04, color: '#3b82f6', icon: 'Terminal' },
+      'kallisti': { id: 'kallisti', name: 'Kallisti', voiceId: 'es-ES-TrianaNeural', pitch: 1.12, rate: 1.02, color: '#ec4899', icon: 'Sparkles' },
+      'astraura prime': { id: 'aurora', name: 'Aurora', voiceId: 'es-ES-ElviraNeural', pitch: 1.08, rate: 1.04, color: '#ec4899', icon: 'Sparkles' },
+      'genesis': { id: 'aurora', name: 'Aurora', voiceId: 'es-ES-ElviraNeural', pitch: 1.08, rate: 1.04, color: '#ec4899', icon: 'Sparkles' },
+      'génesis': { id: 'aurora', name: 'Aurora', voiceId: 'es-ES-ElviraNeural', pitch: 1.08, rate: 1.04, color: '#ec4899', icon: 'Sparkles' },
+      'síntesis coral': { id: 'aurora', name: 'Síntesis Coral 1.58b', voiceId: 'es-ES-ElviraNeural', pitch: 1.05, rate: 1.04, color: '#00f0ff', icon: 'Sparkles' },
+      'sintesis coral': { id: 'aurora', name: 'Síntesis Coral 1.58b', voiceId: 'es-ES-ElviraNeural', pitch: 1.05, rate: 1.04, color: '#00f0ff', icon: 'Sparkles' }
+    };
+
+    while ((match = headerRegex.exec(fullText)) !== null) {
+      if (match.index > lastIndex) {
+        const chunkText = fullText.slice(lastIndex, match.index).trim();
+        if (chunkText.length > 0) {
+          const rawSpeakerKey = currentSpeaker.toLowerCase().trim();
+          let matchedPersona = personaMap['astraura prime'];
+          for (const [k, p] of Object.entries(personaMap)) {
+            if (rawSpeakerKey.includes(k)) {
+              matchedPersona = p;
+              break;
+            }
+          }
+          segments.push({
+            speaker: currentSpeaker,
+            persona: matchedPersona,
+            text: chunkText
+          });
+        }
+      }
+      currentSpeaker = (match[1] || match[2] || "").trim();
+      lastIndex = headerRegex.lastIndex;
+    }
+
+    if (lastIndex < fullText.length) {
+      const remainingText = fullText.slice(lastIndex).trim();
+      if (remainingText.length > 0) {
+        const rawSpeakerKey = currentSpeaker.toLowerCase().trim();
+        let matchedPersona = personaMap['astraura prime'];
+        for (const [k, p] of Object.entries(personaMap)) {
+          if (rawSpeakerKey.includes(k)) {
+            matchedPersona = p;
+            break;
+          }
+        }
+        segments.push({
+          speaker: currentSpeaker,
+          persona: matchedPersona,
+          text: remainingText
+        });
+      }
+    }
+
+    return segments.length > 0 ? segments : [{
+      speaker: 'Astraura Prime',
+      persona: personaMap['astraura prime'],
+      text: fullText
+    }];
+  }
+
+  /**
+   * Sequentially speaks a multi-personality response with each persona's unique voice profile!
+   */
+  speakMultiPersonalityDialogue(fullText, onSegmentStart = null, onSegmentEnd = null, onAllEnd = null) {
+    this.stopSpeaking();
+    const segments = this.parseMultiPersonalitySegments(fullText);
+    if (!segments || segments.length === 0) {
+      if (onAllEnd) onAllEnd();
+      return;
+    }
+
+    let currentIndex = 0;
+
+    const playNext = () => {
+      if (currentIndex >= segments.length) {
+        this.isSpeaking = false;
+        if (onAllEnd) onAllEnd();
+        return;
+      }
+
+      const seg = segments[currentIndex];
+      if (onSegmentStart) onSegmentStart(seg, currentIndex);
+
+      this.speak(
+        seg.text,
+        {
+          persona_id: seg.persona?.id || 'aurora',
+          voice_id: seg.persona?.voiceId || 'es-ES-ElviraNeural',
+          pitch: seg.persona?.pitch || 1.0,
+          rate: seg.persona?.rate || 1.02,
+          volume: 1.0
+        },
+        () => {
+          this.isSpeaking = true;
+        },
+        () => {
+          if (onSegmentEnd) onSegmentEnd(seg, currentIndex);
+          currentIndex++;
+          setTimeout(playNext, 200);
+        }
+      );
+    };
+
+    playNext();
+  }
+
+  /**
+   * Standard One-Shot Speech Recognition (Microphone button in chat)
+   */
+  startListening(onInterim, onFinal, onError) {
+    if (!this.recognition) {
+      if (onError) onError('SpeechRecognition no está disponible en este entorno.');
+      return;
+    }
+
+    this.stopListening();
+
+    this.recognition.onstart = () => {
+      this.isListening = true;
+    };
+
+    this.recognition.onresult = (event) => {
+      let interim = '';
+      let final = '';
+
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          final += event.results[i][0].transcript;
+        } else {
+          interim += event.results[i][0].transcript;
+        }
+      }
+
+      if (interim && onInterim) onInterim(interim);
+      if (final && onFinal) onFinal(final);
+    };
+
+    this.recognition.onerror = (event) => {
+      console.warn('SpeechRecognition error:', event.error);
+      this.isListening = false;
+      if (onError) onError(event.error);
+    };
+
+    this.recognition.onend = () => {
+      this.isListening = false;
+    };
+
+    try {
+      this.recognition.start();
+    } catch (e) {
+      console.warn('Recognition start notice:', e);
+    }
+  }
+
+  stopListening() {
+    if (this.recognition && this.isListening) {
+      try {
+        this.recognition.stop();
+      } catch {}
+      this.isListening = false;
+    }
+  }
+
+  /**
+   * Continuous 24/7 Background Ambient Listening & Voice Perception
+   */
+  startContinuousAmbientListening(onSpeechRecognized, onPerceptionResult, onAudioLevel) {
+    if (typeof window === 'undefined') return;
+    this.isContinuousListening = true;
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      console.warn('SpeechRecognition not available for continuous ambient listening.');
+      return;
+    }
+
+    if (!this.ambientRecognition) {
+      this.ambientRecognition = new SpeechRecognition();
+      this.ambientRecognition.continuous = true;
+      this.ambientRecognition.interimResults = false;
+      this.ambientRecognition.lang = 'es-ES';
+    }
+
+    this.ambientRecognition.onresult = async (event) => {
+      if (!this.isContinuousListening) return;
+      const lastIdx = event.results.length - 1;
+      if (lastIdx < 0) return;
+
+      const result = event.results[lastIdx];
+      if (result.isFinal) {
+        const transcript = result[0].transcript.trim();
+        if (transcript.length > 2) {
+          if (onSpeechRecognized) onSpeechRecognized(transcript);
+
+          try {
+            const resp = await fetch('/api/voice/daemon/ambient_perceive', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                user_transcript: transcript,
+                acoustic_metadata: {
+                  energy: 0.75,
+                  pitch_hz: 195.0,
+                  ambient_db: 40.0
+                }
+              })
+            });
+
+            if (resp.ok) {
+              const data = await resp.json();
+              if (onPerceptionResult) onPerceptionResult(data);
+
+              if (data.success && data.response_text) {
+                if (data.audio_base64) {
+                  const audio = new Audio(data.audio_base64);
+                  this.currentAudioElement = audio;
+                  audio.play().catch(e => console.warn('Ambient auto-play notice:', e));
+                } else {
+                  this.speak(data.response_text, data.voice_profile || {});
+                }
+              }
+            }
+          } catch (e) {
+            console.warn('Ambient perceive fetch error:', e);
+          }
+        }
+      }
+    };
+
+    this.ambientRecognition.onerror = (e) => {
+      if (this.isContinuousListening && e.error !== 'aborted') {
+        setTimeout(() => {
+          if (this.isContinuousListening) {
+            try { this.ambientRecognition.start(); } catch {}
+          }
+        }, 1000);
+      }
+    };
+
+    this.ambientRecognition.onend = () => {
+      if (this.isContinuousListening) {
+        setTimeout(() => {
+          if (this.isContinuousListening) {
+            try { this.ambientRecognition.start(); } catch {}
+          }
+        }, 500);
+      }
+    };
+
+    try {
+      this.ambientRecognition.start();
+    } catch (e) {
+      console.warn('Continuous ambient start notice:', e);
+    }
+  }
+
+  stopContinuousAmbientListening() {
+    this.isContinuousListening = false;
+    if (this.ambientRecognition) {
+      try {
+        this.ambientRecognition.stop();
+      } catch {}
+    }
   }
 
   /**
