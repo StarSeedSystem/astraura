@@ -37,6 +37,7 @@ from .tools.system_senses import system_senses
 from .tools.browser_tool import browser_agent
 from .skills.starseed_library import starseed_library
 from .projects.project_vault import project_vault_manager
+from .projects.projects_manager import projects_manager
 from .core.sensorium_engine import sensorium_engine
 from .core.intuitive_imagination_engine import intuitive_imagination_engine
 from .core.system_notifications_engine import system_notifications_engine
@@ -541,21 +542,42 @@ async def export_project_as_zip(req: ExportZipRequest):
 @app.get("/api/projects")
 async def list_projects_endpoint():
     return {
-        "projects": project_vault_manager.list_projects(),
-        "total": len(project_vault_manager.list_projects())
+        "projects": projects_manager.list_projects(),
+        "total": len(projects_manager.list_projects())
     }
 
-class SaveProjectRequest(BaseModel):
-    project: Dict[str, Any]
+class CreateProjectRequest(BaseModel):
+    name: str
+    description: str
+    type: str = "personal"
 
-@app.post("/api/projects/save")
-async def save_project_endpoint(req: SaveProjectRequest):
-    saved = project_vault_manager.save_project(req.project)
-    return {"success": True, "project": saved}
+@app.post("/api/projects/create")
+async def create_project_endpoint(req: CreateProjectRequest):
+    created = projects_manager.create_project(req.name, req.description, req.type)
+    return {"success": True, "project": created}
 
-class ExportProjectRequest(BaseModel):
+class UpdateProjectRequest(BaseModel):
     project_id: str
-    target_directory: str
+    updates: Dict[str, Any]
+
+@app.post("/api/projects/update")
+async def update_project_endpoint(req: UpdateProjectRequest):
+    updated = projects_manager.update_project(req.project_id, req.updates)
+    if not updated:
+        return {"success": False, "error": "Project not found"}
+    return {"success": True, "project": updated}
+
+class LinkProjectItemRequest(BaseModel):
+    project_id: str
+    item_type: str
+    item_id: str
+
+@app.post("/api/projects/link")
+async def link_project_item_endpoint(req: LinkProjectItemRequest):
+    success = projects_manager.link_item_to_project(req.project_id, req.item_type, req.item_id)
+    return {"success": success}
+
+# --- Legacy Vault Export / Link ---
 
 @app.post("/api/projects/export")
 async def export_project_endpoint(req: ExportProjectRequest):

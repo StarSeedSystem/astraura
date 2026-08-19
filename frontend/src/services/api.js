@@ -492,6 +492,14 @@ export async function autoLinkBrainSynapses(brainId) {
   });
 }
 
+export async function fetchAstrauraProjectStructure() {
+  return apiFetch('/astraura_project/structure');
+}
+
+export async function fetchAstrauraProjectFile(filePath) {
+  return apiFetch(`/astraura_project/file?path=${encodeURIComponent(filePath)}`);
+}
+
 // ================= Universal Code & Project Execution APIs =================
 
 export async function executeCode(language, code, projectFiles = null) {
@@ -555,6 +563,36 @@ export const executeProjectOnBackend = executeMultiFileProject;
 export const saveProject = saveProjectToVault;
 export const exportProjectToDisk = exportProjectZip;
 export const linkProjectFolder = linkLocalProjectFolder;
+
+// ================= Unified Projects Manager APIs =================
+
+export async function fetchProjects() {
+  return apiFetch('/projects');
+}
+
+export async function createProject(name, description, type = 'personal') {
+  return apiFetch('/projects/create', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, description, type })
+  });
+}
+
+export async function updateProject(projectId, updates) {
+  return apiFetch('/projects/update', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ project_id: projectId, updates })
+  });
+}
+
+export async function linkProjectItem(projectId, itemType, itemId) {
+  return apiFetch('/projects/link', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ project_id: projectId, item_type: itemType, item_id: itemId })
+  });
+}
 
 export async function addMem0Memory(memoryText, category = 'general', metadata = {}) {
   try {

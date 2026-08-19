@@ -58,6 +58,7 @@ import DreamStudioView from './components/DreamStudioView';
 import Sensorium360View from './components/Sensorium360View';
 import IntuitiveImaginationView from './components/IntuitiveImaginationView';
 import CreationsView from './components/CreationsView';
+import ProjectsView from './components/ProjectsView';
 import VoiceStudioView from './components/VoiceStudioView';
 import StorageRoutingView from './components/StorageRoutingView';
 import NotificationsLogsView from './components/NotificationsLogsView';
@@ -540,6 +541,7 @@ export default function App() {
   const navTabs = [
     { id: 'chat', label: 'Chat Multiagéntico & Voz', icon: MessageSquare, color: 'cyan' },
     { id: 'voice_studio', label: 'VoiceStudio & Forja de Sonido', icon: Headphones, color: 'purple', badge: '646 Idiomas' },
+    { id: 'projects', label: 'Proyectos & Clasificación', icon: FolderTree, color: 'emerald', badge: 'Automáticos' },
     { id: 'creations', label: 'Creaciones & Evolución Progresiva', icon: Sparkles, color: 'pink', badge: '5 Forjadas' },
     { id: 'imagination', label: 'Imaginación Intuitiva (Always-On)', icon: Sparkles, color: 'purple', badge: imaginationBadge },
     { id: 'storage', label: 'Enrutamiento de Almacenamiento & Medios', icon: HardDrive, color: 'cyan' },
@@ -848,6 +850,7 @@ export default function App() {
           )}
 
           {activeTab === 'voice_studio' && <VoiceStudioView onBackToChat={() => setActiveTab('chat')} />}
+          {activeTab === 'projects' && <ProjectsView />}
           {activeTab === 'creations' && <CreationsView />}
           {activeTab === 'sensorium' && <Sensorium360View />}
           {(activeTab === 'imagination' || activeTab === 'dream') && <IntuitiveImaginationView />}

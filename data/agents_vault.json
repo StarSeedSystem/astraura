@@ -1,6 +1,6 @@
 {
   "version": "1.58.0",
-  "updated_at": 1787105609.318917,
+  "updated_at": 1787170010.6945338,
   "agents": {
     "agent_aurora": {
       "id": "agent_aurora",
@@ -232,7 +232,7 @@
       "ram_limit_mb": 96,
       "compute_trunk": "trunk_b",
       "hardware_acceleration": "Apple Silicon ARM64",
-      "imagination_enabled": false,
+      "imagination_enabled": true,
       "imagination_frequency": "manual",
       "imagination_permission_level": "always_ask",
       "used_personalities": [

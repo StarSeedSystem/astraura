@@ -590,15 +590,33 @@ export default function CreationsView() {
                       <div className="mt-3 p-2 rounded-lg bg-black/30 border border-white/5 space-y-1">
                         <div className="flex items-center justify-between text-[11px] font-mono">
                           <span className="text-slate-400">Agente:</span>
-                          <span className="text-cyan-300 font-bold">{item.agent_name}</span>
+                          <span className="text-cyan-300 font-bold">{item.agent_name || 'Oneiros'}</span>
                         </div>
                         <div className="flex items-center justify-between text-[10px] font-mono">
                           <span className="text-slate-500">Medio de Origen:</span>
-                          <span className="text-slate-300">{item.agent_origin_media}</span>
+                          <span className="text-slate-300">{item.agent_origin_media || 'Imaginación Intuitiva'}</span>
                         </div>
                         <div className="flex items-center justify-between text-[10px] font-mono">
                           <span className="text-slate-500">Cerebro:</span>
-                          <span className="text-purple-300 truncate max-w-[160px]">{item.brain_name.split(' // ')[0]}</span>
+                          <span className="text-purple-300 truncate max-w-[160px]">{item.brain_name?.split(' // ')[0] || 'StarSeed'}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-[10px] font-mono border-t border-white/5 pt-1 mt-1">
+                          <span className="text-slate-500">Proyecto:</span>
+                          <span className="text-emerald-300 font-bold truncate max-w-[160px]">{item.project_id || 'Sin Proyecto'}</span>
+                        </div>
+                      </div>
+
+                      {/* Dates and Processes */}
+                      <div className="mt-2.5 flex flex-col gap-1 text-[10px] font-mono px-2 py-1.5 rounded-lg bg-white/5 border border-white/5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400 flex items-center gap-1"><Clock className="w-3 h-3" /> Creado:</span>
+                          <span className="text-slate-300">{item.created_at ? new Date(item.created_at * 1000).toLocaleDateString() : 'N/A'}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400 flex items-center gap-1"><Activity className="w-3 h-3" /> Procesos:</span>
+                          <span className="text-slate-300">
+                             <span className="text-emerald-400">{item.active_processes || 0} act</span> • <span className="text-amber-400">{item.in_progress_processes || 0} cur</span> • <span className="text-rose-400">{item.discarded_processes || 0} des</span>
+                          </span>
                         </div>
                       </div>
 

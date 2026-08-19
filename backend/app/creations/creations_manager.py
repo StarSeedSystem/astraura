@@ -52,6 +52,15 @@ class CreationsManager:
                 with open(self.state_file, "r", encoding="utf-8") as f:
                     data = json.load(f)
                     self.creations = data.get("creations", [])
+                    # Inject defaults for older data
+                    for c in self.creations:
+                        c.setdefault("created_at", time.time())
+                        c.setdefault("updated_at", time.time())
+                        c.setdefault("active_processes", [])
+                        c.setdefault("discarded_processes", [])
+                        c.setdefault("in_progress_processes", [])
+                        c.setdefault("project_id", None)
+                    
                     self.recycling_history = data.get("recycling_history", [])
                     self.total_recycled_bytes = data.get("total_recycled_bytes", 42800)
                     self.storage_efficiency_ratio = data.get("storage_efficiency_ratio", 0.885)
@@ -61,6 +70,16 @@ class CreationsManager:
                 print(f"[CreationsManager] Error al cargar estado, sembrando catálogo inicial: {e}")
 
         self._seed_default_creations()
+        
+        # Inject defaults for seeded
+        for c in self.creations:
+            c.setdefault("created_at", time.time())
+            c.setdefault("updated_at", time.time())
+            c.setdefault("active_processes", [])
+            c.setdefault("discarded_processes", [])
+            c.setdefault("in_progress_processes", [])
+            c.setdefault("project_id", None)
+            
         self._save_state()
 
     def _seed_default_creations(self):
@@ -639,6 +658,38 @@ Protegido por el sistema de auto-pausa y reciclado balanceado de memorias.
             if c.get("id") == creation_id:
                 return c
         return None
+
+    def add_or_update_creation(self, creation_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Agrega una nueva creación o la actualiza si ya existe,
+        manteniendo sus listas de procesos y proyecto enlazado.
+        """
+        c_id = creation_data.get("id") or f"creation_{int(time.time())}"
+        now = time.time()
+        
+        existing = self.get_creation_by_id(c_id)
+        if existing:
+            # Update fields
+            for k, v in creation_data.items():
+                existing[k] = v
+            existing["updated_at"] = now
+            self._save_state()
+            return existing
+        else:
+            # Create new
+            new_creation = {
+                "id": c_id,
+                "created_at": now,
+                "updated_at": now,
+                "active_processes": [],
+                "discarded_processes": [],
+                "in_progress_processes": [],
+                "project_id": None,
+                **creation_data
+            }
+            self.creations.insert(0, new_creation)
+            self._save_state()
+            return new_creation
 
     def execute_sample_simulation(self, creation_id: str, custom_code: Optional[str] = None) -> Dict[str, Any]:
         """

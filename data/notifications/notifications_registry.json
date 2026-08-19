@@ -1,6 +1,66 @@
 {
   "notifications": [
     {
+      "id": "notif_1787171260",
+      "title": "✨ Auto-Mejora Aplicada: Sueño Lúcido Ciberdélico (UI, Arte & 3D)",
+      "message": "Se aplicó automáticamente: 'Shader Ciberdélico y Geometría Sagrada para Cuernavaca'. Todos los subsistemas sincronizados.",
+      "category": "Imaginación Intuitiva",
+      "severity": "success",
+      "timestamp": 1787171260.512425,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787170658",
+      "title": "✨ Auto-Mejora Aplicada: Sueño Lúcido Ciberdélico (UI, Arte & 3D)",
+      "message": "Se aplicó automáticamente: 'Shader Ciberdélico y Geometría Sagrada para Cuernavaca'. Todos los subsistemas sincronizados.",
+      "category": "Imaginación Intuitiva",
+      "severity": "success",
+      "timestamp": 1787170658.827932,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_req_branch_1787170049",
+      "title": "⚠️ Solicitud de Autorización: Mutación Evolutiva Inter-Cerebros",
+      "message": "Propuesta 'Mutación Sináptica Inter-Cerebros: Génesis ✕ Hephaestus'. Hipótesis: Fusión de las habilidades de razonamiento ontológico con la generación de código de bajo nivel.",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787170049.7782972,
+      "read": false,
+      "branch_id": "branch_1787170049",
+      "status": "pending",
+      "action_type": "grant_authorization"
+    },
+    {
+      "id": "notif_1787170051",
+      "title": "⚠️ Solicitud de Aprobación de Mejora: Mutación Evolutiva Inter-Cerebros",
+      "message": "Propuesta 'Mutación Sináptica Inter-Cerebros: Génesis ✕ Hephaestus' clasificada como [CRITICAL_SECURITY]. Esperando tu confirmación en la pestaña de Propuestas.",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787170051.213883,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787169679",
+      "title": "✅ Permisos Concedidos: 2 Solicitudes Aplicadas",
+      "message": "Se autorizaron y aplicaron exitosamente todas las 2 solicitudes pendientes en segundo plano.",
+      "category": "Autorización Soberana",
+      "severity": "success",
+      "timestamp": 1787169679.759166,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
       "id": "notif_req_branch_1787169445",
       "title": "⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
       "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, README.md, package.json'. Hipótesis: Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, README.md, package.json' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
@@ -19,9 +79,9 @@
       "category": "Solicitud de Autorización",
       "severity": "warning",
       "timestamp": 1787169446.573995,
-      "read": false,
+      "read": true,
       "branch_id": "branch_1787169446",
-      "status": "pending",
+      "status": "applied",
       "action_type": "grant_authorization"
     },
     {
@@ -559,56 +619,6 @@
       "category": "Gobernanza de Solicitudes",
       "severity": "warning",
       "timestamp": 1787167946.2379909,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787167941",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 5 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787167941.224372,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787167936",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 5 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787167936.212318,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787167931",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 5 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787167931.1959412,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787167926",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 5 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787167926.181876,
-      "read": false,
-      "action_type": null
-    },
-    {
-      "id": "notif_1787166998",
-      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
-      "message": "Se alcanzó el límite de 5 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
-      "category": "Gobernanza de Solicitudes",
-      "severity": "warning",
-      "timestamp": 1787166998.500278,
       "read": false,
       "action_type": null
     }

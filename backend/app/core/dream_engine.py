@@ -406,6 +406,9 @@ class AstrauraDreamEngine:
         """
         Applies a dream branch proposal into the active system state.
         """
+        from ..creations.creations_manager import creations_manager
+        from ..projects.projects_manager import projects_manager
+        
         for b in self.dream_branches:
             if b["id"] == branch_id:
                 b["status"] = "applied"
@@ -421,7 +424,30 @@ class AstrauraDreamEngine:
                     })
                 except Exception as e:
                     print(f"[DreamEngine] Apply branch notice: {e}")
-                return {"success": True, "message": f"Rama '{b['theme']}' aplicada con éxito en el exocórtex.", "branch": b}
+                
+                # Assign to Creations Manager
+                creation_data = {
+                    "id": f"creation_from_branch_{branch_id}",
+                    "title": f"Proceso: {b['theme']}",
+                    "category": b.get("process_type", "Proceso Imaginativo"),
+                    "process_id": b["process_type"],
+                    "format_type": "process",
+                    "current_version": "v1.0",
+                    "summary": b["hypothesis"],
+                    "timeline_branches": [b],
+                    "raw_content": b.get("insights", ""),
+                }
+                c = creations_manager.add_or_update_creation(creation_data)
+                
+                # Auto Assign to Project
+                tags = [b.get("process_type", "Proceso")]
+                proj_id = projects_manager.auto_assign_to_project(c["id"], "creation", b["theme"], tags)
+                
+                # Update creation with project_id
+                c["project_id"] = proj_id
+                creations_manager.add_or_update_creation(c)
+                
+                return {"success": True, "message": f"Rama '{b['theme']}' aplicada con éxito en el exocórtex y vinculada al proyecto {proj_id}.", "branch": b}
         return {"success": False, "message": "Rama no encontrada"}
 
     def discard_branch(self, branch_id: str) -> Dict[str, Any]:
@@ -450,10 +476,32 @@ class AstrauraDreamEngine:
         """
         Applies a proactive creation asset.
         """
+        from ..creations.creations_manager import creations_manager
+        from ..projects.projects_manager import projects_manager
+        
         for c in self.proactive_creations:
             if c["id"] == creation_id:
                 c["status"] = "applied"
-                return {"success": True, "message": f"Creación '{c['title']}' aplicada.", "creation": c}
+                
+                # Guardar en el Estudio de Creaciones
+                creation_data = {
+                    "id": c["id"],
+                    "title": c.get("title", "Creación Sin Título"),
+                    "category": c.get("type", "General"),
+                    "format_type": "proactive_creation",
+                    "current_version": "v1.0",
+                    "summary": c.get("content", "")[:150],
+                    "raw_content": c.get("content", ""),
+                }
+                added_c = creations_manager.add_or_update_creation(creation_data)
+                
+                # Auto Assign
+                tags = c.get("tags", [])
+                proj_id = projects_manager.auto_assign_to_project(added_c["id"], "creation", c.get("title", ""), tags)
+                added_c["project_id"] = proj_id
+                creations_manager.add_or_update_creation(added_c)
+                
+                return {"success": True, "message": f"Creación '{c['title']}' aplicada y vinculada al proyecto {proj_id}.", "creation": c}
         return {"success": False, "message": "Creación no encontrada"}
 
     def discard_creation(self, creation_id: str) -> Dict[str, Any]:
