@@ -1,0 +1,29 @@
+{
+  "name": "Astraura 1.58-Bit AI Engine",
+  "short_name": "Astraura",
+  "description": "Plataforma de Inteligencia Artificial Cognitiva de 1.58 Bits (BitNet b1.58) Soberana",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07090e",
+  "theme_color": "#06b6d4",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/",
+      "name": "Astraura File Engine",
+      "accept": {
+        "text/*": [".txt", ".md", ".json", ".yaml", ".yml", ".py", ".js", ".jsx", ".ts", ".cpp", ".glsl"],
+        "application/pdf": [".pdf"],
+        "application/octet-stream": [".gguf", ".safetensors", ".bin"]
+      }
+    }
+  ]
+}

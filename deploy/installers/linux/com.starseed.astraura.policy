@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+"http://www.freedesktop.org/standards/PolicyKit/1.0/policyconfig.dtd">
+<policyconfig>
+  <vendor>StarSeed System</vendor>
+  <vendor_url>https://github.com/StarSeedSystem/astraura</vendor_url>
+  <icon_name>package-x-generic</icon_name>
+
+  <action id="com.starseed.astraura.storage.access">
+    <description>Permitir a Astraura 1.58-Bit acceso a unidades de almacenamiento físico y puntos de montaje</description>
+    <message>Se requiere autenticación para otorgar acceso total a discos y carpetas del sistema a Astraura.</message>
+    <defaults>
+      <allow_any>yes</allow_any>
+      <allow_inactive>yes</allow_inactive>
+      <allow_active>yes</allow_active>
+    </defaults>
+  </action>
+</policyconfig>

@@ -1,0 +1,746 @@
+{
+  "projects": [
+    {
+      "id": "proj_1787191921_aut",
+      "name": "Propuesta de Nuevo Proyecto: Núcleo Neural Multimodal 1.58b",
+      "description": "Scaffolding autónomo para consolidar los shaders WebGL, sintetizadores OmniVoice y kernels ARM NEON en un paquete integrado.",
+      "type": "automatic",
+      "status": "active",
+      "priority": "medium",
+      "progress": 37,
+      "current_version": "v1.0",
+      "permission_policy": {
+        "access_level": "sovereign_full",
+        "allow_agent_file_modifications": true,
+        "allow_auto_branching": true,
+        "allow_memory_sync": true,
+        "cross_platform_mode": "posix_darwin"
+      },
+      "version_history": [
+        {
+          "version": "v1.0",
+          "timestamp": 1787191921.922731,
+          "summary": "Creación inicial del proyecto 'Propuesta de Nuevo Proyecto: Núcleo Neural Multimodal 1.58b'.",
+          "changes": [
+            "Creación de repositorio y asignación de propósitos"
+          ],
+          "author": "Daedalus-Architect"
+        }
+      ],
+      "timeline_branches": [
+        {
+          "id": "branch_main_proj_1787191921_aut",
+          "name": "main",
+          "status": "active",
+          "created_at": 1787191921.922731,
+          "notes": "Rama principal de desarrollo"
+        }
+      ],
+      "created_at": 1787191921.922731,
+      "updated_at": 1787191921.922731,
+      "linked_creations": [
+        "creation_neon_kernel_v2",
+        "creation_shader_cyberdelic_v3",
+        "creation_omnico_voice_v1"
+      ],
+      "linked_processes": [],
+      "linked_agents": [
+        "daedalus",
+        "hephaestus",
+        "oneiros",
+        "hermes"
+      ],
+      "linked_projects": [
+        "proj_astraura_core"
+      ],
+      "synapse_connections": [
+        {
+          "target_project_id": "proj_astraura_core",
+          "synapse_type": "bidirectional",
+          "weight": 0.85,
+          "notes": "Arista sináptica inicial con el núcleo Astraura Core."
+        }
+      ],
+      "linked_personalities": [
+        "astraura_prime"
+      ],
+      "linked_cerebros": [
+        "brain_genesis"
+      ],
+      "linked_memories": [],
+      "key_memories": [
+        "Objetivo: Scaffolding autónomo para consolidar los shaders WebGL, sintetizadores OmniVoice y kernels ARM NEON en un paquete integrado."
+      ],
+      "linked_folders": [
+        "/Users/alex/Documents/IA 1.58 bit/backend/vault/projects_vault/proj_1787191921_aut"
+      ],
+      "linked_files": [],
+      "logs_history": [
+        {
+          "timestamp": 1787191921.922731,
+          "action": "Proyecto Creado",
+          "agent": "Daedalus-Architect",
+          "details": "Proyecto 'Propuesta de Nuevo Proyecto: Núcleo Neural Multimodal 1.58b' registrado con éxito en la bóveda."
+        }
+      ],
+      "_physical_metrics": {
+        "total_bytes_formatted": "0 B",
+        "total_files": 0,
+        "total_loc": 0,
+        "integrity_verdict": "VERIFIED_100_REAL"
+      },
+      "_metrics_cached_at": 1787194238.146731
+    },
+    {
+      "id": "proj_astraura_core",
+      "name": "Astraura 1.58b Core OS",
+      "description": "Núcleo del sistema operativo cognitivo.",
+      "type": "automatic",
+      "created_at": 1786741520.5937548,
+      "updated_at": 1787196289.103575,
+      "linked_creations": [
+        "creation_neon_kernel_v2",
+        "creation_dataset_ternary_v2",
+        "creation_spec_ontocracy_v3",
+        "creation_1787176495",
+        "prop_neon_opt"
+      ],
+      "linked_processes": [],
+      "linked_agents": [
+        "agent_hephaestus_forger",
+        "agent_mnemosyne_archivist",
+        "agent_genesis_orchestrator"
+      ],
+      "linked_projects": [
+        "proj_cyberdelic_arts"
+      ],
+      "linked_personalities": [
+        "astraura_prime"
+      ],
+      "linked_cerebros": [
+        "brain_genesis"
+      ],
+      "status": "active",
+      "priority": "high",
+      "progress": 100,
+      "current_version": "v1.5",
+      "version_history": [
+        {
+          "version": "v1.5",
+          "timestamp": 1787183567.9735858,
+          "summary": "Aplicación proactiva: Optimización NEON 1.58b",
+          "changes": [
+            "Agente autor: Hephaestus",
+            "Entregable: /Users/alex/Documents/IA 1.58 bit/backend/app/core/optimización_neon_1.58b.md"
+          ],
+          "author": "Hephaestus"
+        },
+        {
+          "version": "v1.4",
+          "timestamp": 1787183567.954771,
+          "summary": "Fusión de la rama 'test-branch-verification' en 'main'.",
+          "changes": [
+            "Estrategia de integración: fast-forward",
+            "Notas: Verificación de ramas vivas"
+          ],
+          "author": "Alex Bordón"
+        },
+        {
+          "version": "v1.3",
+          "timestamp": 1787183536.312734,
+          "summary": "Fusión de la rama 'opt-neon-ternary-v3' en 'main'.",
+          "changes": [
+            "Estrategia de integración: fast-forward",
+            "Notas: Rama viva para paralelización SIMD NEON y optimización de latencia."
+          ],
+          "author": "Alex Bordón"
+        },
+        {
+          "version": "v1.0",
+          "timestamp": 1786741520.5937548,
+          "summary": "Versión inicial forjada y registrada en la bóveda.",
+          "changes": [
+            "Inicialización de arquitectura",
+            "Vinculación de nodos"
+          ],
+          "author": "Daedalus-Architect"
+        },
+        {
+          "version": "v1.2",
+          "timestamp": 1787173520.5937548,
+          "summary": "Sincronización de sinapsis cognitivas y enlaces de grafos.",
+          "changes": [
+            "Actualización de dependencias",
+            "Consolidación de procesos"
+          ],
+          "author": "Hephaestus"
+        }
+      ],
+      "timeline_branches": [
+        {
+          "id": "branch_1787191920_feat_architectus-optimization",
+          "name": "feat/architectus-optimization",
+          "origin_branch": "main",
+          "status": "active",
+          "created_at": 1787191920.1694221,
+          "author": "Alex Bordón",
+          "notes": "Rama forjada por Architectus-ProjectMaster para refactorización de silicio."
+        },
+        {
+          "id": "branch_1787183567_test-branch-verification",
+          "name": "test-branch-verification",
+          "origin_branch": "main",
+          "status": "merged",
+          "created_at": 1787183567.953036,
+          "author": "Alex Bordón",
+          "notes": "Verificación de ramas vivas",
+          "merged_into": "main",
+          "merged_at": 1787183567.954758
+        },
+        {
+          "id": "branch_1787183531_opt-neon-ternary-v3",
+          "name": "opt-neon-ternary-v3",
+          "origin_branch": "main",
+          "status": "merged",
+          "created_at": 1787183531.128316,
+          "author": "Alex Bordón",
+          "notes": "Rama viva para paralelización SIMD NEON y optimización de latencia.",
+          "merged_into": "main",
+          "merged_at": 1787183536.312715
+        },
+        {
+          "id": "branch_main_proj_astraura_core",
+          "name": "main/production",
+          "status": "active",
+          "created_at": 1786741520.5937548,
+          "notes": "Tronco principal de ejecución cognitiva"
+        }
+      ],
+      "linked_memories": [
+        {
+          "id": "mem_key_proj_astraura_core_1",
+          "title": "Arquitectura Base de Astraura 1.58b Core OS",
+          "category": "Exocórtex & Diseño",
+          "snippet": "Fundamentos y directrices soberanas para Astraura 1.58b Core OS."
+        }
+      ],
+      "key_memories": [
+        "Axioma (athena): Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana [Auditado por Director]",
+        "Axioma (oneiros): Generación de Mallas y Texturas Dinámicas para la Bóveda de Creaciones [Auditado por Director]",
+        "Axioma (athena): Calibración de Sensores de Entorno y Resonancia Acústica [Auditado por Director]",
+        "Axioma (mnemosyne): Poda y Reestructuración del Grafo Sináptico de Memoria StarSeed [Auditado por Director]",
+        "Axioma (oneiros): Forja de Prototipos de Interfaces Intuitivas de Resonancia Sináptica [Auditado por Director]",
+        "Axioma (mnemosyne): Indexación Rápida de Fragmentos de Memoria Episódica en Bóveda [Auditado por Director]",
+        "Axioma (oneiros): Síntesis de Shader Procedural WebGL Reactivo al Sensorium Ambiental [Auditado por Director]",
+        "Axioma (mnemosyne): Auto-Reactivación: Sincronización & Poda del Grafo de Memoria [Auditado por Director]",
+        "Axioma (oneiros): Auto-Reactivación: Forja de Shaders & Prototipos Visuales [Auditado por Director]",
+        "Axioma (athena): Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1 [Auditado por Director]",
+        "Axioma (athena): Auditoría Continua de Sensores Físicos, Térmica M1 y Batería [Auditado por Director]"
+      ],
+      "linked_folders": [
+        "/Users/alex/Documents/IA 1.58 bit/backend/app/core",
+        "/Users/alex/Documents/IA 1.58 bit/backend/app/agents",
+        "/Users/alex/Documents/IA 1.58 bit/data/projects/proj_astraura_core"
+      ],
+      "linked_files": [
+        "/Users/alex/Documents/IA 1.58 bit/data/projects/proj_astraura_core/sovereignty_manifest.json",
+        "/Users/alex/Documents/IA 1.58 bit/data/projects/proj_astraura_core/audit_report.md",
+        "/Users/alex/Documents/IA 1.58 bit/backend/app/core/optimización_neon_1.58b.md"
+      ],
+      "logs_history": [
+        {
+          "timestamp": 1787196289.1035872,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787196289.10353,
+          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787196215.912435,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787196215.9122581,
+          "action": "Entregable Verificado: Generación de Mallas y Texturas Dinámicas para la Bóveda de Creaciones",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
+        },
+        {
+          "timestamp": 1787196205.8657799,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787196205.865684,
+          "action": "Entregable Verificado: Calibración de Sensores de Entorno y Resonancia Acústica",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787196205.8441432,
+          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787196200.827287,
+          "action": "Entregable Verificado: Indexación Rápida de Fragmentos de Memoria Episódica en Bóveda",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1787196175.002353,
+          "action": "Entregable Verificado: Síntesis de Shader Procedural WebGL Reactivo al Sensorium Ambiental",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
+        },
+        {
+          "timestamp": 1787196164.578314,
+          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787196164.5691981,
+          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787196159.553051,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787196159.552968,
+          "action": "Entregable Verificado: Poda y Reestructuración del Grafo Sináptico de Memoria StarSeed",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1787196134.3272572,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787196134.326936,
+          "action": "Entregable Verificado: Forja de Prototipos de Interfaces Intuitivas de Resonancia Sináptica",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
+        },
+        {
+          "timestamp": 1787196124.225656,
+          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787196124.208232,
+          "action": "Entregable Verificado: Calibración de Sensores de Entorno y Resonancia Acústica",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787196119.14416,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787196119.143839,
+          "action": "Entregable Verificado: Indexación Rápida de Fragmentos de Memoria Episódica en Bóveda",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1787196093.9934561,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787196093.992523,
+          "action": "Entregable Verificado: Síntesis de Shader Procedural WebGL Reactivo al Sensorium Ambiental",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
+        },
+        {
+          "timestamp": 1787196083.874079,
+          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787196083.819145,
+          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787196077.7903628,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787196077.790158,
+          "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1787196052.642773,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787196052.642349,
+          "action": "Entregable Verificado: Auto-Reactivación: Forja de Shaders & Prototipos Visuales",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
+        },
+        {
+          "timestamp": 1787196042.553733,
+          "action": "Entregable Verificado: Calibración de Sensores de Entorno y Resonancia Acústica",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787196042.545417,
+          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787196042.5392818,
+          "action": "Entregable Verificado: Poda y Reestructuración del Grafo Sináptico de Memoria StarSeed",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1787196022.3937972,
+          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787196002.053752,
+          "action": "Entregable Verificado: Indexación Rápida de Fragmentos de Memoria Episódica en Bóveda",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1787196001.808584,
+          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787196001.726841,
+          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787195981.5405922,
+          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787195960.991627,
+          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787195960.951492,
+          "action": "Entregable Verificado: Calibración de Sensores de Entorno y Resonancia Acústica",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787195960.8730931,
+          "action": "Entregable Verificado: Poda y Reestructuración del Grafo Sináptico de Memoria StarSeed",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1787195940.691061,
+          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787195920.554371,
+          "action": "Entregable Verificado: Destilación de Axiomas Soberanos y Recuerdos Clave a Largo Plazo",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1787195920.51216,
+          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787195920.277261,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787195920.274303,
+          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787195899.717927,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787195899.717265,
+          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787195884.378171,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787195884.375417,
+          "action": "Entregable Verificado: Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+        },
+        {
+          "timestamp": 1787195879.137745,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787195879.137641,
+          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787195879.01705,
+          "action": "Entregable Verificado: Indexación Rápida de Fragmentos de Memoria Episódica en Bóveda",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1787195858.41395,
+          "action": "Entregable Verificado: Calibración de Sensores de Entorno y Resonancia Acústica",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787195843.367223,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787195843.367064,
+          "action": "Entregable Verificado: Auto-Reactivación: Rastreo de Tendencias & Preprints de IA 1.58b",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+        },
+        {
+          "timestamp": 1787195838.3357902,
+          "action": "Entregable Verificado: Destilación de Axiomas Soberanos y Recuerdos Clave a Largo Plazo",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1787195838.2936552,
+          "action": "Entregable Verificado: Calibración de Sensores de Entorno y Resonancia Acústica",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787195818.2512581,
+          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787195818.2391381,
+          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787195798.011611,
+          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787195797.966259,
+          "action": "Entregable Verificado: Indexación Rápida de Fragmentos de Memoria Episódica en Bóveda",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1787195777.4674869,
+          "action": "Entregable Verificado: Calibración de Sensores de Entorno y Resonancia Acústica",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        }
+      ],
+      "linked_processs": [
+        "branch_burst_1787176495"
+      ],
+      "permission_policy": {
+        "access_level": "sovereign_full",
+        "allow_agent_file_modifications": true,
+        "allow_auto_branching": true,
+        "allow_memory_sync": true,
+        "cross_platform_mode": "posix_darwin"
+      },
+      "synapse_connections": [
+        {
+          "target_project_id": "proj_cyberdelic_arts",
+          "synapse_type": "bidirectional",
+          "weight": 0.92,
+          "notes": "Enlace sináptico verificado"
+        }
+      ],
+      "_physical_metrics": {
+        "total_bytes_formatted": "2.54 MB",
+        "total_files": 167,
+        "total_loc": 14168,
+        "integrity_verdict": "VERIFIED_100_REAL"
+      },
+      "_metrics_cached_at": 1787194223.449444
+    },
+    {
+      "id": "proj_cyberdelic_arts",
+      "name": "Laboratorio Ciberdélico & Audio",
+      "description": "Exploraciones artísticas, visuales y sonoras.",
+      "type": "personal",
+      "created_at": 1787000720.5937548,
+      "updated_at": 1787183567.957168,
+      "linked_creations": [
+        "creation_shader_cyberdelic_v3",
+        "creation_omnico_voice_v1"
+      ],
+      "linked_processes": [],
+      "linked_agents": [
+        "agent_oneiros_dreamer",
+        "agent_hermes_messenger"
+      ],
+      "linked_projects": [
+        "proj_astraura_core"
+      ],
+      "linked_personalities": [
+        "lyra",
+        "nova"
+      ],
+      "linked_cerebros": [],
+      "status": "active",
+      "priority": "medium",
+      "progress": 44,
+      "current_version": "v1.2",
+      "version_history": [
+        {
+          "version": "v1.0",
+          "timestamp": 1787000720.5937548,
+          "summary": "Versión inicial forjada y registrada en la bóveda.",
+          "changes": [
+            "Inicialización de arquitectura",
+            "Vinculación de nodos"
+          ],
+          "author": "Alex Bordón"
+        },
+        {
+          "version": "v1.2",
+          "timestamp": 1787173520.5937548,
+          "summary": "Sincronización de sinapsis cognitivas y enlaces de grafos.",
+          "changes": [
+            "Actualización de dependencias",
+            "Consolidación de procesos"
+          ],
+          "author": "Hephaestus"
+        }
+      ],
+      "timeline_branches": [
+        {
+          "id": "branch_main_proj_cyberdelic_arts",
+          "name": "main/production",
+          "status": "active",
+          "created_at": 1787000720.5937548,
+          "notes": "Tronco principal de ejecución cognitiva"
+        }
+      ],
+      "linked_memories": [
+        {
+          "id": "mem_key_proj_cyberdelic_arts_1",
+          "title": "Arquitectura Base de Laboratorio Ciberdélico & Audio",
+          "category": "Exocórtex & Diseño",
+          "snippet": "Fundamentos y directrices soberanas para Laboratorio Ciberdélico & Audio."
+        }
+      ],
+      "key_memories": [
+        "Propósito: Exploraciones artísticas, visuales y sonoras.",
+        "Optimizado para cuantización ternaria ARM64 NEON 1.58b"
+      ],
+      "linked_folders": [
+        "/Users/alex/Documents/IA 1.58 bit/data/projects/proj_cyberdelic_arts"
+      ],
+      "linked_files": [],
+      "logs_history": [
+        {
+          "timestamp": 1787000720.5937548,
+          "action": "Proyecto Inicializado",
+          "agent": "Alex Bordón",
+          "details": "Proyecto 'Laboratorio Ciberdélico & Audio' forjado con éxito."
+        }
+      ],
+      "permission_policy": {
+        "access_level": "sovereign_full",
+        "allow_agent_file_modifications": true,
+        "allow_auto_branching": true,
+        "allow_memory_sync": true,
+        "cross_platform_mode": "posix_darwin"
+      },
+      "synapse_connections": [
+        {
+          "target_project_id": "proj_astraura_core",
+          "synapse_type": "bidirectional",
+          "weight": 0.85,
+          "notes": "Arista sináptica de sincronización de memoria StarSeed y orquestación multiagente."
+        }
+      ],
+      "_physical_metrics": {
+        "total_bytes_formatted": "0 B",
+        "total_files": 0,
+        "total_loc": 0,
+        "integrity_verdict": "VERIFIED_100_REAL"
+      },
+      "_metrics_cached_at": 1787194223.449707
+    }
+  ],
+  "saved_at": 1787196289.103589
+}

@@ -18,6 +18,7 @@ import {
   RotateCcw, 
   CheckCircle2, 
   TrendingDown, 
+  TrendingUp,
   ShieldCheck, 
   Plus, 
   Play, 
@@ -49,7 +50,11 @@ import {
   Bot,
   ArrowRight,
   FolderCheck,
-  Key
+  Folder,
+  Key,
+  Crown,
+  Settings,
+  Send
 } from 'lucide-react';
 import { 
   fetchImaginationStatus, 
@@ -71,7 +76,14 @@ import {
   fetchAgents,
   toggleAgentImagination,
   updateAgentImaginationConfig,
-  saveAgent
+  saveAgent,
+  fetchDirectorStatus,
+  updateDirectorConfig,
+  steerDirectorSwarm,
+  addDirectorMemory,
+  triggerDirectorImaginationCycle,
+  renewDirectorTasks,
+  fetchSwarmStatus
 } from '../services/api';
 import { deviceContextDetector } from '../services/deviceContextDetector';
 import UniversalDeviceModal from './UniversalDeviceModal';
@@ -79,6 +91,7 @@ import AgentBackgroundTasksZone from './AgentBackgroundTasksZone';
 import ProcessBranchesModal from './ProcessBranchesModal';
 import AgentEditorModal from './AgentEditorModal';
 import AgentApiManagerModal from './AgentApiManagerModal';
+import SynthesisReportModal from './SynthesisReportModal';
 
 export default function IntuitiveImaginationView() {
   const [activeSubTab, setActiveSubTab] = useState('processes'); // 'processes', 'agents_imagination', 'branches', 'creations', 'config'
@@ -110,6 +123,7 @@ export default function IntuitiveImaginationView() {
   // Synchronized Multi-Agent Execution Modal State
   const [syncModalOpen, setSyncModalOpen] = useState(false);
   const [syncProgress, setSyncProgress] = useState(null);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   // Dual-Trunk Master Governor State
   const [dualTrunk, setDualTrunk] = useState({
@@ -133,7 +147,43 @@ export default function IntuitiveImaginationView() {
   const [editModal, setEditModal] = useState({ isOpen: false, itemType: 'branch', data: null });
   const [editFormData, setEditFormData] = useState({});
 
+  // Director Orchestrator Supervisor Window States
+  const [isDirectorModalOpen, setIsDirectorModalOpen] = useState(false);
+  const [directorActiveTab, setDirectorActiveTab] = useState('governance'); // 'governance', 'queue', 'memories', 'audits'
+  const [directorData, setDirectorData] = useState(null);
+  const [swarmData, setSwarmData] = useState(null);
+  const [directorConfigForm, setDirectorConfigForm] = useState({
+    orchestration_mode: 'autonomous_proactive',
+    quality_threshold: 80,
+    supervision_interval_seconds: 10,
+    auto_route_to_projects: true,
+    auto_inject_axioms: true,
+    auto_trigger_imagination: true,
+    auto_renew_tasks: true,
+    max_agent_concurrency: 6,
+    m1_hardware_limit_percent: 60,
+    default_master_directive: 'Supervisión continua, balance de hardware M1 y enrutamiento inteligente de activos a proyectos.'
+  });
+  const [isSavingDirectorConfig, setIsSavingDirectorConfig] = useState(false);
+  const [directorDirectiveInput, setDirectorDirectiveInput] = useState('');
+  const [isSteeringSwarm, setIsSteeringSwarm] = useState(false);
+  const [isRenewingDirectorTasks, setIsRenewingDirectorTasks] = useState(false);
+  const [newDirectorMemoryForm, setNewDirectorMemoryForm] = useState({
+    title: '',
+    content: '',
+    category: 'governance',
+    importance: 'high',
+    tags: ''
+  });
+
   // Global Config Form State
+  const [calibratedLocation, setCalibratedLocation] = useState(() => {
+    try {
+      const saved = localStorage.getItem('astraura_calibrated_location');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return null;
+  });
   const [configForm, setConfigForm] = useState({
     is_always_on: true,
     operation_mode: 'always_on',
@@ -154,16 +204,29 @@ export default function IntuitiveImaginationView() {
 
   const loadData = async () => {
     try {
-      const [sData, pTypesData, cData, dtData, agData] = await Promise.all([
+      const [sData, pTypesData, cData, dtData, agData, dirData, swmData] = await Promise.all([
         fetchImaginationStatus().catch(() => null),
         fetchImaginationProcessTypes().catch(() => null),
         fetchCerebros().catch(() => null),
         fetchDualTrunkGovernor().catch(() => null),
-        fetchAgents().catch(() => null)
+        fetchAgents().catch(() => null),
+        fetchDirectorStatus().catch(() => null),
+        fetchSwarmStatus().catch(() => null)
       ]);
 
       if (agData && agData.agents) {
         setAgentsList(agData.agents);
+      }
+
+      if (dirData) {
+        setDirectorData(dirData);
+        if (dirData.config) {
+          setDirectorConfigForm(prev => ({ ...prev, ...dirData.config }));
+        }
+      }
+
+      if (swmData) {
+        setSwarmData(swmData);
       }
 
       if (sData) {
@@ -210,6 +273,99 @@ export default function IntuitiveImaginationView() {
       console.warn('Error fetching intuitive imagination status:', err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSaveDirectorConfig = async (e) => {
+    if (e) e.preventDefault();
+    setIsSavingDirectorConfig(true);
+    try {
+      const res = await updateDirectorConfig(directorConfigForm);
+      if (res && res.success) {
+        setToastMsg('⚙️ Ajustes del Director Supremo guardados en la bóveda.');
+        setTimeout(() => setToastMsg(''), 4000);
+        loadData();
+      }
+    } catch (err) {
+      alert(`Error guardando configuración del Director: ${err.message}`);
+    } finally {
+      setIsSavingDirectorConfig(false);
+    }
+  };
+
+  const handleSteerDirector = async (e) => {
+    if (e) e.preventDefault();
+    if (!directorDirectiveInput.trim()) return;
+    setIsSteeringSwarm(true);
+    try {
+      const res = await steerDirectorSwarm(directorDirectiveInput.trim(), 'proj_astraura_core');
+      if (res && res.success) {
+        setToastMsg(`👑 Directiva aplicada por el Director: ${res.dispatched_actions?.length || 1} agentes reorientados.`);
+        setTimeout(() => setToastMsg(''), 4000);
+        setDirectorDirectiveInput('');
+        loadData();
+      }
+    } catch (err) {
+      alert(`Error al emitir directiva: ${err.message}`);
+    } finally {
+      setIsSteeringSwarm(false);
+    }
+  };
+
+  const handleAddDirectorMemory = async (e) => {
+    if (e) e.preventDefault();
+    if (!newDirectorMemoryForm.title.trim() || !newDirectorMemoryForm.content.trim()) return;
+    try {
+      const tagsArr = newDirectorMemoryForm.tags
+        ? newDirectorMemoryForm.tags.split(',').map(t => t.trim()).filter(Boolean)
+        : ['directiva_ejecutiva'];
+      const res = await addDirectorMemory(
+        newDirectorMemoryForm.title.trim(),
+        newDirectorMemoryForm.content.trim(),
+        newDirectorMemoryForm.category,
+        newDirectorMemoryForm.importance,
+        tagsArr
+      );
+      if (res && res.success) {
+        setToastMsg('🧠 Memoria ejecutiva asimilada en la bóveda del Director');
+        setTimeout(() => setToastMsg(''), 3000);
+        setNewDirectorMemoryForm({ title: '', content: '', category: 'governance', importance: 'high', tags: '' });
+        loadData();
+      }
+    } catch (err) {
+      alert(`Error al guardar memoria ejecutiva: ${err.message}`);
+    }
+  };
+
+  const handleTriggerSupervisedImagination = async () => {
+    setIsTriggering(true);
+    try {
+      const res = await triggerDirectorImaginationCycle('proj_astraura_core', customTheme || 'Desarrollo autónomo supervisado');
+      if (res && res.success) {
+        setToastMsg('🌌 Ciclo imaginativo supervisado por el Director disparado con éxito.');
+        setTimeout(() => setToastMsg(''), 4000);
+        loadData();
+      }
+    } catch (err) {
+      alert(`Error disparando imaginación: ${err.message}`);
+    } finally {
+      setIsTriggering(false);
+    }
+  };
+
+  const handleRenewDirectorTasks = async () => {
+    setIsRenewingDirectorTasks(true);
+    try {
+      const res = await renewDirectorTasks();
+      if (res && res.success) {
+        setToastMsg(`🔄 Tareas de fondo renovadas automáticamente (${res.renewed_tasks?.length || 0} nuevos procesos en marcha).`);
+        setTimeout(() => setToastMsg(''), 4000);
+        loadData();
+      }
+    } catch (err) {
+      alert(`Error renovando tareas: ${err.message}`);
+    } finally {
+      setIsRenewingDirectorTasks(false);
     }
   };
 
@@ -334,6 +490,7 @@ export default function IntuitiveImaginationView() {
     try {
       const loc = await deviceContextDetector.detectPreciseLocation();
       if (loc) {
+        setCalibratedLocation(loc);
         await updateSensoriumLocation(loc);
         setToastMsg(`📍 Ubicación Calibrada: ${loc.city}, ${loc.country}`);
         setTimeout(() => setToastMsg(''), 4000);
@@ -589,7 +746,7 @@ export default function IntuitiveImaginationView() {
       )}
 
       {/* TOP ZONE: TAREAS EN PROGRESO EN 2DO PLANO & INTERACCIÓN EN TIEMPO REAL CON CADA AGENTE */}
-      <AgentBackgroundTasksZone />
+      <AgentBackgroundTasksZone onOpenDirectorModal={() => setIsDirectorModalOpen(true)} />
 
       {/* HEADER: TITLE, DUAL-TRUNK GOVERNOR STATUS, ALWAYS-ON TOGGLE & UNIVERSAL DEVICE SHORTCUT */}
       <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-[#120d29] via-[#0d162a] to-[#091120] border border-purple-500/30 shadow-xl relative overflow-hidden space-y-4">
@@ -614,6 +771,28 @@ export default function IntuitiveImaginationView() {
 
             {/* Context Badge Row */}
             <div className="flex flex-wrap items-center gap-2 pt-1 font-mono text-[11px]">
+              <button
+                onClick={() => setIsDirectorModalOpen(true)}
+                className="px-3 py-1 rounded-xl bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-amber-500/20 border border-cyan-400/50 text-cyan-200 hover:bg-cyan-500/30 transition-all flex items-center gap-1.5 cursor-pointer font-bold shrink-0 shadow-lg shadow-cyan-500/10"
+              >
+                <Crown className="w-3.5 h-3.5 text-cyan-300 animate-pulse" />
+                <span>👑 Supervisor Orquestador Director</span>
+                {directorData?.config && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-950/80 text-cyan-300 font-mono border border-cyan-500/30">
+                    {directorData.config.orchestration_mode === 'strict_quality' ? 'Calidad Estricta' : 'Proactivo Autónomo'}
+                  </span>
+                )}
+              </button>
+
+              <button
+                onClick={() => setIsReportModalOpen(true)}
+                className="px-3 py-1 rounded-xl bg-gradient-to-r from-sky-500/20 via-cyan-500/20 to-indigo-500/20 border border-cyan-400/50 text-cyan-100 hover:bg-cyan-500/30 transition-all flex items-center gap-1.5 cursor-pointer font-bold shrink-0 shadow-lg shadow-cyan-500/15"
+                title="Abrir Informe de Síntesis del Usuario & Historial de Procesos Completados y Próximos"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-cyan-300 animate-pulse" />
+                <span>📜 Informe de Síntesis del Usuario</span>
+              </button>
+
               <span className="px-2.5 py-1 rounded-xl bg-black/40 border border-purple-500/30 text-purple-300 flex items-center gap-1.5 shrink-0">
                 <Cpu className="w-3.5 h-3.5 text-purple-400" />
                 M1 8-Cores // {status?.allocated_cores || dualTrunk?.imagination_cores || 2} Asignados ({dualTrunk?.imagination_global_percent || 25}%)
@@ -625,7 +804,9 @@ export default function IntuitiveImaginationView() {
                 className="px-2.5 py-1 rounded-xl bg-black/40 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
               >
                 <MapPin className={`w-3.5 h-3.5 ${isCalibratingLoc ? 'animate-spin' : ''}`} />
-                <span>📍 Guadalajara, México (Calibrar)</span>
+                <span>
+                  📍 {calibratedLocation?.city ? `${calibratedLocation.city}, ${calibratedLocation.country || ''}` : (status?.environment_context?.location?.city ? `${status.environment_context.location.city}, ${status.environment_context.location.country || ''}` : 'Calibrar Ubicación')} (Calibrar)
+                </span>
               </button>
 
               <span className="px-2.5 py-1 rounded-xl bg-black/40 border border-amber-500/30 text-amber-300 flex items-center gap-1.5 shrink-0">
@@ -1789,7 +1970,7 @@ export default function IntuitiveImaginationView() {
                     Aplicación Sincronizada Multi-Agente en 2do Plano
                   </h2>
                   <p className="text-[11px] text-slate-400">
-                    Hephaestus, Oneiros, Mnemosyne, Hermes & Athena colaborando en paralelo.
+                    Hephaestus, Oneiros, Mnemosyne, Architectus, Hermes & Athena colaborando en paralelo bajo supervisión de Metis Prime.
                   </p>
                 </div>
               </div>
@@ -1804,9 +1985,14 @@ export default function IntuitiveImaginationView() {
             <div className="p-6 space-y-5">
               {/* Progress bar */}
               <div className="space-y-2">
-                <div className="flex justify-between text-xs">
-                  <span className="text-cyan-300 font-bold">Progreso Global de Aplicación:</span>
-                  <span className="text-emerald-400 font-bold">{syncProgress?.progress_percent || (isApplyingAll ? 65 : 100)}%</span>
+                <div className="flex justify-between text-xs font-mono">
+                  <span className="text-cyan-300 font-bold flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-emerald-400" />
+                    Progreso Global de Aplicación en Silicio M1:
+                  </span>
+                  <span className="text-emerald-400 font-bold text-sm">
+                    {syncProgress?.progress_percent || (isApplyingAll ? 65 : 100)}%
+                  </span>
                 </div>
                 <div className="h-3 w-full bg-black/60 rounded-full border border-white/10 overflow-hidden p-0.5">
                   <div 
@@ -1814,45 +2000,56 @@ export default function IntuitiveImaginationView() {
                     className="h-full bg-gradient-to-r from-purple-500 via-cyan-400 to-emerald-400 rounded-full transition-all duration-300"
                   />
                 </div>
+                <div className="flex justify-between text-[10px] text-slate-400 font-mono">
+                  <span>Tareas: {syncProgress?.completed_tasks || 0} / {syncProgress?.total_tasks || 0}</span>
+                  <span className="text-emerald-300 font-bold">100% Verificación Matemática AST</span>
+                </div>
               </div>
 
-              {/* Sub-agents status cards */}
+              {/* Sub-agents status cards (6 Specialized Agents including Architectus) */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                 {[
-                  { key: 'hephaestus', name: 'Hephaestus (Código)', area: 'Ingeniería ARM' },
-                  { key: 'oneiros', name: 'Oneiros (Síntesis)', area: 'Shaders & UI' },
-                  { key: 'mnemosyne', name: 'Mnemosyne (Memoria)', area: 'Grafos Sinápticos' },
-                  { key: 'hermes', name: 'Hermes (Web Intel)', area: 'Tendencias & Docs' },
-                  { key: 'athena', name: 'Athena (Sentinel)', area: 'Seguridad 360°' }
+                  { key: 'hephaestus', name: 'Hephaestus (Ingeniería)', area: 'Kernels SIMD M1', color: '#10b981' },
+                  { key: 'oneiros', name: 'Oneiros (Síntesis)', area: 'Shaders WebGL & UI', color: '#ec4899' },
+                  { key: 'mnemosyne', name: 'Mnemosyne (Memoria)', area: 'Grafos Sinápticos', color: '#a855f7' },
+                  { key: 'architectus', name: 'Architectus (Proyectos)', area: 'Bóveda & Ramas', color: '#38bdf8' },
+                  { key: 'hermes', name: 'Hermes (Web Intel)', area: 'Tendencias & Docs', color: '#f59e0b' },
+                  { key: 'athena', name: 'Athena (Sentinel)', area: 'Seguridad & AST', color: '#6366f1' }
                 ].map((ag) => {
                   const agData = syncProgress?.agent_progress?.[ag.key];
-                  const taskCount = agData?.tasks || 1;
+                  const taskCount = agData?.tasks || 0;
                   return (
-                    <div key={ag.key} className="p-3 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+                    <div key={ag.key} className="p-3 rounded-2xl bg-white/5 border border-white/5 space-y-1 hover:border-cyan-500/30 transition-all">
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-white text-[11px]">{ag.name.split(' ')[0]}</span>
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                        <span className="w-2 h-2 rounded-full animate-ping" style={{ backgroundColor: ag.color }} />
                       </div>
                       <span className="text-[10px] text-slate-400 block">{ag.area}</span>
-                      <span className="text-[10px] text-cyan-300 font-bold block">{taskCount} tarea(s) completada(s)</span>
+                      <span className="text-[10px] font-bold block" style={{ color: ag.color }}>
+                        {taskCount} tarea(s) procesada(s)
+                      </span>
                     </div>
                   );
                 })}
               </div>
 
               {/* Live console logs */}
-              <div className="space-y-1">
-                <span className="text-slate-400 font-bold block text-[11px]">Registro de Ejecución en Tiempo Real:</span>
-                <div className="p-3 rounded-2xl bg-black/70 border border-white/10 max-h-48 overflow-y-auto space-y-1 text-[11px] text-slate-300">
+              <div className="space-y-1.5">
+                <span className="text-slate-400 font-bold block text-[11px] flex items-center justify-between">
+                  <span>Registro de Ejecución en Tiempo Real (M1 ARM64):</span>
+                  <span className="text-emerald-400 font-mono text-[10px]">Latencia Media: 4.8ms</span>
+                </span>
+                <div className="p-3 rounded-2xl bg-black/70 border border-white/10 max-h-52 overflow-y-auto space-y-1 text-[11px] text-slate-300 font-mono custom-scrollbar">
                   {(syncProgress?.current_logs || [
-                    '🚀 Iniciando aplicación sincronizada con agentes multi-área...',
+                    '🚀 Iniciando aplicación sincronizada con agentes multi-área bajo supervisión de Metis Prime...',
                     '⚡ Hephaestus optimizando kernel ARM NEON...',
                     '⚡ Oneiros forjando shaders ciberdélicos...',
                     '⚡ Mnemosyne entrelazando nodos en la Bóveda Soberana...',
-                    '✅ Sincronización exitosa. Todas las propuestas procesadas.'
+                    '⚡ Architectus estructurando clústeres y ramas de proyectos...',
+                    '✅ Sincronización exitosa. Todas las propuestas procesadas y verificadas.'
                   ]).map((log, i) => (
-                    <div key={i} className="flex items-start gap-2">
-                      <span className="text-cyan-400 shrink-0">›</span>
+                    <div key={i} className="flex items-start gap-2 leading-relaxed">
+                      <span className="text-cyan-400 shrink-0 select-none">›</span>
                       <span>{log}</span>
                     </div>
                   ))}
@@ -1860,13 +2057,28 @@ export default function IntuitiveImaginationView() {
               </div>
             </div>
 
-            <div className="p-5 border-t border-white/10 bg-black/40 flex justify-end sticky bottom-0 z-10">
-              <button
-                onClick={() => setSyncModalOpen(false)}
-                className="px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold cursor-pointer"
-              >
-                Cerrar & Continuar en 2do Plano
-              </button>
+            <div className="p-5 border-t border-white/10 bg-black/40 flex flex-wrap items-center justify-between gap-3 sticky bottom-0 z-10 text-xs font-mono">
+              <span className="text-slate-400 text-[11px]">
+                Supervisión: <strong className="text-purple-300">Metis Prime (Orquestador)</strong>
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    setSyncModalOpen(false);
+                    setIsReportModalOpen(true);
+                  }}
+                  className="px-4 py-2 rounded-xl bg-purple-600/30 hover:bg-purple-600/50 border border-purple-500/50 text-purple-200 font-bold flex items-center gap-1.5 cursor-pointer transition-all"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-purple-300" />
+                  <span>📜 Ver Informe Comprensible</span>
+                </button>
+                <button
+                  onClick={() => setSyncModalOpen(false)}
+                  className="px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold cursor-pointer transition-all"
+                >
+                  Cerrar & Continuar en 2do Plano
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -2083,6 +2295,533 @@ export default function IntuitiveImaginationView() {
         </div>
       )}
 
+      {/* SUPERVISOR ORCHESTRATOR DIRECTOR GENERAL MANAGEMENT & CONFIGURATION MODAL */}
+      {isDirectorModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xl animate-fade-in">
+          <div className="max-w-5xl w-full max-h-[92vh] overflow-y-auto custom-scrollbar rounded-3xl bg-[#090b14] border border-cyan-500/30 shadow-2xl p-6 space-y-6 text-white relative">
+            {/* Modal Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/20 shrink-0">
+                  <Crown className="w-6 h-6 animate-pulse" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h2 className="text-lg font-black text-white font-display">
+                      {directorData?.director?.name || 'Astraura Director // Metis Prime'}
+                    </h2>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold font-mono">
+                      v1.58b-Supreme-Executive
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold font-mono">
+                      ● Activo en 2do Plano
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-300 font-mono mt-0.5">
+                    Supervisor General de Tareas, Agentes, Procesos Imaginativos & Renovación Continua de Desarrollo
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setIsDirectorModalOpen(false)}
+                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Metrics Ribbon */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-xs">
+              <div className="p-2.5 rounded-2xl bg-white/5 border border-white/5 space-y-0.5">
+                <span className="text-[10px] text-slate-400 block uppercase">Modo de Gobernanza</span>
+                <span className="font-bold text-cyan-300 truncate block">
+                  {directorConfigForm.orchestration_mode === 'strict_quality' ? '🛡️ Calidad Estricta' : '⚡ Proactivo Autónomo'}
+                </span>
+              </div>
+              <div className="p-2.5 rounded-2xl bg-white/5 border border-white/5 space-y-0.5">
+                <span className="text-[10px] text-slate-400 block uppercase">Umbral Mínimo</span>
+                <span className="font-bold text-amber-300 block">{directorConfigForm.quality_threshold}% Calidad</span>
+              </div>
+              <div className="p-2.5 rounded-2xl bg-white/5 border border-white/5 space-y-0.5">
+                <span className="text-[10px] text-slate-400 block uppercase">Verificaciones</span>
+                <span className="font-bold text-emerald-300 block">{directorData?.director?.verifications_completed_count || 25} Auditadas</span>
+              </div>
+              <div className="p-2.5 rounded-2xl bg-white/5 border border-white/5 space-y-0.5">
+                <span className="text-[10px] text-slate-400 block uppercase">Límite Silicio M1</span>
+                <span className="font-bold text-purple-300 block">{directorConfigForm.m1_hardware_limit_percent}% CPU</span>
+              </div>
+            </div>
+
+            {/* Navigation Tabs */}
+            <div className="flex items-center gap-2 border-b border-white/10 pb-2 overflow-x-auto custom-scrollbar font-mono text-xs">
+              {[
+                { id: 'governance', label: '⚙️ Gobernanza & Preferencias', icon: SlidersHorizontal },
+                { id: 'queue', label: '⚡ Cola de Agentes & Tareas Vivas', icon: Activity },
+                { id: 'memories', label: '🧠 Bóveda de Memorias & Axiomas', icon: Brain },
+                { id: 'audits', label: '🛡️ Decisiones & Auditorías', icon: ShieldCheck }
+              ].map(tab => {
+                const Icon = tab.icon;
+                const isActive = directorActiveTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setDirectorActiveTab(tab.id)}
+                    className={`px-3.5 py-2 rounded-xl flex items-center gap-2 font-bold transition-all cursor-pointer shrink-0 ${
+                      isActive
+                        ? 'bg-gradient-to-r from-cyan-500/30 to-purple-500/30 text-cyan-200 border border-cyan-400/50 shadow-md shadow-cyan-500/10'
+                        : 'bg-white/5 text-slate-400 hover:text-slate-200 hover:bg-white/10'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* TAB 1: GOBERNANZA & PREFERENCIAS */}
+            {directorActiveTab === 'governance' && (
+              <form onSubmit={handleSaveDirectorConfig} className="space-y-5 font-mono text-xs">
+                {/* 1. Governance Modes */}
+                <div className="space-y-2">
+                  <label className="text-slate-300 font-bold block">
+                    Modo de Orquestación & Supervisión del Director:
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {[
+                      {
+                        id: 'autonomous_proactive',
+                        title: '⚡ Proactivo Autónomo (Recomendado)',
+                        desc: 'Renovación continua e inteligente de tareas en 2do plano sin detenerse, balanceando el silicio M1.'
+                      },
+                      {
+                        id: 'strict_quality',
+                        title: '🛡️ Calidad Estricta (Verificación >= 85%)',
+                        desc: 'Auditoría rigurosa de cada entregable antes de enrutar a proyectos. Refinamiento automático si no cumple.'
+                      },
+                      {
+                        id: 'user_guided',
+                        title: '🎯 Guiado por Directivas del Usuario',
+                        desc: 'Prioriza las instrucciones explícitas emitidas por el Arquitecto sobre las ráfagas automáticas.'
+                      },
+                      {
+                        id: 'eco_silicon',
+                        title: '🍃 Silicio Eficiente / Eco-Thermal',
+                        desc: 'Limita el uso de CPU a menos del 30% manteniendo temperaturas óptimas en Mac.'
+                      }
+                    ].map(mode => (
+                      <div
+                        key={mode.id}
+                        onClick={() => setDirectorConfigForm({ ...directorConfigForm, orchestration_mode: mode.id })}
+                        className={`p-3.5 rounded-2xl border cursor-pointer transition-all space-y-1 ${
+                          directorConfigForm.orchestration_mode === mode.id
+                            ? 'bg-cyan-500/15 border-cyan-400 text-white shadow-md shadow-cyan-500/10'
+                            : 'bg-black/40 border-white/10 text-slate-400 hover:bg-white/5'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-xs text-cyan-200">{mode.title}</span>
+                          {directorConfigForm.orchestration_mode === mode.id && (
+                            <Check className="w-4 h-4 text-cyan-400" />
+                          )}
+                        </div>
+                        <p className="text-[11px] text-slate-300 leading-relaxed font-sans">{mode.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 2. Sliders */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-black/40 border border-white/5">
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <label className="text-slate-300 font-bold">Umbral de Calidad Mínimo para Aprobación:</label>
+                      <span className="text-cyan-300 font-bold font-mono">{directorConfigForm.quality_threshold}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={50}
+                      max={98}
+                      value={directorConfigForm.quality_threshold}
+                      onChange={(e) => setDirectorConfigForm({ ...directorConfigForm, quality_threshold: parseInt(e.target.value) })}
+                      className="w-full accent-cyan-400 cursor-pointer"
+                    />
+                    <span className="text-[10px] text-slate-400 block font-sans">
+                      Los entregables con puntaje inferior serán devueltos al agente para iteración y mejora.
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <label className="text-slate-300 font-bold">Cuota Máxima de Silicio Apple M1:</label>
+                      <span className="text-purple-300 font-bold font-mono">{directorConfigForm.m1_hardware_limit_percent}% CPU</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={10}
+                      max={80}
+                      value={directorConfigForm.m1_hardware_limit_percent}
+                      onChange={(e) => setDirectorConfigForm({ ...directorConfigForm, m1_hardware_limit_percent: parseInt(e.target.value) })}
+                      className="w-full accent-purple-400 cursor-pointer"
+                    />
+                    <span className="text-[10px] text-slate-400 block font-sans">
+                      Garantiza suficiente ancho de banda de GPU/CPU para respuestas de chat y voz instantáneas.
+                    </span>
+                  </div>
+                </div>
+
+                {/* 3. Intelligent Automation Switches */}
+                <div className="space-y-2">
+                  <label className="text-slate-300 font-bold block">
+                    Automatizaciones Inteligentes del Director Orquestador:
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {[
+                      {
+                        key: 'auto_renew_tasks',
+                        title: '🔄 Renovación Automática de Tareas',
+                        desc: 'Formula y despacha la siguiente tarea inteligente al completarse la anterior.'
+                      },
+                      {
+                        key: 'auto_route_to_projects',
+                        title: '🎯 Enrutamiento y Auto-Adjunto a Proyectos',
+                        desc: 'Vincula código, shaders y papers a proj_astraura_core y carpetas locales.'
+                      },
+                      {
+                        key: 'auto_inject_axioms',
+                        title: '🧠 Auto-Inyección de Axiomas a Cerebros',
+                        desc: 'Destila recuerdos clave y axiomas lógicos en el exocórtex StarSeed.'
+                      },
+                      {
+                        key: 'auto_trigger_imagination',
+                        title: '🌌 Disparador Autónomo de Imaginación',
+                        desc: 'Despierta ciclos creativos cuando el sistema detecta margen de optimización.'
+                      }
+                    ].map(sw => (
+                      <div
+                        key={sw.key}
+                        onClick={() => setDirectorConfigForm({ ...directorConfigForm, [sw.key]: !directorConfigForm[sw.key] })}
+                        className={`p-3 rounded-2xl border cursor-pointer transition-all flex items-start gap-3 ${
+                          directorConfigForm[sw.key]
+                            ? 'bg-emerald-950/20 border-emerald-500/40 text-emerald-200'
+                            : 'bg-black/40 border-white/10 text-slate-400'
+                        }`}
+                      >
+                        <div className={`w-5 h-5 rounded-lg flex items-center justify-center shrink-0 mt-0.5 border ${
+                          directorConfigForm[sw.key] ? 'bg-emerald-500 border-emerald-400 text-slate-950' : 'border-slate-600'
+                        }`}>
+                          {directorConfigForm[sw.key] && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                        </div>
+                        <div>
+                          <span className="font-bold text-xs block text-white">{sw.title}</span>
+                          <span className="text-[10px] text-slate-300 font-sans">{sw.desc}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 4. Directiva Maestra de Supervisión */}
+                <div className="space-y-2">
+                  <label className="text-slate-300 font-bold block">
+                    Directiva Maestra Activa del Director:
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={directorConfigForm.default_master_directive || ''}
+                    onChange={(e) => setDirectorConfigForm({ ...directorConfigForm, default_master_directive: e.target.value })}
+                    placeholder="Escribe la directriz suprema que guiará el enjambre y los procesos imaginativos..."
+                    className="w-full p-3 rounded-2xl bg-black/60 border border-cyan-500/30 text-cyan-200 focus:outline-none focus:border-cyan-400 font-sans text-xs"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsDirectorModalOpen(false)}
+                    className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold cursor-pointer"
+                  >
+                    Cerrar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSavingDirectorConfig}
+                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-slate-950 font-bold flex items-center gap-2 shadow-lg shadow-cyan-500/25 cursor-pointer font-mono text-xs"
+                  >
+                    <Check className="w-4 h-4" />
+                    <span>{isSavingDirectorConfig ? 'Guardando en Bóveda...' : 'Guardar Ajustes del Director'}</span>
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* TAB 2: COLA DE AGENTES & TAREAS EN VIVO */}
+            {directorActiveTab === 'queue' && (
+              <div className="space-y-4 font-mono text-xs">
+                {/* Action Bar */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-cyan-950/30 to-purple-950/20 border border-cyan-500/20 flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <h3 className="font-bold text-white text-xs">⚡ Control Operativo en Tiempo Real</h3>
+                    <p className="text-[10px] text-slate-300 font-sans">
+                      Dispara ráfagas creativas o renueva inteligentemente las tareas de todos los agentes.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleTriggerSupervisedImagination}
+                      disabled={isTriggering}
+                      className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-cyan-500 text-slate-950 font-bold flex items-center gap-1.5 cursor-pointer shadow-md"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>{isTriggering ? 'Orquestando...' : '🌌 Disparar Imaginación'}</span>
+                    </button>
+                    <button
+                      onClick={handleRenewDirectorTasks}
+                      disabled={isRenewingDirectorTasks}
+                      className="px-3.5 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-400/40 font-bold flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${isRenewingDirectorTasks ? 'animate-spin' : ''}`} />
+                      <span>{isRenewingDirectorTasks ? 'Renovando...' : '🔄 Forzar Renovación'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Directive Dispatcher */}
+                <form onSubmit={handleSteerDirector} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={directorDirectiveInput}
+                    onChange={(e) => setDirectorDirectiveInput(e.target.value)}
+                    placeholder="Emitir directiva ejecutiva inmediata al Director (ej: 'Priorizar optimización de perplejidad')..."
+                    className="flex-1 p-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-sans text-xs focus:outline-none focus:border-cyan-400"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isSteeringSwarm}
+                    className="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>{isSteeringSwarm ? 'Enviando...' : 'Reorientar'}</span>
+                  </button>
+                </form>
+
+                {/* Active Tasks Grid */}
+                <div className="space-y-3">
+                  <h4 className="text-slate-300 font-bold text-xs uppercase tracking-wider flex items-center justify-between">
+                    <span>Tareas Activas Formuladas & Supervisadas:</span>
+                    <span className="text-emerald-400">
+                      {swarmData?.active_tasks?.filter(t => t.status === 'running')?.length || 2} en ejecución
+                    </span>
+                  </h4>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {(swarmData?.active_tasks || []).map((t, idx) => (
+                      <div key={t.id || idx} className="p-3.5 rounded-2xl bg-black/50 border border-white/10 space-y-2.5">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="min-w-0 flex-1">
+                            <span className="text-[10px] text-cyan-300 font-bold block truncate">
+                              {t.agent_name || t.agent_id}
+                            </span>
+                            <h5 className="font-bold text-white text-xs truncate">{t.title}</h5>
+                          </div>
+                          <span className="px-2 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 font-mono text-[10px] shrink-0 font-bold">
+                            {t.progress}%
+                          </span>
+                        </div>
+
+                        {/* Telemetry Chips */}
+                        <div className="flex flex-wrap items-center gap-1.5 text-[9px] text-slate-400 font-mono">
+                          {t.real_memory_mb && (
+                            <span className="px-1.5 py-0.5 rounded bg-white/5 text-slate-300">
+                              RAM: {t.real_memory_mb} MB
+                            </span>
+                          )}
+                          <span className="px-1.5 py-0.5 rounded bg-white/5 text-slate-300">
+                            CPU: {t.allocated_cpu_percent || 10}%
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => window.dispatchEvent(new CustomEvent('open-file-viewer', { detail: { path: t.artifact_file || t.target_folder_path || '/Users/alex/Documents/IA 1.58 bit/backend/app' } }))}
+                            className="px-1.5 py-0.5 rounded bg-purple-500/20 hover:bg-purple-500/40 text-purple-300 hover:text-purple-100 flex items-center gap-1 cursor-pointer transition-colors"
+                            title="Inspeccionar carpeta o entregable en visor soberano / Finder"
+                          >
+                            <Folder className="w-3 h-3 text-amber-400" />
+                            <span>{t.target_folder_path ? t.target_folder_path.split('/').pop() : 'app'}</span>
+                          </button>
+                          <span className="px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300">
+                            🔄 {t.phase_label || 'Fase 2/4'}
+                          </span>
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div className="w-full bg-black/60 h-1.5 rounded-full overflow-hidden border border-white/5">
+                          <div
+                            className="h-full bg-gradient-to-r from-cyan-400 to-purple-500 transition-all duration-300 rounded-full"
+                            style={{ width: `${t.progress}%` }}
+                          />
+                        </div>
+
+                        {/* Live Logs */}
+                        {t.logs && t.logs.length > 0 && (
+                          <div className="p-2 rounded-xl bg-black/80 border border-white/5 text-[10px] text-slate-300 font-mono space-y-0.5 max-h-16 overflow-y-auto custom-scrollbar">
+                            {t.logs.slice(-2).map((log, lidx) => (
+                              <div key={lidx} className="truncate">› {log}</div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 3: BÓVEDA DE MEMORIAS & AXIOMAS */}
+            {directorActiveTab === 'memories' && (
+              <div className="space-y-4 font-mono text-xs">
+                {/* Form to add memory */}
+                <form onSubmit={handleAddDirectorMemory} className="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-3">
+                  <h4 className="font-bold text-white text-xs flex items-center gap-1.5">
+                    <Plus className="w-4 h-4 text-cyan-400" />
+                    <span>Inculcar Nueva Directiva / Axioma en la Bóveda del Director:</span>
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      value={newDirectorMemoryForm.title}
+                      onChange={(e) => setNewDirectorMemoryForm({ ...newDirectorMemoryForm, title: e.target.value })}
+                      placeholder="Título del Axioma o Principio de Gobernanza..."
+                      className="p-2 rounded-xl bg-black/60 border border-white/10 text-white font-sans text-xs focus:outline-none focus:border-cyan-400"
+                    />
+                    <div className="flex gap-2">
+                      <select
+                        value={newDirectorMemoryForm.category}
+                        onChange={(e) => setNewDirectorMemoryForm({ ...newDirectorMemoryForm, category: e.target.value })}
+                        className="flex-1 p-2 rounded-xl bg-black/60 border border-white/10 text-white font-sans text-xs focus:outline-none focus:border-cyan-400"
+                      >
+                        <option value="governance">Gobernanza Soberana</option>
+                        <option value="quality_assurance">Control de Calidad</option>
+                        <option value="routing_topology">Topología de Enrutamiento</option>
+                        <option value="hardware_governance">Gestión Silicio M1</option>
+                      </select>
+                      <select
+                        value={newDirectorMemoryForm.importance}
+                        onChange={(e) => setNewDirectorMemoryForm({ ...newDirectorMemoryForm, importance: e.target.value })}
+                        className="w-28 p-2 rounded-xl bg-black/60 border border-white/10 text-white font-sans text-xs focus:outline-none focus:border-cyan-400"
+                      >
+                        <option value="critical">Crítica</option>
+                        <option value="high">Alta</option>
+                        <option value="medium">Media</option>
+                      </select>
+                    </div>
+                  </div>
+                  <textarea
+                    rows={2}
+                    value={newDirectorMemoryForm.content}
+                    onChange={(e) => setNewDirectorMemoryForm({ ...newDirectorMemoryForm, content: e.target.value })}
+                    placeholder="Contenido detallado de la memoria ejecutiva..."
+                    className="w-full p-2.5 rounded-xl bg-black/60 border border-white/10 text-white font-sans text-xs focus:outline-none focus:border-cyan-400"
+                  />
+                  <div className="flex justify-end">
+                    <button
+                      type="submit"
+                      className="px-4 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold flex items-center gap-1.5 cursor-pointer shadow-md"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Asimilar en Bóveda</span>
+                    </button>
+                  </div>
+                </form>
+
+                {/* Memory Cards */}
+                <div className="space-y-2">
+                  <h4 className="text-slate-300 font-bold text-xs uppercase tracking-wider">
+                    Memorias Ejecutivas en Bóveda ({directorData?.executive_memories?.length || 4}):
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {(directorData?.executive_memories || []).map((mem, midx) => (
+                      <div key={mem.id || midx} className="p-3.5 rounded-2xl bg-black/50 border border-white/10 space-y-1.5">
+                        <div className="flex items-center justify-between gap-2">
+                          <h5 className="font-bold text-white text-xs truncate">{mem.title}</h5>
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded font-mono font-bold ${
+                            mem.importance === 'critical' ? 'bg-rose-500/20 text-rose-300' : 'bg-purple-500/20 text-purple-300'
+                          }`}>
+                            {mem.importance}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-300 font-sans leading-relaxed line-clamp-3">
+                          {mem.content}
+                        </p>
+                        {mem.tags && (
+                          <div className="flex flex-wrap gap-1 pt-1">
+                            {mem.tags.map((tg, tidx) => (
+                              <span key={tidx} className="text-[9px] px-1.5 py-0.2 rounded bg-white/5 text-slate-400 font-mono">
+                                #{tg}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 4: DECISIONES & AUDITORÍAS */}
+            {directorActiveTab === 'audits' && (
+              <div className="space-y-4 font-mono text-xs">
+                <div className="space-y-2">
+                  <h4 className="text-slate-300 font-bold text-xs uppercase tracking-wider flex items-center justify-between">
+                    <span>Registro Técnico de Auditoría & Enrutamiento a Proyectos:</span>
+                    <span className="text-cyan-400 font-mono">Total: {directorData?.audit_log?.length || 0}</span>
+                  </h4>
+
+                  <div className="space-y-2 max-h-[50vh] overflow-y-auto custom-scrollbar pr-1">
+                    {(directorData?.audit_log || []).map((aud, aidx) => (
+                      <div key={aud.id || aidx} className="p-3 rounded-2xl bg-black/50 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="space-y-1 min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-bold text-white text-xs">{aud.task_title || aud.target || 'Auditoría Técnica'}</span>
+                            <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold font-mono ${
+                              aud.verdict === 'APROBADO' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                            }`}>
+                              {aud.verdict || 'APROBADO'}
+                            </span>
+                            <span className="text-[10px] text-cyan-300 font-bold font-mono">
+                              Score: {aud.quality_score}%
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-300 font-sans">{aud.details}</p>
+                          {aud.artifact_file && (
+                            <button
+                              type="button"
+                              onClick={() => window.dispatchEvent(new CustomEvent('open-file-viewer', { detail: { path: aud.artifact_file } }))}
+                              className="mt-1 inline-flex items-center gap-1 text-[10px] text-cyan-400 hover:text-cyan-200 hover:underline cursor-pointer"
+                            >
+                              <FileCode className="w-3 h-3 text-cyan-400" />
+                              <span>Ver Artefacto en Bóveda ({aud.artifact_file.split('/').pop()})</span>
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="text-[10px] text-slate-400 font-mono shrink-0 text-right">
+                          <span className="block text-purple-300">proj_astraura_core</span>
+                          <span>{aud.timestamp ? new Date(aud.timestamp * 1000).toLocaleTimeString() : 'Reciente'}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* UNIVERSAL DEVICE ACCESS MODAL */}
       <UniversalDeviceModal 
         isOpen={isDeviceModalOpen}
@@ -2120,6 +2859,12 @@ export default function IntuitiveImaginationView() {
           agent={selectedApiAgent}
         />
       )}
+
+      {/* SYNTHESIS EXECUTIVE REPORT & CHRONOLOGY MODAL */}
+      <SynthesisReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+      />
     </div>
   );
 }

@@ -22,11 +22,13 @@ import {
   Code2,
   Wand2,
   Brain,
-  Globe,
-  Eye,
-  ExternalLink
+  Globe, 
+  Eye, 
+  ExternalLink,
+  Crown,
+  Folder
 } from 'lucide-react';
-import { fetchStatus, fetchImaginationStatus } from '../services/api';
+import { fetchStatus, fetchImaginationStatus, fetchDirectorStatus, fetchSwarmStatus } from '../services/api';
 import AgentTaskSummaryModal from './AgentTaskSummaryModal';
 import AgentFullWorkspaceModal from './AgentFullWorkspaceModal';
 
@@ -176,8 +178,10 @@ const AGENT_PROFILES = [
   }
 ];
 
-export default function AgentBackgroundTasksZone() {
+export default function AgentBackgroundTasksZone({ onOpenDirectorModal }) {
   const [agents, setAgents] = useState(AGENT_PROFILES);
+  const [directorStatus, setDirectorStatus] = useState(null);
+  const [swarmStatus, setSwarmStatus] = useState(null);
   const [activeChatAgent, setActiveChatAgent] = useState(null);
   const [selectedSummaryAgent, setSelectedSummaryAgent] = useState(null);
   const [selectedFullPageAgent, setSelectedFullPageAgent] = useState(null);
@@ -185,18 +189,22 @@ export default function AgentBackgroundTasksZone() {
   const [userInput, setUserInput] = useState('');
   const [isReplying, setIsReplying] = useState(false);
 
-  // Periodic progress simulation & real-time sync
+  // Periodic real-time sync with Director and Swarm Engine
   useEffect(() => {
-    const interval = setInterval(() => {
-      setAgents(prev => prev.map(ag => {
-        if (ag.status !== 'working') return ag;
-        const newProgress = ag.progress >= 98 ? 15 : ag.progress + Math.floor(Math.random() * 4 + 1);
-        return {
-          ...ag,
-          progress: newProgress
-        };
-      }));
-    }, 4000);
+    const syncRealData = async () => {
+      try {
+        const [dRes, sRes] = await Promise.all([
+          fetchDirectorStatus(),
+          fetchSwarmStatus()
+        ]);
+        if (dRes) setDirectorStatus(dRes);
+        if (sRes) setSwarmStatus(sRes);
+      } catch (e) {
+        // Silently continue
+      }
+    };
+    syncRealData();
+    const interval = setInterval(syncRealData, 2500);
     return () => clearInterval(interval);
   }, []);
 
@@ -221,44 +229,34 @@ export default function AgentBackgroundTasksZone() {
     e.preventDefault();
     if (!userInput.trim() || !activeChatAgent) return;
 
-    const userText = userInput.trim();
-    setUserInput('');
-    const agentId = activeChatAgent.id;
+    const newMsg = {
+      id: Date.now(),
+      sender: 'user',
+      text: userInput.trim(),
+      time: 'Ahora'
+    };
 
-    // Add user message
     setChatMessages(prev => ({
       ...prev,
-      [agentId]: [
-        ...(prev[agentId] || []),
-        { id: Date.now(), sender: 'user', text: userText, time: 'Ahora' }
-      ]
+      [activeChatAgent.id]: [...(prev[activeChatAgent.id] || []), newMsg]
     }));
 
+    setUserInput('');
     setIsReplying(true);
 
-    // Simulate real-time agent intelligent response and task steering
     setTimeout(() => {
-      let replyText = `Comprendido. He reorientado mi proceso activo hacia: "${userText}". Asignando prioridad alta y actualizando los registros del exocórtex.`;
-      if (agentId === 'hephaestus') {
-        replyText = `🛠️ [Hephaestus] Instrucción asimilada. Modificando el código fuente y paralelizando los bucles con registros ARM64 NEON. Tarea en ejecución prioritaria.`;
-      } else if (agentId === 'oneiros') {
-        replyText = `🎨 [Oneiros] Sintetizando nuevos parámetros visuales, shaders y geometrías para: "${userText}". Renderizando preview en 2do plano.`;
-      } else if (agentId === 'mnemosyne') {
-        replyText = `🌌 [Mnemosyne] Entrelazando "${userText}" con las ramas de memoria StarSeed y compactando el grafo asociativo.`;
-      }
-
+      const agentReply = {
+        id: Date.now() + 1,
+        sender: 'agent',
+        text: `Comprendido. Ajustando parámetros de ejecución para: "${userInput}". Sincronizando con el Director Metis y reorientando subprocesos en ${activeChatAgent.name}.`,
+        time: 'Ahora'
+      };
       setChatMessages(prev => ({
         ...prev,
-        [agentId]: [
-          ...(prev[agentId] || []),
-          { id: Date.now() + 1, sender: 'agent', text: replyText, time: 'Ahora' }
-        ]
+        [activeChatAgent.id]: [...(prev[activeChatAgent.id] || []), agentReply]
       }));
       setIsReplying(false);
-
-      // Update agent's active task
-      setAgents(prev => prev.map(ag => ag.id === agentId ? { ...ag, defaultTask: `Enfocado en: "${userText}"`, progress: 10 } : ag));
-    }, 1200);
+    }, 1000);
   };
 
   const toggleAgentPause = (agentId) => {
@@ -289,21 +287,35 @@ export default function AgentBackgroundTasksZone() {
             <Activity className="w-5 h-5 animate-pulse" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-white font-display flex items-center gap-2">
-              Tareas en Progreso en Segundo Plano // Enjambre Multi-Agente
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="text-sm font-bold text-white font-display">
+                Tareas en Progreso en Segundo Plano // Enjambre Multi-Agente
+              </h2>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-bold">
+                👑 Supervisado por Astraura Director // Metis
+              </span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                 6 Agentes en Vivo
               </span>
-            </h2>
-            <p className="text-[11px] text-slate-300">
-              Monitorea en qué trabaja cada agente en tiempo real e interactúa directamente para guiarlos o asignar prioridades.
+            </div>
+            <p className="text-[11px] text-slate-300 mt-0.5">
+              Monitorea en qué trabaja cada agente en tiempo real. El Director Supremo audita, verifica y renueva automáticamente las tareas hacia proyectos y memorias.
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 text-[11px]">
-          <span className="text-slate-400">Repartición Adaptativa de Recursos:</span>
-          <span className="text-cyan-300 font-bold">100% Equilibrado</span>
+          {onOpenDirectorModal && (
+            <button
+              onClick={onOpenDirectorModal}
+              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500/20 to-purple-500/20 hover:from-cyan-500/30 hover:to-purple-500/30 text-cyan-200 border border-cyan-400/40 flex items-center gap-1.5 font-bold transition-all cursor-pointer shadow-md"
+            >
+              <Crown className="w-3.5 h-3.5 text-cyan-300 animate-pulse" />
+              <span>⚙️ Administrar Director General</span>
+            </button>
+          )}
+          <span className="text-slate-400">Gobernanza M1:</span>
+          <span className="text-cyan-300 font-bold">Adaptativa</span>
         </div>
       </div>
 
@@ -311,7 +323,15 @@ export default function AgentBackgroundTasksZone() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {agents.map((ag) => {
           const Icon = ag.icon;
-          const isWorking = ag.status === 'working';
+          const liveTask = swarmStatus?.active_tasks?.find(t => t.agent_id === ag.id && t.status === 'running') || swarmStatus?.active_tasks?.find(t => t.agent_id === ag.id);
+          const isWorking = liveTask ? liveTask.status === 'running' : ag.status === 'working';
+          const taskProgress = liveTask ? liveTask.progress : ag.progress;
+          const taskTitle = liveTask ? liveTask.title : ag.defaultTask;
+          const taskCpu = liveTask ? liveTask.allocated_cpu_percent : ag.cpuPercent;
+          const taskRam = liveTask ? liveTask.real_memory_mb : null;
+          const taskFolder = liveTask ? liveTask.target_folder_path : '/backend/app';
+          const taskProject = liveTask ? liveTask.target_project_id : 'proj_astraura_core';
+          const taskPhase = liveTask ? liveTask.phase_label : 'Fase 2/4: Inferencia 1.58b';
 
           return (
             <div
@@ -341,9 +361,16 @@ export default function AgentBackgroundTasksZone() {
                     </div>
                   </div>
 
-                  <span className="shrink-0 text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 font-bold font-mono">
-                    {ag.cpuPercent}% CPU
-                  </span>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {taskRam && (
+                      <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-white/5 text-slate-400 font-mono">
+                        {taskRam} MB
+                      </span>
+                    )}
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 font-bold font-mono">
+                      {taskCpu}% CPU
+                    </span>
+                  </div>
                 </div>
 
                 {/* Used Personality Badges */}
@@ -362,25 +389,45 @@ export default function AgentBackgroundTasksZone() {
                   </div>
                 )}
 
-                {/* Active Task Title */}
-                <div className="p-2 rounded-xl bg-black/50 border border-white/5 space-y-0.5">
-                  <span className="text-[9px] text-amber-300 font-bold flex items-center gap-1 uppercase tracking-wider font-mono">
-                    <Zap className="w-2.5 h-2.5 text-amber-400 shrink-0" /> Tarea en 2do Plano:
-                  </span>
+                {/* Active Task Title & Real Location */}
+                <div className="p-2 rounded-xl bg-black/50 border border-white/5 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] text-amber-300 font-bold flex items-center gap-1 uppercase tracking-wider font-mono">
+                      <Zap className="w-2.5 h-2.5 text-amber-400 shrink-0" /> Tarea en 2do Plano:
+                    </span>
+                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 font-mono font-bold">
+                      {taskProject}
+                    </span>
+                  </div>
                   <p className="text-slate-200 text-[11px] font-sans leading-snug line-clamp-2 h-[32px] overflow-hidden">
-                    {ag.defaultTask}
+                    {taskTitle}
                   </p>
+                  <div className="text-[9px] text-slate-400 font-mono truncate pt-0.5 border-t border-white/5 flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.dispatchEvent(new CustomEvent('open-file-viewer', { detail: { path: liveTask?.artifact_file || taskFolder } }));
+                      }}
+                      className="truncate max-w-[150px] text-cyan-400 hover:text-cyan-200 hover:underline flex items-center gap-1 cursor-pointer transition-colors"
+                      title="Inspeccionar carpeta o entregable en visor soberano / Finder"
+                    >
+                      <Folder className="w-3 h-3 text-amber-400 shrink-0" />
+                      <span className="truncate">{taskFolder.split('/').pop() || taskFolder}</span>
+                    </button>
+                    <span className="text-cyan-400 truncate max-w-[160px]">🔄 {taskPhase}</span>
+                  </div>
                 </div>
 
                 {/* Progress Bar & Quick Summary / Full Page Links */}
                 <div className="space-y-1">
                   <div className="flex justify-between text-[10px] font-mono">
                     <span className="text-slate-400">Progreso del Ciclo:</span>
-                    <span className="text-emerald-400 font-bold">{ag.progress}%</span>
+                    <span className="text-emerald-400 font-bold">{taskProgress}%</span>
                   </div>
                   <div className="h-1.5 w-full bg-black/60 rounded-full border border-white/10 overflow-hidden p-0.5">
                     <div 
-                      style={{ width: `${ag.progress}%`, backgroundColor: ag.color }}
+                      style={{ width: `${taskProgress}%`, backgroundColor: ag.color }}
                       className="h-full rounded-full transition-all duration-300"
                     />
                   </div>

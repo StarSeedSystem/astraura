@@ -570,11 +570,15 @@ export async function fetchProjects() {
   return apiFetch('/projects');
 }
 
-export async function createProject(name, description, type = 'personal') {
+export async function fetchProjectDetails(projectId) {
+  return apiFetch(`/projects/${projectId}`);
+}
+
+export async function createProject(name, description, type = 'personal', extraData = {}) {
   return apiFetch('/projects/create', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, description, type })
+    body: JSON.stringify({ name, description, type, ...extraData })
   });
 }
 
@@ -586,11 +590,149 @@ export async function updateProject(projectId, updates) {
   });
 }
 
+export async function deleteProject(projectId) {
+  return apiFetch('/projects/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ project_id: projectId })
+  });
+}
+
+export async function addProjectVersion(projectId, versionData) {
+  return apiFetch('/projects/add_version', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ project_id: projectId, ...versionData })
+  });
+}
+
+export async function addProjectLog(projectId, action, agent, details) {
+  return apiFetch('/projects/add_log', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ project_id: projectId, action, agent, details })
+  });
+}
+
 export async function linkProjectItem(projectId, itemType, itemId) {
   return apiFetch('/projects/link', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ project_id: projectId, item_type: itemType, item_id: itemId })
+  });
+}
+
+export async function unlinkProjectItem(projectId, itemType, itemId) {
+  return apiFetch('/projects/unlink', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ project_id: projectId, item_type: itemType, item_id: itemId })
+  });
+}
+
+export async function fetchProjectIntegrity(projectId) {
+  return apiFetch(`/projects/integrity/${projectId}`);
+}
+
+export async function createProjectBranch(projectId, branchName, originBranch = 'main', notes = '', author = 'Alex Bordón') {
+  return apiFetch('/projects/branch/create', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ project_id: projectId, branch_name: branchName, origin_branch: originBranch, notes, author })
+  });
+}
+
+export async function mergeProjectBranch(projectId, sourceBranch, targetBranch = 'main', strategy = 'fast-forward', author = 'Alex Bordón') {
+  return apiFetch('/projects/branch/merge', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ project_id: projectId, source_branch: sourceBranch, target_branch: targetBranch, strategy, author })
+  });
+}
+
+export async function connectProjectSynapse(sourceProjectId, targetProjectId, synapseType = 'bidirectional', weight = 0.85, notes = '') {
+  return apiFetch('/projects/synapse/connect', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ source_project_id: sourceProjectId, target_project_id: targetProjectId, synapse_type: synapseType, weight, notes })
+  });
+}
+
+export async function disconnectProjectSynapse(sourceProjectId, targetProjectId) {
+  return apiFetch('/projects/synapse/disconnect', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ source_project_id: sourceProjectId, target_project_id: targetProjectId })
+  });
+}
+
+export async function modifyProjectFile(projectId, filePath, content, isBinary = false, permissionsMode = '0644') {
+  return apiFetch('/projects/file/write', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ project_id: projectId, file_path: filePath, content, is_binary: isBinary, permissions_mode: permissionsMode })
+  });
+}
+
+export async function deleteProjectFile(projectId, filePath, physicalDelete = false) {
+  return apiFetch('/projects/file/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ project_id: projectId, file_path: filePath, physical_delete: physicalDelete })
+  });
+}
+
+export async function applyProjectProposal(projectId, proposal) {
+  return apiFetch('/projects/apply_proposal', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ project_id: projectId, proposal })
+  });
+}
+
+// ================= Project Master Agent (Architectus) APIs =================
+
+export async function fetchProjectMasterAgentStatus() {
+  return apiFetch('/projects/agent/status');
+}
+
+export async function updateProjectMasterAgentConfig(config) {
+  return apiFetch('/projects/agent/config', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ config })
+  });
+}
+
+export async function runProjectMasterAgentCycle(triggerReason = 'manual') {
+  return apiFetch('/projects/agent/run_cycle', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ trigger_reason: triggerReason })
+  });
+}
+
+export async function applyProjectMasterAgentProposal(proposalId) {
+  return apiFetch('/projects/agent/proposals/apply', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ proposal_id: proposalId })
+  });
+}
+
+export async function autoOrganizeProjectsVault() {
+  return apiFetch('/projects/agent/auto_organize', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({})
+  });
+}
+
+export async function triggerProjectDream(theme, processType, targetProjectId) {
+  return apiFetch('/dream/trigger', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ theme, process_type: processType, target_project_id: targetProjectId })
   });
 }
 
@@ -848,6 +990,18 @@ export async function searchComputerFiles(query, root = null) {
   return apiFetch(url);
 }
 
+export async function openNativePath(path, reveal = true) {
+  return apiFetch('/system/open_native', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path, reveal })
+  });
+}
+
+export async function fetchItemDetails(path) {
+  return apiFetch(`/system/item_details?path=${encodeURIComponent(path)}`);
+}
+
 // ================= Sensorium 360° APIs =================
 
 export async function fetchSensoriumStatus() {
@@ -924,6 +1078,14 @@ export async function fetchProcessDetails(processId) {
 
 export async function fetchProcessBranches(processId) {
   return apiFetch(`/imagination/process/${processId}/branches`);
+}
+
+export async function simulateLiveProcessStep(processId, branchId = null) {
+  return apiFetch(`/imagination/process/${processId}/step`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ branch_id: branchId })
+  });
 }
 
 export async function regenerateBranch(branchId) {
@@ -1343,6 +1505,14 @@ export async function recycleCreationsStorage() {
   });
 }
 
+export async function linkCreationProjects(creationId, projectIds) {
+  return await apiFetch('/creations/link_projects', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ creation_id: creationId, project_ids: projectIds })
+  });
+}
+
 // ================= StarSeed OS Control & Smart Updates APIs =================
 
 export async function fetchOSSystemStatus() {
@@ -1481,6 +1651,123 @@ export async function perceiveAmbientAudioAndRespond(userTranscript, acousticMet
   });
 }
 
+// ================= Director Orchestrator Supreme Agent APIs =================
 
+export async function fetchDirectorStatus() {
+  return apiFetch('/director/status');
+}
+
+export async function steerDirectorSwarm(directive, targetProjectId = null) {
+  return apiFetch('/director/steer_swarm', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      directive,
+      target_project_id: targetProjectId
+    })
+  });
+}
+
+export async function verifyDirectorTask(taskData) {
+  return apiFetch('/director/verify_task', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      task: taskData
+    })
+  });
+}
+
+export async function addDirectorMemory(title, content, category = 'general', importance = 'medium', tags = null) {
+  return apiFetch('/director/add_memory', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      title,
+      content,
+      category,
+      importance,
+      tags
+    })
+  });
+}
+
+export async function triggerDirectorCycle() {
+  return apiFetch('/director/trigger_cycle', {
+    method: 'POST'
+  });
+}
+
+export async function fetchDirectorConfig() {
+  return apiFetch('/director/config');
+}
+
+export async function updateDirectorConfig(config) {
+  return apiFetch('/director/config', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ config })
+  });
+}
+
+export async function triggerDirectorImaginationCycle(targetProjectId = null, theme = null) {
+  return apiFetch('/director/imagination_cycle', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      target_project_id: targetProjectId,
+      theme
+    })
+  });
+}
+
+export async function renewDirectorTasks() {
+  return apiFetch('/director/renew_tasks', {
+    method: 'POST'
+  });
+}
+
+// ================= Synthesis Reports & Chronology API =================
+
+export async function fetchSynthesisReports(limit = 50) {
+  return apiFetch(`/imagination/synthesis_reports?limit=${limit}`);
+}
+
+export async function fetchLatestSynthesisReport() {
+  return apiFetch('/imagination/synthesis_reports/latest');
+}
+
+export async function fetchSynthesisReportById(reportId) {
+  return apiFetch(`/imagination/synthesis_reports/${reportId}`);
+}
+
+export async function generateSynthesisReport(triggerType = 'manual_request', contextData = {}) {
+  return apiFetch('/imagination/synthesis_reports/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      trigger_type: triggerType,
+      context_data: contextData
+    })
+  });
+}
+
+export async function clearSynthesisReportsHistory() {
+  return apiFetch('/imagination/synthesis_reports/clear', {
+    method: 'DELETE'
+  });
+}
+
+export async function fetchStorageDrives() {
+  return apiFetch('/system/storage/drives');
+}
+
+export async function inspectFileStorage(filePath) {
+  return apiFetch('/system/storage/inspect', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path: filePath })
+  });
+}
 
 

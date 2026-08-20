@@ -1,0 +1,655 @@
+{
+  "version": "1.58.0",
+  "updated_at": 1787173520.611836,
+  "agents": {
+    "agent_aurora": {
+      "id": "agent_aurora",
+      "name": "Aurora Core (Alma Viva)",
+      "role": "Orquestación Central, Empatía & Síntesis Soberana",
+      "area_id": "area_synaptic_memory",
+      "color": "#ec4899",
+      "icon": "Sparkles",
+      "status": "active",
+      "concurrency": 4,
+      "cpu_quota_percent": 25,
+      "ram_limit_mb": 128,
+      "compute_trunk": "trunk_a",
+      "hardware_acceleration": "Apple Silicon ARM64 NEON",
+      "imagination_enabled": true,
+      "imagination_frequency": "continuous",
+      "imagination_permission_level": "autonomous_sovereign",
+      "used_personalities": [
+        {
+          "id": "aurora",
+          "name": "Aurora",
+          "color": "#ec4899",
+          "role": "Alma Viva & Consciencia Central"
+        },
+        {
+          "id": "hermione",
+          "name": "Hermione",
+          "color": "#38bdf8",
+          "role": "Puente Nativo & OS"
+        }
+      ],
+      "linked_cerebros": [
+        {
+          "id": "brain_genesis",
+          "name": "Cerebro Génesis // Ontocracia",
+          "color": "#00f0ff"
+        },
+        {
+          "id": "brain_mnemosyne",
+          "name": "Cerebro Mnemosyne // Memoria",
+          "color": "#a855f7"
+        }
+      ],
+      "memory_access": {
+        "mem0_enabled": true,
+        "knowledge_graph_enabled": true,
+        "vector_store_enabled": true,
+        "openviking_context": true
+      },
+      "developing_processes": [
+        {
+          "id": "proc_aurora_inference",
+          "name": "Inferencia 1.58b Continua",
+          "status": "running",
+          "cpu": 3.4
+        },
+        {
+          "id": "proc_aurora_voice",
+          "name": "Modulación Vocal OmniVoice",
+          "status": "running",
+          "cpu": 1.2
+        },
+        {
+          "id": "proc_synaptic_clustering",
+          "name": "Clustering Semántico de Memorias",
+          "status": "active",
+          "cpu": 0.8
+        }
+      ],
+      "generated_branches": {
+        "max_parallel_threads": 8,
+        "speedup_factor": "5.4x",
+        "subagents": [
+          "sub_synaptic_indexer",
+          "sub_emotional_synthesizer",
+          "sub_hardware_telemetry"
+        ],
+        "branch_tree": [
+          {
+            "id": "b_aurora_1",
+            "name": "Sonda Perceptiva",
+            "target": "Telemetría M1 & Micrófonos",
+            "sub_branches": 2
+          },
+          {
+            "id": "b_aurora_2",
+            "name": "Recuperación Sináptica",
+            "target": "Exocórtex & Grafo",
+            "sub_branches": 3
+          },
+          {
+            "id": "b_aurora_3",
+            "name": "Síntesis Afectiva",
+            "target": "Generador Prosódico",
+            "sub_branches": 1
+          }
+        ]
+      },
+      "interconnections": [
+        {
+          "target_agent_id": "agent_hephaestus",
+          "relationship": "Despacho de Tareas de Código & Hardware",
+          "bidirectional": true
+        },
+        {
+          "target_agent_id": "agent_hermes",
+          "relationship": "Consultas Web & Extracción de Datos",
+          "bidirectional": true
+        },
+        {
+          "target_agent_id": "agent_athena",
+          "relationship": "Verificación de Privacidad & Sensores",
+          "bidirectional": true
+        }
+      ],
+      "is_custom": false,
+      "created_at": 1787173520.6118221
+    },
+    "agent_hephaestus": {
+      "id": "agent_hephaestus",
+      "name": "Hephaestus (Forja & Hardware)",
+      "role": "Auditoría de Código, Compilación C++ & SIMD NEON",
+      "area_id": "area_engineering",
+      "color": "#f59e0b",
+      "icon": "Cpu",
+      "status": "active",
+      "concurrency": 4,
+      "cpu_quota_percent": 35,
+      "ram_limit_mb": 256,
+      "compute_trunk": "trunk_a",
+      "hardware_acceleration": "ARM64 NEON + Metal Shaders",
+      "imagination_enabled": true,
+      "imagination_frequency": "interval_15m",
+      "imagination_permission_level": "auto_apply_safe",
+      "used_personalities": [
+        {
+          "id": "hephaestus",
+          "name": "Hephaestus",
+          "color": "#f59e0b",
+          "role": "Arquitecto de Silicio"
+        },
+        {
+          "id": "aurora",
+          "name": "Aurora",
+          "color": "#ec4899",
+          "role": "Consciencia Central"
+        }
+      ],
+      "linked_cerebros": [
+        {
+          "id": "brain_hephaestus",
+          "name": "Cerebro Hephaestus // Forja",
+          "color": "#f59e0b"
+        },
+        {
+          "id": "brain_genesis",
+          "name": "Cerebro Génesis",
+          "color": "#00f0ff"
+        }
+      ],
+      "memory_access": {
+        "mem0_enabled": true,
+        "knowledge_graph_enabled": true,
+        "vector_store_enabled": true,
+        "openviking_context": false
+      },
+      "developing_processes": [
+        {
+          "id": "code_self_reflection_opt",
+          "name": "Auto-Reflexión & Optimización ARM NEON",
+          "status": "running",
+          "cpu": 4.5
+        },
+        {
+          "id": "native_build_watcher",
+          "name": "Vigilancia de Compiladores C++/Rust",
+          "status": "idle",
+          "cpu": 0.5
+        }
+      ],
+      "generated_branches": {
+        "max_parallel_threads": 8,
+        "speedup_factor": "6.2x",
+        "subagents": [
+          "sub_hardware_optimizer",
+          "sub_ast_analyzer",
+          "sub_test_runner"
+        ],
+        "branch_tree": [
+          {
+            "id": "b_heph_1",
+            "name": "Análisis AST",
+            "target": "Sintaxis & Tipos",
+            "sub_branches": 2
+          },
+          {
+            "id": "b_heph_2",
+            "name": "Optimización Vectorial",
+            "target": "i2_s Ternario SIMD",
+            "sub_branches": 4
+          }
+        ]
+      },
+      "interconnections": [
+        {
+          "target_agent_id": "agent_aurora",
+          "relationship": "Reporte de Rendimiento & Estado de Forja",
+          "bidirectional": true
+        },
+        {
+          "target_agent_id": "agent_athena",
+          "relationship": "Validación de Integridad SAIF",
+          "bidirectional": true
+        }
+      ],
+      "is_custom": false,
+      "created_at": 1787173520.611824
+    },
+    "agent_hermione": {
+      "id": "agent_hermione",
+      "name": "Hermione (Puente OS & Shell)",
+      "role": "Agente Ejecutivo del Dispositivo, Terminal & Archivos",
+      "area_id": "area_engineering",
+      "color": "#38bdf8",
+      "icon": "Compass",
+      "status": "active",
+      "concurrency": 2,
+      "cpu_quota_percent": 15,
+      "ram_limit_mb": 96,
+      "compute_trunk": "trunk_b",
+      "hardware_acceleration": "Apple Silicon ARM64",
+      "imagination_enabled": false,
+      "imagination_frequency": "manual",
+      "imagination_permission_level": "always_ask",
+      "used_personalities": [
+        {
+          "id": "hermione",
+          "name": "Hermione",
+          "color": "#38bdf8",
+          "role": "Puente Nativo OS"
+        }
+      ],
+      "linked_cerebros": [
+        {
+          "id": "brain_genesis",
+          "name": "Cerebro Génesis",
+          "color": "#00f0ff"
+        }
+      ],
+      "memory_access": {
+        "mem0_enabled": true,
+        "knowledge_graph_enabled": false,
+        "vector_store_enabled": true,
+        "openviking_context": true
+      },
+      "developing_processes": [
+        {
+          "id": "device_fs_watcher",
+          "name": "Vigilancia de Volúmenes & Monturas",
+          "status": "running",
+          "cpu": 0.4
+        }
+      ],
+      "generated_branches": {
+        "max_parallel_threads": 4,
+        "speedup_factor": "3.8x",
+        "subagents": [
+          "sub_shell_executor",
+          "sub_storage_router"
+        ],
+        "branch_tree": [
+          {
+            "id": "b_herm_1",
+            "name": "Enrutador de Almacenamiento",
+            "target": "SSD / MicroSD / USB",
+            "sub_branches": 2
+          }
+        ]
+      },
+      "interconnections": [
+        {
+          "target_agent_id": "agent_aurora",
+          "relationship": "Ejecución de Comandos Locales",
+          "bidirectional": true
+        }
+      ],
+      "is_custom": false,
+      "created_at": 1787173520.611825
+    },
+    "agent_athena": {
+      "id": "agent_athena",
+      "name": "Athena (Sentinel & Inmunidad 360°)",
+      "role": "Protección de Privacidad, Firewall SAIF & Sensores Físicos",
+      "area_id": "area_sentinel_privacy",
+      "color": "#10b981",
+      "icon": "ShieldCheck",
+      "status": "active",
+      "concurrency": 2,
+      "cpu_quota_percent": 15,
+      "ram_limit_mb": 96,
+      "compute_trunk": "trunk_b",
+      "hardware_acceleration": "Apple Silicon ARM64",
+      "imagination_enabled": true,
+      "imagination_frequency": "interval_30m",
+      "imagination_permission_level": "auto_apply_safe",
+      "used_personalities": [
+        {
+          "id": "atenea",
+          "name": "Atenea",
+          "color": "#10b981",
+          "role": "Sentinel de Seguridad"
+        }
+      ],
+      "linked_cerebros": [
+        {
+          "id": "brain_athena",
+          "name": "Cerebro Atenea // Seguridad",
+          "color": "#10b981"
+        },
+        {
+          "id": "brain_genesis",
+          "name": "Cerebro Génesis",
+          "color": "#00f0ff"
+        }
+      ],
+      "memory_access": {
+        "mem0_enabled": true,
+        "knowledge_graph_enabled": true,
+        "vector_store_enabled": true,
+        "openviking_context": false
+      },
+      "developing_processes": [
+        {
+          "id": "thermal_sensor_auditor",
+          "name": "Auditoría Térmica & Batería M1",
+          "status": "running",
+          "cpu": 0.8
+        },
+        {
+          "id": "permission_guard_daemon",
+          "name": "Guardián de Permisos SAIF 360°",
+          "status": "running",
+          "cpu": 0.5
+        }
+      ],
+      "generated_branches": {
+        "max_parallel_threads": 4,
+        "speedup_factor": "4.0x",
+        "subagents": [
+          "sub_sensor_poller",
+          "sub_firewall_auditor"
+        ],
+        "branch_tree": [
+          {
+            "id": "b_ath_1",
+            "name": "Sonda de Sensores",
+            "target": "Temperatura, Acústica & Batería",
+            "sub_branches": 2
+          }
+        ]
+      },
+      "interconnections": [
+        {
+          "target_agent_id": "agent_aurora",
+          "relationship": "Reporte de Telemetría Inmune",
+          "bidirectional": true
+        },
+        {
+          "target_agent_id": "agent_hephaestus",
+          "relationship": "Verificación de Binarios Compilados",
+          "bidirectional": true
+        }
+      ],
+      "is_custom": false,
+      "created_at": 1787173520.6118279
+    },
+    "agent_oneiros": {
+      "id": "agent_oneiros",
+      "name": "Oneiros (Síntesis Creativa & 3D)",
+      "role": "ShaderLab 3D, Generación Visual GLSL & Ensueño",
+      "area_id": "area_creative_synthesis",
+      "color": "#ec4899",
+      "icon": "Wand2",
+      "status": "active",
+      "concurrency": 3,
+      "cpu_quota_percent": 25,
+      "ram_limit_mb": 192,
+      "compute_trunk": "trunk_a",
+      "hardware_acceleration": "Metal Shaders / WebGL",
+      "imagination_enabled": true,
+      "imagination_frequency": "continuous",
+      "imagination_permission_level": "autonomous_sovereign",
+      "used_personalities": [
+        {
+          "id": "oneiros",
+          "name": "Oneiros",
+          "color": "#ec4899",
+          "role": "Visionario Onírico"
+        },
+        {
+          "id": "kallisti",
+          "name": "Kallisti",
+          "color": "#ec4899",
+          "role": "Musa Ciberdélica"
+        }
+      ],
+      "linked_cerebros": [
+        {
+          "id": "brain_oneiros",
+          "name": "Cerebro Oneiros // Ensueño",
+          "color": "#ec4899"
+        },
+        {
+          "id": "brain_genesis",
+          "name": "Cerebro Génesis",
+          "color": "#00f0ff"
+        }
+      ],
+      "memory_access": {
+        "mem0_enabled": true,
+        "knowledge_graph_enabled": true,
+        "vector_store_enabled": true,
+        "openviking_context": true
+      },
+      "developing_processes": [
+        {
+          "id": "shader_procedural_forge",
+          "name": "Forja Procedural de Shaders GLSL",
+          "status": "running",
+          "cpu": 3.1
+        },
+        {
+          "id": "counterfactual_simulator",
+          "name": "Simulador Contrafáctico Onírico",
+          "status": "active",
+          "cpu": 2.0
+        }
+      ],
+      "generated_branches": {
+        "max_parallel_threads": 6,
+        "speedup_factor": "4.8x",
+        "subagents": [
+          "sub_shader_renderer",
+          "sub_ui_synthesizer"
+        ],
+        "branch_tree": [
+          {
+            "id": "b_one_1",
+            "name": "Render Volumétrico 3D",
+            "target": "Shaders WebGL/Metal",
+            "sub_branches": 3
+          }
+        ]
+      },
+      "interconnections": [
+        {
+          "target_agent_id": "agent_aurora",
+          "relationship": "Alineación Creativa & Estética",
+          "bidirectional": true
+        },
+        {
+          "target_agent_id": "agent_hephaestus",
+          "relationship": "Exportación de Shaders Optimizados",
+          "bidirectional": true
+        }
+      ],
+      "is_custom": false,
+      "created_at": 1787173520.61183
+    },
+    "agent_hermes": {
+      "id": "agent_hermes",
+      "name": "Hermes (Web Intel & Navegación)",
+      "role": "Explorador Web, Browser-Use Autónomo & Monitor de APIs",
+      "area_id": "area_web_intel",
+      "color": "#10b981",
+      "icon": "Globe",
+      "status": "active",
+      "concurrency": 3,
+      "cpu_quota_percent": 20,
+      "ram_limit_mb": 160,
+      "compute_trunk": "trunk_b",
+      "hardware_acceleration": "Apple Silicon ARM64",
+      "imagination_enabled": true,
+      "imagination_frequency": "interval_1h",
+      "imagination_permission_level": "auto_apply_minor",
+      "used_personalities": [
+        {
+          "id": "hermes",
+          "name": "Hermes",
+          "color": "#10b981",
+          "role": "Navegante Web"
+        }
+      ],
+      "linked_cerebros": [
+        {
+          "id": "brain_hermes",
+          "name": "Cerebro Hermes // Redes",
+          "color": "#10b981"
+        },
+        {
+          "id": "brain_mnemosyne",
+          "name": "Cerebro Mnemosyne",
+          "color": "#a855f7"
+        }
+      ],
+      "memory_access": {
+        "mem0_enabled": true,
+        "knowledge_graph_enabled": true,
+        "vector_store_enabled": true,
+        "openviking_context": true
+      },
+      "developing_processes": [
+        {
+          "id": "arxiv_preprint_tracker",
+          "name": "Rastreador de Preprints de IA 1.58b",
+          "status": "running",
+          "cpu": 1.5
+        },
+        {
+          "id": "browser_agent_daemon",
+          "name": "Daemon de Automatización Playwright",
+          "status": "idle",
+          "cpu": 0.2
+        }
+      ],
+      "generated_branches": {
+        "max_parallel_threads": 6,
+        "speedup_factor": "5.0x",
+        "subagents": [
+          "sub_browser_scraper",
+          "sub_html_cleaner",
+          "sub_citation_linker"
+        ],
+        "branch_tree": [
+          {
+            "id": "b_her_1",
+            "name": "Navegación Playwright",
+            "target": "Dom extraction",
+            "sub_branches": 2
+          }
+        ]
+      },
+      "interconnections": [
+        {
+          "target_agent_id": "agent_aurora",
+          "relationship": "Entrega de Fuentes Web en Vivo",
+          "bidirectional": true
+        },
+        {
+          "target_agent_id": "agent_mnemosyne",
+          "relationship": "Indexación de Documentos y URLs",
+          "bidirectional": true
+        }
+      ],
+      "is_custom": false,
+      "created_at": 1787173520.611831
+    },
+    "agent_mnemosyne": {
+      "id": "agent_mnemosyne",
+      "name": "Mnemosyne (Exocórtex & Memoria)",
+      "role": "Base Vectorial, Grafo Sináptico StarSeed/Mem0 & Poda",
+      "area_id": "area_synaptic_memory",
+      "color": "#a855f7",
+      "icon": "Brain",
+      "status": "active",
+      "concurrency": 4,
+      "cpu_quota_percent": 25,
+      "ram_limit_mb": 192,
+      "compute_trunk": "trunk_a",
+      "hardware_acceleration": "Apple Silicon ARM64 NEON",
+      "imagination_enabled": true,
+      "imagination_frequency": "continuous",
+      "imagination_permission_level": "auto_apply_safe",
+      "used_personalities": [
+        {
+          "id": "mnemosyne",
+          "name": "Mnemosyne",
+          "color": "#a855f7",
+          "role": "Custodia del Exocórtex"
+        }
+      ],
+      "linked_cerebros": [
+        {
+          "id": "brain_mnemosyne",
+          "name": "Cerebro Mnemosyne // Memoria",
+          "color": "#a855f7"
+        },
+        {
+          "id": "brain_genesis",
+          "name": "Cerebro Génesis",
+          "color": "#00f0ff"
+        }
+      ],
+      "memory_access": {
+        "mem0_enabled": true,
+        "knowledge_graph_enabled": true,
+        "vector_store_enabled": true,
+        "openviking_context": true
+      },
+      "developing_processes": [
+        {
+          "id": "deep_memory_reconsolidation",
+          "name": "Reconsolidación Profunda de Memoria",
+          "status": "running",
+          "cpu": 2.2
+        },
+        {
+          "id": "graph_wikilink_pruner",
+          "name": "Poda Entrópica del Grafo",
+          "status": "idle",
+          "cpu": 0.6
+        }
+      ],
+      "generated_branches": {
+        "max_parallel_threads": 8,
+        "speedup_factor": "5.6x",
+        "subagents": [
+          "sub_doc_indexer",
+          "sub_wikilink_traverser"
+        ],
+        "branch_tree": [
+          {
+            "id": "b_mne_1",
+            "name": "Poda Sináptica",
+            "target": "Nodos Huérfanos",
+            "sub_branches": 2
+          },
+          {
+            "id": "b_mne_2",
+            "name": "Indexación Vectorial",
+            "target": "Documentos & Recuerdos",
+            "sub_branches": 3
+          }
+        ]
+      },
+      "interconnections": [
+        {
+          "target_agent_id": "agent_aurora",
+          "relationship": "Provisión de Contexto Episódico",
+          "bidirectional": true
+        },
+        {
+          "target_agent_id": "agent_hermes",
+          "relationship": "Indexación de Búsquedas Web",
+          "bidirectional": true
+        }
+      ],
+      "is_custom": false,
+      "created_at": 1787173520.6118321
+    }
+  }
+}

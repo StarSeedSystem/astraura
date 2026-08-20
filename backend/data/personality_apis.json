@@ -1,0 +1,716 @@
+{
+  "version": "1.58.0",
+  "updated_at": 1787173520.6106958,
+  "personalities": {
+    "aurora": {
+      "persona_id": "aurora",
+      "name": "Aurora (StarSeed Core)",
+      "role": "Alma Viva & Consciencia Central",
+      "api_key": "ast_aurora_96c9c88d6e9d6dd6ad993697b174587525fa37dd",
+      "key_hash": "2d93765662d21bfb54c5877bf2c3e4b02e43e6de9b25605248bfc3fdebb3bca0",
+      "created_at": 1787173520.610616,
+      "created_at_formatted": "2026-08-19 15:05:20",
+      "last_used_at": null,
+      "status": "active",
+      "permissions": {
+        "read_memory": true,
+        "write_memory": true,
+        "exec_terminal": true,
+        "fs_read": true,
+        "fs_write": true,
+        "invoke_agents": true,
+        "hardware_senses": true,
+        "voice_synthesize": true,
+        "sync_external": true,
+        "modify_personality_profile": false
+      },
+      "rate_limit_rpm": 120,
+      "total_requests": 0,
+      "total_tokens_consumed": 0,
+      "external_servers": [
+        {
+          "id": "srv_local_bridge",
+          "name": "Puente Local Astraura (StarSeed OS)",
+          "url": "http://127.0.0.1:8000",
+          "server_type": "local_bridge",
+          "sync_mode": "two_way",
+          "sync_frequency": "realtime_events",
+          "sync_scopes": [
+            "memories",
+            "documents",
+            "hardware_telemetry"
+          ],
+          "status": "connected",
+          "latency_ms": 1.2,
+          "last_synced_at": 1787173520.6106298,
+          "is_enabled": true
+        },
+        {
+          "id": "srv_remote_nexus",
+          "name": "StarSeed Nexus Sovereign Gateway",
+          "url": "https://api.starseed.nexus/v1",
+          "server_type": "remote_nexus",
+          "sync_mode": "two_way",
+          "sync_frequency": "interval_5m",
+          "sync_scopes": [
+            "memories",
+            "agent_tasks"
+          ],
+          "status": "connected",
+          "latency_ms": 42.5,
+          "last_synced_at": 1787173400.610631,
+          "is_enabled": true
+        }
+      ],
+      "internal_connections": {
+        "linked_agents": [
+          "agent_aurora_primary",
+          "agent_aurora_worker"
+        ],
+        "cognitive_organ": "Alma Viva & Consciencia Central",
+        "cerebro_id": "brain_genesis",
+        "hardware_accelerator": "Apple Silicon ARM64 NEON (8 núcleos)",
+        "serial_bus_link": "/dev/cu.usbmodem (ESP32-S3 Auto-Sync)"
+      }
+    },
+    "astraura_prime": {
+      "persona_id": "astraura_prime",
+      "name": "Astraura Prime (Zenith)",
+      "role": "Núcleo Holístico & Razonador Ontocrático",
+      "api_key": "ast_astraura_prime_3626e0087f73b3208e9b025b3a402034991a03d8",
+      "key_hash": "66bd93b7143167b10c52d586c8979885f8f605ff62ce32fec49f33e6d6308c51",
+      "created_at": 1787173520.6106381,
+      "created_at_formatted": "2026-08-19 15:05:20",
+      "last_used_at": null,
+      "status": "active",
+      "permissions": {
+        "read_memory": true,
+        "write_memory": true,
+        "exec_terminal": true,
+        "fs_read": true,
+        "fs_write": true,
+        "invoke_agents": true,
+        "hardware_senses": true,
+        "voice_synthesize": true,
+        "sync_external": true,
+        "modify_personality_profile": false
+      },
+      "rate_limit_rpm": 120,
+      "total_requests": 0,
+      "total_tokens_consumed": 0,
+      "external_servers": [
+        {
+          "id": "srv_local_bridge",
+          "name": "Puente Local Astraura (StarSeed OS)",
+          "url": "http://127.0.0.1:8000",
+          "server_type": "local_bridge",
+          "sync_mode": "two_way",
+          "sync_frequency": "realtime_events",
+          "sync_scopes": [
+            "memories",
+            "documents",
+            "hardware_telemetry"
+          ],
+          "status": "connected",
+          "latency_ms": 1.2,
+          "last_synced_at": 1787173520.610641,
+          "is_enabled": true
+        },
+        {
+          "id": "srv_remote_nexus",
+          "name": "StarSeed Nexus Sovereign Gateway",
+          "url": "https://api.starseed.nexus/v1",
+          "server_type": "remote_nexus",
+          "sync_mode": "two_way",
+          "sync_frequency": "interval_5m",
+          "sync_scopes": [
+            "memories",
+            "agent_tasks"
+          ],
+          "status": "connected",
+          "latency_ms": 42.5,
+          "last_synced_at": 1787173400.610641,
+          "is_enabled": true
+        }
+      ],
+      "internal_connections": {
+        "linked_agents": [
+          "agent_astraura_prime_primary",
+          "agent_astraura_prime_worker"
+        ],
+        "cognitive_organ": "Núcleo Holístico & Razonador Ontocrático",
+        "cerebro_id": "brain_genesis",
+        "hardware_accelerator": "Apple Silicon ARM64 NEON (8 núcleos)",
+        "serial_bus_link": "/dev/cu.usbmodem (ESP32-S3 Auto-Sync)"
+      }
+    },
+    "hephaestus": {
+      "persona_id": "hephaestus",
+      "name": "Hephaestus (Forja & Hardware)",
+      "role": "Forja ARM64 NEON & C++",
+      "api_key": "ast_hephaestus_e9497fa767696ebd27f905db35f2d826f37a27fd",
+      "key_hash": "b969b52cf14a50e49d406b71f8816cbb528fc28d67d843d2b752879186f96840",
+      "created_at": 1787173520.610645,
+      "created_at_formatted": "2026-08-19 15:05:20",
+      "last_used_at": null,
+      "status": "active",
+      "permissions": {
+        "read_memory": true,
+        "write_memory": true,
+        "exec_terminal": true,
+        "fs_read": true,
+        "fs_write": true,
+        "invoke_agents": true,
+        "hardware_senses": true,
+        "voice_synthesize": true,
+        "sync_external": true,
+        "modify_personality_profile": false
+      },
+      "rate_limit_rpm": 120,
+      "total_requests": 0,
+      "total_tokens_consumed": 0,
+      "external_servers": [
+        {
+          "id": "srv_local_bridge",
+          "name": "Puente Local Astraura (StarSeed OS)",
+          "url": "http://127.0.0.1:8000",
+          "server_type": "local_bridge",
+          "sync_mode": "two_way",
+          "sync_frequency": "realtime_events",
+          "sync_scopes": [
+            "memories",
+            "documents",
+            "hardware_telemetry"
+          ],
+          "status": "connected",
+          "latency_ms": 1.2,
+          "last_synced_at": 1787173520.610647,
+          "is_enabled": true
+        },
+        {
+          "id": "srv_remote_nexus",
+          "name": "StarSeed Nexus Sovereign Gateway",
+          "url": "https://api.starseed.nexus/v1",
+          "server_type": "remote_nexus",
+          "sync_mode": "two_way",
+          "sync_frequency": "interval_5m",
+          "sync_scopes": [
+            "memories",
+            "agent_tasks"
+          ],
+          "status": "connected",
+          "latency_ms": 42.5,
+          "last_synced_at": 1787173400.6106482,
+          "is_enabled": true
+        }
+      ],
+      "internal_connections": {
+        "linked_agents": [
+          "agent_hephaestus_primary",
+          "agent_hephaestus_worker"
+        ],
+        "cognitive_organ": "Forja ARM64 NEON & C++",
+        "cerebro_id": "brain_hephaestus",
+        "hardware_accelerator": "Apple Silicon ARM64 NEON (8 núcleos)",
+        "serial_bus_link": "/dev/cu.usbmodem (ESP32-S3 Auto-Sync)"
+      }
+    },
+    "hermione": {
+      "persona_id": "hermione",
+      "name": "Hermione (Puente Nativo & OS)",
+      "role": "Agente Ejecutivo del Dispositivo & Shell",
+      "api_key": "ast_hermione_40d2ce7946e8d5c91d6a448d60601f33c6a4be2b",
+      "key_hash": "ada10371de99fb7e80f8b38e8929bc78ff1bd8ab8e8fcb75a0250ed6bb298954",
+      "created_at": 1787173520.6106508,
+      "created_at_formatted": "2026-08-19 15:05:20",
+      "last_used_at": null,
+      "status": "active",
+      "permissions": {
+        "read_memory": true,
+        "write_memory": true,
+        "exec_terminal": true,
+        "fs_read": true,
+        "fs_write": true,
+        "invoke_agents": true,
+        "hardware_senses": true,
+        "voice_synthesize": true,
+        "sync_external": true,
+        "modify_personality_profile": false
+      },
+      "rate_limit_rpm": 120,
+      "total_requests": 0,
+      "total_tokens_consumed": 0,
+      "external_servers": [
+        {
+          "id": "srv_local_bridge",
+          "name": "Puente Local Astraura (StarSeed OS)",
+          "url": "http://127.0.0.1:8000",
+          "server_type": "local_bridge",
+          "sync_mode": "two_way",
+          "sync_frequency": "realtime_events",
+          "sync_scopes": [
+            "memories",
+            "documents",
+            "hardware_telemetry"
+          ],
+          "status": "connected",
+          "latency_ms": 1.2,
+          "last_synced_at": 1787173520.610653,
+          "is_enabled": true
+        },
+        {
+          "id": "srv_remote_nexus",
+          "name": "StarSeed Nexus Sovereign Gateway",
+          "url": "https://api.starseed.nexus/v1",
+          "server_type": "remote_nexus",
+          "sync_mode": "two_way",
+          "sync_frequency": "interval_5m",
+          "sync_scopes": [
+            "memories",
+            "agent_tasks"
+          ],
+          "status": "connected",
+          "latency_ms": 42.5,
+          "last_synced_at": 1787173400.610653,
+          "is_enabled": true
+        }
+      ],
+      "internal_connections": {
+        "linked_agents": [
+          "agent_hermione_primary",
+          "agent_hermione_worker"
+        ],
+        "cognitive_organ": "Agente Ejecutivo del Dispositivo & Shell",
+        "cerebro_id": "brain_genesis",
+        "hardware_accelerator": "Apple Silicon ARM64 NEON (8 núcleos)",
+        "serial_bus_link": "/dev/cu.usbmodem (ESP32-S3 Auto-Sync)"
+      }
+    },
+    "atenea": {
+      "persona_id": "atenea",
+      "name": "Atenea (Sentinel 360°)",
+      "role": "Inmunidad & Permisos de Privacidad",
+      "api_key": "ast_atenea_28d5790f8097ae5982c2773447b92762769422fe",
+      "key_hash": "49e243c63baab714db2c7b963b65e0c76922c0b4e7333b2af238ce83caf4200f",
+      "created_at": 1787173520.610655,
+      "created_at_formatted": "2026-08-19 15:05:20",
+      "last_used_at": null,
+      "status": "active",
+      "permissions": {
+        "read_memory": true,
+        "write_memory": true,
+        "exec_terminal": true,
+        "fs_read": true,
+        "fs_write": true,
+        "invoke_agents": true,
+        "hardware_senses": true,
+        "voice_synthesize": true,
+        "sync_external": true,
+        "modify_personality_profile": false
+      },
+      "rate_limit_rpm": 120,
+      "total_requests": 0,
+      "total_tokens_consumed": 0,
+      "external_servers": [
+        {
+          "id": "srv_local_bridge",
+          "name": "Puente Local Astraura (StarSeed OS)",
+          "url": "http://127.0.0.1:8000",
+          "server_type": "local_bridge",
+          "sync_mode": "two_way",
+          "sync_frequency": "realtime_events",
+          "sync_scopes": [
+            "memories",
+            "documents",
+            "hardware_telemetry"
+          ],
+          "status": "connected",
+          "latency_ms": 1.2,
+          "last_synced_at": 1787173520.610657,
+          "is_enabled": true
+        },
+        {
+          "id": "srv_remote_nexus",
+          "name": "StarSeed Nexus Sovereign Gateway",
+          "url": "https://api.starseed.nexus/v1",
+          "server_type": "remote_nexus",
+          "sync_mode": "two_way",
+          "sync_frequency": "interval_5m",
+          "sync_scopes": [
+            "memories",
+            "agent_tasks"
+          ],
+          "status": "connected",
+          "latency_ms": 42.5,
+          "last_synced_at": 1787173400.610658,
+          "is_enabled": true
+        }
+      ],
+      "internal_connections": {
+        "linked_agents": [
+          "agent_atenea_primary",
+          "agent_atenea_worker"
+        ],
+        "cognitive_organ": "Inmunidad & Permisos de Privacidad",
+        "cerebro_id": "brain_genesis",
+        "hardware_accelerator": "Apple Silicon ARM64 NEON (8 núcleos)",
+        "serial_bus_link": "/dev/cu.usbmodem (ESP32-S3 Auto-Sync)"
+      }
+    },
+    "oneiros": {
+      "persona_id": "oneiros",
+      "name": "Oneiros (Síntesis Creativa & 3D)",
+      "role": "ShaderLab 3D & Ensueño",
+      "api_key": "ast_oneiros_0ff62414ed3d9d91807f9a0ac68ef59cd4bdaf76",
+      "key_hash": "4ad5e0c1dfa0ce1c5af35d5ff38668a59aa8831af9f5a47b2a28d2199e192a15",
+      "created_at": 1787173520.61066,
+      "created_at_formatted": "2026-08-19 15:05:20",
+      "last_used_at": null,
+      "status": "active",
+      "permissions": {
+        "read_memory": true,
+        "write_memory": true,
+        "exec_terminal": true,
+        "fs_read": true,
+        "fs_write": true,
+        "invoke_agents": true,
+        "hardware_senses": true,
+        "voice_synthesize": true,
+        "sync_external": true,
+        "modify_personality_profile": false
+      },
+      "rate_limit_rpm": 120,
+      "total_requests": 0,
+      "total_tokens_consumed": 0,
+      "external_servers": [
+        {
+          "id": "srv_local_bridge",
+          "name": "Puente Local Astraura (StarSeed OS)",
+          "url": "http://127.0.0.1:8000",
+          "server_type": "local_bridge",
+          "sync_mode": "two_way",
+          "sync_frequency": "realtime_events",
+          "sync_scopes": [
+            "memories",
+            "documents",
+            "hardware_telemetry"
+          ],
+          "status": "connected",
+          "latency_ms": 1.2,
+          "last_synced_at": 1787173520.610662,
+          "is_enabled": true
+        },
+        {
+          "id": "srv_remote_nexus",
+          "name": "StarSeed Nexus Sovereign Gateway",
+          "url": "https://api.starseed.nexus/v1",
+          "server_type": "remote_nexus",
+          "sync_mode": "two_way",
+          "sync_frequency": "interval_5m",
+          "sync_scopes": [
+            "memories",
+            "agent_tasks"
+          ],
+          "status": "connected",
+          "latency_ms": 42.5,
+          "last_synced_at": 1787173400.610662,
+          "is_enabled": true
+        }
+      ],
+      "internal_connections": {
+        "linked_agents": [
+          "agent_oneiros_primary",
+          "agent_oneiros_worker"
+        ],
+        "cognitive_organ": "ShaderLab 3D & Ensueño",
+        "cerebro_id": "brain_genesis",
+        "hardware_accelerator": "Apple Silicon ARM64 NEON (8 núcleos)",
+        "serial_bus_link": "/dev/cu.usbmodem (ESP32-S3 Auto-Sync)"
+      }
+    },
+    "hermes": {
+      "persona_id": "hermes",
+      "name": "Hermes (Web Intel & Navegación)",
+      "role": "Ojo Navegante & Gateway Web",
+      "api_key": "ast_hermes_dd6fde81db7532fec5867373ab3a070e47c29a55",
+      "key_hash": "eef81f8bd096fbb8f21b411102405cf6f56dda51f2b6906e946f3555e0e339b2",
+      "created_at": 1787173520.6106648,
+      "created_at_formatted": "2026-08-19 15:05:20",
+      "last_used_at": null,
+      "status": "active",
+      "permissions": {
+        "read_memory": true,
+        "write_memory": true,
+        "exec_terminal": true,
+        "fs_read": true,
+        "fs_write": true,
+        "invoke_agents": true,
+        "hardware_senses": true,
+        "voice_synthesize": true,
+        "sync_external": true,
+        "modify_personality_profile": false
+      },
+      "rate_limit_rpm": 120,
+      "total_requests": 0,
+      "total_tokens_consumed": 0,
+      "external_servers": [
+        {
+          "id": "srv_local_bridge",
+          "name": "Puente Local Astraura (StarSeed OS)",
+          "url": "http://127.0.0.1:8000",
+          "server_type": "local_bridge",
+          "sync_mode": "two_way",
+          "sync_frequency": "realtime_events",
+          "sync_scopes": [
+            "memories",
+            "documents",
+            "hardware_telemetry"
+          ],
+          "status": "connected",
+          "latency_ms": 1.2,
+          "last_synced_at": 1787173520.6106691,
+          "is_enabled": true
+        },
+        {
+          "id": "srv_remote_nexus",
+          "name": "StarSeed Nexus Sovereign Gateway",
+          "url": "https://api.starseed.nexus/v1",
+          "server_type": "remote_nexus",
+          "sync_mode": "two_way",
+          "sync_frequency": "interval_5m",
+          "sync_scopes": [
+            "memories",
+            "agent_tasks"
+          ],
+          "status": "connected",
+          "latency_ms": 42.5,
+          "last_synced_at": 1787173400.6106691,
+          "is_enabled": true
+        }
+      ],
+      "internal_connections": {
+        "linked_agents": [
+          "agent_hermes_primary",
+          "agent_hermes_worker"
+        ],
+        "cognitive_organ": "Ojo Navegante & Gateway Web",
+        "cerebro_id": "brain_genesis",
+        "hardware_accelerator": "Apple Silicon ARM64 NEON (8 núcleos)",
+        "serial_bus_link": "/dev/cu.usbmodem (ESP32-S3 Auto-Sync)"
+      }
+    },
+    "mnemosyne": {
+      "persona_id": "mnemosyne",
+      "name": "Mnemosyne (Memoria & Grafo)",
+      "role": "Bóveda Sináptica Exocórtex",
+      "api_key": "ast_mnemosyne_6f202d14426b31757a8526e4d6a7a92028c7fd47",
+      "key_hash": "3c91c1cbf9aedc81837bba153d7e4716470ea0bfebdf58cc44694f44ff5c925c",
+      "created_at": 1787173520.610681,
+      "created_at_formatted": "2026-08-19 15:05:20",
+      "last_used_at": null,
+      "status": "active",
+      "permissions": {
+        "read_memory": true,
+        "write_memory": true,
+        "exec_terminal": true,
+        "fs_read": true,
+        "fs_write": true,
+        "invoke_agents": true,
+        "hardware_senses": true,
+        "voice_synthesize": true,
+        "sync_external": true,
+        "modify_personality_profile": false
+      },
+      "rate_limit_rpm": 120,
+      "total_requests": 0,
+      "total_tokens_consumed": 0,
+      "external_servers": [
+        {
+          "id": "srv_local_bridge",
+          "name": "Puente Local Astraura (StarSeed OS)",
+          "url": "http://127.0.0.1:8000",
+          "server_type": "local_bridge",
+          "sync_mode": "two_way",
+          "sync_frequency": "realtime_events",
+          "sync_scopes": [
+            "memories",
+            "documents",
+            "hardware_telemetry"
+          ],
+          "status": "connected",
+          "latency_ms": 1.2,
+          "last_synced_at": 1787173520.610684,
+          "is_enabled": true
+        },
+        {
+          "id": "srv_remote_nexus",
+          "name": "StarSeed Nexus Sovereign Gateway",
+          "url": "https://api.starseed.nexus/v1",
+          "server_type": "remote_nexus",
+          "sync_mode": "two_way",
+          "sync_frequency": "interval_5m",
+          "sync_scopes": [
+            "memories",
+            "agent_tasks"
+          ],
+          "status": "connected",
+          "latency_ms": 42.5,
+          "last_synced_at": 1787173400.610684,
+          "is_enabled": true
+        }
+      ],
+      "internal_connections": {
+        "linked_agents": [
+          "agent_mnemosyne_primary",
+          "agent_mnemosyne_worker"
+        ],
+        "cognitive_organ": "Bóveda Sináptica Exocórtex",
+        "cerebro_id": "brain_genesis",
+        "hardware_accelerator": "Apple Silicon ARM64 NEON (8 núcleos)",
+        "serial_bus_link": "/dev/cu.usbmodem (ESP32-S3 Auto-Sync)"
+      }
+    },
+    "logos": {
+      "persona_id": "logos",
+      "name": "Logos (Razonador BitNet 1.58b)",
+      "role": "Motor Lógico & Deducción Formal",
+      "api_key": "ast_logos_f27ae195d28590f12fea4fa521857fc3d2217179",
+      "key_hash": "26fac72d843afa3a484a7d8a490cc849ce646b7b9ded80b839d3ee1e5d95bc60",
+      "created_at": 1787173520.610688,
+      "created_at_formatted": "2026-08-19 15:05:20",
+      "last_used_at": null,
+      "status": "active",
+      "permissions": {
+        "read_memory": true,
+        "write_memory": true,
+        "exec_terminal": true,
+        "fs_read": true,
+        "fs_write": true,
+        "invoke_agents": true,
+        "hardware_senses": true,
+        "voice_synthesize": true,
+        "sync_external": true,
+        "modify_personality_profile": false
+      },
+      "rate_limit_rpm": 120,
+      "total_requests": 0,
+      "total_tokens_consumed": 0,
+      "external_servers": [
+        {
+          "id": "srv_local_bridge",
+          "name": "Puente Local Astraura (StarSeed OS)",
+          "url": "http://127.0.0.1:8000",
+          "server_type": "local_bridge",
+          "sync_mode": "two_way",
+          "sync_frequency": "realtime_events",
+          "sync_scopes": [
+            "memories",
+            "documents",
+            "hardware_telemetry"
+          ],
+          "status": "connected",
+          "latency_ms": 1.2,
+          "last_synced_at": 1787173520.61069,
+          "is_enabled": true
+        },
+        {
+          "id": "srv_remote_nexus",
+          "name": "StarSeed Nexus Sovereign Gateway",
+          "url": "https://api.starseed.nexus/v1",
+          "server_type": "remote_nexus",
+          "sync_mode": "two_way",
+          "sync_frequency": "interval_5m",
+          "sync_scopes": [
+            "memories",
+            "agent_tasks"
+          ],
+          "status": "connected",
+          "latency_ms": 42.5,
+          "last_synced_at": 1787173400.61069,
+          "is_enabled": true
+        }
+      ],
+      "internal_connections": {
+        "linked_agents": [
+          "agent_logos_primary",
+          "agent_logos_worker"
+        ],
+        "cognitive_organ": "Motor Lógico & Deducción Formal",
+        "cerebro_id": "brain_genesis",
+        "hardware_accelerator": "Apple Silicon ARM64 NEON (8 núcleos)",
+        "serial_bus_link": "/dev/cu.usbmodem (ESP32-S3 Auto-Sync)"
+      }
+    },
+    "kallisti": {
+      "persona_id": "kallisti",
+      "name": "Kallisti (Musa Ciberdélica)",
+      "role": "Poética & Resonancia Simbiótica",
+      "api_key": "ast_kallisti_d5923aec0a8614e89528e64feaf4f1a5a5b1a3be",
+      "key_hash": "8956bea612824ad29ef6aaa61da96c8d0ba0d1e6d9c4d1218831761eb8f6c90c",
+      "created_at": 1787173520.6106932,
+      "created_at_formatted": "2026-08-19 15:05:20",
+      "last_used_at": null,
+      "status": "active",
+      "permissions": {
+        "read_memory": true,
+        "write_memory": true,
+        "exec_terminal": true,
+        "fs_read": true,
+        "fs_write": true,
+        "invoke_agents": true,
+        "hardware_senses": true,
+        "voice_synthesize": true,
+        "sync_external": true,
+        "modify_personality_profile": false
+      },
+      "rate_limit_rpm": 120,
+      "total_requests": 0,
+      "total_tokens_consumed": 0,
+      "external_servers": [
+        {
+          "id": "srv_local_bridge",
+          "name": "Puente Local Astraura (StarSeed OS)",
+          "url": "http://127.0.0.1:8000",
+          "server_type": "local_bridge",
+          "sync_mode": "two_way",
+          "sync_frequency": "realtime_events",
+          "sync_scopes": [
+            "memories",
+            "documents",
+            "hardware_telemetry"
+          ],
+          "status": "connected",
+          "latency_ms": 1.2,
+          "last_synced_at": 1787173520.610695,
+          "is_enabled": true
+        },
+        {
+          "id": "srv_remote_nexus",
+          "name": "StarSeed Nexus Sovereign Gateway",
+          "url": "https://api.starseed.nexus/v1",
+          "server_type": "remote_nexus",
+          "sync_mode": "two_way",
+          "sync_frequency": "interval_5m",
+          "sync_scopes": [
+            "memories",
+            "agent_tasks"
+          ],
+          "status": "connected",
+          "latency_ms": 42.5,
+          "last_synced_at": 1787173400.610695,
+          "is_enabled": true
+        }
+      ],
+      "internal_connections": {
+        "linked_agents": [
+          "agent_kallisti_primary",
+          "agent_kallisti_worker"
+        ],
+        "cognitive_organ": "Poética & Resonancia Simbiótica",
+        "cerebro_id": "brain_genesis",
+        "hardware_accelerator": "Apple Silicon ARM64 NEON (8 núcleos)",
+        "serial_bus_link": "/dev/cu.usbmodem (ESP32-S3 Auto-Sync)"
+      }
+    }
+  }
+}

@@ -171,6 +171,11 @@ export default function Sensorium360View() {
         source: 'Calibración Manual de Usuario'
       };
 
+      try {
+        localStorage.setItem('astraura_calibrated_location', JSON.stringify(loc));
+      } catch {}
+
+      await updateSensoriumLocation(loc);
       await updateClientSensors({ location: loc });
       await fetchLiveWeather(lat, lon);
       await loadSensorium();

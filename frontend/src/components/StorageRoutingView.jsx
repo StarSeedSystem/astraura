@@ -329,9 +329,16 @@ export default function StorageRoutingView() {
                 </div>
 
                 <div className="text-[10px] text-slate-300 space-y-0.5">
-                  <div className="flex justify-between">
+                  <div className="flex justify-between items-center">
                     <span className="text-slate-400">Ruta:</span>
-                    <span className="truncate max-w-[120px] text-slate-200">{dev.mountpoint}</span>
+                    <button
+                      type="button"
+                      onClick={() => window.dispatchEvent(new CustomEvent('open-file-viewer', { detail: { path: dev.mountpoint } }))}
+                      className="truncate max-w-[130px] text-cyan-400 hover:text-cyan-200 hover:underline cursor-pointer"
+                      title="Explorar este volumen en el visor soberano / Finder"
+                    >
+                      {dev.mountpoint}
+                    </button>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-400">Libre:</span>
@@ -339,13 +346,23 @@ export default function StorageRoutingView() {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => openCreateModal(dev.mountpoint)}
-                  className="w-full py-1 rounded-lg bg-white/5 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-200 border border-white/5 hover:border-cyan-500/30 text-[10px] font-bold flex items-center justify-center gap-1 cursor-pointer transition-all"
-                >
-                  <Plus className="w-3 h-3" />
-                  <span>Crear Regla para este Medio</span>
-                </button>
+                <div className="flex gap-1.5">
+                  <button
+                    onClick={() => window.dispatchEvent(new CustomEvent('open-file-viewer', { detail: { path: dev.mountpoint } }))}
+                    className="py-1 px-2 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/30 text-[10px] font-bold flex items-center justify-center gap-1 cursor-pointer transition-all"
+                    title="Explorar Archivos en este Medio"
+                  >
+                    <Folder className="w-3 h-3 text-amber-400" />
+                    <span>Explorar</span>
+                  </button>
+                  <button
+                    onClick={() => openCreateModal(dev.mountpoint)}
+                    className="flex-1 py-1 rounded-lg bg-white/5 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-200 border border-white/5 hover:border-cyan-500/30 text-[10px] font-bold flex items-center justify-center gap-1 cursor-pointer transition-all"
+                  >
+                    <Plus className="w-3 h-3" />
+                    <span>Regla</span>
+                  </button>
+                </div>
               </div>
             ))}
           </div>

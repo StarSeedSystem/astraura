@@ -33,7 +33,16 @@ import {
   Key,
   GitBranch,
   ArrowRight,
-  Bot
+  Bot,
+  Crown,
+  FolderTree,
+  FolderOpen,
+  Shield,
+  ListChecks,
+  MessageSquareQuote,
+  Compass,
+  FileText,
+  Settings
 } from 'lucide-react';
 import { 
   fetchSwarmStatus, 
@@ -48,17 +57,53 @@ import {
   fetchAgents,
   saveAgent,
   deleteAgent,
-  toggleAgentImagination
+  toggleAgentImagination,
+  fetchDirectorStatus,
+  steerDirectorSwarm,
+  addDirectorMemory,
+  triggerDirectorCycle,
+  fetchDirectorConfig,
+  updateDirectorConfig,
+  triggerDirectorImaginationCycle
 } from '../services/api';
 import AgentEditorModal from './AgentEditorModal';
 import AgentApiManagerModal from './AgentApiManagerModal';
 
 export default function AgentSwarmView() {
   const [swarmData, setSwarmData] = useState(null);
+  const [directorData, setDirectorData] = useState(null);
   const [agentsList, setAgentsList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeSubTab, setActiveSubTab] = useState('tasks'); // 'tasks', 'schedules', 'agents', 'telemetry'
+  const [activeSubTab, setActiveSubTab] = useState('director'); // 'director', 'tasks', 'schedules', 'agents', 'telemetry'
   const [toastMsg, setToastMsg] = useState('');
+
+  // Director Directive Input & Memory State
+  const [directiveInput, setDirectiveInput] = useState('');
+  const [isSteeringSwarm, setIsSteeringSwarm] = useState(false);
+  const [isAddMemoryModalOpen, setIsAddMemoryModalOpen] = useState(false);
+  const [newMemoryForm, setNewMemoryForm] = useState({
+    title: '',
+    content: '',
+    category: 'governance',
+    importance: 'high',
+    tags: ''
+  });
+
+  // Director Configuration & Preferences State
+  const [isDirectorConfigModalOpen, setIsDirectorConfigModalOpen] = useState(false);
+  const [isSavingDirectorConfig, setIsSavingDirectorConfig] = useState(false);
+  const [isOrchestratingImagination, setIsOrchestratingImagination] = useState(false);
+  const [directorConfigForm, setDirectorConfigForm] = useState({
+    orchestration_mode: 'autonomous_proactive',
+    quality_threshold: 80,
+    supervision_interval_seconds: 10,
+    auto_route_to_projects: true,
+    auto_inject_axioms: true,
+    auto_trigger_imagination: true,
+    max_agent_concurrency: 6,
+    m1_hardware_limit_percent: 60,
+    default_master_directive: 'Supervisión continua, balance de hardware M1 y enrutamiento inteligente de activos a proyectos.'
+  });
 
   // Agent Vault Modals
   const [isAgentEditorOpen, setIsAgentEditorOpen] = useState(false);
@@ -87,22 +132,115 @@ export default function AgentSwarmView() {
 
   const loadSwarm = async () => {
     try {
-      const [sData, aData] = await Promise.all([
+      const [sData, aData, dData] = await Promise.all([
         fetchSwarmStatus(),
-        fetchAgents()
+        fetchAgents(),
+        fetchDirectorStatus()
       ]);
       if (sData) setSwarmData(sData);
       if (aData && aData.agents) setAgentsList(aData.agents);
+      if (dData) {
+        setDirectorData(dData);
+        if (dData.config) {
+          setDirectorConfigForm(prev => ({ ...prev, ...dData.config }));
+        }
+      }
     } catch (err) {
-      console.warn('Error fetching swarm/agents status:', err);
+      console.warn('Error fetching swarm/agents/director status:', err);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleSaveDirectorConfig = async (e) => {
+    if (e) e.preventDefault();
+    setIsSavingDirectorConfig(true);
+    try {
+      const res = await updateDirectorConfig(directorConfigForm);
+      if (res && res.success) {
+        setToastMsg('⚙️ Ajustes y preferencias del Director actualizados y guardados en la bóveda.');
+        setTimeout(() => setToastMsg(''), 4000);
+        setIsDirectorConfigModalOpen(false);
+        loadSwarm();
+      }
+    } catch (err) {
+      console.error('Error saving director config:', err);
+    } finally {
+      setIsSavingDirectorConfig(false);
+    }
+  };
+
+  const handleTriggerSupervisedImagination = async () => {
+    setIsOrchestratingImagination(true);
+    try {
+      const res = await triggerDirectorImaginationCycle(
+        'proj_astraura_core',
+        'Optimización continua y desarrollo creativo para Astraura Core OS'
+      );
+      if (res && res.success) {
+        setToastMsg('🌌 Proceso imaginativo intuitivo supervisado por el Director disparado con éxito.');
+        setTimeout(() => setToastMsg(''), 4000);
+        loadSwarm();
+      }
+    } catch (err) {
+      console.error('Error triggering supervised imagination:', err);
+    } finally {
+      setIsOrchestratingImagination(false);
+    }
+  };
+
+  const handleSteerDirector = async (e) => {
+    if (e) e.preventDefault();
+    if (!directiveInput.trim()) return;
+
+    try {
+      setIsSteeringSwarm(true);
+      const res = await steerDirectorSwarm(directiveInput.trim());
+      if (res && res.success) {
+        setToastMsg(`👑 Directiva aplicada por el Director: ${res.dispatched_actions?.length || 1} agentes reorientados.`);
+        setTimeout(() => setToastMsg(''), 4000);
+        setDirectiveInput('');
+        loadSwarm();
+      }
+    } catch (err) {
+      alert(`Error al emitir directiva: ${err.message}`);
+    } finally {
+      setIsSteeringSwarm(false);
+    }
+  };
+
+  const handleAddDirectorMemory = async (e) => {
+    e.preventDefault();
+    if (!newMemoryForm.title.trim() || !newMemoryForm.content.trim()) return;
+
+    try {
+      const tagsArr = newMemoryForm.tags
+        ? newMemoryForm.tags.split(',').map(t => t.trim()).filter(Boolean)
+        : ['directiva_ejecutiva'];
+
+      const res = await addDirectorMemory(
+        newMemoryForm.title.trim(),
+        newMemoryForm.content.trim(),
+        newMemoryForm.category,
+        newMemoryForm.importance,
+        tagsArr
+      );
+
+      if (res && res.success) {
+        setToastMsg(`🧠 Memoria ejecutiva asimilada en la bóveda del Director`);
+        setTimeout(() => setToastMsg(''), 3000);
+        setIsAddMemoryModalOpen(false);
+        setNewMemoryForm({ title: '', content: '', category: 'governance', importance: 'high', tags: '' });
+        loadSwarm();
+      }
+    } catch (err) {
+      alert(`Error al guardar memoria ejecutiva: ${err.message}`);
+    }
+  };
+
   useEffect(() => {
     loadSwarm();
-    const interval = setInterval(loadSwarm, 4000);
+    const interval = setInterval(loadSwarm, 2000);
     return () => clearInterval(interval);
   }, []);
 
@@ -364,6 +502,7 @@ export default function AgentSwarmView() {
       {/* Navigation Sub-Tabs */}
       <div className="flex items-center gap-2 border-b border-white/10 pb-2 overflow-x-auto text-xs font-mono">
         {[
+          { id: 'director', label: '👑 Director Orquestador Supremo', icon: Crown, count: directorData?.decision_history?.length || 0 },
           { id: 'tasks', label: '⚡ Tareas Concurrentes en Vivo', icon: Activity, count: swarmData?.active_tasks?.length || 0 },
           { id: 'schedules', label: '⏰ Reactivaciones Programadas', icon: Clock, count: swarmData?.schedules?.length || 0 },
           { id: 'agents', label: '🤖 Matriz de Agentes Especializados', icon: Users, count: swarmData?.agents?.length || 0 },
@@ -392,6 +531,261 @@ export default function AgentSwarmView() {
           );
         })}
       </div>
+
+      {/* ================= TAB 0: DIRECTOR ORCHESTRATOR SUPREME VIEW ================= */}
+      {activeSubTab === 'director' && (
+        <div className="space-y-6 animate-fade-in font-mono text-xs">
+          {/* Executive Directives Console */}
+          <div className="p-5 rounded-3xl bg-gradient-to-r from-[#0d1322] via-[#0f172a] to-[#120f24] border border-cyan-500/40 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2.5 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 shadow-md">
+                  <Crown className="w-5 h-5 animate-pulse" />
+                </div>
+                <div>
+                  <h2 className="text-base font-display font-black text-white flex items-center gap-2">
+                    {directorData?.director?.name || 'Astraura Director // Metis Prime'}
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-bold">
+                      Director Supremo
+                    </span>
+                  </h2>
+                  <p className="text-xs text-slate-400 font-mono">
+                    {directorData?.director?.role || 'Director General del Enjambre & Gobernador Ejecutivo de Tareas y Contextos'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                <button
+                  onClick={handleTriggerSupervisedImagination}
+                  disabled={isOrchestratingImagination}
+                  className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500/20 to-pink-500/20 hover:from-cyan-500/30 hover:to-pink-500/30 border border-pink-500/40 text-pink-300 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-md"
+                >
+                  <Sparkles className={`w-3.5 h-3.5 ${isOrchestratingImagination ? 'animate-spin' : ''}`} />
+                  <span>{isOrchestratingImagination ? 'Orquestando...' : '🌌 Disparar Imaginación'}</span>
+                </button>
+
+                <button
+                  onClick={() => setIsAddMemoryModalOpen(true)}
+                  className="px-3 py-1.5 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-purple-300 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>+ Memoria Ejecutiva</span>
+                </button>
+
+                <button
+                  onClick={() => setIsDirectorConfigModalOpen(true)}
+                  className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/20 text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-md"
+                >
+                  <Settings className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>⚙️ Ajustes & Preferencias</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Director Preferences Summary Ribbon */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 p-3 bg-black/40 rounded-2xl border border-white/5 text-[11px]">
+              <div>
+                <span className="text-[10px] text-slate-500 block">Modo Gobernanza</span>
+                <span className="font-bold text-cyan-300 capitalize">{directorData?.config?.orchestration_mode?.replace('_', ' ') || 'Autónomo'}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-500 block">Umbral de Calidad</span>
+                <span className="font-bold text-emerald-300">{directorData?.config?.quality_threshold || 80}% Mínimo</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-500 block">Auto-Enrutamiento</span>
+                <span className="font-bold text-purple-300">{directorData?.config?.auto_route_to_projects !== false ? '✅ Habilitado' : '❌ Desactivado'}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-500 block">Auto-Axiomas</span>
+                <span className="font-bold text-amber-300">{directorData?.config?.auto_inject_axioms !== false ? '✅ Habilitado' : '❌ Desactivado'}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-500 block">Imaginación Auto</span>
+                <span className="font-bold text-pink-300">{directorData?.config?.auto_trigger_imagination !== false ? '✅ Habilitada' : '❌ Desactivada'}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-500 block">Concurrencia M1</span>
+                <span className="font-bold text-cyan-300">{directorData?.config?.max_agent_concurrency || 6} Hilos</span>
+              </div>
+            </div>
+
+            {/* Directive Input Form */}
+            <form onSubmit={handleSteerDirector} className="space-y-2 pt-2">
+              <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                <MessageSquareQuote className="w-4 h-4 text-cyan-400" />
+                Emitir Directiva Maestra de Dirección al Enjambre:
+              </label>
+              <div className="flex gap-2">
+                <textarea
+                  rows={2}
+                  value={directiveInput}
+                  onChange={(e) => setDirectiveInput(e.target.value)}
+                  placeholder="Ej: Priorizar la optimización del microkernel ARM NEON para Hephaestus y enrutar las investigaciones de papers a la memoria del proyecto Core OS..."
+                  className="flex-1 bg-black/50 border border-white/15 rounded-2xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-mono resize-none leading-relaxed"
+                />
+                <button
+                  type="submit"
+                  disabled={isSteeringSwarm}
+                  className="px-5 rounded-2xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-black flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-cyan-950/40 transition-all min-w-[120px]"
+                >
+                  {isSteeringSwarm ? (
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <Compass className="w-4 h-4" />
+                      <span>Dirigir Enjambre</span>
+                    </>
+                  )}
+                </button>
+              </div>
+              <div className="text-[11px] text-slate-400 flex items-center gap-2 pt-1">
+                <span className="text-cyan-400 font-bold">Directiva Activa:</span>
+                <span className="text-slate-300 italic">"{directorData?.director?.active_directive || 'Supervisión continua y balance de hardware M1.'}"</span>
+              </div>
+            </form>
+          </div>
+
+          {/* Holistic Context Omniscient Overview Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="p-4 rounded-2xl bg-[#0b0e18] border border-white/10 space-y-2">
+              <div className="flex items-center justify-between text-slate-400">
+                <span className="flex items-center gap-1.5 text-cyan-300 font-bold">
+                  <FolderTree className="w-4 h-4" /> Proyectos
+                </span>
+                <span className="text-white font-bold">{directorData?.holistic_context?.projects_count || 0}</span>
+              </div>
+              <p className="text-[11px] text-slate-400">Proyectos soberanos enlazados y alineados a metas de la IA.</p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-[#0b0e18] border border-white/10 space-y-2">
+              <div className="flex items-center justify-between text-slate-400">
+                <span className="flex items-center gap-1.5 text-purple-300 font-bold">
+                  <Brain className="w-4 h-4" /> Cerebros
+                </span>
+                <span className="text-white font-bold">6 Cerebros</span>
+              </div>
+              <p className="text-[11px] text-slate-400">Contextos multidimensionales activos (Génesis, Atenea, Hephaestus...).</p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-[#0b0e18] border border-white/10 space-y-2">
+              <div className="flex items-center justify-between text-slate-400">
+                <span className="flex items-center gap-1.5 text-emerald-300 font-bold">
+                  <ShieldCheck className="w-4 h-4" /> Verificaciones
+                </span>
+                <span className="text-emerald-400 font-bold">{directorData?.director?.verifications_completed_count || 0} Auditadas</span>
+              </div>
+              <p className="text-[11px] text-slate-400">Entregables analizados con score de calidad técnica.</p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-[#0b0e18] border border-white/10 space-y-2">
+              <div className="flex items-center justify-between text-slate-400">
+                <span className="flex items-center gap-1.5 text-pink-300 font-bold">
+                  <Network className="w-4 h-4" /> Enrutamientos
+                </span>
+                <span className="text-pink-400 font-bold">{directorData?.director?.routings_performed_count || 0} Adjuntos</span>
+              </div>
+              <p className="text-[11px] text-slate-400">Resultados conectados a Proyectos, Carpetas y Memorias.</p>
+            </div>
+          </div>
+
+          {/* Dual Column: Decision & Verification History + Executive Memories Vault */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Column 1: Decision & Verification History */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-white font-display flex items-center gap-2">
+                  <ListChecks className="w-4 h-4 text-cyan-400" />
+                  Bitácora de Decisiones & Enrutamientos
+                </h3>
+                <span className="text-[10px] text-slate-400">
+                  {directorData?.decision_history?.length || 0} Registros
+                </span>
+              </div>
+
+              <div className="space-y-2.5 max-h-[420px] overflow-y-auto custom-scrollbar pr-1">
+                {(directorData?.decision_history || []).map((dec, idx) => (
+                  <div key={idx} className="p-3.5 rounded-2xl bg-[#0b0e18] border border-white/10 space-y-2">
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="font-bold text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
+                        {dec.action}
+                      </span>
+                      <span className="text-slate-400">
+                        {dec.timestamp ? new Date(dec.timestamp * 1000).toLocaleTimeString() : 'N/A'}
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      {dec.reasoning || dec.directive}
+                    </p>
+
+                    <div className="pt-2 border-t border-white/5 flex flex-wrap items-center gap-2 text-[10px]">
+                      {dec.target_project && (
+                        <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                          📁 {dec.target_project}
+                        </span>
+                      )}
+                      {dec.target_cerebro && (
+                        <span className="px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                          🧠 {dec.target_cerebro}
+                        </span>
+                      )}
+                      {dec.agent_id && (
+                        <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                          🤖 {dec.agent_id}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Column 2: Executive Memory Vault of the Director */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-white font-display flex items-center gap-2">
+                  <Brain className="w-4 h-4 text-purple-400" />
+                  Bóveda de Memorias Propias del Director
+                </h3>
+                <span className="text-[10px] text-slate-400">
+                  {directorData?.executive_memories?.length || 0} Axiomas
+                </span>
+              </div>
+
+              <div className="space-y-2.5 max-h-[420px] overflow-y-auto custom-scrollbar pr-1">
+                {(directorData?.executive_memories || []).map((mem, idx) => (
+                  <div key={idx} className="p-3.5 rounded-2xl bg-[#0b0e18] border border-purple-500/20 space-y-1.5">
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="font-bold text-purple-300 flex items-center gap-1">
+                        💡 {mem.title}
+                      </span>
+                      <span className="text-[9px] px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-200 uppercase font-bold">
+                        {mem.importance || 'medium'}
+                      </span>
+                    </div>
+
+                    <p className="text-[11px] text-slate-300 leading-relaxed">
+                      {mem.content}
+                    </p>
+
+                    {mem.tags && mem.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 pt-1">
+                        {mem.tags.map((t, tidx) => (
+                          <span key={tidx} className="text-[9px] px-1.5 py-0.5 rounded bg-white/5 text-slate-400">
+                            #{t}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* TAB 1: CONCURRENT ACTIVE TASKS */}
       {activeSubTab === 'tasks' && (
@@ -440,8 +834,8 @@ export default function AgentSwarmView() {
                       </span>
                     </div>
 
-                    {/* Progress Bar */}
-                    <div className="space-y-1">
+                    {/* Progress Bar & Phase */}
+                    <div className="space-y-1.5">
                       <div className="flex justify-between text-[10px]">
                         <span className="text-slate-400">Agente: <b className="text-cyan-300">{task.agent_name || task.agent_id}</b></span>
                         <span className="text-slate-300 font-bold">{task.progress}%</span>
@@ -451,6 +845,28 @@ export default function AgentSwarmView() {
                           className="h-full bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full transition-all duration-500"
                           style={{ width: `${task.progress}%` }}
                         />
+                      </div>
+                      <div className="flex items-center justify-between text-[9px] text-cyan-400 pt-0.5">
+                        <span className="font-mono flex items-center gap-1">
+                          🔄 {task.phase_label || 'Fase 1/4: Inspección de Archivos & Telemetría'}
+                        </span>
+                        {task.real_memory_mb && (
+                          <span className="text-slate-400 font-mono">
+                            RAM: {task.real_memory_mb} MB • PID: {task.real_pid || 'M1'}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Real Physical Location & Target Project */}
+                    <div className="p-2 bg-black/40 rounded-xl border border-white/5 text-[10px] space-y-1">
+                      <div className="flex items-center justify-between text-slate-400">
+                        <span className="truncate flex items-center gap-1">
+                          📁 <span className="text-slate-300 font-mono">{task.target_folder_path || '/backend/app'}</span>
+                        </span>
+                        <span className="px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 font-bold">
+                          {task.target_project_id || 'proj_astraura_core'}
+                        </span>
                       </div>
                     </div>
 
@@ -998,15 +1414,288 @@ export default function AgentSwarmView() {
         />
       )}
 
-      {isAgentApiModalOpen && selectedApiAgent && (
-        <AgentApiManagerModal
-          isOpen={isAgentApiModalOpen}
-          onClose={() => {
-            setIsAgentApiModalOpen(false);
-            setSelectedApiAgent(null);
-          }}
-          agent={selectedApiAgent}
-        />
+      {/* MODAL AÑADIR MEMORIA EJECUTIVA AL DIRECTOR */}
+      {isAddMemoryModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in font-mono text-xs">
+          <div className="bg-[#0b0e18] border border-purple-500/40 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden space-y-4 p-5">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <h3 className="text-sm font-display font-bold text-white flex items-center gap-2">
+                <Crown className="w-4 h-4 text-purple-400" />
+                Inyectar Memoria / Axioma Ejecutivo al Director
+              </h3>
+              <button 
+                onClick={() => setIsAddMemoryModalOpen(false)}
+                className="text-slate-400 hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleAddDirectorMemory} className="space-y-3">
+              <div>
+                <label className="block text-slate-400 mb-1">Título del Axioma / Memoria:</label>
+                <input
+                  type="text"
+                  required
+                  value={newMemoryForm.title}
+                  onChange={e => setNewMemoryForm({...newMemoryForm, title: e.target.value})}
+                  placeholder="Ej: Protocolo de Enrutamiento para Shaders GLSL"
+                  className="w-full p-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-400 mb-1">Contenido de la Memoria Ejecutiva:</label>
+                <textarea
+                  rows={4}
+                  required
+                  value={newMemoryForm.content}
+                  onChange={e => setNewMemoryForm({...newMemoryForm, content: e.target.value})}
+                  placeholder="Describe la directiva o principio que el Director debe recordar para la toma de decisiones..."
+                  className="w-full p-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:outline-none focus:border-purple-500 resize-none leading-relaxed"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-400 mb-1">Categoría:</label>
+                  <select
+                    value={newMemoryForm.category}
+                    onChange={e => setNewMemoryForm({...newMemoryForm, category: e.target.value})}
+                    className="w-full p-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs"
+                  >
+                    <option value="governance">Gobernanza & Mando</option>
+                    <option value="quality_assurance">Auditoría & Calidad</option>
+                    <option value="routing_topology">Topología de Enrutamiento</option>
+                    <option value="hardware_governance">Silicio M1 & Hardware</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-400 mb-1">Importancia:</label>
+                  <select
+                    value={newMemoryForm.importance}
+                    onChange={e => setNewMemoryForm({...newMemoryForm, importance: e.target.value})}
+                    className="w-full p-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs"
+                  >
+                    <option value="critical">Crítica</option>
+                    <option value="high">Alta</option>
+                    <option value="medium">Media</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-400 mb-1">Tags (separados por coma):</label>
+                <input
+                  type="text"
+                  value={newMemoryForm.tags}
+                  onChange={e => setNewMemoryForm({...newMemoryForm, tags: e.target.value})}
+                  placeholder="directiva, shaders, core_os, arm64"
+                  className="w-full p-2 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setIsAddMemoryModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold cursor-pointer"
+                >
+                  💾 Inyectar Memoria
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL AJUSTES Y CONFIGURACIÓN DEL DIRECTOR ORQUESTRADOR */}
+      {isDirectorConfigModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in font-mono text-xs">
+          <div className="bg-[#0b0e18] border border-cyan-500/50 rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden space-y-4 p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <h3 className="text-base font-display font-bold text-white flex items-center gap-2.5">
+                <Settings className="w-5 h-5 text-cyan-400" />
+                Ajustes, Configuración y Preferencias del Director Supremo
+              </h3>
+              <button 
+                onClick={() => setIsDirectorConfigModalOpen(false)}
+                className="text-slate-400 hover:text-white cursor-pointer text-sm"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveDirectorConfig} className="space-y-4">
+              {/* Mode Selection */}
+              <div>
+                <label className="block text-slate-300 font-bold mb-1.5">
+                  Modo de Orquestación & Gobernanza:
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { id: 'autonomous_proactive', label: '🚀 Autónomo Proactivo', desc: 'Despacha e investiga de forma continua sin esperar órdenes.' },
+                    { id: 'user_guided', label: '🧭 Asistido por Usuario', desc: 'Prioriza exclusivamente directivas emitidas en la consola.' },
+                    { id: 'strict_quality', label: '🛡️ Calidad Estricta (95%+)', desc: 'Auditoría rigurosa. Rechaza cualquier artefacto imperfecto.' },
+                    { id: 'eco_silicon', label: '🌱 Eco Silicio Apple M1', desc: 'Limita el uso de CPU a un solo núcleo para bajo consumo.' }
+                  ].map(m => (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => setDirectorConfigForm({ ...directorConfigForm, orchestration_mode: m.id })}
+                      className={`p-3 rounded-2xl border text-left cursor-pointer transition-all ${
+                        directorConfigForm.orchestration_mode === m.id
+                          ? 'bg-cyan-500/20 border-cyan-400 text-white shadow-md'
+                          : 'bg-black/40 border-white/10 text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      <div className="font-bold text-xs text-cyan-300 mb-1">{m.label}</div>
+                      <div className="text-[10px] text-slate-400 leading-tight">{m.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Quality Threshold Slider */}
+              <div className="p-3.5 bg-black/40 rounded-2xl border border-white/5 space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span className="text-slate-300 font-bold">Umbral Mínimo de Calidad Técnica para Aprobación:</span>
+                  <span className="text-cyan-400 font-bold text-sm">{directorConfigForm.quality_threshold}%</span>
+                </div>
+                <input
+                  type="range"
+                  min={50}
+                  max={98}
+                  step={1}
+                  value={directorConfigForm.quality_threshold}
+                  onChange={e => setDirectorConfigForm({ ...directorConfigForm, quality_threshold: parseInt(e.target.value) })}
+                  className="w-full accent-cyan-400 cursor-pointer"
+                />
+                <div className="text-[10px] text-slate-500 flex justify-between">
+                  <span>50% (Permisivo)</span>
+                  <span>80% (Recomendado)</span>
+                  <span>98% (Máxima Exigencia)</span>
+                </div>
+              </div>
+
+              {/* Switches Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="p-3 bg-black/40 rounded-2xl border border-white/5 space-y-2">
+                  <span className="text-xs text-slate-300 font-bold block">Auto-Enrutamiento</span>
+                  <p className="text-[10px] text-slate-400">Adjunta automáticamente entregables a Proyectos y Carpetas.</p>
+                  <label className="flex items-center gap-2 cursor-pointer pt-1">
+                    <input
+                      type="checkbox"
+                      checked={directorConfigForm.auto_route_to_projects}
+                      onChange={e => setDirectorConfigForm({ ...directorConfigForm, auto_route_to_projects: e.target.checked })}
+                      className="accent-cyan-400 w-4 h-4"
+                    />
+                    <span className="text-xs text-white">Activar</span>
+                  </label>
+                </div>
+
+                <div className="p-3 bg-black/40 rounded-2xl border border-white/5 space-y-2">
+                  <span className="text-xs text-slate-300 font-bold block">Auto-Axiomas Memoria</span>
+                  <p className="text-[10px] text-slate-400">Inyecta lecciones en la memoria StarSeed / Mem0.</p>
+                  <label className="flex items-center gap-2 cursor-pointer pt-1">
+                    <input
+                      type="checkbox"
+                      checked={directorConfigForm.auto_inject_axioms}
+                      onChange={e => setDirectorConfigForm({ ...directorConfigForm, auto_inject_axioms: e.target.checked })}
+                      className="accent-purple-400 w-4 h-4"
+                    />
+                    <span className="text-xs text-white">Activar</span>
+                  </label>
+                </div>
+
+                <div className="p-3 bg-black/40 rounded-2xl border border-white/5 space-y-2">
+                  <span className="text-xs text-slate-300 font-bold block">Imaginación Intuitiva</span>
+                  <p className="text-[10px] text-slate-400">Dispara ciclos creativos autónomos en segundo plano.</p>
+                  <label className="flex items-center gap-2 cursor-pointer pt-1">
+                    <input
+                      type="checkbox"
+                      checked={directorConfigForm.auto_trigger_imagination}
+                      onChange={e => setDirectorConfigForm({ ...directorConfigForm, auto_trigger_imagination: e.target.checked })}
+                      className="accent-pink-400 w-4 h-4"
+                    />
+                    <span className="text-xs text-white">Activar</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Concurrency & M1 Limit Sliders */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="p-3 bg-black/40 rounded-2xl border border-white/5 space-y-2">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-300">Concurrencia Máxima de Agentes:</span>
+                    <span className="text-cyan-400 font-bold">{directorConfigForm.max_agent_concurrency} Agentes</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={1}
+                    max={12}
+                    value={directorConfigForm.max_agent_concurrency}
+                    onChange={e => setDirectorConfigForm({ ...directorConfigForm, max_agent_concurrency: parseInt(e.target.value) })}
+                    className="w-full accent-cyan-400 cursor-pointer"
+                  />
+                </div>
+
+                <div className="p-3 bg-black/40 rounded-2xl border border-white/5 space-y-2">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-300">Límite de CPU Silicio M1:</span>
+                    <span className="text-emerald-400 font-bold">{directorConfigForm.m1_hardware_limit_percent}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={10}
+                    max={80}
+                    step={5}
+                    value={directorConfigForm.m1_hardware_limit_percent}
+                    onChange={e => setDirectorConfigForm({ ...directorConfigForm, m1_hardware_limit_percent: parseInt(e.target.value) })}
+                    className="w-full accent-emerald-400 cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              {/* Default Master Directive */}
+              <div>
+                <label className="block text-slate-300 font-bold mb-1">
+                  Directiva Maestra Predeterminada:
+                </label>
+                <textarea
+                  rows={2}
+                  value={directorConfigForm.default_master_directive}
+                  onChange={e => setDirectorConfigForm({ ...directorConfigForm, default_master_directive: e.target.value })}
+                  className="w-full p-2.5 rounded-xl bg-black/50 border border-white/10 text-white font-mono text-xs focus:outline-none focus:border-cyan-500 resize-none leading-relaxed"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setIsDirectorConfigModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingDirectorConfig}
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-black shadow-lg shadow-cyan-500/25 cursor-pointer flex items-center gap-2"
+                >
+                  {isSavingDirectorConfig ? 'Guardando...' : '💾 Guardar Preferencias'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );

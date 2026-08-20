@@ -3,14 +3,14 @@
   "personas": {
     "aurora": {
       "rapport_level": 100,
-      "total_interactions": 395,
+      "total_interactions": 669,
       "domains": {
         "filosofia": 100,
         "emocional": 95,
         "creatividad": 100,
         "general": 100,
-        "memoria": 64,
-        "codigo": 62
+        "memoria": 66,
+        "codigo": 64
       },
       "inflection_offsets": {
         "pitch_delta": 2.0,
@@ -84,17 +84,19 @@
       }
     },
     "hermes": {
-      "rapport_level": 86,
-      "total_interactions": 34,
+      "rapport_level": 100,
+      "total_interactions": 75,
       "domains": {
         "red": 94,
         "web": 95,
         "agilidad": 96,
-        "general": 64
+        "general": 100,
+        "creatividad": 66
       },
       "inflection_offsets": {
         "cadence_delta": 0.05,
-        "question_inquisitiveness": 0.8400000000000001
+        "question_inquisitiveness": 1.0,
+        "expressive_exaggeration": 0.9000000000000001
       }
     },
     "unassigned": {
@@ -108,5 +110,5 @@
       }
     }
   },
-  "last_updated": 1787126431.768011
+  "last_updated": 1787196121.579183
 }

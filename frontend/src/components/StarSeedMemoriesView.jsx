@@ -1192,26 +1192,46 @@ export default function StarSeedMemoriesView() {
                 {selectedNode.type === 'context' && (
                   <div className="p-3 bg-black/50 rounded-xl border border-purple-500/30 space-y-2">
                     <span className="text-[10px] text-purple-300 font-bold block">Ruta del Sistema:</span>
-                    <p className="text-[10px] text-slate-300 bg-white/5 p-2 rounded-lg break-all">{selectedNode.path}</p>
-                    <div className="text-[10px] text-emerald-400 font-bold">✓ Indexado en Exocórtex 1.58-Bit</div>
+                    <p className="text-[10px] text-slate-300 bg-white/5 p-2 rounded-lg break-all font-mono">{selectedNode.path}</p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => window.dispatchEvent(new CustomEvent('open-file-viewer', { detail: { path: selectedNode.path } }))}
+                        className="flex-1 py-1.5 px-2 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-purple-200 text-xs font-semibold flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>Previsualizar In-App</span>
+                      </button>
+                      <button
+                        onClick={() => window.dispatchEvent(new CustomEvent('open-file-viewer', { detail: { path: selectedNode.path } }))}
+                        className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1 cursor-pointer transition-colors"
+                        title="Abrir en Finder"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>Finder</span>
+                      </button>
+                    </div>
                   </div>
                 )}
 
                 {/* MEMORY NODE CONTROLS */}
                 {selectedNode.type !== 'agent' && selectedNode.type !== 'context' && (
-                  <button
-                    onClick={() => {
-                      const matchedDoc = documents.find((d) => d.id === selectedNode.id || d.name.toLowerCase() === selectedNode.label.toLowerCase());
-                      if (matchedDoc) {
-                        setSelectedDoc(matchedDoc);
-                        setActiveSubTab('vault');
-                      }
-                    }}
-                    className="w-full py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <FileText className="w-4 h-4" />
-                    Abrir Documento en Bóveda
-                  </button>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => {
+                        const matchedDoc = documents.find((d) => d.id === selectedNode.id || d.name.toLowerCase() === selectedNode.label.toLowerCase());
+                        if (matchedDoc) {
+                          setSelectedDoc(matchedDoc);
+                          setActiveSubTab('vault');
+                        } else {
+                          window.dispatchEvent(new CustomEvent('open-file-viewer', { detail: { path: `/Users/alex/Documents/IA 1.58 bit/data/vault/memories` } }));
+                        }
+                      }}
+                      className="w-full py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      <FileText className="w-4 h-4" />
+                      Abrir en Bóveda / Visor
+                    </button>
+                  </div>
                 )}
               </div>
             ) : (

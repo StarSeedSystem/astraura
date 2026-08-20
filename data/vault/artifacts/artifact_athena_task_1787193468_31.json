@@ -1,0 +1,14 @@
+{
+  "task_id": "task_1787193468_31",
+  "agent_id": "athena",
+  "title": "Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
+  "timestamp": 1787193499.920322,
+  "target_project_id": "proj_astraura_core",
+  "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/telemetry",
+  "scanned_files_count": 0,
+  "hardware_telemetry": {
+    "pid": 37541,
+    "ram_rss_mb": 39.6,
+    "cpu_percent": 38.8
+  }
+}

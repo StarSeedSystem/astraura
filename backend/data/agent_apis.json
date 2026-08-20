@@ -1,0 +1,321 @@
+{
+  "version": "1.58.0",
+  "updated_at": 1787173520.612323,
+  "agents": {
+    "agent_aurora": {
+      "agent_id": "agent_aurora",
+      "name": "Aurora Core (Alma Viva)",
+      "role": "Orquestación Central, Empatía & Síntesis Soberana",
+      "api_key": "ast_agent_agent_aurora_c88c5b4e4a153c3e8129d8fbd1687cbc5093d7b4",
+      "key_hash": "06270c4aa78f26382ac479117717e1eb19209451b2a84d42dd3ff7b302a2bc87",
+      "created_at": 1787173520.612289,
+      "created_at_formatted": "2026-08-19 15:05:20",
+      "last_used_at": null,
+      "status": "active",
+      "permissions": {
+        "read_memory": true,
+        "write_memory": true,
+        "exec_terminal": true,
+        "fs_read": true,
+        "fs_write": true,
+        "invoke_subagents": true,
+        "hardware_senses": true,
+        "imagination_spawn": true,
+        "sync_external": true,
+        "modify_agent_config": false
+      },
+      "rate_limit_rpm": 150,
+      "total_requests": 0,
+      "total_tokens_consumed": 0,
+      "external_servers": [
+        {
+          "id": "srv_agent_bridge_agent_aurora",
+          "name": "Puente Local Aurora Core (Alma Viva)",
+          "url": "http://127.0.0.1:8000",
+          "server_type": "local_bridge",
+          "sync_mode": "two_way",
+          "sync_frequency": "realtime_events",
+          "sync_scopes": [
+            "tasks",
+            "branch_plans",
+            "memories"
+          ],
+          "status": "connected",
+          "latency_ms": 1.5,
+          "last_synced_at": 1787173520.612294,
+          "is_enabled": true
+        }
+      ]
+    },
+    "agent_hephaestus": {
+      "agent_id": "agent_hephaestus",
+      "name": "Hephaestus (Forja & Hardware)",
+      "role": "Auditoría de Código, Compilación C++ & SIMD NEON",
+      "api_key": "ast_agent_agent_hephaestus_27a2f4e8fe7c30fb1d44137d23fb5253042b1a94",
+      "key_hash": "0496a3fdf80eb3e49d3e897950a84f0f10b63e1b26e91a2d8a9b991eeeed1554",
+      "created_at": 1787173520.612298,
+      "created_at_formatted": "2026-08-19 15:05:20",
+      "last_used_at": null,
+      "status": "active",
+      "permissions": {
+        "read_memory": true,
+        "write_memory": true,
+        "exec_terminal": true,
+        "fs_read": true,
+        "fs_write": true,
+        "invoke_subagents": true,
+        "hardware_senses": true,
+        "imagination_spawn": true,
+        "sync_external": true,
+        "modify_agent_config": false
+      },
+      "rate_limit_rpm": 150,
+      "total_requests": 0,
+      "total_tokens_consumed": 0,
+      "external_servers": [
+        {
+          "id": "srv_agent_bridge_agent_hephaestus",
+          "name": "Puente Local Hephaestus (Forja & Hardware)",
+          "url": "http://127.0.0.1:8000",
+          "server_type": "local_bridge",
+          "sync_mode": "two_way",
+          "sync_frequency": "realtime_events",
+          "sync_scopes": [
+            "tasks",
+            "branch_plans",
+            "memories"
+          ],
+          "status": "connected",
+          "latency_ms": 1.5,
+          "last_synced_at": 1787173520.612301,
+          "is_enabled": true
+        }
+      ]
+    },
+    "agent_hermione": {
+      "agent_id": "agent_hermione",
+      "name": "Hermione (Puente OS & Shell)",
+      "role": "Agente Ejecutivo del Dispositivo, Terminal & Archivos",
+      "api_key": "ast_agent_agent_hermione_fcb2d945c06dc0f31dce6798f0a2dc0028f72957",
+      "key_hash": "31467ab90c705ffd62292b833c0862cd1ae25fc73117cb94f56f1ac0c6eea422",
+      "created_at": 1787173520.612303,
+      "created_at_formatted": "2026-08-19 15:05:20",
+      "last_used_at": null,
+      "status": "active",
+      "permissions": {
+        "read_memory": true,
+        "write_memory": true,
+        "exec_terminal": true,
+        "fs_read": true,
+        "fs_write": true,
+        "invoke_subagents": true,
+        "hardware_senses": true,
+        "imagination_spawn": true,
+        "sync_external": true,
+        "modify_agent_config": false
+      },
+      "rate_limit_rpm": 150,
+      "total_requests": 0,
+      "total_tokens_consumed": 0,
+      "external_servers": [
+        {
+          "id": "srv_agent_bridge_agent_hermione",
+          "name": "Puente Local Hermione (Puente OS & Shell)",
+          "url": "http://127.0.0.1:8000",
+          "server_type": "local_bridge",
+          "sync_mode": "two_way",
+          "sync_frequency": "realtime_events",
+          "sync_scopes": [
+            "tasks",
+            "branch_plans",
+            "memories"
+          ],
+          "status": "connected",
+          "latency_ms": 1.5,
+          "last_synced_at": 1787173520.6123059,
+          "is_enabled": true
+        }
+      ]
+    },
+    "agent_athena": {
+      "agent_id": "agent_athena",
+      "name": "Athena (Sentinel & Inmunidad 360°)",
+      "role": "Protección de Privacidad, Firewall SAIF & Sensores Físicos",
+      "api_key": "ast_agent_agent_athena_0baf5988ca7eeca69f904626a5afc04b7becfa3f",
+      "key_hash": "d0a27a5ae01bb4e419fe4de8fc2daadfc493a0f676027494d00bdb44578c4d93",
+      "created_at": 1787173520.612308,
+      "created_at_formatted": "2026-08-19 15:05:20",
+      "last_used_at": null,
+      "status": "active",
+      "permissions": {
+        "read_memory": true,
+        "write_memory": true,
+        "exec_terminal": true,
+        "fs_read": true,
+        "fs_write": true,
+        "invoke_subagents": true,
+        "hardware_senses": true,
+        "imagination_spawn": true,
+        "sync_external": true,
+        "modify_agent_config": false
+      },
+      "rate_limit_rpm": 150,
+      "total_requests": 0,
+      "total_tokens_consumed": 0,
+      "external_servers": [
+        {
+          "id": "srv_agent_bridge_agent_athena",
+          "name": "Puente Local Athena (Sentinel & Inmunidad 360°)",
+          "url": "http://127.0.0.1:8000",
+          "server_type": "local_bridge",
+          "sync_mode": "two_way",
+          "sync_frequency": "realtime_events",
+          "sync_scopes": [
+            "tasks",
+            "branch_plans",
+            "memories"
+          ],
+          "status": "connected",
+          "latency_ms": 1.5,
+          "last_synced_at": 1787173520.61231,
+          "is_enabled": true
+        }
+      ]
+    },
+    "agent_oneiros": {
+      "agent_id": "agent_oneiros",
+      "name": "Oneiros (Síntesis Creativa & 3D)",
+      "role": "ShaderLab 3D, Generación Visual GLSL & Ensueño",
+      "api_key": "ast_agent_agent_oneiros_246e9ce102664134b5bc1782f4bcbfbcca05cc0e",
+      "key_hash": "52c10a1959b11b0cbbd9fd2c97e11fcb6d42d227efc34ccf1731e436d16bf725",
+      "created_at": 1787173520.612312,
+      "created_at_formatted": "2026-08-19 15:05:20",
+      "last_used_at": null,
+      "status": "active",
+      "permissions": {
+        "read_memory": true,
+        "write_memory": true,
+        "exec_terminal": true,
+        "fs_read": true,
+        "fs_write": true,
+        "invoke_subagents": true,
+        "hardware_senses": true,
+        "imagination_spawn": true,
+        "sync_external": true,
+        "modify_agent_config": false
+      },
+      "rate_limit_rpm": 150,
+      "total_requests": 0,
+      "total_tokens_consumed": 0,
+      "external_servers": [
+        {
+          "id": "srv_agent_bridge_agent_oneiros",
+          "name": "Puente Local Oneiros (Síntesis Creativa & 3D)",
+          "url": "http://127.0.0.1:8000",
+          "server_type": "local_bridge",
+          "sync_mode": "two_way",
+          "sync_frequency": "realtime_events",
+          "sync_scopes": [
+            "tasks",
+            "branch_plans",
+            "memories"
+          ],
+          "status": "connected",
+          "latency_ms": 1.5,
+          "last_synced_at": 1787173520.6123142,
+          "is_enabled": true
+        }
+      ]
+    },
+    "agent_hermes": {
+      "agent_id": "agent_hermes",
+      "name": "Hermes (Web Intel & Navegación)",
+      "role": "Explorador Web, Browser-Use Autónomo & Monitor de APIs",
+      "api_key": "ast_agent_agent_hermes_0abf6bc2ca3cd5146490645fd17ab39dc3971ca8",
+      "key_hash": "a7b2b17f3c1e7dc6ad5345835cd580db6b93c9f5b44c6e86e15315947616e2e0",
+      "created_at": 1787173520.612316,
+      "created_at_formatted": "2026-08-19 15:05:20",
+      "last_used_at": null,
+      "status": "active",
+      "permissions": {
+        "read_memory": true,
+        "write_memory": true,
+        "exec_terminal": true,
+        "fs_read": true,
+        "fs_write": true,
+        "invoke_subagents": true,
+        "hardware_senses": true,
+        "imagination_spawn": true,
+        "sync_external": true,
+        "modify_agent_config": false
+      },
+      "rate_limit_rpm": 150,
+      "total_requests": 0,
+      "total_tokens_consumed": 0,
+      "external_servers": [
+        {
+          "id": "srv_agent_bridge_agent_hermes",
+          "name": "Puente Local Hermes (Web Intel & Navegación)",
+          "url": "http://127.0.0.1:8000",
+          "server_type": "local_bridge",
+          "sync_mode": "two_way",
+          "sync_frequency": "realtime_events",
+          "sync_scopes": [
+            "tasks",
+            "branch_plans",
+            "memories"
+          ],
+          "status": "connected",
+          "latency_ms": 1.5,
+          "last_synced_at": 1787173520.612318,
+          "is_enabled": true
+        }
+      ]
+    },
+    "agent_mnemosyne": {
+      "agent_id": "agent_mnemosyne",
+      "name": "Mnemosyne (Exocórtex & Memoria)",
+      "role": "Base Vectorial, Grafo Sináptico StarSeed/Mem0 & Poda",
+      "api_key": "ast_agent_agent_mnemosyne_4a5fef7f314515a8199405e3b29f11364a4b1580",
+      "key_hash": "c2d797c0d33ac859bed2f3864a248db88d5da18218fb6e464bc7710787d878c1",
+      "created_at": 1787173520.6123211,
+      "created_at_formatted": "2026-08-19 15:05:20",
+      "last_used_at": null,
+      "status": "active",
+      "permissions": {
+        "read_memory": true,
+        "write_memory": true,
+        "exec_terminal": true,
+        "fs_read": true,
+        "fs_write": true,
+        "invoke_subagents": true,
+        "hardware_senses": true,
+        "imagination_spawn": true,
+        "sync_external": true,
+        "modify_agent_config": false
+      },
+      "rate_limit_rpm": 150,
+      "total_requests": 0,
+      "total_tokens_consumed": 0,
+      "external_servers": [
+        {
+          "id": "srv_agent_bridge_agent_mnemosyne",
+          "name": "Puente Local Mnemosyne (Exocórtex & Memoria)",
+          "url": "http://127.0.0.1:8000",
+          "server_type": "local_bridge",
+          "sync_mode": "two_way",
+          "sync_frequency": "realtime_events",
+          "sync_scopes": [
+            "tasks",
+            "branch_plans",
+            "memories"
+          ],
+          "status": "connected",
+          "latency_ms": 1.5,
+          "last_synced_at": 1787173520.612322,
+          "is_enabled": true
+        }
+      ]
+    }
+  }
+}

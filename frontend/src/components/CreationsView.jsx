@@ -36,17 +36,24 @@ import {
   TrendingUp,
   Percent,
   Clock,
-  ShieldCheck
+  ShieldCheck,
+  FolderTree,
+  FolderOpen,
+  Network
 } from 'lucide-react';
 import {
   fetchCreationsCatalog,
   executeCreationSample,
   forkCreationVersion,
-  recycleCreationsStorage
+  recycleCreationsStorage,
+  fetchProjects,
+  linkCreationProjects
 } from '../services/api';
 
 export default function CreationsView() {
   const [creations, setCreations] = useState([]);
+  const [projectsList, setProjectsList] = useState([]);
+  const [projectFilter, setProjectFilter] = useState('all');
   const [storageTelemetry, setStorageTelemetry] = useState(null);
   const [recyclingHistory, setRecyclingHistory] = useState([]);
   const [selectedCreationId, setSelectedCreationId] = useState(null);
@@ -58,6 +65,11 @@ export default function CreationsView() {
   const [isRunningSample, setIsRunningSample] = useState(false);
   const [executionResult, setExecutionResult] = useState(null);
   const [toastMessage, setToastMessage] = useState('');
+
+  // Project Link Modal State
+  const [isProjectLinkModalOpen, setIsProjectLinkModalOpen] = useState(false);
+  const [targetCreationForLinking, setTargetCreationForLinking] = useState(null);
+  const [selectedProjectIdsForLinking, setSelectedProjectIdsForLinking] = useState([]);
 
   // Timeline / Version State
   const [selectedVersionIndex, setSelectedVersionIndex] = useState(0);
@@ -92,7 +104,10 @@ export default function CreationsView() {
   const loadData = async () => {
     try {
       setIsLoading(true);
-      const res = await fetchCreationsCatalog();
+      const [res, pRes] = await Promise.all([
+        fetchCreationsCatalog(),
+        fetchProjects()
+      ]);
       if (res && res.success) {
         setCreations(res.creations || []);
         setStorageTelemetry(res.storage_telemetry || null);
@@ -100,6 +115,9 @@ export default function CreationsView() {
         if (!selectedCreationId && res.creations && res.creations.length > 0) {
           setSelectedCreationId(res.creations[0].id);
         }
+      }
+      if (pRes && pRes.projects) {
+        setProjectsList(pRes.projects);
       }
     } catch (e) {
       console.error('Error fetching creations catalog:', e);
@@ -355,8 +373,42 @@ export default function CreationsView() {
   const filteredCreations = creations.filter((c) => {
     if (categoryFilter !== 'all' && c.category !== categoryFilter) return false;
     if (formatFilter !== 'all' && c.format_type !== formatFilter) return false;
+    if (projectFilter !== 'all') {
+      const linkedP = c.linked_projects || (c.project_id ? [c.project_id] : []);
+      if (!linkedP.includes(projectFilter)) return false;
+    }
     return true;
   });
+
+  const openProjectLinkModal = (creation) => {
+    setTargetCreationForLinking(creation);
+    const existing = creation.linked_projects || (creation.project_id ? [creation.project_id] : []);
+    setSelectedProjectIdsForLinking(existing);
+    setIsProjectLinkModalOpen(true);
+  };
+
+  const handleSaveProjectLinks = async () => {
+    if (!targetCreationForLinking) return;
+    try {
+      const res = await linkCreationProjects(targetCreationForLinking.id, selectedProjectIdsForLinking);
+      if (res && res.success) {
+        showToast('🔗 Proyectos vinculados a la creación con éxito');
+        setIsProjectLinkModalOpen(false);
+        await loadData();
+      }
+    } catch (e) {
+      console.error('Link projects error:', e);
+      showToast('Error al vincular proyectos');
+    }
+  };
+
+  const toggleProjectSelectionForLinking = (pId) => {
+    if (selectedProjectIdsForLinking.includes(pId)) {
+      setSelectedProjectIdsForLinking(selectedProjectIdsForLinking.filter(id => id !== pId));
+    } else {
+      setSelectedProjectIdsForLinking([...selectedProjectIdsForLinking, pId]);
+    }
+  };
 
   const activeVersion = activeCreation?.timeline_branches?.[selectedVersionIndex] || null;
 
@@ -533,7 +585,21 @@ export default function CreationsView() {
                 ))}
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                {/* Project Filter Selector */}
+                <select
+                  value={projectFilter}
+                  onChange={(e) => setProjectFilter(e.target.value)}
+                  className="px-2.5 py-1 rounded-lg bg-[#07090e] border border-emerald-500/30 text-xs font-mono text-emerald-300 focus:outline-none focus:border-emerald-500"
+                >
+                  <option value="all">📁 Todos los Proyectos ({projectsList.length})</option>
+                  {projectsList.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      📁 {p.name}
+                    </option>
+                  ))}
+                </select>
+
                 <select
                   value={formatFilter}
                   onChange={(e) => setFormatFilter(e.target.value)}
@@ -600,9 +666,31 @@ export default function CreationsView() {
                           <span className="text-slate-500">Cerebro:</span>
                           <span className="text-purple-300 truncate max-w-[160px]">{item.brain_name?.split(' // ')[0] || 'StarSeed'}</span>
                         </div>
-                        <div className="flex items-center justify-between text-[10px] font-mono border-t border-white/5 pt-1 mt-1">
-                          <span className="text-slate-500">Proyecto:</span>
-                          <span className="text-emerald-300 font-bold truncate max-w-[160px]">{item.project_id || 'Sin Proyecto'}</span>
+                        <div className="flex items-center justify-between text-[10px] font-mono border-t border-white/5 pt-1.5 mt-1">
+                          <span className="text-slate-400">Proyectos Vinculados:</span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openProjectLinkModal(item);
+                            }}
+                            className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/30 font-bold"
+                          >
+                            🔗 Gestionar
+                          </button>
+                        </div>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {(item.linked_projects || (item.project_id ? [item.project_id] : [])).map((pid) => {
+                            const pObj = projectsList.find((p) => p.id === pid);
+                            return (
+                              <span
+                                key={pid}
+                                className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-[9px] font-mono truncate max-w-[150px]"
+                                title={pObj ? pObj.name : pid}
+                              >
+                                📁 {pObj ? pObj.name : pid}
+                              </span>
+                            );
+                          })}
                         </div>
                       </div>
 
@@ -1257,6 +1345,84 @@ export default function CreationsView() {
                 className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold cursor-pointer"
               >
                 🌿 Forjar Versión & Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= MODAL VINCULAR PROYECTOS A CREACIÓN ================= */}
+      {isProjectLinkModalOpen && targetCreationForLinking && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+          <div className="w-full max-w-lg bg-[#0d101a] border border-emerald-500/40 rounded-3xl p-5 space-y-4 shadow-2xl animate-scale-up">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <FolderTree className="w-5 h-5 text-emerald-400" />
+                <div>
+                  <h3 className="font-display font-bold text-base text-white">
+                    Vincular Creación a Proyectos
+                  </h3>
+                  <p className="text-xs text-slate-400 font-mono truncate max-w-[320px]">
+                    {targetCreationForLinking.title}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsProjectLinkModalOpen(false)}
+                className="p-1 rounded-lg hover:bg-white/10 text-slate-400"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-300 font-mono">
+              Selecciona uno o múltiples proyectos donde residirá esta creación y aportará contexto soberano:
+            </p>
+
+            <div className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-1">
+              {projectsList.map((proj) => {
+                const isSelected = selectedProjectIdsForLinking.includes(proj.id);
+                return (
+                  <div
+                    key={proj.id}
+                    onClick={() => toggleProjectSelectionForLinking(proj.id)}
+                    className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
+                      isSelected
+                        ? 'bg-emerald-500/20 border-emerald-500/50 text-white shadow-md'
+                        : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                    }`}
+                  >
+                    <div>
+                      <div className="text-xs font-mono font-bold text-white flex items-center gap-1.5">
+                        <FolderOpen className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>{proj.name}</span>
+                      </div>
+                      <div className="text-[10px] text-slate-400 font-mono mt-0.5 line-clamp-1">{proj.description}</div>
+                    </div>
+                    <span
+                      className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${
+                        isSelected ? 'bg-emerald-500/30 text-emerald-200 font-bold' : 'bg-white/5 text-slate-500'
+                      }`}
+                    >
+                      {isSelected ? '✓ Vinculado' : '+ Enlazar'}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-white/10 font-mono text-xs">
+              <button
+                onClick={() => setIsProjectLinkModalOpen(false)}
+                className="px-4 py-2 rounded-xl hover:bg-white/10 text-slate-400"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSaveProjectLinks}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-black font-bold cursor-pointer shadow-lg shadow-emerald-950/40"
+              >
+                💾 Guardar Enlaces
               </button>
             </div>
           </div>

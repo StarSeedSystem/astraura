@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>es</string>
+    <key>CFBundleDisplayName</key>
+    <string>Astraura 1.58-Bit</string>
+    <key>CFBundleExecutable</key>
+    <string>Astraura</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.starseed.astraura</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>Astraura</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.5.8</string>
+    <key>CFBundleVersion</key>
+    <string>1580</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>12.0</string>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>NSSupportsAutomaticGraphicsSwitching</key>
+    <true/>
+
+    <!-- Privacy & Hardware Usage Descriptions (macOS TCC) -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Astraura requiere acceso al micrófono para el sintetizador de voz OmniVoice, análisis acústico en tiempo real y comandos por voz con IA.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Astraura requiere acceso a la cámara para la visión computacional multimodal, análisis de documentos y sensores 360°.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Astraura utiliza la ubicación local para sincronizar los sensores meteorológicos y ambientales del Sensorium 360°.</string>
+    <key>NSAppleEventsUsageDescription</key>
+    <string>Astraura utiliza AppleEvents para la interacción y automatización con el Finder y herramientas del sistema.</string>
+    <key>NSSystemAdministrationUsageDescription</key>
+    <string>Astraura requiere acceso al sistema de archivos para indexar y conectar proyectos, carpetas locales y unidades externas.</string>
+    <key>NSFileProviderDomainUsageDescription</key>
+    <string>Astraura sincroniza archivos locales y en la nube (iCloud, volúmenes de almacenamiento).</string>
+</dict>
+</plist>

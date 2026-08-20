@@ -30,6 +30,7 @@ from .cerebros.cerebros_manager import cerebros_manager
 from .personalities.personality_engine import personality_engine
 from .agents.orchestrator import orchestrator
 from .agents.swarm_manager import swarm_manager
+from .agents.director_orchestrator import director_orchestrator
 from .workflows.workflow_engine import workflow_engine
 from .tools.system_explorer import system_explorer
 from .tools.terminal_tool import terminal_tool
@@ -38,6 +39,7 @@ from .tools.browser_tool import browser_agent
 from .skills.starseed_library import starseed_library
 from .projects.project_vault import project_vault_manager
 from .projects.projects_manager import projects_manager
+from .projects.project_master_agent import project_master_agent
 from .core.sensorium_engine import sensorium_engine
 from .core.intuitive_imagination_engine import intuitive_imagination_engine
 from .core.system_notifications_engine import system_notifications_engine
@@ -53,6 +55,7 @@ from .core.continuous_voice_daemon import continuous_voice_daemon
 from .core.needle_engine import needle_engine
 from .core.personality_api_engine import personality_api_engine
 from .core.agent_vault_engine import agent_vault_engine
+from .core.synthesis_reporter_engine import synthesis_reporter_engine
 from .api.voice_studio import router as voice_studio_router
 
 @asynccontextmanager
@@ -265,6 +268,80 @@ async def update_agent_concurrency(req: UpdateConcurrencyRequest):
         swarm_manager._save_state()
         return {"success": True}
     return {"success": False}
+
+# ================= Director Orchestrator Supreme Agent APIs =================
+
+@app.get("/api/director/status")
+async def get_director_status_endpoint():
+    return director_orchestrator.get_status()
+
+@app.get("/api/director/config")
+async def get_director_config_endpoint():
+    return {"config": director_orchestrator.get_config()}
+
+class UpdateDirectorConfigRequest(BaseModel):
+    config: Dict[str, Any]
+
+@app.post("/api/director/config")
+async def update_director_config_endpoint(req: UpdateDirectorConfigRequest):
+    updated = director_orchestrator.update_config(req.config)
+    return {"success": True, "config": updated}
+
+class SteerSwarmRequest(BaseModel):
+    directive: str
+    target_project_id: Optional[str] = None
+
+@app.post("/api/director/steer_swarm")
+async def steer_director_swarm_endpoint(req: SteerSwarmRequest):
+    return director_orchestrator.steer_swarm_with_directive(req.directive, req.target_project_id)
+
+class VerifyTaskRequest(BaseModel):
+    task: Dict[str, Any]
+
+@app.post("/api/director/verify_task")
+async def verify_director_task_endpoint(req: VerifyTaskRequest):
+    return director_orchestrator.audit_and_verify_task_output(req.task)
+
+class AddDirectorMemoryRequest(BaseModel):
+    title: str
+    content: str
+    category: Optional[str] = "general"
+    importance: Optional[str] = "medium"
+    tags: Optional[List[str]] = None
+
+@app.post("/api/director/add_memory")
+async def add_director_memory_endpoint(req: AddDirectorMemoryRequest):
+    return {"success": True, "memory": director_orchestrator.add_executive_memory(req.title, req.content, req.category, req.importance, req.tags)}
+
+class TriggerDirectorImaginationRequest(BaseModel):
+    target_project_id: Optional[str] = None
+    theme: Optional[str] = None
+
+@app.post("/api/director/imagination_cycle")
+async def trigger_director_imagination_cycle_endpoint(req: TriggerDirectorImaginationRequest):
+    return await director_orchestrator.orchestrate_imagination_cycle(req.target_project_id, req.theme)
+
+@app.post("/api/director/renew_tasks")
+async def renew_director_tasks_endpoint():
+    from app.agents.swarm_manager import swarm_manager
+    pool = ["hephaestus", "hermes", "mnemosyne", "oneiros", "athena", "daedalus"]
+    renewed = []
+    for ag_id in pool[:3]:
+        spec = director_orchestrator.formulate_next_intelligent_task(ag_id)
+        swarm_manager.dispatch_task(
+            area_id=spec["area_id"],
+            title=spec["title"],
+            prompt=spec["prompt"],
+            agent_id=spec["agent_id"],
+            target_project_id=spec["target_project_id"]
+        )
+        renewed.append(spec)
+    return {"success": True, "renewed_tasks": renewed}
+
+@app.post("/api/director/trigger_cycle")
+async def trigger_director_cycle_endpoint():
+    context = director_orchestrator.get_holistic_context()
+    return {"success": True, "context": context}
 
 # ================= Vault & Connections APIs =================
 
@@ -546,14 +623,53 @@ async def list_projects_endpoint():
         "total": len(projects_manager.list_projects())
     }
 
+@app.get("/api/projects/{project_id}")
+async def get_project_detail_endpoint(project_id: str):
+    p = projects_manager.get_project(project_id)
+    if not p:
+        return {"success": False, "error": "Project not found"}
+    return {"success": True, "project": p}
+
 class CreateProjectRequest(BaseModel):
     name: str
     description: str
     type: str = "personal"
+    status: Optional[str] = "active"
+    priority: Optional[str] = "medium"
+    progress: Optional[int] = 10
+    current_version: Optional[str] = "v1.0"
+    linked_creations: Optional[List[str]] = []
+    linked_processes: Optional[List[str]] = []
+    linked_agents: Optional[List[str]] = ["daedalus"]
+    linked_projects: Optional[List[str]] = []
+    linked_personalities: Optional[List[str]] = ["astraura_prime"]
+    linked_cerebros: Optional[List[str]] = ["brain_genesis"]
+    linked_memories: Optional[List[Dict[str, Any]]] = []
+    key_memories: Optional[List[str]] = []
+    linked_folders: Optional[List[str]] = []
+    linked_files: Optional[List[str]] = []
 
 @app.post("/api/projects/create")
 async def create_project_endpoint(req: CreateProjectRequest):
-    created = projects_manager.create_project(req.name, req.description, req.type)
+    created = projects_manager.create_project(
+        name=req.name, 
+        description=req.description, 
+        project_type=req.type,
+        status=req.status,
+        priority=req.priority,
+        progress=req.progress,
+        current_version=req.current_version,
+        linked_creations=req.linked_creations,
+        linked_processes=req.linked_processes,
+        linked_agents=req.linked_agents,
+        linked_projects=req.linked_projects,
+        linked_personalities=req.linked_personalities,
+        linked_cerebros=req.linked_cerebros,
+        linked_memories=req.linked_memories,
+        key_memories=req.key_memories,
+        linked_folders=req.linked_folders,
+        linked_files=req.linked_files
+    )
     return {"success": True, "project": created}
 
 class UpdateProjectRequest(BaseModel):
@@ -567,17 +683,167 @@ async def update_project_endpoint(req: UpdateProjectRequest):
         return {"success": False, "error": "Project not found"}
     return {"success": True, "project": updated}
 
+class DeleteProjectRequest(BaseModel):
+    project_id: str
+
+@app.post("/api/projects/delete")
+async def delete_project_endpoint(req: DeleteProjectRequest):
+    success = projects_manager.delete_project(req.project_id)
+    return {"success": success}
+
+class AddProjectVersionRequest(BaseModel):
+    project_id: str
+    version: Optional[str] = None
+    summary: str
+    changes: Optional[List[str]] = []
+    author: Optional[str] = "Alex Bordón"
+
+@app.post("/api/projects/add_version")
+async def add_project_version_endpoint(req: AddProjectVersionRequest):
+    updated = projects_manager.add_project_version(req.project_id, req.model_dump())
+    if not updated:
+        return {"success": False, "error": "Project not found"}
+    return {"success": True, "project": updated}
+
+class AddProjectLogRequest(BaseModel):
+    project_id: str
+    action: str
+    agent: str = "Alex Bordón"
+    details: str
+
+@app.post("/api/projects/add_log")
+async def add_project_log_endpoint(req: AddProjectLogRequest):
+    success = projects_manager.add_project_log(req.project_id, req.action, req.agent, req.details)
+    return {"success": success}
+
 class LinkProjectItemRequest(BaseModel):
     project_id: str
     item_type: str
-    item_id: str
+    item_id: Any
 
 @app.post("/api/projects/link")
 async def link_project_item_endpoint(req: LinkProjectItemRequest):
     success = projects_manager.link_item_to_project(req.project_id, req.item_type, req.item_id)
     return {"success": success}
 
-# --- Legacy Vault Export / Link ---
+class UnlinkProjectItemRequest(BaseModel):
+    project_id: str
+    item_type: str
+    item_id: str
+
+@app.post("/api/projects/unlink")
+async def unlink_project_item_endpoint(req: UnlinkProjectItemRequest):
+    success = projects_manager.unlink_item_from_project(req.project_id, req.item_type, req.item_id)
+    return {"success": success}
+
+# --- Extended Project Operations: Integrity, Synapses, Branches, Files & Proposals ---
+
+@app.get("/api/projects/integrity/{project_id}")
+async def get_project_integrity_endpoint(project_id: str):
+    metrics = projects_manager.get_project_physical_metrics(project_id)
+    return metrics
+
+class CreateProjectBranchRequest(BaseModel):
+    project_id: str
+    branch_name: str
+    origin_branch: Optional[str] = "main"
+    notes: Optional[str] = ""
+    author: Optional[str] = "Alex Bordón"
+
+@app.post("/api/projects/branch/create")
+async def create_project_branch_endpoint(req: CreateProjectBranchRequest):
+    return projects_manager.create_timeline_branch(
+        project_id=req.project_id,
+        branch_name=req.branch_name,
+        origin_branch=req.origin_branch or "main",
+        notes=req.notes or "",
+        author=req.author or "Alex Bordón"
+    )
+
+class MergeProjectBranchRequest(BaseModel):
+    project_id: str
+    source_branch: str
+    target_branch: Optional[str] = "main"
+    strategy: Optional[str] = "fast-forward"
+    author: Optional[str] = "Alex Bordón"
+
+@app.post("/api/projects/branch/merge")
+async def merge_project_branch_endpoint(req: MergeProjectBranchRequest):
+    return projects_manager.merge_timeline_branch(
+        project_id=req.project_id,
+        source_branch=req.source_branch,
+        target_branch=req.target_branch or "main",
+        strategy=req.strategy or "fast-forward",
+        author=req.author or "Alex Bordón"
+    )
+
+class ConnectProjectSynapseRequest(BaseModel):
+    source_project_id: str
+    target_project_id: str
+    synapse_type: Optional[str] = "bidirectional"
+    weight: Optional[float] = 0.85
+    notes: Optional[str] = ""
+
+@app.post("/api/projects/synapse/connect")
+async def connect_project_synapse_endpoint(req: ConnectProjectSynapseRequest):
+    return projects_manager.connect_project_synapse(
+        source_project_id=req.source_project_id,
+        target_project_id=req.target_project_id,
+        synapse_type=req.synapse_type or "bidirectional",
+        weight=req.weight or 0.85,
+        notes=req.notes or ""
+    )
+
+class DisconnectProjectSynapseRequest(BaseModel):
+    source_project_id: str
+    target_project_id: str
+
+@app.post("/api/projects/synapse/disconnect")
+async def disconnect_project_synapse_endpoint(req: DisconnectProjectSynapseRequest):
+    success = projects_manager.disconnect_project_synapse(req.source_project_id, req.target_project_id)
+    return {"success": success}
+
+class ModifyProjectFileRequest(BaseModel):
+    project_id: str
+    file_path: str
+    content: str
+    is_binary: Optional[bool] = False
+    permissions_mode: Optional[str] = "0644"
+
+@app.post("/api/projects/file/write")
+async def modify_project_file_endpoint(req: ModifyProjectFileRequest):
+    return projects_manager.modify_or_create_project_file(
+        project_id=req.project_id,
+        file_path=req.file_path,
+        content=req.content,
+        is_binary=req.is_binary or False,
+        permissions_mode=req.permissions_mode or "0644"
+    )
+
+class DeleteProjectFileRequest(BaseModel):
+    project_id: str
+    file_path: str
+    physical_delete: Optional[bool] = False
+
+@app.post("/api/projects/file/delete")
+async def delete_project_file_endpoint(req: DeleteProjectFileRequest):
+    return projects_manager.delete_project_file(
+        project_id=req.project_id,
+        file_path=req.file_path,
+        physical_delete=req.physical_delete or False
+    )
+
+class ApplyProjectProposalRequest(BaseModel):
+    project_id: str
+    proposal: Dict[str, Any]
+
+@app.post("/api/projects/apply_proposal")
+async def apply_project_proposal_endpoint(req: ApplyProjectProposalRequest):
+    return projects_manager.apply_agent_proposal(req.project_id, req.proposal)
+
+class ExportProjectRequest(BaseModel):
+    project_id: str
+    target_directory: str
 
 @app.post("/api/projects/export")
 async def export_project_endpoint(req: ExportProjectRequest):
@@ -589,6 +855,38 @@ class LinkFolderRequest(BaseModel):
 @app.post("/api/projects/link_folder")
 async def link_folder_endpoint(req: LinkFolderRequest):
     return project_vault_manager.scan_and_link_local_folder(req.folder_path)
+
+# ================= Project Master Agent (Architectus-ProjectMaster) APIs =================
+
+@app.get("/api/projects/agent/status")
+async def get_project_master_agent_status_endpoint():
+    return project_master_agent.get_status()
+
+class UpdateProjectAgentConfigRequest(BaseModel):
+    config: Dict[str, Any]
+
+@app.post("/api/projects/agent/config")
+async def update_project_master_agent_config_endpoint(req: UpdateProjectAgentConfigRequest):
+    return project_master_agent.update_config(req.config)
+
+class TriggerProjectAgentCycleRequest(BaseModel):
+    trigger_reason: Optional[str] = "manual"
+
+@app.post("/api/projects/agent/run_cycle")
+async def run_project_agent_imaginative_cycle_endpoint(req: Optional[TriggerProjectAgentCycleRequest] = None):
+    reason = req.trigger_reason if req and req.trigger_reason else "manual"
+    return await project_master_agent.run_imaginative_cycle(reason)
+
+class ApplyProjectAgentProposalRequest(BaseModel):
+    proposal_id: str
+
+@app.post("/api/projects/agent/proposals/apply")
+async def apply_project_master_agent_proposal_endpoint(req: ApplyProjectAgentProposalRequest):
+    return project_master_agent.apply_proposal(req.proposal_id)
+
+@app.post("/api/projects/agent/auto_organize")
+async def auto_organize_projects_vault_endpoint():
+    return project_master_agent.auto_organize_vault()
 
 # ================= Dream Studio & Imagination APIs =================
 
@@ -619,13 +917,15 @@ class TriggerDreamRequest(BaseModel):
     theme: Optional[str] = None
     parent_branch_id: Optional[str] = None
     process_type: Optional[str] = None
+    target_project_id: Optional[str] = None
 
 @app.post("/api/dream/trigger")
 async def trigger_dream(req: TriggerDreamRequest):
     return await dream_engine.execute_dream_burst(
         theme=req.theme, 
         parent_branch_id=req.parent_branch_id, 
-        process_type=req.process_type
+        process_type=req.process_type,
+        target_project_id=req.target_project_id
     )
 
 class AddCreationRequest(BaseModel):
@@ -925,6 +1225,14 @@ async def fork_creation_version_endpoint(req: ForkCreationVersionRequest):
 @app.post("/api/creations/recycle")
 async def recycle_creations_storage_endpoint():
     return creations_manager.recycle_and_balance_storage()
+
+class LinkCreationProjectsRequest(BaseModel):
+    creation_id: str
+    project_ids: List[str]
+
+@app.post("/api/creations/link_projects")
+async def link_creation_projects_endpoint(req: LinkCreationProjectsRequest):
+    return creations_manager.link_creation_to_projects(req.creation_id, req.project_ids)
 
 # ================= Mem0 Universal Memory APIs (https://github.com/mem0ai/mem0) =================
 
@@ -1538,6 +1846,18 @@ async def save_os_preferences_endpoint(req: OSPreferencesRequest):
 
 # ================= Computer-Wide Filesystem Endpoints =================
 
+class OpenNativePathRequest(BaseModel):
+    path: str
+    reveal: bool = True
+
+@app.post("/api/system/open_native")
+async def open_native_path_endpoint(req: OpenNativePathRequest):
+    return system_explorer.open_native_path(req.path, reveal=req.reveal)
+
+@app.get("/api/system/item_details")
+async def get_system_item_details(path: str = Query(...)):
+    return system_explorer.get_item_details(path)
+
 @app.get("/api/system/fs")
 async def list_computer_files(path: Optional[str] = Query(None)):
     return system_explorer.list_directory(path)
@@ -1724,6 +2044,14 @@ async def modify_branch_endpoint(branch_id: str, req: ModifyBranchRequest):
 async def delete_branch_endpoint(branch_id: str):
     return intuitive_imagination_engine.delete_branch(branch_id)
 
+class SimulateStepRequest(BaseModel):
+    branch_id: Optional[str] = None
+
+@app.post("/api/imagination/process/{process_id}/step")
+async def simulate_process_step_endpoint(process_id: str, req: Optional[SimulateStepRequest] = None):
+    b_id = req.branch_id if req else None
+    return intuitive_imagination_engine.simulate_live_process_step(process_id, b_id)
+
 class UpdateProcessConfigRequest(BaseModel):
     config: Dict[str, Any]
 
@@ -1804,6 +2132,51 @@ async def handle_unified_imagination_action(req: UnifiedActionRequest):
     elif req.action == "edit":
         return intuitive_imagination_engine.edit_proposal(req.item_id, req.item_type, req.data or {})
     return {"success": False, "error": "Acción no reconocida"}
+
+# ================= Synthesis Reporter & Chronology APIs =================
+
+@app.get("/api/imagination/synthesis_reports")
+async def get_synthesis_reports(limit: int = 50):
+    return {
+        "success": True,
+        "total_reports": len(synthesis_reporter_engine.reports_history),
+        "latest": synthesis_reporter_engine.get_latest_report(),
+        "reports": synthesis_reporter_engine.get_reports_history(limit)
+    }
+
+@app.get("/api/imagination/synthesis_reports/latest")
+async def get_latest_synthesis_report():
+    report = synthesis_reporter_engine.get_latest_report()
+    if not report:
+        report = synthesis_reporter_engine.generate_synthesis_report(
+            trigger_type="initial_baseline",
+            context_data={"theme": "Inicialización Soberana de la Bóveda"}
+        )
+    return {"success": True, "report": report}
+
+@app.get("/api/imagination/synthesis_reports/{report_id}")
+async def get_synthesis_report_by_id(report_id: str):
+    report = synthesis_reporter_engine.get_report_by_id(report_id)
+    if not report:
+        return {"success": False, "error": "Informe no encontrado"}
+    return {"success": True, "report": report}
+
+class GenerateSynthesisReportRequest(BaseModel):
+    trigger_type: Optional[str] = "manual_request"
+    context_data: Optional[Dict[str, Any]] = None
+
+@app.post("/api/imagination/synthesis_reports/generate")
+async def generate_synthesis_report_endpoint(req: GenerateSynthesisReportRequest):
+    report = synthesis_reporter_engine.generate_synthesis_report(
+        trigger_type=req.trigger_type or "manual_request",
+        context_data=req.context_data or {}
+    )
+    return {"success": True, "report": report}
+
+@app.delete("/api/imagination/synthesis_reports/clear")
+async def clear_synthesis_reports():
+    synthesis_reporter_engine.clear_history()
+    return {"success": True, "message": "Historial de síntesis reiniciado."}
 
 # ================= Storage Media, Folders & Files Dynamic Memory Routing APIs =================
 
@@ -2075,6 +2448,32 @@ async def websocket_chat(websocket: WebSocket):
         manager.disconnect(websocket)
     except Exception:
         manager.disconnect(websocket)
+
+# ================= Universal Storage & Drives APIs =================
+
+@app.get("/api/system/storage/drives")
+async def get_storage_drives():
+    from app.tools.storage_adapters import universal_storage_manager
+    drives = universal_storage_manager.get_all_storage_drives()
+    return {
+        "success": True,
+        "os_platform": universal_storage_manager.os_type,
+        "total_drives": len(drives),
+        "drives": drives
+    }
+
+@app.post("/api/system/storage/inspect")
+async def inspect_file_storage(data: dict):
+    from app.tools.storage_adapters import universal_storage_manager
+    file_path = data.get("path", "")
+    if not file_path:
+        return {"success": False, "error": "Ruta de archivo no especificada"}
+    
+    info = universal_storage_manager.classify_file_format(file_path)
+    return {
+        "success": True,
+        "file_info": info
+    }
 
 frontend_dist = settings.workspace_path / "frontend" / "dist"
 if frontend_dist.exists():

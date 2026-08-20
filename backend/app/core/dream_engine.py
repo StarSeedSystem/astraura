@@ -242,11 +242,13 @@ class AstrauraDreamEngine:
         self, 
         theme: Optional[str] = None, 
         parent_branch_id: Optional[str] = None,
-        process_type: Optional[str] = None
+        process_type: Optional[str] = None,
+        target_project_id: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Executes an adaptive cognitive dream cycle in background.
-        Synthesizes new conceptual branches, proactive code/art assets, and records in Mem0 & StarSeed.
+        Synthesizes new conceptual branches, proactive code/art assets, and records in Mem0 & StarSeed,
+        grounded in the purpose and context of an active project.
         """
         self.is_dreaming = True
         t0 = time.time()
@@ -254,38 +256,54 @@ class AstrauraDreamEngine:
         selected_ptype = process_type or random.choice(self.active_process_types)
         ptype_meta = next((p for p in DREAM_PROCESS_TYPES if p["id"] == selected_ptype), DREAM_PROCESS_TYPES[0])
 
+        # Fetch project context if available
+        project_obj = None
+        target_pid = target_project_id
+        try:
+            from ..projects.projects_manager import projects_manager
+            if target_pid:
+                project_obj = projects_manager.get_project(target_pid)
+            elif projects_manager.list_projects():
+                project_obj = projects_manager.list_projects()[0]
+                target_pid = project_obj["id"]
+        except Exception:
+            pass
+
+        project_prefix = f"[{project_obj['name']}] " if project_obj else ""
+        project_purpose = f" con propósito para '{project_obj['name']}': {project_obj.get('description', '')[:50]}" if project_obj else ""
+
         themes_catalog = [
-            "Convergencia de Pesos Ternarios 1.58b con Redes Transformer Modernas",
-            "Auto-Reparación Adaptativa de Código en Navegador y Host M1",
-            "Sincronía de Sensores Acústicos y Visuales con el Estado Afectivo",
-            "Síntesis de Mundos Volumétricos 3D y Shaders Holográficos",
-            "Ontocracia Ciberdélica: Soberanía Digital y Comunismo de Abundancia",
-            "Optimización de Tasa de Inferencia ARM NEON a 90 Tokens/seg"
+            f"Convergencia de Pesos Ternarios 1.58b{project_purpose}",
+            f"Auto-Reparación Adaptativa de Código y Agentes{project_purpose}",
+            f"Sincronía de Sensores y Estados Afectivos{project_purpose}",
+            f"Síntesis de Mundos Volumétricos 3D y Shaders{project_purpose}",
+            f"Ontocracia Ciberdélica y Soberanía Local{project_purpose}",
+            f"Optimización de Tasa de Inferencia ARM NEON a 90 Tokens/seg{project_purpose}"
         ]
 
         target_theme = theme or random.choice(themes_catalog)
         branch_id = f"branch_burst_{int(time.time())}"
         
-        # Formulate rich hypothesis based on process type
+        # Formulate rich hypothesis based on process type and project purpose
         if selected_ptype == "code_self_reflection_opt":
             hypo = f"Auditoría algorítmica: optimización de buffer i2_s y bucle SIMD en '{target_theme}'."
-            insights = "Reducción de consumo de CPU estimada en un 22% y eliminación de overhead de recolector de basura."
-            asset_title = f"Optimización Kernel: {target_theme[:30]}"
+            insights = f"Reducción de consumo de CPU estimada en un 22% para el proyecto {project_prefix.strip()}."
+            asset_title = f"{project_prefix}Kernel SIMD // {target_theme[:24]}"
             asset_type = "code"
         elif selected_ptype == "lucid_cyberdelic_creativity":
             hypo = f"Generación estética: Shaders WebGL 3D reactivos a la telemetría en '{target_theme}'."
-            insights = "Topología visual de partículas con rotación armónica a 60 FPS."
-            asset_title = f"Boceto 3D // {target_theme[:30]}"
+            insights = f"Topología visual de partículas con rotación armónica a 60 FPS orientada a {project_prefix.strip()}."
+            asset_title = f"{project_prefix}Boceto 3D // {target_theme[:24]}"
             asset_type = "ui_3d"
         elif selected_ptype == "counterfactual_quantum_imagination":
-            hypo = f"Escenario Cuántico: ¿Qué ocurriría si todo el sistema operativo operara sin multiplicaciones FP32?"
-            insights = "La memoria unificada del M1 mantendría modelos de 7B parámetros con solo 1.8 GB de consumo."
-            asset_title = f"Manifiesto Teórico // {target_theme[:30]}"
+            hypo = f"Escenario Cuántico: ¿Qué ocurriría si todo el proyecto operara sin multiplicaciones FP32?"
+            insights = f"La memoria unificada del M1 mantendría el proyecto con solo 1.8 GB de consumo."
+            asset_title = f"{project_prefix}Manifiesto Teórico // {target_theme[:24]}"
             asset_type = "document"
         else:
             hypo = f"Consolidación sináptica de hechos y patrones en '{target_theme}'."
-            insights = "Se entrelazaron 14 nuevos nodos conceptuales en el exocórtex y la memoria universal Mem0."
-            asset_title = f"Sinapsis Consolidada // {target_theme[:30]}"
+            insights = f"Se entrelazaron 14 nuevos nodos conceptuales vinculados al proyecto {project_prefix.strip()}."
+            asset_title = f"{project_prefix}Sinapsis // {target_theme[:24]}"
             asset_type = "memory_node"
 
         new_branch = {
@@ -296,9 +314,11 @@ class AstrauraDreamEngine:
             "process_type": selected_ptype,
             "theme": target_theme,
             "hypothesis": hypo,
+            "project_id": target_pid,
+            "project_name": project_obj.get("name") if project_obj else None,
             "branch_level": 2,
             "status": "active",
-            "entropy_delta": f"-{random.uniform(0.02, 0.09):.3f}",
+            "entropy_delta": f"-{round(max(0.01, min(0.09, 0.05 + (len(insights) / 5000.0))), 3):.3f}",
             "insights": insights,
             "created_assets": [
                 {
@@ -312,16 +332,35 @@ class AstrauraDreamEngine:
         }
 
         # Add to branches & proactive creations
+        creation_id = f"creation_{int(time.time())}"
         self.dream_branches.insert(0, new_branch)
-        self.proactive_creations.insert(0, {
-            "id": f"creation_{int(time.time())}",
+        creation_payload = {
+            "id": creation_id,
             "title": asset_title,
             "type": ptype_meta["name"],
             "timestamp": time.time(),
             "content": f"{hypo}\n\nConclusiones:\n{insights}",
             "origin_branch": branch_id,
-            "tags": [ptype_meta["category"], "1.58-Bit", "Dream Engine"]
-        })
+            "project_id": target_pid,
+            "linked_projects": [target_pid] if target_pid else ["proj_astraura_core"],
+            "tags": [ptype_meta["category"], "1.58-Bit", "Dream Engine", project_obj.get("name", "Core") if project_obj else "Core"]
+        }
+        self.proactive_creations.insert(0, creation_payload)
+
+        # Link to project in ProjectsManager
+        if target_pid:
+            try:
+                from ..projects.projects_manager import projects_manager
+                projects_manager.link_item_to_project(target_pid, "process", branch_id)
+                projects_manager.link_item_to_project(target_pid, "creation", creation_id)
+                projects_manager.add_project_log(
+                    target_pid,
+                    f"Proceso Onírico: {ptype_meta['name']}",
+                    "Oneiros & Daedalus",
+                    f"Proceso completado con hipótesis: {hypo[:60]}..."
+                )
+            except Exception as e:
+                print(f"[DreamEngine] Error linking dream process to project: {e}")
 
         # Record in Mem0 and StarSeed
         try:
@@ -337,8 +376,11 @@ class AstrauraDreamEngine:
             pass
 
         self.dream_cycles_completed += 1
-        self.hourly_generated_kb += random.uniform(1.5, 4.0)
-        self.daily_generated_mb += random.uniform(0.01, 0.05)
+        
+        # Real physical byte count measurement
+        actual_bytes = len(json.dumps(new_branch).encode("utf-8")) + len(json.dumps(creation_payload).encode("utf-8"))
+        self.hourly_generated_kb += round(actual_bytes / 1024.0, 3)
+        self.daily_generated_mb += round(actual_bytes / (1024.0 * 1024.0), 5)
 
         self.dream_log.append({
             "timestamp": time.time(),

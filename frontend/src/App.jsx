@@ -69,6 +69,7 @@ import DeviceContextModal from './components/DeviceContextModal';
 import GatewayModal from './components/GatewayModal';
 import UniversalDeviceModal from './components/UniversalDeviceModal';
 import ThemePickerModal from './components/ThemePickerModal';
+import UniversalFileViewerModal from './components/UniversalFileViewerModal';
 import { ChatWebSocketClient, fetchStatus, fetchSystemNotifications } from './services/api';
 import { webCognition } from './services/webCognition';
 import { deviceContextDetector } from './services/deviceContextDetector';
@@ -99,7 +100,24 @@ export default function App() {
   const [isGatewayModalOpen, setIsGatewayModalOpen] = useState(false);
   const [isUniversalPermsModalOpen, setIsUniversalPermsModalOpen] = useState(false);
   const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
+  const [fileViewerState, setFileViewerState] = useState({ isOpen: false, path: null, title: '' });
   const [deviceProfile, setDeviceProfile] = useState(null);
+
+  // Global listener for opening files/folders anywhere in the app
+  useEffect(() => {
+    const handleOpenFile = (e) => {
+      const detail = e.detail;
+      if (detail && detail.path) {
+        setFileViewerState({
+          isOpen: true,
+          path: detail.path,
+          title: detail.title || ''
+        });
+      }
+    };
+    window.addEventListener('open-file-viewer', handleOpenFile);
+    return () => window.removeEventListener('open-file-viewer', handleOpenFile);
+  }, []);
 
   // Chat Sessions & Folders State
   const [folders, setFolders] = useState(() => {
@@ -541,8 +559,7 @@ export default function App() {
   const navTabs = [
     { id: 'chat', label: 'Chat Multiagéntico & Voz', icon: MessageSquare, color: 'cyan' },
     { id: 'voice_studio', label: 'VoiceStudio & Forja de Sonido', icon: Headphones, color: 'purple', badge: '646 Idiomas' },
-    { id: 'projects', label: 'Proyectos & Clasificación', icon: FolderTree, color: 'emerald', badge: 'Automáticos' },
-    { id: 'creations', label: 'Creaciones & Evolución Progresiva', icon: Sparkles, color: 'pink', badge: '5 Forjadas' },
+    { id: 'projects', label: 'Proyectos y Creaciones', icon: FolderTree, color: 'emerald', badge: 'Daedalus 1.58b' },
     { id: 'imagination', label: 'Imaginación Intuitiva (Always-On)', icon: Sparkles, color: 'purple', badge: imaginationBadge },
     { id: 'storage', label: 'Enrutamiento de Almacenamiento & Medios', icon: HardDrive, color: 'cyan' },
     { id: 'sensorium', label: 'Sensorium 360° & Clima', icon: Activity, color: 'cyan' },
@@ -757,16 +774,16 @@ export default function App() {
             </button>
 
             <button
-              onClick={() => setActiveTab('creations')}
+              onClick={() => setActiveTab('projects')}
               className={`text-xs px-2.5 py-1 rounded-lg font-mono transition-colors flex items-center gap-1.5 font-bold whitespace-nowrap ${
-                activeTab === 'creations'
-                  ? 'bg-pink-500/30 border border-pink-400 text-pink-200'
-                  : 'bg-pink-500/15 hover:bg-pink-500/25 border border-pink-500/30 text-pink-300'
+                activeTab === 'projects' || activeTab === 'creations'
+                  ? 'bg-emerald-500/30 border border-emerald-400 text-emerald-200'
+                  : 'bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300'
               }`}
-              title="Estudio de Creaciones & Evolución Progresiva"
+              title="Bóveda de Proyectos, Creaciones & Evolución Progresiva"
             >
-              <Sparkles className="w-3.5 h-3.5 text-pink-400 shrink-0" />
-              <span className="hidden md:inline">Creaciones</span>
+              <FolderTree className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <span className="hidden md:inline">Proyectos & Creaciones</span>
             </button>
 
             <button
@@ -850,8 +867,7 @@ export default function App() {
           )}
 
           {activeTab === 'voice_studio' && <VoiceStudioView onBackToChat={() => setActiveTab('chat')} />}
-          {activeTab === 'projects' && <ProjectsView />}
-          {activeTab === 'creations' && <CreationsView />}
+          {(activeTab === 'projects' || activeTab === 'creations') && <ProjectsView />}
           {activeTab === 'sensorium' && <Sensorium360View />}
           {(activeTab === 'imagination' || activeTab === 'dream') && <IntuitiveImaginationView />}
           {activeTab === 'storage' && <StorageRoutingView />}
@@ -920,6 +936,13 @@ export default function App() {
       <ThemePickerModal
         isOpen={isThemeModalOpen}
         onClose={() => setIsThemeModalOpen(false)}
+      />
+
+      {/* Universal File & Folder Inspector Modal (In-App Preview & Native Finder execution) */}
+      <UniversalFileViewerModal
+        isOpen={fileViewerState.isOpen}
+        initialPath={fileViewerState.path}
+        onClose={() => setFileViewerState({ isOpen: false, path: null, title: '' })}
       />
 
       {/* Organic Mobile Bottom Navigation Dock (Smartphones & Small Tablets) */}

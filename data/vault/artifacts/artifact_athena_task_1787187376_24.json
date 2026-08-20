@@ -1,0 +1,14 @@
+{
+  "task_id": "task_1787187376_24",
+  "agent_id": "athena",
+  "title": "Calibración de Sensores de Entorno y Resonancia Acústica",
+  "timestamp": 1787187406.340427,
+  "target_project_id": "proj_astraura_core",
+  "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/telemetry",
+  "scanned_files_count": 0,
+  "hardware_telemetry": {
+    "pid": 27910,
+    "ram_rss_mb": 31.8,
+    "cpu_percent": 0.0
+  }
+}

@@ -199,6 +199,21 @@ class SystemNotificationsEngine:
         self._save()
         return {"success": True, "notification": target}
 
+    def mark_as_read(self, notif_id: Optional[str] = None) -> bool:
+        """Marca una o todas las notificaciones como leídas."""
+        if notif_id:
+            target = next((n for n in self.notifications if n["id"] == notif_id), None)
+            if target:
+                target["read"] = True
+                self._save()
+                return True
+            return False
+        else:
+            for n in self.notifications:
+                n["read"] = True
+            self._save()
+            return True
+
     def delete_notification(self, notif_id: str) -> Dict[str, Any]:
         initial_len = len(self.notifications)
         self.notifications = [n for n in self.notifications if n["id"] != notif_id]

@@ -1,6 +1,9 @@
 import os
 import stat
 import mimetypes
+import subprocess
+import platform
+import hashlib
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 import pypdf
@@ -214,6 +217,155 @@ class SystemExplorer:
             }
         except Exception as e:
             return {"success": False, "error": str(e)}
+
+    def open_native_path(self, target_path: str, reveal: bool = True) -> Dict[str, Any]:
+        """
+        Abre o revela el archivo/carpeta en el explorador de archivos nativo del sistema operativo (Finder en macOS).
+        """
+        try:
+            p = Path(target_path).expanduser().resolve()
+            if not p.exists():
+                # If path does not exist, try finding workspace relative path
+                workspace_p = (Path("/Users/alex/Documents/IA 1.58 bit") / target_path).resolve()
+                if workspace_p.exists():
+                    p = workspace_p
+                else:
+                    # Fallback to nearest existing parent
+                    parent = p.parent
+                    while not parent.exists() and parent != parent.parent:
+                        parent = parent.parent
+                    p = parent if parent.exists() else self.home_dir
+
+            system_name = platform.system()
+            if system_name == "Darwin":  # macOS
+                if reveal and p.is_file():
+                    subprocess.Popen(["open", "-R", str(p)])
+                else:
+                    subprocess.Popen(["open", str(p)])
+            elif system_name == "Windows":
+                if reveal and p.is_file():
+                    subprocess.Popen(["explorer", "/select,", str(p)])
+                else:
+                    os.startfile(str(p))
+            else:  # Linux / Unix
+                subprocess.Popen(["xdg-open", str(p if p.is_dir() else p.parent)])
+
+            return {
+                "success": True,
+                "path": str(p),
+                "original_requested": target_path,
+                "system": system_name,
+                "message": f"Abierto en el gestor nativo del sistema ({system_name})"
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "error": f"No se pudo abrir la ruta nativa: {str(e)}",
+                "path": target_path
+            }
+
+    def get_item_details(self, target_path: str) -> Dict[str, Any]:
+        """
+        Obtiene información completa para visualización in-app (previsualización, código, SHA-256, hijos si es carpeta).
+        """
+        try:
+            p = Path(target_path).expanduser().resolve()
+            if not p.exists():
+                workspace_p = (Path("/Users/alex/Documents/IA 1.58 bit") / target_path).resolve()
+                if workspace_p.exists():
+                    p = workspace_p
+                else:
+                    return {
+                        "success": False,
+                        "exists": False,
+                        "path": str(p),
+                        "error": f"Ruta no encontrada en disco: {target_path}"
+                    }
+
+            is_dir = p.is_dir()
+            stat_info = p.stat()
+
+            # Breadcrumbs
+            parts = list(p.parts)
+            breadcrumbs = []
+            curr_build = ""
+            for pt in parts:
+                curr_build = "/" if pt == "/" else os.path.join(curr_build, pt)
+                breadcrumbs.append({"name": pt if pt != "/" else "Raíz", "path": curr_build})
+
+            # Storage tier categorization
+            path_str = str(p)
+            storage_tier = "Host Local (Apple Silicon M1)"
+            if "vault/memories" in path_str:
+                storage_tier = "🧠 StarSeed Memory Vault (Bóveda Sináptica)"
+            elif "vault/projects" in path_str:
+                storage_tier = "📁 Bóveda Soberana de Proyectos"
+            elif "vault/artifacts" in path_str:
+                storage_tier = "⚡ Bóveda de Artefactos de Agentes"
+            elif "vault/creations" in path_str:
+                storage_tier = "🎨 Bóveda de Creaciones & Shaders"
+            elif "data/research" in path_str:
+                storage_tier = "🌐 Exocórtex de Investigación arXiv"
+            elif "backend/app" in path_str:
+                storage_tier = "🛠️ Kernel & Backend Engine"
+            elif "frontend/src" in path_str:
+                storage_tier = "🖥️ Interfaz Soberana (React / WebGL)"
+
+            if is_dir:
+                dir_res = self.list_directory(str(p))
+                return {
+                    "success": True,
+                    "exists": True,
+                    "is_dir": True,
+                    "name": p.name or "Raíz",
+                    "path": str(p),
+                    "parent_path": str(p.parent) if p.parent != p else None,
+                    "breadcrumbs": breadcrumbs,
+                    "storage_tier": storage_tier,
+                    "total_items": dir_res.get("total_items", 0),
+                    "items": dir_res.get("items", []),
+                    "modified_timestamp": stat_info.st_mtime,
+                    "readable": os.access(p, os.R_OK),
+                    "writable": os.access(p, os.W_OK)
+                }
+            else:
+                file_res = self.read_file_content(str(p))
+                sha256_hash = ""
+                try:
+                    with open(p, "rb") as f:
+                        sha256_hash = hashlib.sha256(f.read(1024 * 1024 * 5)).hexdigest()
+                except Exception:
+                    pass
+
+                mime, _ = mimetypes.guess_type(p.name)
+                ext = p.suffix.lower()
+
+                return {
+                    "success": True,
+                    "exists": True,
+                    "is_dir": False,
+                    "name": p.name,
+                    "path": str(p),
+                    "parent_path": str(p.parent),
+                    "breadcrumbs": breadcrumbs,
+                    "storage_tier": storage_tier,
+                    "size_bytes": stat_info.st_size,
+                    "size_formatted": self._format_size(stat_info.st_size),
+                    "extension": ext,
+                    "mime_type": mime or "text/plain",
+                    "sha256": sha256_hash,
+                    "content": file_res.get("content", ""),
+                    "truncated": file_res.get("truncated", False),
+                    "modified_timestamp": stat_info.st_mtime,
+                    "readable": os.access(p, os.R_OK),
+                    "writable": os.access(p, os.W_OK)
+                }
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e),
+                "path": target_path
+            }
 
     @staticmethod
     def _format_size(num_bytes: Optional[int]) -> str:

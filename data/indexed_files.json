@@ -1,6 +1,6 @@
 {
-  "Cuantización vs. Offloading en IA.pdf": "4bb825054df6631280422d050cac0fe97593a3521cf84f3bf3265fd501998fb7",
-  "Potencial y Desafíos del 1.58 Bits.pdf": "7a11fcd895abeb34f3beaf268a8b1452cb246d26f9ba09244990a5d177767ad0",
+  "Cuantizacio\u0301n vs. Offloading en IA.pdf": "4bb825054df6631280422d050cac0fe97593a3521cf84f3bf3265fd501998fb7",
+  "Potencial y Desaf\u00edos del 1.58 Bits.pdf": "7a11fcd895abeb34f3beaf268a8b1452cb246d26f9ba09244990a5d177767ad0",
   "backend/requirements.txt": "0968626878def85268d2465747c7fc128005c86310410c7f1f7e914b4dc5d8f0",
   "README.md": "6b6e8ec034bf28b52b4932c72f7bce601a3d5a75d46f40750a243f6bc3915a26",
   "backend/BitNet/CODE_OF_CONDUCT.md": "9daeae709a0bd71bcfd1c96dc5822ecec5210327eff929da64b0ae7f8faf1444",
@@ -339,5 +339,6 @@
   "backend/app/core/needle_src/build/CMakeFiles/TargetDirectories.txt": "4f3ecaafe474e5b1f742ab6822e07ad7e7ad7bb70b2024c6f7392019b5822525",
   "backend/app/core/needle_src/build/CMakeFiles/needle_engine.dir/link.txt": "347dfb0a27c111f2586cfa367acc6244dfef9926e15610c2ce4af7cfc76bb939",
   "backend/app/core/needle_src/build/CMakeFiles/nd_dump.dir/link.txt": "2311086ee66c46f7512a41903aaa2155a42ae28c71f3e9a8f0d1df31596978b5",
-  "backend/app/core/needle_src/build/CMakeFiles/nd_gtest.dir/link.txt": "01a3b6e34fab2794b5279213d7daa0df4afa87d1388b11e03cad5b906df39796"
+  "backend/app/core/needle_src/build/CMakeFiles/nd_gtest.dir/link.txt": "01a3b6e34fab2794b5279213d7daa0df4afa87d1388b11e03cad5b906df39796",
+  "backend/app/core/optimizaci\u00f3n_neon_1.58b.md": "670e9032bc2093890ba755676d96a719104ed908455a52eff5901180eb78841c"
 }

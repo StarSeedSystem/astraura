@@ -1,0 +1,14 @@
+{
+  "task_id": "task_1787190338_63",
+  "agent_id": "hephaestus",
+  "title": "Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM",
+  "timestamp": 1787190368.74249,
+  "target_project_id": "proj_astraura_core",
+  "target_folder": "/Users/alex/Documents/IA 1.58 bit/backend/app",
+  "scanned_files_count": 1,
+  "hardware_telemetry": {
+    "pid": 31925,
+    "ram_rss_mb": 46.2,
+    "cpu_percent": 0.0
+  }
+}

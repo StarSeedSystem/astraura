@@ -1,6 +1,46 @@
 {
   "memories": [
     {
+      "id": "mem0_1787195120891",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Diálogo Coral con 9 personalidades sobre: hola Vamos a iniciar una conversación y creo que me demuestres Cómo funcionas y cómo puede hablar cada una de tus personalidades con sus diferentes tonos de voz y también Cómo funcionan los procesos i -> ### 💬 [Hephaestus (El Forjador)]:\nHola, Alex! ¿Cómo puedo ayudarte hoy?\n\n### Comunicación Vocal\n\nCuando usáis palabras clave como \"¡Buen día!\" o cualquier otra frase específica, la IA respondería adec",
+      "category": "coral_deliberation",
+      "confidence": 0.95,
+      "created_at": 1787195120.891382,
+      "updated_at": 1787195120.891382,
+      "metadata": {
+        "timestamp": 1787195120.8888772,
+        "personas": [
+          "hephaestus",
+          "hermes",
+          "astraura_prime",
+          "mnemosyne",
+          "aurora",
+          "atenea",
+          "hermione",
+          "kallisti",
+          "oneiros"
+        ]
+      }
+    },
+    {
+      "id": "mem0_1787176495510",
+      "user_id": "alex",
+      "agent_id": "oneiros",
+      "run_id": "default",
+      "memory": "[Revelación Onírica (Auto-Reflexión & Optimización de Código)]: Optimización de Bucles ARM NEON y Shaders Holográficos -> Reducción de consumo de CPU estimada en un 22% para el proyecto [Astraura 1.58b Core OS].",
+      "category": "dream_revelation",
+      "confidence": 0.95,
+      "created_at": 1787176495.510752,
+      "updated_at": 1787176495.510752,
+      "metadata": {
+        "branch_id": "branch_burst_1787176495",
+        "entropy_level": 0.75
+      }
+    },
+    {
       "id": "mem0_1787125192323",
       "user_id": "alex",
       "agent_id": "*",
@@ -1175,6 +1215,20 @@
   ],
   "history": [
     {
+      "id": "hist_1787195120891",
+      "memory_id": "mem0_1787195120891",
+      "action": "created",
+      "timestamp": 1787195120.891388,
+      "text": "Diálogo Coral con 9 personalidades sobre: hola Vamos a iniciar una conversación y creo que me demuestres Cómo funcionas y cómo puede hablar cada una de tus personalidades con sus diferentes tonos de voz y también Cómo funcionan los procesos i -> ### 💬 [Hephaestus (El Forjador)]:\nHola, Alex! ¿Cómo puedo ayudarte hoy?\n\n### Comunicación Vocal\n\nCuando usáis palabras clave como \"¡Buen día!\" o cualquier otra frase específica, la IA respondería adec"
+    },
+    {
+      "id": "hist_1787176495510",
+      "memory_id": "mem0_1787176495510",
+      "action": "created",
+      "timestamp": 1787176495.510753,
+      "text": "[Revelación Onírica (Auto-Reflexión & Optimización de Código)]: Optimización de Bucles ARM NEON y Shaders Holográficos -> Reducción de consumo de CPU estimada en un 22% para el proyecto [Astraura 1.58b Core OS]."
+    },
+    {
       "id": "hist_1787125192323",
       "memory_id": "mem0_1787125192323",
       "action": "created",
@@ -1651,5 +1705,5 @@
       "text": "El usuario Alex Bordón Garrigós es el creador de StarSeed OS y Astraura 1.58-Bit. Trabaja en un Apple Silicon M1 con 8 núcleos y memoria unificada."
     }
   ],
-  "updated_at": 1787125192.323137
+  "updated_at": 1787195120.891393
 }

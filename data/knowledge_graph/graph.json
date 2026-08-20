@@ -406,7 +406,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (desarrolla una historia dramatica s...)",
       "strength": 1.0,
-      "updated_at": 1787125209.273361
+      "updated_at": 1787195130.367779
     },
     "Microsoft": {
       "id": "Microsoft",
@@ -678,7 +678,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (desarrolla una historia dramatica s...)",
       "strength": 1.0,
-      "updated_at": 1787124770.487967
+      "updated_at": 1787195130.375484
     },
     "Todos": {
       "id": "Todos",
@@ -750,7 +750,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (quien soy yo, como me llamo y que s...)",
       "strength": 1.0,
-      "updated_at": 1787122929.385362
+      "updated_at": 1787195130.352654
     },
     "Podría": {
       "id": "Podría",
@@ -2261,8 +2261,8 @@
       "label": "Comunicación",
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (demuéstrame cómo funciona tu sistem...)",
-      "strength": 0.6,
-      "updated_at": 1787108730.800912
+      "strength": 0.7,
+      "updated_at": 1787195130.3603468
     },
     "Interacción": {
       "id": "Interacción",
@@ -2453,8 +2453,8 @@
       "label": "Vocal",
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (Hola Aurora dime cómo funciona tu s...)",
-      "strength": 0.6,
-      "updated_at": 1787122395.5447922
+      "strength": 0.7,
+      "updated_at": 1787195130.3375309
     },
     "Musical": {
       "id": "Musical",
@@ -2567,6 +2567,14 @@
       "description": "Concepto destilado de interacción (Hola Aurora, ¿cuál es la capital de...)",
       "strength": 0.6,
       "updated_at": 1787123054.130523
+    },
+    "Plaintext": {
+      "id": "Plaintext",
+      "label": "Plaintext",
+      "category": "Learned Concept",
+      "description": "Concepto destilado de interacción (hola Vamos a iniciar una conversaci...)",
+      "strength": 0.6,
+      "updated_at": 1787195130.385087
     }
   },
   "edges": [
@@ -6569,6 +6577,36 @@
     {
       "source": "Maggasukha",
       "target": "Estoy",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Vocal",
+      "target": "Hola",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Hola",
+      "target": "Comunicación",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Comunicación",
+      "target": "Astraura",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Astraura",
+      "target": "Cómo",
+      "relation": "asociado_con",
+      "weight": 0.65
+    },
+    {
+      "source": "Cómo",
+      "target": "Plaintext",
       "relation": "asociado_con",
       "weight": 0.65
     }
