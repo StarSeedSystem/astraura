@@ -303,7 +303,7 @@ export default function NotificationsLogsView() {
           className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-bold flex items-center gap-2 cursor-pointer shadow-md shadow-emerald-500/20 transition-all disabled:opacity-50"
         >
           <Sparkles className={`w-3.5 h-3.5 ${isApplyingAll ? 'animate-spin' : ''}`} />
-          <span>{isApplyingAll ? 'Sincronizando Agentes...' : '✨ Aplicar Todas con Agentes en 2do Plano'}</span>
+          <span>{isApplyingAll ? 'Sincronizando Agentes...' : '✨ Autorizar y Aplicar Todas con Agentes en 2do Plano'}</span>
         </button>
       </div>
 

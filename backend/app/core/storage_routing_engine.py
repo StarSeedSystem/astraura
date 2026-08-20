@@ -426,4 +426,81 @@ class StorageRoutingEngine:
             except Exception:
                 pass
 
+    def register_accessed_folder(self, folder_info: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Registra una carpeta accedida vía File System Access API.
+        La agrega como dispositivo detectado para enrutamiento automático.
+        """
+        folder_name = folder_info.get("folder_name", "carpeta_desconocida")
+        folder_path = folder_info.get("folder_path", "/")
+        file_count = folder_info.get("file_count", 0)
+        access_type = folder_info.get("access_type", "filesystem_api")
+
+        # Agregar como dispositivo conocido
+        self.known_connected_paths.add(folder_path)
+
+        # Crear dispositivo virtual para el almacenamiento
+        device = {
+            "id": f"fs_{folder_path.replace('/', '_').replace(' ', '_')[:64]}",
+            "name": folder_name,
+            "path": folder_path,
+            "type": "filesystem_api_virtual",
+            "filesystem": "File System Access API",
+            "storage_drive": folder_name,
+            "isConnected": True,
+            "capacity_mode": "auto",
+            "lastConnected": time.time(),
+            "permissions": {
+                "mode": "bidirectional_merge",
+                "access_type": access_type,
+                "file_count": file_count,
+                "registered_at": folder_info.get("registered_at", time.time())
+            },
+            "hasStorageAccess": True,
+            "isExternalBrain": False,
+            "brain_id": None,
+            "fused_at": None,
+            "fuse_mode": None,
+            "lastFuseSync": None,
+            "sync_status": "synced"
+        }
+
+        # Agregar regla de enrutamiento automático si no existe
+        rule_exists = any(
+            r.get("target_path", "").startswith(folder_path)
+            for r in self.rules
+        )
+        if not rule_exists:
+            default_rule = {
+                "id": f"rule_fs_{folder_path.replace('/', '_')[:32]}",
+                "name": f"Enrutamiento {folder_name}",
+                "target_path": folder_path,
+                "pattern": "**/*",
+                "trigger_imagination": {
+                    "enabled": True,
+                    "process_types": ["starseed_memory_consolidation", "auto_code_optimization"],
+                    "memory_routing": {
+                        "enabled": True,
+                        "target_brains": ["brain_genesis", "brain_hermes", "brain_hephaestus"]
+                    }
+                },
+                "source": "filesystem_api_registration",
+                "created_at": time.time(),
+                "capacity_mode": "auto"
+            }
+            self.rules.append(default_rule)
+            self._save_rules()
+
+        self._notify_callbacks({
+            "type": "new_storage_device",
+            "device": device,
+            "action": "register_folder"
+        })
+
+        return {
+            "success": True,
+            "device": device,
+            "message": f"Carpeta '{folder_name}' registrada y enrutada automáticamente."
+        }
+
 storage_routing_engine = StorageRoutingEngine()

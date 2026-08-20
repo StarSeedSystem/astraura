@@ -2527,6 +2527,26 @@ async def scan_storage_now():
 async def simulate_storage_connection(rule_id: str):
     return await storage_routing_engine.simulate_media_connection(rule_id)
 
+# ================= Folder Registration via File System Access API =================
+
+@app.post("/api/storage/folder/register")
+async def register_folder_from_filesystem(req: Dict[str, Any]):
+    """
+    Register a folder accessed via File System Access API (showDirectoryPicker)
+    so the storage routing engine can index and route it.
+    """
+    folder_name = req.get("folder_name", "Sin nombre")
+    folder_path = req.get("folder_path", "/")
+    file_count = req.get("file_count", 0)
+    access_type = req.get("access_type", "filesystem_api")
+    return await storage_routing_engine.register_accessed_folder({
+        "folder_name": folder_name,
+        "folder_path": folder_path,
+        "file_count": file_count,
+        "access_type": access_type,
+        "registered_at": time.time()
+    })
+
 # ================= System Notifications & Branching Logs APIs =================
 
 @app.get("/api/notifications")

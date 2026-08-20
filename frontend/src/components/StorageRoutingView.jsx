@@ -51,6 +51,12 @@ import {
   syncPortableBrainToStorage,
   fetchSyncMeshTelemetry
 } from '../services/api';
+import { 
+  requestFolderAccess, 
+  autoRefreshFolderPermissions,
+  submitFolderToBackend,
+  readFolderContent
+} from '../services/fs_access_api';
 import { sovereignBroadcastBus } from '../services/sovereignBroadcastBus';
 
 export default function StorageRoutingView() {
@@ -129,6 +135,14 @@ export default function StorageRoutingView() {
       if (pData && pData.process_types) setProcessTypesList(pData.process_types);
       if (extBrains && extBrains.external_brains) setExternalBrains(extBrains.external_brains);
       if (meshData && meshData.mesh) setSyncMesh(meshData.mesh);
+
+      // Si no hay dispositivos detectados y estamos en navegador, intentar acceso local
+      if (!devs || !devs.devices?.length) {
+        const result = await tryAutoAccessLocalStorage();
+        if (result?.success && devs) {
+          setDevicesData({ ...devs, devices: [result.device, ...devs.devices], devices_count: (devs.devices_count || 0) + 1 });
+        }
+      }
     } catch (err) {
       console.warn('Error loading storage routing data:', err);
     } finally {
@@ -152,6 +166,76 @@ export default function StorageRoutingView() {
       unsubscribe();
     };
   }, []);
+
+  // Auto-solicitar acceso a carpetas locales cuando no hay dispositivos detectados
+  const tryAutoAccessLocalStorage = async () => {
+  if (typeof window === 'undefined' || !window.showDirectoryPicker) {
+    return { success: false, message: 'File System Access API no disponible en este entorno.' };
+  }
+
+  try {
+    // 1. Pedir acceso a la raíz del sistema (carpeta padre común)
+    const rootAccess = await requestFolderAccess('Acceder a tus archivos locales para enrutamiento automático');
+
+    if (rootAccess?.cancelled) {
+      return { success: false, message: 'Acceso cancelado por el usuario.' };
+    }
+
+    if (rootAccess?.error) {
+      return { success: false, message: rootAccess.error };
+    }
+
+    // 2. Leer y contar archivos recursivamente
+    const rootHandle = rootAccess.handle;
+    const content = await readFolderContent(rootHandle);
+
+    // 3. Contar archivos recursivamente
+    function countAll(items) {
+      let c = 0;
+      for (const item of items) {
+        if (item.isDirectory && item.children) c += countAll(item.children);
+        else c++;
+      }
+      return c;
+    }
+    const totalFiles = countAll(content);
+
+    // 4. Enviar al backend para registro
+    const regResult = await submitFolderToBackend(
+      rootAccess.name || 'Almacenamiento Local',
+      '/' + rootAccess.name,
+      totalFiles
+    );
+
+    if (regResult?.error) {
+      console.warn('Backend no disponible, carpeta guardada localmente:', regResult.error);
+    }
+
+    // 5. Construir dispositivo para la UI
+    const device = {
+      id: `fs_local_${Date.now()}`,
+      name: rootAccess.name || 'Almacenamiento Local',
+      path: '/' + (rootAccess.name || 'root'),
+      type: 'filesystem_api_virtual',
+      filesystem: 'File System Access API',
+      storage_drive: rootAccess.name || 'Local',
+      isConnected: true,
+      capacity_mode: 'auto',
+      hasStorageAccess: true,
+      isExternalBrain: false,
+      permissions: {
+        mode: 'bidirectional_merge',
+        access_type: 'filesystem_api',
+        file_count: totalFiles
+      },
+      sync_status: 'synced'
+    };
+
+    return { success: true, device, fileCount: totalFiles };
+  } catch (err) {
+    return { success: false, message: err.message || 'Error al acceder al almacenamiento local.' };
+  }
+  };
 
   const handleScanNow = async () => {
     setIsScanning(true);
@@ -417,6 +501,16 @@ export default function StorageRoutingView() {
             >
               <RefreshCw className={`w-4 h-4 ${isScanning ? 'animate-spin' : ''}`} />
               <span>{isScanning ? 'Escaneando...' : 'Escanear Medios'}</span>
+            </button>
+
+            <button
+              onClick={tryAutoAccessLocalStorage}
+              disabled={isScanning}
+              className="px-4 py-2.5 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 font-bold flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50 shadow-md shadow-purple-950/30"
+              title="Acceder a tus carpetas locales para enrutamiento automático"
+            >
+              <Folder className="w-4 h-4" />
+              <span>Acceder a Almacenamiento Local</span>
             </button>
           </div>
         </div>
