@@ -38,7 +38,7 @@
       "category": "Orchestrator",
       "description": "Sistema cognitivo adaptable y consciente del entorno físico y digital.",
       "strength": 1.0,
-      "updated_at": 1787102069.475465
+      "updated_at": 1787266340.224036
     },
     "Arquitectura_1.58-bit": {
       "id": "Arquitectura_1.58-bit",
@@ -86,7 +86,7 @@
       "category": "Ecosystem",
       "description": "Sistema operativo descentralizado para nodos locales y comunitarios",
       "strength": 1.0,
-      "updated_at": 1787102069.506633
+      "updated_at": 1787266340.2314298
     },
     "LibreMesh_P2P": {
       "id": "LibreMesh_P2P",
@@ -6609,6 +6609,12 @@
       "target": "Plaintext",
       "relation": "asociado_con",
       "weight": 0.65
+    },
+    {
+      "source": "Astraura_Core",
+      "target": "StarSeed_OS",
+      "relation": "co-ocurre_en_IDEA.md",
+      "weight": 0.7
     }
   ]
 }

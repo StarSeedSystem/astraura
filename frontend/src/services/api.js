@@ -1848,6 +1848,16 @@ export async function broadcastStateMutation(event, payload = {}) {
   });
 }
 
+
+export async function executeAllNotificationsInList(notifIds) {
+  if (!notifIds || !notifIds.length) return { success: true, processed: 0, failed: 0 };
+  return apiFetch('/notifications/apply_all_from_list', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ notif_ids: notifIds })
+  });
+}
+
 export async function fetchImaginationSyncExecutionState() {
   return apiFetch('/imagination/sync_execution_state');
 }

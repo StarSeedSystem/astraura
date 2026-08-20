@@ -31,6 +31,7 @@ from .personalities.personality_engine import personality_engine
 from .agents.orchestrator import orchestrator
 from .agents.swarm_manager import swarm_manager
 from .agents.director_orchestrator import director_orchestrator
+from .agents.intelligent_authorization_orchestrator import intelligent_authorization_orchestrator
 from .workflows.workflow_engine import workflow_engine
 from .tools.system_explorer import system_explorer
 from .tools.terminal_tool import terminal_tool
@@ -2589,6 +2590,39 @@ async def apply_single_notification_endpoint(req: NotificationActionRequest):
         intuitive_imagination_engine._save_state()
 
     return res
+
+
+
+class ApplyAllFromListRequest(BaseModel):
+    notif_ids: List[str]
+
+
+@app.post("/api/notifications/apply_all_from_list")
+async def apply_all_notifications_from_list(req: ApplyAllFromListRequest):
+    """**[AUTO] Orquestación Inteligente 1.58-bit: procesa TODA lista de notificaciones
+    invocando los agentes reales del enjambre con sus personalidades, cerebros y memorias
+    correspondientes. Relaciona tareas, determina orden por prioridad/dependencias, refina
+    cada propuesta según contexto y actualiza TODOS los medios al final.**"""
+
+    # Delegar a la capa de orquestación inteligente (relación + enrutamiento + exocórtex + medios)
+    result = await intelligent_authorization_orchestrator.orchestrate_list(req.notif_ids)
+
+    if not result.get("success"):
+        return result
+
+    return {
+        "success": True,
+        "orchestrated_by": "IntelligentAuthorizationOrchestrator",
+        "processed": [p["notif_id"] for p in result.get("processed", [])],
+        "processed_count": result.get("processed_count", 0),
+        "applied_through_agent": result.get("processed_count", 0),
+        "agent_executions": result.get("agent_executions", {}),
+        "failed": result.get("failed", []),
+        "failed_count": result.get("failed_count", 0),
+        "storage_events": result.get("storage_events", 0),
+        "elapsed_seconds": result.get("elapsed_seconds", 0),
+        "message": result.get("message", "Orquestación completa."),
+    }
 
 @app.post("/api/notifications/delete")
 async def delete_notification_endpoint(req: NotificationActionRequest):

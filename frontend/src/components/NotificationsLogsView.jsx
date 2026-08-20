@@ -116,10 +116,43 @@ export default function NotificationsLogsView() {
         console.warn('Apply all proposals fallback:', e);
       }
 
-      // 3. Mark all notifications as read & applied
+      // 3. Procesar TODAS las notificaciones de la lista con los agentes reales
+      //    (cada notificación invoca su agente correspondiente con su personalidad,
+      //    cerebro y memoria 1.58-bit — no solo marcar como leído)
+      const pendingNotifs = data.notifications.filter(n =>
+        !n.read && (n.status === 'pending' || n.action_type === 'grant_authorization' ||
+                    n.category === 'Solicitud de Autorización')
+      );
+      const notifIdsToProcess = pendingNotifs.map(n => n.id).filter(id => id);
+      let totalProcessed = appliedCount;
+      if (notifIdsToProcess.length > 0) {
+        try {
+          setToastMsg(`⚡ Procesando ${notifIdsToProcess.length} notificaciones con los agentes del enjambre...`);
+          const execRes = await executeAllNotificationsInList(notifIdsToProcess);
+          if (execRes && execRes.success) {
+            totalProcessed += execRes.processed_count || 0;
+            const failedCount = execRes.failed_count || 0;
+            if (execRes.applied_through_agent) {
+              totalProcessed += execRes.applied_through_agent;
+            }
+            setToastMsg(
+              failedCount > 0
+                ? `✅ ¡${execRes.processed_count} notificaciones procesadas (${execRes.processed_count - failedCount} desarrolladas por agentes), ${failedCount} con errores. Actualizando medios perceptivos...`
+                : `✅ ¡${execRes.processed_count} notificaciones procesadas por los agentes en segundo plano (personalidades, cerebros y memorias 1.58-bit)!`
+            );
+          } else {
+            setToastMsg('⚠️ No se pudo procesar la lista de notificaciones con los agentes.');
+          }
+        } catch (e) {
+          console.warn('Execute all notifications fallback:', e);
+          setToastMsg('⚠️ Error procesando notificaciones en batch con agentes.');
+        }
+      }
+
+      // 4. Mark all notifications as read & applied
       await markNotificationsRead(null);
       
-      // 4. Force refresh from backend after sync
+      // 5. Force refresh from backend after sync
       await loadNotifications();
       
       const total = appliedCount > 0 ? appliedCount : data.notifications.length;
@@ -221,7 +254,9 @@ export default function NotificationsLogsView() {
     : data.notifications.filter(n => n.category === activeCategory);
 
   const pendingRequestsCount = data.notifications.filter(n => 
-    n.category === 'Solicitud de Autorización' || n.severity === 'warning' || !n.read
+    n.category === 'Solicitud de Autorización' || 
+    n.action_type === 'grant_authorization' ||
+    (n.severity === 'warning' && n.id && n.id.startsWith('notif_req_'))
   ).length;
 
   return (
