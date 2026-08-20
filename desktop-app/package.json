@@ -1,0 +1,102 @@
+{
+  "name": "astraura-158bit-desktop",
+  "version": "1.5.8",
+  "description": "Astraura 1.58-Bit Cognitive Engine // StarSeed OS - Sovereign Multi-Agent Desktop App",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux",
+    "build:win": "electron-builder --win",
+    "install:all": "npm install && cd ../frontend && npm install"
+  },
+  "keywords": [
+    "astraura",
+    "1.58-bit",
+    "bitnet",
+    "starseed",
+    "ai",
+    "cognitive-engine",
+    "sovereign",
+    "multi-agent"
+  ],
+  "author": "StarSeed System <alexbordongarrigos@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^32.0.0",
+    "electron-builder": "^25.0.0",
+    "electron-icon-builder": "^2.1.0"
+  },
+  "dependencies": {
+    "electron-store": "^10.0.0",
+    "node-pty": "^1.0.0"
+  },
+  "build": {
+    "appId": "com.starseed.astraura",
+    "productName": "Astraura 1.58-Bit",
+    "copyright": "Copyright © 2026 StarSeed System",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "assets/**/*",
+      "resources/**/*"
+    ],
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "icon": "assets/icon.icns",
+      "category": "public.app-category.developer-tools",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "assets/entitlements.mac.plist",
+      "entitlementsInherit": "assets/entitlements.mac.plist"
+    },
+    "dmg": {
+      "title": "Astraura 1.58-Bit Installer",
+      "background": "assets/dmg-background.png",
+      "icon": "assets/icon.icns"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb",
+        "rpm"
+      ],
+      "icon": "assets/icon.png",
+      "category": "Development",
+      "maintainer": "StarSeed System <alexbordongarrigos@gmail.com>",
+      "desktop": {
+        "Name": "Astraura 1.58-Bit",
+        "Comment": "Sovereign Multi-Agent Cognitive Engine",
+        "Categories": "Development;Science;Education;"
+      }
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "assets/icon.ico",
+      "publisherName": "StarSeed System",
+      "verifyUpdateCodeSignature": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Astraura 1.58-Bit",
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "installerHeaderIcon": "assets/icon.ico"
+    }
+  }
+}

@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#07090e;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0f141f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a1130;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="coreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#a855f7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#a855f7;stop-opacity:0.6" />
+    </radialGradient>
+    <radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:0.4" />
+      <stop offset="70%" style="stop-color:#a855f7;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#1a1130;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="250" fill="url(#bgGrad)" stroke="url(#coreGrad)" stroke-width="4"/>
+  
+  <!-- Outer glow -->
+  <circle cx="256" cy="256" r="200" fill="url(#glowGrad)" />
+  
+  <!-- Hexagonal core (representing ternary architecture) -->
+  <g transform="translate(256, 256)">
+    <!-- Outer hexagon ring -->
+    <polygon points="
+      0,-120
+      104,-60
+      104,60
+      0,120
+      -104,60
+      -104,-60
+    " fill="none" stroke="url(#ringGrad)" stroke-width="3" opacity="0.6"/>
+    
+    <!-- Middle hexagon -->
+    <polygon points="
+      0,-80
+      69,-40
+      69,40
+      0,80
+      -69,40
+      -69,-40
+    " fill="none" stroke="url(#coreGrad)" stroke-width="2" opacity="0.8"/>
+    
+    <!-- Inner core circle -->
+    <circle cx="0" cy="0" r="45" fill="url(#coreGrad)" opacity="0.9">
+      <animate attributeName="r" values="45;50;45" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.9;1;0.9" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Ternary symbols: -1, 0, 1 -->
+    <g font-family="system-ui, sans-serif" font-weight="bold" font-size="28" fill="#07090e" text-anchor="middle" dominant-baseline="middle">
+      <!-- -1 -->
+      <text x="-60" y="-35" opacity="0.9">−1</text>
+      <!-- 0 -->
+      <text x="0" y="0" opacity="0.9">0</text>
+      <!-- 1 -->
+      <text x="60" y="35" opacity="0.9">1</text>
+    </g>
+    
+    <!-- Neural connections lines -->
+    <g stroke="url(#coreGrad)" stroke-width="1.5" opacity="0.5">
+      <line x1="0" y1="-45" x2="0" y2="-80" stroke-dasharray="4,4">
+        <animate attributeName="stroke-opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="0" y1="45" x2="0" y2="80" stroke-dasharray="4,4">
+        <animate attributeName="stroke-opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="-45" y1="0" x2="-80" y2="0" stroke-dasharray="4,4">
+        <animate attributeName="stroke-opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="45" y1="0" x2="80" y2="0" stroke-dasharray="4,4">
+        <animate attributeName="stroke-opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="-32" y1="-32" x2="-57" y2="-57" stroke-dasharray="4,4">
+        <animate attributeName="stroke-opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="32" y1="32" x2="57" y2="57" stroke-dasharray="4,4">
+        <animate attributeName="stroke-opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="-32" y1="32" x2="-57" y2="57" stroke-dasharray="4,4">
+        <animate attributeName="stroke-opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="32" y1="-32" x2="57" y2="-57" stroke-dasharray="4,4">
+        <animate attributeName="stroke-opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/>
+      </line>
+    </g>
+    
+    <!-- Small orbiting particles (representing 1.58-bit agents) -->
+    <g fill="url(#coreGrad)">
+      <circle r="4">
+        <animateMotion path="M 0 -65 L 56 -32 L 56 32 L 0 65 L -56 32 L -56 -32 Z" dur="6s" repeatCount="indefinite" rotate="auto"/>
+        <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/>
+      </circle>
+      <circle r="3">
+        <animateMotion path="M 0 -65 L 56 -32 L 56 32 L 0 65 L -56 32 L -56 -32 Z" dur="6s" repeatCount="indefinite" rotate="auto" begin="1.5s"/>
+        <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/>
+      </circle>
+      <circle r="2.5">
+        <animateMotion path="M 0 -65 L 56 -32 L 56 32 L 0 65 L -56 32 L -56 -32 Z" dur="6s" repeatCount="indefinite" rotate="auto" begin="3s"/>
+        <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+  
+  <!-- "1.58" text at bottom -->
+  <text x="256" y="420" font-family="system-ui, sans-serif" font-weight="800" font-size="32" fill="url(#coreGrad)" text-anchor="middle" dominant-baseline="middle" letter-spacing="2">
+    1.58
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="256" y="455" font-family="system-ui, sans-serif" font-weight="500" font-size="14" fill="#64748b" text-anchor="middle" dominant-baseline="middle" letter-spacing="1.5">
+    BITNET CORE
+  </text>
+</svg>

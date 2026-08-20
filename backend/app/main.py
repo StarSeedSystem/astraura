@@ -88,6 +88,15 @@ async def lifespan(app: FastAPI):
     asyncio.create_task(intuitive_imagination_engine.start_background_loop())
     asyncio.create_task(swarm_manager.start_scheduler_loop())
     asyncio.create_task(storage_routing_engine.start_watcher_loop())
+    
+    # 6. Start Sovereign Mesh Tunnel Manager (Cloudflare Quick Tunnel & LAN Discovery)
+    try:
+        from .core.tunnel_manager import tunnel_manager
+        tunnel_manager.start_tunnel_in_background()
+        print("🌐 Túnel HTTPS Soberano & Enlace Multi-Dispositivo (Cloudflare/LAN): ACTIVO")
+    except Exception as e:
+        print(f"⚠️ No se pudo iniciar el túnel automático: {e}")
+        
     print("🧠 Worker de aprendizaje continuo en segundo plano: ACTIVO")
     print("🌌 Worker de Imaginación Intuitiva Unificada (Always-On 1.58b): ACTIVO")
     print("⚡ Worker de Enjambre Multiagéntico & Reactivaciones Programadas: ACTIVO")
@@ -97,6 +106,11 @@ async def lifespan(app: FastAPI):
     yield
     
     background_learner.stop()
+    try:
+        from .core.tunnel_manager import tunnel_manager
+        tunnel_manager.stop_tunnel()
+    except Exception:
+        pass
     print("🛑 Astraura 1.58-Bit AI Engine detenido.")
 
 app = FastAPI(
@@ -108,9 +122,10 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,  # Must be False when allow_origins=["*"]
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 app.include_router(voice_studio_router)
@@ -2086,6 +2101,21 @@ async def grant_single_request_endpoint(branch_id: str, req: Optional[GrantSingl
     d = req.data if req else None
     return intuitive_imagination_engine.grant_and_apply_request(branch_id, d)
 
+@app.get("/api/imagination/sync_execution_state")
+async def get_imagination_sync_execution_state():
+    """Returns the current multi-agent synchronized proposal execution state (progress, logs, agent breakdown)."""
+    state = intuitive_imagination_engine.sync_execution_state
+    return {
+        "success": True,
+        "is_running": state.get("is_running", False),
+        "global_progress_pct": state.get("progress_percent", 100),
+        "total_tasks": state.get("total_tasks", 0),
+        "completed_tasks": state.get("completed_tasks", 0),
+        "agents": state.get("agent_progress", {}),
+        "current_logs": state.get("current_logs", []),
+        "applied_details": state.get("applied_details", [])
+    }
+
 # ================= Universal Device & OS Native Hardware Access APIs =================
 
 @app.get("/api/system/universal_device_access")
@@ -2177,6 +2207,295 @@ async def generate_synthesis_report_endpoint(req: GenerateSynthesisReportRequest
 async def clear_synthesis_reports():
     synthesis_reporter_engine.clear_history()
     return {"success": True, "message": "Historial de síntesis reiniciado."}
+
+# ================= Synthesis Report Memory/Brain Link APIs =================
+
+@app.get("/api/imagination/synthesis_reports/{report_id}/memory_graph")
+async def get_synthesis_report_memory_graph(report_id: str):
+    """
+    Fetch the memory graph, brain/cerebro mappings, and folder/file tree 
+    specific to a synthesis report. This ensures each tab's content is
+    uniquely developed from its own memory traces.
+    """
+    report = synthesis_reporter_engine.get_report_by_id(report_id)
+    if not report:
+        return {"success": False, "error": "Informe no encontrado"}
+    
+    from pathlib import Path as PathLib
+    from app.core.memory_graph_engine import memory_graph_engine
+    
+    # Get linked memory references from the report
+    real_links = report.get("real_links", {})
+    memory_refs = real_links.get("memories", [])
+    file_refs = real_links.get("files", [])
+    folder_refs = real_links.get("folders", [])
+    project_refs = real_links.get("projects", [])
+    
+    # Build memory graph from the report's actual memory references
+    graph_nodes = []
+    graph_edges = []
+    
+    for mem in memory_refs:
+        node = {
+            "id": mem.get("id", f"mem_{len(graph_nodes)}"),
+            "label": mem.get("title", "Memoria"),
+            "type": mem.get("type", "general"),
+            "category": mem.get("type", "memoria"),
+            "content_snippet": mem.get("content_snippet", ""),
+            "path": mem.get("path", ""),
+            "size": mem.get("size", 0),
+            "brain_id": mem.get("brain_id", ""),
+            "created_at": mem.get("timestamp", time.time())
+        }
+        graph_nodes.append(node)
+    
+    for file_ref in file_refs:
+        node = {
+            "id": f"file_{file_refs.index(file_ref)}",
+            "label": file_ref.get("name", "archivo"),
+            "type": "file",
+            "category": "document",
+            "path": file_ref.get("path", ""),
+            "size_formatted": file_ref.get("size_formatted", ""),
+            "status": file_ref.get("status", ""),
+            "brain_id": file_ref.get("brain_id", "")
+        }
+        graph_nodes.append(node)
+    
+    for folder_ref in folder_refs:
+        node = {
+            "id": f"folder_{folder_refs.index(folder_ref)}",
+            "label": folder_ref.get("name", "carpeta"),
+            "type": "folder",
+            "category": "workspace",
+            "path": folder_ref.get("path", ""),
+            "brain_id": folder_ref.get("brain_id", "")
+        }
+        graph_nodes.append(node)
+    
+    # Build edges (relationships between memories, files, folders)
+    for i, mem in enumerate(memory_refs):
+        for j, file_ref in enumerate(file_refs):
+            edge = {
+                "source": mem.get("id", f"mem_{i}"),
+                "target": f"file_{j}",
+                "type": "references",
+                "weight": 0.8
+            }
+            graph_edges.append(edge)
+    
+    for i, mem in enumerate(memory_refs):
+        for j, folder_ref in enumerate(folder_refs):
+            edge = {
+                "source": mem.get("id", f"mem_{i}"),
+                "target": f"folder_{j}",
+                "type": "stored_in",
+                "weight": 0.6
+            }
+            graph_edges.append(edge)
+    
+    # Add 2D and 3D layout info
+    graph_2d = {
+        "nodes": graph_nodes,
+        "edges": graph_edges,
+        "layout": "force-directed-2d",
+        "width": 800,
+        "height": 600
+    }
+    
+    graph_3d = {
+        "nodes": [{**n, "z": (hash(n["id"]) % 100) / 100.0, "x": i * 50, "y": i * 30} for i, n in enumerate(graph_nodes)],
+        "edges": graph_edges,
+        "layout": "3d-force-graph",
+        "width": 800,
+        "height": 600
+    }
+    
+    return {
+        "success": True,
+        "report_id": report_id,
+        "graph_2d": graph_2d,
+        "graph_3d": graph_3d,
+        "memory_references": memory_refs,
+        "total_nodes": len(graph_nodes),
+        "total_edges": len(graph_edges)
+    }
+
+@app.get("/api/imagination/synthesis_reports/{report_id}/brain_cerebros")
+async def get_synthesis_report_brain_cerebros(report_id: str):
+    """
+    Fetch brain/cerebro mappings specific to a synthesis report.
+    Shows which cerebros have access to which memories and files referenced in this report.
+    """
+    report = synthesis_reporter_engine.get_report_by_id(report_id)
+    if not report:
+        return {"success": False, "error": "Informe no encontrado"}
+    
+    from app.core.personality_engine import personality_engine
+    from app.memory.starseed_memory_engine import starseed_memory_engine
+    
+    # Get participating agents and their cerebro mappings
+    participating_agents = report.get("participating_agents", [])
+    
+    cerebro_mappings = []
+    for agent in participating_agents:
+        agent_id = agent.get("id", agent.get("name", "").lower())
+        brain_id = agent.get("brain_id", f"brain_{agent_id}")
+        
+        # Get cerebro memory access
+        cerebro_info = starseed_memory_engine.get_cerebro_access(brain_id) if hasattr(starseed_memory_engine, 'get_cerebro_access') else {"memories": [], "files": [], "projects": []}
+        
+        mapping = {
+            "agent_id": agent_id,
+            "agent_name": agent.get("name", ""),
+            "agent_role": agent.get("role", ""),
+            "brain_id": brain_id,
+            "brain_label": agent.get("brain_label", brain_id),
+            "memories_access": cerebro_info.get("memories", []),
+            "files_access": cerebro_info.get("files", []),
+            "projects_access": cerebro_info.get("projects", []),
+            "total_memories": len(cerebro_info.get("memories", [])),
+            "total_files": len(cerebro_info.get("files", [])),
+            "total_projects": len(cerebro_info.get("projects", []))
+        }
+        cerebro_mappings.append(mapping)
+    
+    # Also get the report's own memory graph links
+    real_links = report.get("real_links", {})
+    
+    return {
+        "success": True,
+        "report_id": report_id,
+        "synthesis_index": report.get("synthesis_index", 0),
+        "total_cerebros": len(cerebro_mappings),
+        "cerebro_mappings": cerebro_mappings,
+        "memory_refs_in_report": real_links.get("memories", []),
+        "folder_refs_in_report": real_links.get("folders", []),
+        "file_refs_in_report": real_links.get("files", []),
+        "project_refs_in_report": real_links.get("projects", [])
+    }
+
+@app.get("/api/imagination/synthesis_reports/{report_id}/file_tree")
+async def get_synthesis_report_file_tree(report_id: str):
+    """
+    Fetch the folder/file tree specific to a synthesis report, 
+    with brain/cerebro mapping for each file/folder.
+    """
+    report = synthesis_reporter_engine.get_report_by_id(report_id)
+    if not report:
+        return {"success": False, "error": "Informe no encontrado"}
+    
+    real_links = report.get("real_links", {})
+    folders = real_links.get("folders", [])
+    files = real_links.get("files", [])
+    memories = real_links.get("memories", [])
+    
+    # Build the tree from actual report links
+    file_tree = {
+        "report_id": report_id,
+        "trees": [],
+        "folders": folders,
+        "files": files,
+        "memories": memories,
+        "interconnections": [],
+        "brain_mappings": []
+    }
+    
+    # Build folder tree
+    folder_tree = {}
+    for folder in folders:
+        path_parts = folder.get("path", "").split("/")
+        brain_id = folder.get("brain_id", "")
+        
+        current = folder_tree
+        for part in path_parts:
+            if part:
+                if part not in current:
+                    current[part] = {"__files": [], "__memories": [], "__brain_id": brain_id, "__path": folder.get("path", "")}
+                current = current[part]
+    
+    # Map files to folders
+    for file_ref in files:
+        file_path = file_ref.get("path", "")
+        brain_id = file_ref.get("brain_id", "")
+        
+        # Find which folder this file belongs to
+        for folder in folders:
+            folder_path = folder.get("path", "")
+            if file_path.startswith(folder_path):
+                file_tree["interconnections"].append({
+                    "file": file_path,
+                    "folder": folder_path,
+                    "brain_id": brain_id,
+                    "type": "file_in_folder"
+                })
+    
+    # Map memories to files and folders
+    for mem in memories:
+        mem_id = mem.get("id", "")
+        brain_id = mem.get("brain_id", "")
+        
+        for file_ref in files:
+            if file_ref.get("path", "").find(mem.get("path", "")) != -1:
+                file_tree["interconnections"].append({
+                    "memory_id": mem_id,
+                    "file": file_ref.get("path", ""),
+                    "brain_id": brain_id,
+                    "type": "memory_in_file"
+                })
+    
+    # Map brains to their resources
+    all_brain_ids = set()
+    for f in files:
+        if f.get("brain_id"): all_brain_ids.add(f["brain_id"])
+    for m in memories:
+        if m.get("brain_id"): all_brain_ids.add(m["brain_id"])
+    for folder in folders:
+        if folder.get("brain_id"): all_brain_ids.add(folder["brain_id"])
+    
+    for brain_id in all_brain_ids:
+        brain_files = [f for f in files if f.get("brain_id") == brain_id]
+        brain_memories = [m for m in memories if m.get("brain_id") == brain_id]
+        brain_folders = [fold for fold in folders if fold.get("brain_id") == brain_id]
+        
+        file_tree["brain_mappings"].append({
+            "brain_id": brain_id,
+            "brain_label": f"Cerebro {brain_id}",
+            "files": brain_files,
+            "memories": brain_memories,
+            "folders": brain_folders,
+            "total_files": len(brain_files),
+            "total_memories": len(brain_memories),
+            "total_folders": len(brain_folders)
+        })
+    
+    return {
+        "success": True,
+        "report_id": report_id,
+        "file_tree": file_tree,
+        "total_folders": len(folders),
+        "total_files": len(files),
+        "total_memories": len(memories),
+        "total_brains": len(all_brain_ids)
+    }
+
+@app.post("/api/imagination/synthesis_reports/{report_id}/regenerate_tab")
+async def regenerate_synthesis_report_tab(report_id: str, req: Dict[str, Any]):
+    """
+    Regenerate the content for a specific tab in a synthesis report.
+    Ensures unique content for each tab, developed by the appropriate agent.
+    """
+    tab_id = req.get("tab_id", "summary")
+    report = synthesis_reporter_engine.get_report_by_id(report_id)
+    if not report:
+        return {"success": False, "error": "Informe no encontrado"}
+    
+    # Call the synthesis reporter to regenerate tab-specific content
+    updated_report = synthesis_reporter_engine.regenerate_tab_content(report_id, tab_id)
+    if updated_report:
+        return {"success": True, "report": updated_report}
+    return {"success": False, "error": "No se pudo regenerar el contenido"}
+
 
 # ================= Storage Media, Folders & Files Dynamic Memory Routing APIs =================
 
@@ -2412,6 +2731,8 @@ async def chat_stream_endpoint(req: ChatRequest):
 @app.websocket("/ws/chat")
 async def websocket_chat(websocket: WebSocket):
     await manager.connect(websocket)
+    from app.core.global_state_broadcaster import global_broadcaster
+    await global_broadcaster.register(websocket)
     try:
         await websocket.send_json({
             "type": "init_state",
@@ -2421,7 +2742,8 @@ async def websocket_chat(websocket: WebSocket):
             "graph": knowledge_graph.get_full_graph(),
             "skills": starseed_library.get_all_skills(),
             "dream": dream_engine.get_status(),
-            "swarm": swarm_manager.get_swarm_status()
+            "swarm": swarm_manager.get_swarm_status(),
+            "sync_mesh": global_broadcaster.get_sync_telemetry()
         })
         
         while True:
@@ -2441,13 +2763,21 @@ async def websocket_chat(websocket: WebSocket):
                 await websocket.send_json({
                     "type": "pong", 
                     "environment": environment_sensor.get_live_metrics(),
-                    "telemetry": system_senses.get_full_telemetry()
+                    "telemetry": system_senses.get_full_telemetry(),
+                    "sync_mesh": global_broadcaster.get_sync_telemetry()
                 })
+            
+            elif msg_type == "state_mutation_broadcast":
+                event_name = data.get("event", "generic_mutation")
+                payload = data.get("payload", {})
+                await global_broadcaster.broadcast_state_mutation(event_name, payload)
                 
     except WebSocketDisconnect:
         manager.disconnect(websocket)
+        await global_broadcaster.unregister(websocket)
     except Exception:
         manager.disconnect(websocket)
+        await global_broadcaster.unregister(websocket)
 
 # ================= Universal Storage & Drives APIs =================
 
@@ -2473,6 +2803,232 @@ async def inspect_file_storage(data: dict):
     return {
         "success": True,
         "file_info": info
+    }
+
+# ================= Inter-Cerebral Synaptic Bridge & Fusion APIs =================
+
+@app.get("/api/cerebros/external/scan")
+async def scan_external_brains():
+    from app.cerebros.inter_cerebral_bridge import inter_cerebral_bridge
+    detected = inter_cerebral_bridge.scan_connected_storage_for_brains()
+    return {
+        "success": True,
+        "total_detected": len(detected),
+        "external_brains": detected
+    }
+
+@app.post("/api/cerebros/external/fuse")
+async def fuse_external_brain(data: dict):
+    from app.cerebros.inter_cerebral_bridge import inter_cerebral_bridge
+    from app.core.global_state_broadcaster import global_broadcaster
+    brain_id = data.get("brain_id") or data.get("external_brain_id") or data.get("external_vault_path") or data.get("vault_path") or ""
+    strategy = data.get("strategy", "bidirectional_merge")
+    res = inter_cerebral_bridge.fuse_external_brain(brain_id, strategy)
+    if res.get("success"):
+        await global_broadcaster.broadcast_state_mutation("cerebral_fusion_completed", res)
+    return res
+
+@app.post("/api/cerebros/external/permissions")
+async def update_external_brain_permissions(data: dict):
+    from app.cerebros.inter_cerebral_bridge import inter_cerebral_bridge
+    brain_id = data.get("brain_id") or data.get("external_brain_id") or data.get("external_vault_path") or data.get("vault_path") or ""
+    new_mode = data.get("mode", "bidirectional_merge")
+    res = inter_cerebral_bridge.update_connection_permissions(brain_id, new_mode)
+    return res
+
+# ================= Universal Portable Brain Capsule & Sync APIs =================
+
+@app.post("/api/cerebros/portable/sync_to_storage")
+async def sync_portable_brain_to_storage(data: dict):
+    from app.cerebros.portable_brain_generator import portable_brain_generator
+    from app.core.global_state_broadcaster import global_broadcaster
+    brain_id = data.get("brain_id", "starseed_unified_brain")
+    drive_path = data.get("drive_path", "")
+    include_projects = data.get("include_projects", True)
+    include_voice = data.get("include_voice_studio", True)
+    
+    if not drive_path:
+        return {"success": False, "error": "Ruta de almacenamiento de destino no especificada"}
+
+    res = portable_brain_generator.sync_brain_to_storage_drive(
+        brain_id=brain_id,
+        target_drive_path=drive_path,
+        include_projects=include_projects,
+        include_voice_studio=include_voice
+    )
+    if res.get("success"):
+        await global_broadcaster.broadcast_state_mutation("portable_brain_synced", res)
+    return res
+
+# ================= Real-Time Multi-Device Mesh Telemetry =================
+
+@app.get("/api/system/sync/telemetry")
+async def get_sync_mesh_telemetry():
+    from app.core.global_state_broadcaster import global_broadcaster
+    return {
+        "success": True,
+        "mesh": global_broadcaster.get_sync_telemetry()
+    }
+
+@app.post("/api/system/sync/broadcast")
+async def post_sync_mesh_broadcast(data: dict):
+    from app.core.global_state_broadcaster import global_broadcaster
+    event_name = data.get("event", "client_state_sync")
+    payload = data.get("payload", {})
+    await global_broadcaster.broadcast_state_mutation(event_name, payload)
+    return {"success": True}
+
+# ================= Sovereign Tunnel & Mesh APIs =================
+
+@app.get("/api/system/tunnel/status")
+async def get_system_tunnel_status():
+    from .core.tunnel_manager import tunnel_manager
+    return {
+        "success": True,
+        "tunnel": tunnel_manager.get_status()
+    }
+
+@app.post("/api/system/tunnel/restart")
+async def restart_system_tunnel():
+    from .core.tunnel_manager import tunnel_manager
+    tunnel_manager.stop_tunnel()
+    ok = tunnel_manager.start_tunnel_in_background()
+    return {
+        "success": ok,
+        "tunnel": tunnel_manager.get_status()
+    }
+
+@app.post("/api/system/tunnel/stop")
+async def stop_system_tunnel():
+    from .core.tunnel_manager import tunnel_manager
+    tunnel_manager.stop_tunnel()
+    return {
+        "success": True,
+        "tunnel": tunnel_manager.get_status()
+    }
+
+@app.post("/api/system/tunnel/start")
+async def start_system_tunnel():
+    from .core.tunnel_manager import tunnel_manager
+    ok = tunnel_manager.start_tunnel_in_background()
+    return {
+        "success": ok,
+        "tunnel": tunnel_manager.get_status()
+    }
+
+@app.get("/active_tunnel.json")
+async def get_active_tunnel_json_dynamic():
+    """
+    Dynamic active_tunnel.json endpoint — served directly from the backend,
+    accessible at TUNNEL_URL/active_tunnel.json for auto-discovery by Vercel/mobile clients.
+    Returns current tunnel URL + LAN IPs for zero-config multi-device pairing.
+    """
+    from .core.tunnel_manager import tunnel_manager
+    status = tunnel_manager.get_status()
+    lan_ips = status.get("lan_ips", [])
+    url = status.get("url")
+    vercel_link = f"https://astraura.vercel.app/?gateway={url}" if url else "https://astraura.vercel.app/"
+    return {
+        "active": status.get("active", False),
+        "url": url,
+        "lan_ips": lan_ips,
+        "lan_endpoints": [f"http://{ip}:8000" for ip in lan_ips],
+        "vercel_link": vercel_link,
+        "provider": "cloudflare_quick_tunnel",
+        "timestamp": __import__('time').time()
+    }
+
+@app.get("/api/system/tunnel/qr_data")
+async def get_tunnel_qr_data():
+    """Returns the tunnel URL + deep link for generating QR codes in the frontend."""
+    from .core.tunnel_manager import tunnel_manager
+    status = tunnel_manager.get_status()
+    url = status.get("url")
+    lan_ips = status.get("lan_ips", [])
+    return {
+        "success": True,
+        "tunnel_url": url,
+        "vercel_deeplink": f"https://astraura.vercel.app/?gateway={url}" if url else None,
+        "lan_endpoints": [f"http://{ip}:8000" for ip in lan_ips],
+        "connect_instructions": {
+            "step1": "Escanea el código QR o abre el enlace Vercel en cualquier dispositivo",
+            "step2": "La app detecta automáticamente el túnel activo y se conecta",
+            "step3": "Todos los cerebros, medios y proyectos se sincronizan en tiempo real"
+        }
+    }
+
+@app.get("/api/system/cerebros_media_map")
+async def get_cerebros_media_map():
+    """Returns which media/storage devices each Cerebro has access to, and which Cerebros are linked to each storage volume."""
+    from .core.tunnel_manager import tunnel_manager
+    from app.core.starseed_memory_engine import starseed_memory_engine
+    
+    tunnel_status = tunnel_manager.get_status()
+    
+    # Get all cerebros
+    cerebros_raw = starseed_memory_engine.get_all_cerebros() if hasattr(starseed_memory_engine, 'get_all_cerebros') else []
+    
+    # Get storage devices
+    try:
+        from app.core.storage_routing_engine import storage_routing_engine
+        devices_data = storage_routing_engine.get_connected_devices()
+        devices = devices_data.get("devices", [])
+    except Exception:
+        devices = []
+
+    # Build bidirectional map
+    cerebro_to_media = {}
+    media_to_cerebros = {}
+
+    for cerebro in cerebros_raw:
+        cid = cerebro.get("id", "")
+        linked_paths = []
+        # Check rules for this cerebro
+        try:
+            rules = storage_routing_engine.get_all_rules().get("rules", []) if hasattr(storage_routing_engine, 'get_all_rules') else []
+            for rule in rules:
+                brain_ids = rule.get("auto_memory_routing", {}).get("target_brains", [])
+                if cid in brain_ids:
+                    linked_paths.append({
+                        "rule_id": rule.get("id"),
+                        "name": rule.get("name"),
+                        "path": rule.get("target_path"),
+                        "type": rule.get("media_type")
+                    })
+        except Exception:
+            pass
+        cerebro_to_media[cid] = {
+            "cerebro_name": cerebro.get("name", cid),
+            "linked_media": linked_paths,
+            "total_linked": len(linked_paths)
+        }
+
+    for dev in devices:
+        dev_id = dev.get("id") or dev.get("path", "unknown")
+        linked_cerebros = []
+        try:
+            rules = storage_routing_engine.get_all_rules().get("rules", []) if hasattr(storage_routing_engine, 'get_all_rules') else []
+            for rule in rules:
+                if dev.get("path") and dev.get("path") in rule.get("target_path", ""):
+                    brain_ids = rule.get("auto_memory_routing", {}).get("target_brains", [])
+                    linked_cerebros.extend(brain_ids)
+        except Exception:
+            pass
+        media_to_cerebros[dev_id] = {
+            "device_label": dev.get("label", dev_id),
+            "device_type": dev.get("media_type", "unknown"),
+            "path": dev.get("path"),
+            "linked_cerebros": list(set(linked_cerebros))
+        }
+
+    return {
+        "success": True,
+        "tunnel_url": tunnel_status.get("url"),
+        "lan_endpoints": tunnel_status.get("lan_endpoints", []),
+        "cerebro_to_media": cerebro_to_media,
+        "media_to_cerebros": media_to_cerebros,
+        "total_devices": len(devices),
+        "total_cerebros": len(cerebros_raw)
     }
 
 frontend_dist = settings.workspace_path / "frontend" / "dist"

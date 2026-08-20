@@ -1,0 +1,751 @@
+#!/usr/bin/env bash
+# =============================================================================
+# Astraura 1.58-Bit Desktop App // Universal Launcher & CLI Manager
+# 
+# This script provides intelligent terminal access to the Astraura 1.58-Bit 
+# Cognitive Engine. It offers three modes at startup:
+#   1. Install and open the full desktop app (Electron wrapper)
+#   2. Install and open in terminal mode (backend + Vite dev server)
+#   3. Open in browser mode (Vercel live deployment)
+#   4. Pure terminal mode (backend only, no frontend)
+#
+# Usage:
+#   astraura                     # Interactive mode selector
+#   astraura --mode=app          # Launch desktop app
+#   astraura --mode=terminal     # Launch backend + terminal
+#   astraura --mode=browser      # Open in browser
+#   astraura --mode=cli          # Pure CLI mode
+#   astraura --install           # Run full install + launch app
+#
+# =============================================================================
+
+set -e
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Configuration
+# ──────────────────────────────────────────────────────────────────────────────
+APP_NAME="Astraura 1.58-Bit"
+APP_VERSION="1.5.8"
+INSTALL_DIR="${HOME}/.astraura"
+BACKEND_PORT=8000
+FRONTEND_PORT=5173
+WEB_URL="https://astraura.vercel.app"
+GITHUB_REPO="https://github.com/StarSeedSystem/astraura.git"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+PURPLE='\033[0;35m'
+WHITE='\033[1;37m'
+ORANGE='\033[0;33m'
+BOLD='\033[1m'
+RESET='\033[0m'
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Utility Functions
+# ──────────────────────────────────────────────────────────────────────────────
+
+log() {
+    echo -e "${CYAN}[Astraura]${RESET} $1"
+}
+
+log_success() {
+    echo -e "${GREEN}✅ $1${RESET}"
+}
+
+log_warn() {
+    echo -e "${YELLOW}⚠️  $1${RESET}"
+}
+
+log_error() {
+    echo -e "${RED}❌ $1${RESET}"
+}
+
+log_step() {
+    echo -e "${PURPLE}▶️  $1${RESET}"
+}
+
+print_banner() {
+    echo -e "${CYAN}"
+    echo "╔════════════════════════════════════════════════════════════════════════════╗"
+    echo "║                                                                            ║"
+    echo "║  🚀 ASTRAURA 1.58-BIT COGNITIVE ENGINE // STARSEED OS                     ║"
+    echo "║  Arquitectura: Microsoft BitNet b1.58 Ternary ({-1, 0, 1})                 ║"
+    echo "║  Versión: ${APP_VERSION}                                                     ║"
+    echo "║  Soberanía: 100% Local / Zero-Leak                                       ║"
+    echo "║                                                                            ║"
+    echo "╚════════════════════════════════════════════════════════════════════════════╝"
+    echo -e "${RESET}"
+}
+
+detect_os() {
+    OS="$(uname -s)"
+    ARCH="$(uname -m)"
+    
+    case "$OS" in
+        Darwin*)
+            OS_NAME="macOS"
+            PYTHON_CMD="python3"
+            ;;
+        Linux*)
+            OS_NAME="Linux"
+            PYTHON_CMD="python3"
+            ;;
+        MINGW*|MSYS*|CYGWIN*)
+            OS_NAME="Windows"
+            PYTHON_CMD="python"
+            ;;
+        *)
+            OS_NAME="Unknown"
+            PYTHON_CMD="python3"
+            ;;
+    esac
+    
+    log "Plataforma detectada: ${OS_NAME} (${ARCH})"
+}
+
+check_python() {
+    if ! command -v "${PYTHON_CMD}" &> /dev/null; then
+        log_error "Python 3 no encontrado. Instalando..."
+        
+        if [ "$OS" = "Darwin" ] && command -v brew &> /dev/null; then
+            brew install python@3.11
+        elif [ "$OS" = "Linux" ] && command -v apt &> /dev/null; then
+            sudo apt-get update && sudo apt-get install -y python3 python3-venv python3-pip
+        elif [ "$OS" = "Linux" ] && command -v pacman &> /dev/null; then
+            sudo pacman -S python python-pip
+        elif [ "$OS" = "Linux" ] && command -v dnf &> /dev/null; then
+            sudo dnf install -y python3 python3-pip
+        else
+            log_error "No se pudo instalar Python automáticamente. Por favor instálalo manualmente."
+            exit 1
+        fi
+    fi
+    
+    log_success "Python verificado: $(${PYTHON_CMD} --version 2>&1)"
+}
+
+check_node() {
+    if ! command -v npm &> /dev/null; then
+        log_error "Node.js/npm no encontrado. Instalando..."
+        
+        if [ "$OS" = "Darwin" ] && command -v brew &> /dev/null; then
+            brew install node
+        elif [ "$OS" = "Linux" ]; then
+            curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+        fi
+    fi
+    
+    log_success "Node.js verificado: $(node --version 2>&1)"
+}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Backend Management
+# ──────────────────────────────────────────────────────────────────────────────
+
+create_venv() {
+    if [ ! -d "${INSTALL_DIR}/.venv" ]; then
+        log_step "Creando entorno virtual aislado..."
+        ${PYTHON_CMD} -m venv "${INSTALL_DIR}/.venv"
+    fi
+    
+    # Activate and install deps
+    source "${INSTALL_DIR}/.venv/bin/activate"
+    pip install --upgrade pip setuptools wheel 2>/dev/null
+    
+    if [ -f "${INSTALL_DIR}/backend/requirements.txt" ]; then
+        log_step "Instalando dependencias del backend..."
+        pip install -r "${INSTALL_DIR}/backend/requirements.txt" 2>&1 | grep -vi "warning" | tail -3
+    else
+        pip install fastapi uvicorn httpx numpy pydantic psutil beautifulsoup4 2>&1 | grep -vi "warning" | tail -3
+    fi
+}
+
+start_backend() {
+    if [ -f "${INSTALL_DIR}/backend/run_backend.py" ]; then
+        log "Iniciando backend en puerto ${BACKEND_PORT}..."
+        source "${INSTALL_DIR}/.venv/bin/activate"
+        cd "${INSTALL_DIR}"
+        
+        PYTHONPATH="${INSTALL_DIR}" ${PYTHON_CMD} backend/run_backend.py &
+        BACKEND_PID=$!
+        
+        # Wait for backend to start
+        log "Esperando a que el backend esté listo..."
+        for i in $(seq 1 30); do
+            if curl -s "http://127.0.0.1:${BACKEND_PORT}/api/status" > /dev/null 2>&1; then
+                log_success "Backend iniciado correctamente! [PID: ${BACKEND_PID}]"
+                return 0
+            fi
+            sleep 1
+        done
+        
+        log_warn "Backend aún no responde. Reintentando en 3s..."
+        sleep 3
+    else
+        log_error "Backend no encontrado en ${INSTALL_DIR}/backend/"
+        return 1
+    fi
+}
+
+stop_backend() {
+    if [ -n "${BACKEND_PID}" ] && kill -0 ${BACKEND_PID} 2>/dev/null; then
+        log "Deteniendo backend [PID: ${BACKEND_PID}]..."
+        kill ${BACKEND_PID} 2>/dev/null
+        wait ${BACKEND_PID} 2>/dev/null
+        unset BACKEND_PID
+    fi
+}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Frontend Management  
+# ──────────────────────────────────────────────────────────────────────────────
+
+install_frontend() {
+    if [ -f "${INSTALL_DIR}/frontend/package.json" ]; then
+        log_step "Instalando dependencias del frontend..."
+        cd "${INSTALL_DIR}/frontend"
+        npm install --silent 2>&1 | tail -3
+        log_success "Frontend configurado"
+    fi
+}
+
+start_frontend_dev() {
+    if [ -f "${INSTALL_DIR}/frontend/package.json" ]; then
+        log "Iniciando frontend en http://localhost:${FRONTEND_PORT}..."
+        cd "${INSTALL_DIR}/frontend"
+        npm run dev &
+        FRONTEND_PID=$!
+        
+        # Wait for Vite to start
+        log "Esperando a que el frontend esté listo..."
+        for i in $(seq 1 30); do
+            if curl -s "http://localhost:${FRONTEND_PORT}" > /dev/null 2>&1; then
+                log_success "Frontend iniciado correctamente! [PID: ${FRONTEND_PID}]"
+                return 0
+            fi
+            sleep 1
+        done
+    fi
+}
+
+stop_frontend() {
+    if [ -n "${FRONTEND_PID}" ] && kill -0 ${FRONTEND_PID} 2>/dev/null; then
+        kill ${FRONTEND_PID} 2>/dev/null
+        wait ${FRONTEND_PID} 2>/dev/null
+        unset FRONTEND_PID
+    fi
+}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Desktop App Management
+# ──────────────────────────────────────────────────────────────────────────────
+
+install_desktop_app() {
+    log_step "Instalando aplicación desktop (Electron)..."
+    cd "${INSTALL_DIR}/desktop-app"
+    
+    if [ ! -f "node_modules/.package-lock.json" ]; then
+        npm install --silent 2>&1 | tail -3
+    fi
+    
+    log_success "Desktop app configurada"
+}
+
+start_desktop_app() {
+    log_step "Iniciando aplicación desktop de Astraura..."
+    cd "${INSTALL_DIR}/desktop-app"
+    
+    # Start backend first
+    start_backend
+    
+    # Launch Electron
+    npm start &
+    APP_PID=$!
+    log_success "Aplicación desktop iniciada! [PID: ${APP_PID}]"
+    log "La app se abrirá automáticamente en localhost:${BACKEND_PORT}"
+    
+    # Auto-open browser to backend status
+    sleep 2
+    if command -v open &> /dev/null; then
+        open "http://localhost:${BACKEND_PORT}"
+    elif command -v xdg-open &> /dev/null; then
+        xdg-open "http://localhost:${BACKEND_PORT}" &
+    fi
+}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Mode Selection
+# ──────────────────────────────────────────────────────────────────────────────
+
+show_mode_selector() {
+    print_banner
+    
+    echo -e "${WHITE}${BOLD}Selecciona el modo de ejecución:${RESET}"
+    echo ""
+    echo -e "  ${GREEN}1.${RESET} 🖥️  Instalar y abrir App Completa (Electron)"
+    echo     "     Aplicación nativa de escritorio con icono instalable."
+    echo     "     Incluye backend local + frontend integrado."
+    echo ""
+    echo -e "  ${YELLOW}2.${RESET} 🖥️  Instalar y abrir en Terminal"
+    echo     "     Backend en localhost:${BACKEND_PORT} + Vite dev server."
+    echo     "     Ideal para desarrollo y depuración."
+    echo ""
+    echo -e "  ${BLUE}3.${RESET} 🌐 Abrir en Navegador (Vercel Live)"
+    echo     "     Despliegue oficial en ${WEB_URL}"
+    echo ""
+    echo -e "  ${PURPLE}4.${RESET} ⚡ Modo Puro Terminal"
+    echo     "     Solo backend en ejecución. Sin frontend."
+    echo     "     Controla todo desde comandos."
+    echo ""
+    echo -e "  ${RED}5.${RESET} ❌ Salir"
+    echo ""
+    
+    read -p "$(echo -e ${CYAN}"Selecciona una opción (1-5): "${RESET}')" choice
+    
+    case $choice in
+        1) launch_app_mode ;;
+        2) launch_terminal_mode ;;
+        3) launch_browser_mode ;;
+        4) launch_cli_mode ;;
+        5) exit 0 ;;
+        *) 
+            log_error "Opción inválida"
+            show_mode_selector
+            ;;
+    esac
+}
+
+launch_app_mode() {
+    echo ""
+    log_step "Modo: App Completa (Electron)"
+    log "Instalando y lanzando aplicación desktop..."
+    
+    install_frontend
+    install_desktop_app
+    start_desktop_app
+    
+    echo ""
+    log_success "¡Listo! La aplicación de Astraura 1.58-Bit está corriendo."
+    echo -e "${WHITE}Instrucciones de uso:${RESET}"
+    echo "  • La app se abrió automáticamente en localhost:${BACKEND_PORT}"
+    echo "  • Usa el menú de la app para acceder a todas las funciones"
+    echo "  • Presiona Cmd/Ctrl+Click en cualquier enlace para abrir en navegador"
+    echo ""
+    echo "Comandos de terminal útiles:"
+    echo "  astraura status       - Ver estado del sistema"
+    echo "  astraura chat         - Iniciar conversación"
+    echo "  astraura scan         - Escanear dispositivos de almacenamiento"
+    echo "  astraura agents       - Ver agentes del enjambre"
+    echo "  astraura help         - Ver todos los comandos"
+}
+
+launch_terminal_mode() {
+    echo ""
+    log_step "Modo: Terminal (Backend + Vite)"
+    log "Iniciando backend y servidor de desarrollo..."
+    
+    install_frontend
+    start_backend
+    start_frontend_dev
+    
+    echo ""
+    log_success "¡Listo! Astraura está corriendo."
+    echo -e "${WHITE}Accesos rápidos:${RESET}"
+    echo "  • Backend:  http://127.0.0.1:${BACKEND_PORT}"
+    echo "  • Frontend: http://localhost:${FRONTEND_PORT}"
+    
+    echo ""
+    echo "Comandos de terminal útiles:"
+    echo "  astraura status       - Ver estado del sistema"
+    echo "  astraura chat         - Iniciar conversación"
+    echo "  astraura scan         - Escanear dispositivos"
+    echo "  astraura agents       - Ver agentes del enjambre"
+    echo "  astraura help         - Ver todos los comandos"
+    
+    echo ""
+    echo "Presiona Ctrl+C para detener."
+    wait
+}
+
+launch_browser_mode() {
+    echo ""
+    log_step "Modo: Navegador (Vercel Live)"
+    log "Abriendo despliegue oficial..."
+    
+    if command -v open &> /dev/null; then
+        open "${WEB_URL}"
+    elif command -v xdg-open &> /dev/null; then
+        xdg-open "${WEB_URL}" &
+    elif command -v start &> /dev/null; then
+        start "${WEB_URL}"
+    else
+        echo "Abre manualmente: ${WEB_URL}"
+    fi
+    
+    log_success "¡Listo! Abierto en ${WEB_URL}"
+}
+
+launch_cli_mode() {
+    echo ""
+    log_step "Modo: Terminal Pura (Backend Only)"
+    log "Iniciando backend sin frontend..."
+    
+    start_backend
+    
+    echo ""
+    log_success "Backend corriendo en http://127.0.0.1:${BACKEND_PORT}"
+    echo ""
+    echo "Comandos de terminal:"
+    echo "  astraura status       - Ver estado del sistema"
+    echo "  astraura chat         - Iniciar conversación"  
+    echo "  astraura scan         - Escanear dispositivos"
+    echo "  astraura agents       - Ver agentes del enjambre"
+    echo "  astraura help         - Ver todos los comandos"
+    echo ""
+    echo "Presiona Ctrl+C para detener."
+    wait
+}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# CLI Commands
+# ──────────────────────────────────────────────────────────────────────────────
+
+cmd_status() {
+    print_banner
+    echo -e "${WHITE}Estado del Sistema Astraura 1.58-Bit${RESET}"
+    echo ""
+    
+    # Check backend
+    if curl -s "http://127.0.0.1:${BACKEND_PORT}/api/status" > /dev/null 2>&1; then
+        echo -e "  Backend: ${GREEN}✅ Activo${RESET} (http://127.0.0.1:${BACKEND_PORT})"
+        
+        # Fetch detailed status
+        STATUS=$(curl -s "http://127.0.0.1:${BACKEND_PORT}/api/status" 2>/dev/null)
+        if [ -n "$STATUS" ]; then
+            ENGINE=$(echo "$STATUS" | ${PYTHON_CMD} -c "import json,sys; d=json.load(sys.stdin); print(d.get('engine',{}).get('engine_name','N/A'))" 2>/dev/null)
+            echo "  Motor: $ENGINE"
+        fi
+    else
+        echo -e "  Backend: ${RED}❌ Inactivo${RESET}"
+    fi
+    
+    # Check frontend
+    if curl -s "http://localhost:${FRONTEND_PORT}" > /dev/null 2>&1; then
+        echo -e "  Frontend: ${GREEN}✅ Activo${RESET} (http://localhost:${FRONTEND_PORT})"
+    else
+        echo -e "  Frontend: ${RED}❌ Inactivo${RESET}"
+    fi
+    
+    # Check models
+    MODEL_DIR="${INSTALL_DIR}/data/models"
+    if [ -d "$MODEL_DIR" ]; then
+        MODEL_COUNT=$(find "$MODEL_DIR" -name "*.gguf" 2>/dev/null | wc -l | tr -d ' ')
+        echo -e "  Modelos locales: ${CYAN}${MODEL_COUNT} encontrados${RESET}"
+    else
+        echo -e "  Modelos locales: ${YELLOW}No hay directorio de modelos${RESET}"
+    fi
+}
+
+cmd_chat() {
+    print_banner
+    
+    if ! curl -s "http://127.0.0.1:${BACKEND_PORT}/api/status" > /dev/null 2>&1; then
+        log_warn "Backend no está activo. Iniciando..."
+        start_backend
+    fi
+    
+    echo -e "${WHITE}Iniciando conversación con Astraura IA...${RESET}"
+    echo -e "${YELLOW}Escribe '/exit' o '/quit' para salir.${RESET}"
+    echo ""
+    
+    while true; do
+        echo -ne "${CYAN}🧠 Tú ${RESET}> "
+        read -r INPUT
+        
+        if [[ "$INPUT" == "/exit" || "$INPUT" == "/quit" ]]; then
+            log "Saliendo del chat..."
+            break
+        fi
+        
+        if [ -z "$INPUT" ]; then
+            continue
+        fi
+        
+        # Send to backend API
+        RESPONSE=$(curl -s -X POST "http://127.0.0.1:${BACKEND_PORT}/api/chat" \
+            -H "Content-Type: application/json" \
+            -d "{\"prompt\": \"$INPUT\", \"system_prompt\": \"Eres Astraura, la inteligencia artificial de StarSeed OS.\"}" \
+            2>/dev/null)
+        
+        if [ -n "$RESPONSE" ]; then
+            ANSWER=$(echo "$RESPONSE" | ${PYTHON_CMD} -c "import json,sys; d=json.load(sys.stdin); print(d.get('response','No se obtuvo respuesta'))" 2>/dev/null)
+            echo -e "${PURPLE}🌌 Astraura ${RESET}: $ANSWER"
+        else
+            echo -e "${RED}⚠️  Error al conectar con el backend${RESET}"
+        fi
+    done
+}
+
+cmd_scan() {
+    echo ""
+    log_step "Escaneando dispositivos y medios de almacenamiento..."
+    
+    if ! curl -s "http://127.0.0.1:${BACKEND_PORT}/api/status" > /dev/null 2>&1; then
+        log_error "Backend no activo. Inicia con 'astraura start'"
+        exit 1
+    fi
+    
+    DEVICES=$(curl -s "http://127.0.0.1:${BACKEND_PORT}/api/storage/devices" 2>/dev/null)
+    
+    echo -e "${WHITE}Dispositivos y Medios Detectados:${RESET}"
+    echo ""
+    echo "$DEVICES" | ${PYTHON_CMD} -c "
+import json, sys
+try:
+    d = json.load(sys.stdin)
+    devices = d.get('devices', [])
+    for dev in devices:
+        name = dev.get('name', 'Unknown')
+        mount = dev.get('mountpoint', '')
+        free = dev.get('free_gb', 0)
+        used = dev.get('percent_used', 0)
+        ext = dev.get('is_external', False)
+        status = 'External' if ext else 'Internal'
+        icon = '🔌' if ext else '💾'
+        print(f'  {icon} {name} ({status})')
+        print(f'     📍 {mount}')
+        print(f'     💾 {free} GB libre ({used}% usado)')
+        print()
+except:
+    print('  No se pudieron obtener dispositivos')
+" 2>/dev/null
+}
+
+cmd_agents() {
+    echo ""
+    log_step "Estado del Enjambre Multiagéntico"
+    
+    if ! curl -s "http://127.0.0.1:${BACKEND_PORT}/api/status" > /dev/null 2>&1; then
+        log_error "Backend no activo. Inicia con 'astraura start'"
+        exit 1
+    fi
+    
+    STATUS=$(curl -s "http://127.0.0.1:${BACKEND_PORT}/api/swarm/status" 2>/dev/null)
+    
+    echo "$STATUS" | ${PYTHON_CMD} -c "
+import json, sys
+try:
+    d = json.load(sys.stdin)
+    agents = d.get('agents', {})
+    print('  Agentes del Enjambre:')
+    print()
+    for aid, info in agents.items():
+        name = info.get('name', aid)
+        status = info.get('status', 'unknown')
+        tasks = info.get('completed_tasks', 0)
+        icon = '✅' if status == 'active' else '⏸️' if status == 'paused' else '⚠️'
+        print(f'  {icon} {name} ({aid})')
+        print(f'     Estado: {status} | Tareas completadas: {tasks}')
+        print()
+except Exception as e:
+    print(f'  Error: {e}')
+" 2>/dev/null
+}
+
+cmd_help() {
+    print_banner
+    
+    echo -e "${WHITE}${BOLD}Comandos de Astraura CLI:${RESET}"
+    echo ""
+    echo "  ${GREEN}astraura${RESET}                    Iniciar selector de modos interactivo"
+    echo "  ${GREEN}astraura start${RESET}           Iniciar backend + abrir en navegador"
+    echo "  ${GREEN}astraura app${RESET}             Instalar y lanzar app desktop (Electron)"
+    echo "  ${GREEN}astraura terminal${RESET}        Iniciar en modo terminal (backend + Vite)"
+    echo "  ${GREEN}astraura browser${RESET}         Abrir en navegador (Vercel)"
+    echo "  ${GREEN}astraura cli${RESET}             Iniciar solo backend (modo terminal puro)"
+    echo ""
+    echo "  ${CYAN}astraura status${RESET}          Ver estado del sistema (backend, frontend, modelos)"
+    echo "  ${CYAN}astraura chat${RESET}            Iniciar conversación con Astraura IA"
+    echo "  ${CYAN}astraura scan${RESET}            Escanear dispositivos de almacenamiento"
+    echo "  ${CYAN}astraura agents${RESET}          Ver estado del enjambre multiagéntico"
+    echo "  ${CYAN}astraura install${RESET}         Instalar Astraura completamente desde GitHub"
+    echo ""
+    echo "  ${YELLOW}astraura help${RESET}             Mostrar esta ayuda"
+    echo "  ${YELLOW}astraura version${RESET}        Mostrar versión"
+    echo ""
+    echo -e "${WHITE}Ejemplos:${RESET}"
+    echo "  astraura install       # Instala todo y lanza la app"
+    echo "  astraura --mode=app    # Lanza con modo app"
+    echo "  astraura chat          # Inicia chat interactivo"
+}
+
+cmd_version() {
+    print_banner
+    echo -e "${WHITE}Versión:${RESET} ${APP_VERSION}"
+    echo -e "${WHITE}Arquitectura:${RESET} BitNet b1.58 Ternary ({-1, 0, 1})"
+    echo -e "${WHITE}GitHub:${RESET} ${GITHUB_REPO}"
+}
+
+cmd_install() {
+    echo ""
+    print_banner
+    log "Instalación completa de Astraura 1.58-Bit"
+    
+    detect_os
+    check_python
+    check_node
+    
+    # Clone from GitHub
+    log_step "Clonando repositorio oficial..."
+    mkdir -p "${INSTALL_DIR}"
+    
+    if [ -d "${INSTALL_DIR}/.git" ]; then
+        log "Actualizando desde GitHub..."
+        cd "${INSTALL_DIR}"
+        git fetch origin main 2>/dev/null || true
+        git reset --hard origin/main 2>/dev/null || true
+    else
+        log "Clonando desde ${GITHUB_REPO}..."
+        git clone "${GITHUB_REPO}" "${INSTALL_DIR}" 2>&1 | tail -3
+    fi
+    
+    # Install backend
+    log_step "Configurando entorno virtual del backend..."
+    create_venv
+    
+    # Install frontend
+    install_frontend
+    
+    # Install desktop app
+    install_desktop_app
+    
+    log_success "¡Instalación completada!"
+    echo ""
+    
+    # Show options
+    echo -e "${WHITE}¿Qué deseas hacer ahora?${RESET}"
+    echo ""
+    echo -e "  ${GREEN}1.${RESET} Lanzar aplicación desktop (Electron)"
+    echo -e "  ${GREEN}2.${RESET} Iniciar en modo terminal"
+    echo -e "  ${GREEN}3.${RESET} Abrir en navegador"
+    echo ""
+    
+    read -p "$(echo -e ${CYAN}"Selecciona (1/2/3): "${RESET}')" choice
+    
+    case $choice in
+        1) start_desktop_app ;;
+        2) launch_terminal_mode ;;
+        3) launch_browser_mode ;;
+    esac
+}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Argument Parsing
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Export variables for subshell
+export INSTALL_DIR
+export BACKEND_PORT
+export FRONTEND_PORT
+export WEB_URL
+export PYTHON_CMD
+
+# Parse arguments
+MODE=""
+INSTALL_FIRST=false
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --mode=app)
+            MODE="app"
+            shift
+            ;;
+        --mode=terminal)
+            MODE="terminal"
+            shift
+            ;;
+        --mode=browser)
+            MODE="browser"
+            shift
+            ;;
+        --mode=cli)
+            MODE="cli"
+            shift
+            ;;
+        --install)
+            INSTALL_FIRST=true
+            shift
+            ;;
+        -h|--help)
+            cmd_help
+            exit 0
+            ;;
+        -v|--version)
+            cmd_version
+            exit 0
+            ;;
+        start|app|terminal|browser|cli)
+            MODE="$1"
+            shift
+            ;;
+        status|chat|scan|agents|help|version|install)
+            cmd_$1
+            exit 0
+            ;;
+        *)
+            log_error "Argumento desconocido: $1"
+            echo "Usa 'astraura help' para ver todos los comandos."
+            exit 1
+            ;;
+    esac
+done
+
+# Execute mode
+if [ "$INSTALL_FIRST" = true ]; then
+    cmd_install
+    exit 0
+fi
+
+case "$MODE" in
+    app)
+        detect_os
+        check_python
+        start_backend
+        start_desktop_app
+        ;;
+    terminal)
+        detect_os
+        check_python
+        check_node
+        start_backend
+        start_frontend_dev
+        if command -v open &> /dev/null; then
+            open "http://localhost:${FRONTEND_PORT}"
+        fi
+        ;;
+    browser)
+        if command -v open &> /dev/null; then
+            open "${WEB_URL}"
+        elif command -v xdg-open &> /dev/null; then
+            xdg-open "${WEB_URL}" &
+        fi
+        ;;
+    cli)
+        detect_os
+        check_python
+        start_backend
+        cmd_chat
+        ;;
+    "")
+        show_mode_selector
+        ;;
+    *)
+        log_error "Modo desconocido: $MODE"
+        cmd_help
+        ;;
+esac

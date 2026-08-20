@@ -140,17 +140,17 @@
           "metrics": {
             "exists": true,
             "path": "/Users/alex/Documents/IA 1.58 bit",
-            "file_count": 3810,
-            "size_mb": 1249.65,
+            "file_count": 5649,
+            "size_mb": 1256.06,
             "types_breakdown": {
+              ".json": 1826,
               ".cpp": 569,
               ".idx": 476,
+              ".py": 312,
               ".ts": 299,
-              ".py": 288,
               ".svelte": 268,
-              ".h": 254,
-              ".cu": 186,
-              ".cl": 150
+              ".h": 260,
+              ".cu": 186
             },
             "status": "Indexado y Activo"
           }
@@ -165,14 +165,14 @@
           "metrics": {
             "exists": true,
             "path": "/Users/alex/Documents/starseed-os-main",
-            "file_count": 3144,
+            "file_count": 3145,
             "size_mb": 174.01,
             "types_breakdown": {
               ".tsx": 983,
               ".py": 728,
               ".ts": 614,
               "sin_ext": 302,
-              ".md": 167,
+              ".md": 168,
               ".js": 56,
               ".sql": 42,
               ".png": 40
@@ -209,9 +209,9 @@
         }
       ],
       "token_parameter_stats": {
-        "total_context_tokens": 357764,
+        "total_context_tokens": 359367,
         "ternary_compression_ratio": "8.0x (1.58-bit i2_s)",
-        "effective_ram_usage_mb": 69.88,
+        "effective_ram_usage_mb": 70.19,
         "multi_source_sync_state": "Activo y Sincronizado en Tiempo Real"
       },
       "linked_personalities": [
@@ -277,6 +277,12 @@
               "concept": "Alineación Cuántica de Cerebro Génesis",
               "category": "Exocórtex",
               "resonance": 0.99
+            },
+            {
+              "id": "mem_auto_2",
+              "concept": "Vectorización de Inferencia Ternaria M1",
+              "category": "Ingeniería",
+              "resonance": 0.97
             }
           ],
           "last_synapse_time": "Hace 1s"
@@ -303,6 +309,12 @@
               "concept": "Alineación Cuántica de Cerebro Génesis",
               "category": "Exocórtex",
               "resonance": 0.99
+            },
+            {
+              "id": "mem_auto_2",
+              "concept": "Vectorización de Inferencia Ternaria M1",
+              "category": "Ingeniería",
+              "resonance": 0.97
             }
           ],
           "last_synapse_time": "Hace 1s"
@@ -427,8 +439,8 @@
           "metrics": {
             "exists": true,
             "path": "/Users/alex/Documents/IA 1.58 bit/backend/BitNet",
-            "file_count": 3621,
-            "size_mb": 164.45,
+            "file_count": 3631,
+            "size_mb": 164.52,
             "types_breakdown": {
               ".cpp": 569,
               ".idx": 476,
@@ -471,7 +483,7 @@
         }
       ],
       "token_parameter_stats": {
-        "total_context_tokens": 42962,
+        "total_context_tokens": 42980,
         "ternary_compression_ratio": "8.0x (1.58-bit i2_s)",
         "effective_ram_usage_mb": 8.39,
         "multi_source_sync_state": "Activo y Sincronizado en Tiempo Real"
@@ -642,17 +654,17 @@
           "metrics": {
             "exists": true,
             "path": "/Users/alex/Documents/IA 1.58 bit/data",
-            "file_count": 26,
-            "size_mb": 1070.01,
+            "file_count": 1793,
+            "size_mb": 1084.8,
             "types_breakdown": {
-              ".json": 17,
-              "sin_ext": 2,
+              ".json": 1781,
+              "sin_ext": 3,
+              ".md": 2,
               ".txt": 2,
-              ".md": 1,
+              ".cact": 1,
               ".gguf": 1,
               ".tag": 1,
-              ".lock": 1,
-              ".metadata": 1
+              ".lock": 1
             },
             "status": "Indexado y Activo"
           }
@@ -686,9 +698,9 @@
         }
       ],
       "token_parameter_stats": {
-        "total_context_tokens": 269250,
+        "total_context_tokens": 273050,
         "ternary_compression_ratio": "8.0x (1.58-bit i2_s)",
-        "effective_ram_usage_mb": 52.59,
+        "effective_ram_usage_mb": 53.33,
         "multi_source_sync_state": "Activo y Sincronizado en Tiempo Real"
       },
       "linked_personalities": [
@@ -801,5 +813,5 @@
       "color": "#f59e0b"
     }
   ],
-  "updated_at": 1787090344.076514
+  "updated_at": 1787199320.06863
 }

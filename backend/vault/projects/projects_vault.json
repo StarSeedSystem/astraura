@@ -89,7 +89,7 @@
         "total_loc": 0,
         "integrity_verdict": "VERIFIED_100_REAL"
       },
-      "_metrics_cached_at": 1787194238.146731
+      "_metrics_cached_at": 1787211834.851489
     },
     {
       "id": "proj_astraura_core",
@@ -97,7 +97,7 @@
       "description": "Núcleo del sistema operativo cognitivo.",
       "type": "automatic",
       "created_at": 1786741520.5937548,
-      "updated_at": 1787196289.103575,
+      "updated_at": 1787211840.207822,
       "linked_creations": [
         "creation_neon_kernel_v2",
         "creation_dataset_ternary_v2",
@@ -225,17 +225,17 @@
         }
       ],
       "key_memories": [
-        "Axioma (athena): Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana [Auditado por Director]",
-        "Axioma (oneiros): Generación de Mallas y Texturas Dinámicas para la Bóveda de Creaciones [Auditado por Director]",
-        "Axioma (athena): Calibración de Sensores de Entorno y Resonancia Acústica [Auditado por Director]",
-        "Axioma (mnemosyne): Poda y Reestructuración del Grafo Sináptico de Memoria StarSeed [Auditado por Director]",
         "Axioma (oneiros): Forja de Prototipos de Interfaces Intuitivas de Resonancia Sináptica [Auditado por Director]",
-        "Axioma (mnemosyne): Indexación Rápida de Fragmentos de Memoria Episódica en Bóveda [Auditado por Director]",
-        "Axioma (oneiros): Síntesis de Shader Procedural WebGL Reactivo al Sensorium Ambiental [Auditado por Director]",
+        "Axioma (oneiros): Generación de Mallas y Texturas Dinámicas para la Bóveda de Creaciones [Auditado por Director]",
+        "Axioma (mnemosyne): Poda y Reestructuración del Grafo Sináptico de Memoria StarSeed [Auditado por Director]",
         "Axioma (mnemosyne): Auto-Reactivación: Sincronización & Poda del Grafo de Memoria [Auditado por Director]",
-        "Axioma (oneiros): Auto-Reactivación: Forja de Shaders & Prototipos Visuales [Auditado por Director]",
-        "Axioma (athena): Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1 [Auditado por Director]",
-        "Axioma (athena): Auditoría Continua de Sensores Físicos, Térmica M1 y Batería [Auditado por Director]"
+        "Axioma (athena): Auditoría Continua de Sensores Físicos, Térmica M1 y Batería [Auditado por Director]",
+        "Axioma (athena): Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana [Auditado por Director]",
+        "Axioma (athena): Calibración de Sensores de Entorno y Resonancia Acústica [Auditado por Director]",
+        "Axioma (mnemosyne): Indexación Rápida de Fragmentos de Memoria Episódica en Bóveda [Auditado por Director]",
+        "Axioma (mnemosyne): Destilación de Axiomas Soberanos y Recuerdos Clave a Largo Plazo [Auditado por Director]",
+        "Axioma (hephaestus): Compactación de Huella de Memoria RAM para Modelos de 1.58 Bits [Auditado por Director]",
+        "Axioma (oneiros): Síntesis de Shader Procedural WebGL Reactivo al Sensorium Ambiental [Auditado por Director]"
       ],
       "linked_folders": [
         "/Users/alex/Documents/IA 1.58 bit/backend/app/core",
@@ -249,364 +249,364 @@
       ],
       "logs_history": [
         {
-          "timestamp": 1787196289.1035872,
+          "timestamp": 1787211840.207843,
           "action": "Modificación de Proyecto",
           "agent": "Alex Bordón / Daedalus",
           "details": "Proyecto actualizado y sincronizado en el grafo."
         },
         {
-          "timestamp": 1787196289.10353,
-          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
-        },
-        {
-          "timestamp": 1787196215.912435,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787196215.9122581,
-          "action": "Entregable Verificado: Generación de Mallas y Texturas Dinámicas para la Bóveda de Creaciones",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
-        },
-        {
-          "timestamp": 1787196205.8657799,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787196205.865684,
-          "action": "Entregable Verificado: Calibración de Sensores de Entorno y Resonancia Acústica",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
-        },
-        {
-          "timestamp": 1787196205.8441432,
-          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
-        },
-        {
-          "timestamp": 1787196200.827287,
-          "action": "Entregable Verificado: Indexación Rápida de Fragmentos de Memoria Episódica en Bóveda",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
-        },
-        {
-          "timestamp": 1787196175.002353,
-          "action": "Entregable Verificado: Síntesis de Shader Procedural WebGL Reactivo al Sensorium Ambiental",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
-        },
-        {
-          "timestamp": 1787196164.578314,
-          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
-        },
-        {
-          "timestamp": 1787196164.5691981,
-          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
-        },
-        {
-          "timestamp": 1787196159.553051,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787196159.552968,
-          "action": "Entregable Verificado: Poda y Reestructuración del Grafo Sináptico de Memoria StarSeed",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
-        },
-        {
-          "timestamp": 1787196134.3272572,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787196134.326936,
+          "timestamp": 1787211840.207768,
           "action": "Entregable Verificado: Forja de Prototipos de Interfaces Intuitivas de Resonancia Sináptica",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
         },
         {
-          "timestamp": 1787196124.225656,
-          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+          "timestamp": 1787211820.159991,
+          "action": "Entregable Verificado: Destilación de Axiomas Soberanos y Recuerdos Clave a Largo Plazo",
           "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
         },
         {
-          "timestamp": 1787196124.208232,
-          "action": "Entregable Verificado: Calibración de Sensores de Entorno y Resonancia Acústica",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
-        },
-        {
-          "timestamp": 1787196119.14416,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787196119.143839,
+          "timestamp": 1787211820.145975,
           "action": "Entregable Verificado: Indexación Rápida de Fragmentos de Memoria Episódica en Bóveda",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
         },
         {
-          "timestamp": 1787196093.9934561,
+          "timestamp": 1787211805.113655,
+          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787211800.087456,
           "action": "Modificación de Proyecto",
           "agent": "Alex Bordón / Daedalus",
           "details": "Proyecto actualizado y sincronizado en el grafo."
         },
         {
-          "timestamp": 1787196093.992523,
+          "timestamp": 1787211800.087323,
+          "action": "Entregable Verificado: Generación de Mallas y Texturas Dinámicas para la Bóveda de Creaciones",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
+        },
+        {
+          "timestamp": 1787211780.0612311,
+          "action": "Entregable Verificado: Destilación de Axiomas Soberanos y Recuerdos Clave a Largo Plazo",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1787211780.055521,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787211780.0554938,
+          "action": "Entregable Verificado: Poda y Reestructuración del Grafo Sináptico de Memoria StarSeed",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1787211765.03897,
+          "action": "Entregable Verificado: Calibración de Sensores de Entorno y Resonancia Acústica",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787211760.0311968,
           "action": "Entregable Verificado: Síntesis de Shader Procedural WebGL Reactivo al Sensorium Ambiental",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
         },
         {
-          "timestamp": 1787196083.874079,
-          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+          "timestamp": 1787211740.014978,
+          "action": "Entregable Verificado: Destilación de Axiomas Soberanos y Recuerdos Clave a Largo Plazo",
           "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
         },
         {
-          "timestamp": 1787196083.819145,
-          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
-        },
-        {
-          "timestamp": 1787196077.7903628,
+          "timestamp": 1787211740.0080671,
           "action": "Modificación de Proyecto",
           "agent": "Alex Bordón / Daedalus",
           "details": "Proyecto actualizado y sincronizado en el grafo."
         },
         {
-          "timestamp": 1787196077.790158,
+          "timestamp": 1787211740.008033,
           "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
         },
         {
-          "timestamp": 1787196052.642773,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
+          "timestamp": 1787211724.990929,
+          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
         },
         {
-          "timestamp": 1787196052.642349,
-          "action": "Entregable Verificado: Auto-Reactivación: Forja de Shaders & Prototipos Visuales",
+          "timestamp": 1787211719.982628,
+          "action": "Entregable Verificado: Generación de Mallas y Texturas Dinámicas para la Bóveda de Creaciones",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
         },
         {
-          "timestamp": 1787196042.553733,
+          "timestamp": 1787211704.967098,
           "action": "Entregable Verificado: Calibración de Sensores de Entorno y Resonancia Acústica",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
         },
         {
-          "timestamp": 1787196042.545417,
-          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
-        },
-        {
-          "timestamp": 1787196042.5392818,
-          "action": "Entregable Verificado: Poda y Reestructuración del Grafo Sináptico de Memoria StarSeed",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
-        },
-        {
-          "timestamp": 1787196022.3937972,
-          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
-        },
-        {
-          "timestamp": 1787196002.053752,
+          "timestamp": 1787211699.9552,
           "action": "Entregable Verificado: Indexación Rápida de Fragmentos de Memoria Episódica en Bóveda",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
         },
         {
-          "timestamp": 1787196001.808584,
-          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
-        },
-        {
-          "timestamp": 1787196001.726841,
-          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
-        },
-        {
-          "timestamp": 1787195981.5405922,
-          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
-        },
-        {
-          "timestamp": 1787195960.991627,
-          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
-        },
-        {
-          "timestamp": 1787195960.951492,
+          "timestamp": 1787211684.941783,
           "action": "Entregable Verificado: Calibración de Sensores de Entorno y Resonancia Acústica",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
         },
         {
-          "timestamp": 1787195960.8730931,
-          "action": "Entregable Verificado: Poda y Reestructuración del Grafo Sináptico de Memoria StarSeed",
+          "timestamp": 1787211679.832551,
+          "action": "Entregable Verificado: Síntesis de Shader Procedural WebGL Reactivo al Sensorium Ambiental",
           "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
         },
         {
-          "timestamp": 1787195940.691061,
-          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
-        },
-        {
-          "timestamp": 1787195920.554371,
-          "action": "Entregable Verificado: Destilación de Axiomas Soberanos y Recuerdos Clave a Largo Plazo",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
-        },
-        {
-          "timestamp": 1787195920.51216,
-          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
-        },
-        {
-          "timestamp": 1787195920.277261,
+          "timestamp": 1787211664.770284,
           "action": "Modificación de Proyecto",
           "agent": "Alex Bordón / Daedalus",
           "details": "Proyecto actualizado y sincronizado en el grafo."
         },
         {
-          "timestamp": 1787195920.274303,
+          "timestamp": 1787211664.770118,
+          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787211659.7390568,
+          "action": "Entregable Verificado: Destilación de Axiomas Soberanos y Recuerdos Clave a Largo Plazo",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1787211644.6782122,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787211644.678049,
+          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787211639.648451,
+          "action": "Entregable Verificado: Forja de Prototipos de Interfaces Intuitivas de Resonancia Sináptica",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
+        },
+        {
+          "timestamp": 1787211624.584325,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787211624.5841658,
+          "action": "Entregable Verificado: Calibración de Sensores de Entorno y Resonancia Acústica",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787211619.548835,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787211619.548657,
+          "action": "Entregable Verificado: Indexación Rápida de Fragmentos de Memoria Episódica en Bóveda",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1787211604.480722,
           "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
         },
         {
-          "timestamp": 1787195899.717927,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787195899.717265,
-          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+          "timestamp": 1787211599.447157,
+          "action": "Entregable Verificado: Generación de Mallas y Texturas Dinámicas para la Bóveda de Creaciones",
           "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
         },
         {
-          "timestamp": 1787195884.378171,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787195884.375417,
-          "action": "Entregable Verificado: Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787195879.137745,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787195879.137641,
+          "timestamp": 1787211584.2942998,
           "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
         },
         {
-          "timestamp": 1787195879.01705,
-          "action": "Entregable Verificado: Indexación Rápida de Fragmentos de Memoria Episódica en Bóveda",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
-        },
-        {
-          "timestamp": 1787195858.41395,
-          "action": "Entregable Verificado: Calibración de Sensores de Entorno y Resonancia Acústica",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
-        },
-        {
-          "timestamp": 1787195843.367223,
+          "timestamp": 1787211579.284862,
           "action": "Modificación de Proyecto",
           "agent": "Alex Bordón / Daedalus",
           "details": "Proyecto actualizado y sincronizado en el grafo."
         },
         {
-          "timestamp": 1787195843.367064,
-          "action": "Entregable Verificado: Auto-Reactivación: Rastreo de Tendencias & Preprints de IA 1.58b",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787195838.3357902,
+          "timestamp": 1787211579.284836,
           "action": "Entregable Verificado: Destilación de Axiomas Soberanos y Recuerdos Clave a Largo Plazo",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
         },
         {
-          "timestamp": 1787195838.2936552,
-          "action": "Entregable Verificado: Calibración de Sensores de Entorno y Resonancia Acústica",
+          "timestamp": 1787211569.26909,
+          "action": "Entregable Verificado: Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM",
           "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
         },
         {
-          "timestamp": 1787195818.2512581,
+          "timestamp": 1787211559.251338,
+          "action": "Entregable Verificado: Forja de Prototipos de Interfaces Intuitivas de Resonancia Sináptica",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
+        },
+        {
+          "timestamp": 1787211544.232314,
           "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
         },
         {
-          "timestamp": 1787195818.2391381,
-          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
-        },
-        {
-          "timestamp": 1787195798.011611,
-          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
-        },
-        {
-          "timestamp": 1787195797.966259,
+          "timestamp": 1787211539.223583,
           "action": "Entregable Verificado: Indexación Rápida de Fragmentos de Memoria Episódica en Bóveda",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
         },
         {
-          "timestamp": 1787195777.4674869,
-          "action": "Entregable Verificado: Calibración de Sensores de Entorno y Resonancia Acústica",
+          "timestamp": 1787211529.2121458,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787211529.212113,
+          "action": "Entregable Verificado: Compactación de Huella de Memoria RAM para Modelos de 1.58 Bits",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
+        },
+        {
+          "timestamp": 1787211519.201621,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787211519.201592,
+          "action": "Entregable Verificado: Síntesis de Shader Procedural WebGL Reactivo al Sensorium Ambiental",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
+        },
+        {
+          "timestamp": 1787211504.18655,
+          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787211499.1788878,
+          "action": "Entregable Verificado: Poda y Reestructuración del Grafo Sináptico de Memoria StarSeed",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1787211489.168281,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787211489.168255,
+          "action": "Entregable Verificado: Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
+        },
+        {
+          "timestamp": 1787211479.157566,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787211479.157527,
+          "action": "Entregable Verificado: Forja de Prototipos de Interfaces Intuitivas de Resonancia Sináptica",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
+        },
+        {
+          "timestamp": 1787211464.1263769,
+          "action": "Entregable Verificado: Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787211458.8488908,
+          "action": "Entregable Verificado: Destilación de Axiomas Soberanos y Recuerdos Clave a Largo Plazo",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1787211448.812684,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787211448.812494,
+          "action": "Entregable Verificado: Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
+        },
+        {
+          "timestamp": 1787211438.7808378,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787211438.780641,
+          "action": "Entregable Verificado: Generación de Mallas y Texturas Dinámicas para la Bóveda de Creaciones",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
+        },
+        {
+          "timestamp": 1787211423.741612,
+          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787211418.724223,
+          "action": "Entregable Verificado: Poda y Reestructuración del Grafo Sináptico de Memoria StarSeed",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1787211408.700487,
+          "action": "Entregable Verificado: Compactación de Huella de Memoria RAM para Modelos de 1.58 Bits",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
+        },
+        {
+          "timestamp": 1787211398.6718771,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
         }
       ],
       "linked_processs": [
@@ -628,12 +628,12 @@
         }
       ],
       "_physical_metrics": {
-        "total_bytes_formatted": "2.54 MB",
-        "total_files": 167,
-        "total_loc": 14168,
+        "total_bytes_formatted": "2.58 MB",
+        "total_files": 171,
+        "total_loc": 14596,
         "integrity_verdict": "VERIFIED_100_REAL"
       },
-      "_metrics_cached_at": 1787194223.449444
+      "_metrics_cached_at": 1787211824.870751
     },
     {
       "id": "proj_cyberdelic_arts",
@@ -739,8 +739,8 @@
         "total_loc": 0,
         "integrity_verdict": "VERIFIED_100_REAL"
       },
-      "_metrics_cached_at": 1787194223.449707
+      "_metrics_cached_at": 1787211824.8708239
     }
   ],
-  "saved_at": 1787196289.103589
+  "saved_at": 1787211840.2078452
 }

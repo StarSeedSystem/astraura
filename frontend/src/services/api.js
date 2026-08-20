@@ -52,22 +52,55 @@ export async function testGatewayConnection(urlToTest = null) {
   }
 }
 
-async function apiFetch(path, options = {}) {
+export async function apiFetch(path, options = {}) {
   const base = getApiBase();
   const url = path.startsWith('http') ? path : `${base}${path.startsWith('/') ? '' : '/'}${path}`;
+  
+  // Enhanced fetch with gateway retry logic
+  const ctrl = new AbortController();
+  const timeoutId = setTimeout(() => ctrl.abort(), 15000); // 15 second timeout
+  
   try {
-    const res = await fetch(url, options);
+    const res = await fetch(url, { ...options, signal: ctrl.signal });
+    clearTimeout(timeoutId);
+    
     if (!res.ok) {
+      // If gateway fails with 5xx, try localhost as fallback
+      if (res.status >= 500 && typeof window !== 'undefined' && 
+          window.location.hostname !== 'localhost' && 
+          window.location.hostname !== '127.0.0.1') {
+        console.warn(`[Astraura Bridge] Gateway ${url} returned ${res.status}, trying localhost fallback...`);
+        const fallbackUrl = `http://127.0.0.1:8000${path}`;
+        try {
+          const fallbackRes = await fetch(fallbackUrl, { ...options, signal: AbortSignal.timeout(5000) });
+          if (fallbackRes.ok) {
+            const contentType = fallbackRes.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+              return await fallbackRes.json();
+            }
+            return fallbackRes;
+          }
+        } catch (fallbackErr) {
+          console.warn('[Astraura Bridge] Localhost fallback also failed:', fallbackErr.message);
+        }
+      }
+      
       const errText = await res.text().catch(() => '');
       throw new Error(`HTTP ${res.status} en ${path}: ${errText || res.statusText}`);
     }
+    
     const contentType = res.headers.get('content-type') || '';
     if (contentType.includes('application/json')) {
       return await res.json();
     }
     return res;
   } catch (err) {
-    // If failed on external host, try fallback
+    clearTimeout(timeoutId);
+    // Enhanced error reporting for storage scanning
+    if (path.includes('/storage/') || path.includes('/scan')) {
+      console.warn(`[Astraura Bridge] Storage scan error on ${url}:`, err.message);
+      throw new Error(`Failed to fetch: ${err.message || 'Network error'}. Verifica que el backend esté corriendo en http://127.0.0.1:8000`);
+    }
     console.warn(`[Astraura Bridge] Fetch error on ${url}:`, err.message);
     throw err;
   }
@@ -1770,4 +1803,183 @@ export async function inspectFileStorage(filePath) {
   });
 }
 
+export async function scanExternalBrains() {
+  return apiFetch('/cerebros/external/scan');
+}
 
+export async function fuseExternalBrain(brainId, strategy = 'bidirectional_merge') {
+  return apiFetch('/cerebros/external/fuse', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ brain_id: brainId, strategy })
+  });
+}
+
+export async function updateExternalBrainPermissions(brainId, mode) {
+  return apiFetch('/cerebros/external/permissions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ brain_id: brainId, mode })
+  });
+}
+
+export async function syncPortableBrainToStorage(brainId, drivePath, options = {}) {
+  return apiFetch('/cerebros/portable/sync_to_storage', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      brain_id: brainId,
+      drive_path: drivePath,
+      include_projects: options.includeProjects ?? true,
+      include_voice_studio: options.includeVoiceStudio ?? true
+    })
+  });
+}
+
+export async function fetchSyncMeshTelemetry() {
+  return apiFetch('/system/sync/telemetry');
+}
+
+export async function broadcastStateMutation(event, payload = {}) {
+  return apiFetch('/system/sync/broadcast', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ event, payload })
+  });
+}
+
+export async function fetchImaginationSyncExecutionState() {
+  return apiFetch('/imagination/sync_execution_state');
+}
+
+// ================= Sovereign Tunnel & Mesh APIs =================
+
+export async function fetchTunnelStatus() {
+  return apiFetch('/system/tunnel/status');
+}
+
+export async function startTunnel() {
+  return apiFetch('/system/tunnel/start', { method: 'POST' });
+}
+
+export async function stopTunnel() {
+  return apiFetch('/system/tunnel/stop', { method: 'POST' });
+}
+
+export async function restartTunnel() {
+  return apiFetch('/system/tunnel/restart', { method: 'POST' });
+}
+
+/**
+ * Auto-detects the live tunnel URL from the backend and optionally updates the gateway.
+ * Call this on app startup from Vercel/external hosts.
+ */
+export async function autoDetectAndSetLiveTunnel() {
+  const candidates = [
+    DEFAULT_HTTPS_GATEWAY,
+    'https://astraura.vercel.app/active_tunnel.json'
+  ];
+  
+  for (const candidate of candidates) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
+      // Try fetching active tunnel from the Vercel deployment
+      let tunnelUrl = null;
+      if (candidate.includes('/active_tunnel.json')) {
+        const res = await fetch(candidate, { 
+          signal: controller.signal,
+          headers: { 'Accept': 'application/json' }
+        });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const data = await res.json();
+          tunnelUrl = data?.tunnel?.url || data?.url;
+        }
+      } else {
+        // Try the backend tunnel status directly
+        const res = await fetch(`${candidate.replace(/\/$/, '')}/api/system/tunnel/status`, { 
+          signal: controller.signal 
+        });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const data = await res.json();
+          tunnelUrl = data?.tunnel?.url;
+        }
+      }
+      
+      if (tunnelUrl && tunnelUrl.startsWith('https://')) {
+        // Verify the tunnel is actually live
+        try {
+          const verifyRes = await fetch(`${tunnelUrl}/api/status`, { 
+            signal: AbortSignal.timeout(5000) 
+          });
+          if (verifyRes.ok) {
+            const saved = localStorage.getItem('astraura_backend_gateway');
+            if (saved !== tunnelUrl) {
+              console.log(`[Astraura Bridge] 🌐 Túnel vivo detectado: ${tunnelUrl}`);
+              setCustomGateway(tunnelUrl);
+            }
+            return tunnelUrl;
+          }
+        } catch (e) {
+          console.warn(`[Astraura Bridge] Tunnel ${tunnelUrl} not responding to verification`);
+        }
+      }
+    } catch (e) {
+      console.warn(`[Astraura Bridge] Tunnel discovery failed for ${candidate}:`, e.message);
+    }
+  }
+  
+  // Fallback: try scanning common local ports if on same network
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+    const localIp = window.location.hostname;
+    for (const port of [8000, 8001, 8002]) {
+      try {
+        const res = await fetch(`http://${localIp}:${port}/api/status`, { 
+          signal: AbortSignal.timeout(2000) 
+        });
+        if (res.ok) {
+          console.warn(`[Astraura Bridge] No HTTPS tunnel found. Consider starting one with: python3 backend/run_backend.py --tunnel`);
+          return null;
+        }
+      } catch (e) {
+        // Port not responding, try next
+      }
+    }
+  }
+  
+  return null;
+}
+
+// ================= Synthesis Report Memory/Brain Link APIs =================
+
+/**
+ * Fetch the memory graph, brain/cerebro mappings, and folder/file tree
+ * specific to a given synthesis report. This ensures each report's tab content
+ * is uniquely developed from its own memory traces, not reused text.
+ */
+export async function fetchSynthesisReportMemoryGraph(reportId) {
+  return apiFetch(`/imagination/synthesis_reports/${reportId}/memory_graph`);
+}
+
+export async function fetchSynthesisReportBrainCerebros(reportId) {
+  return apiFetch(`/imagination/synthesis_reports/${reportId}/brain_cerebros`);
+}
+
+export async function fetchSynthesisReportFileTree(reportId) {
+  return apiFetch(`/imagination/synthesis_reports/${reportId}/file_tree`);
+}
+
+/**
+ * Generate a new synthesis report specifically for a tab, ensuring
+ * unique, non-reused content developed by the assigned agent.
+ */
+export async function regenerateSynthesisReportContent(reportId, tabId) {
+  return apiFetch(`/imagination/synthesis_reports/${reportId}/regenerate_tab`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tab_id: tabId })
+  });
+}

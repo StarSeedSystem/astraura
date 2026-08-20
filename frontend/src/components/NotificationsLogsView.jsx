@@ -29,7 +29,8 @@ import {
   grantAllRequests,
   applySingleNotification,
   deleteSingleNotification,
-  clearAllNotifications
+  clearAllNotifications,
+  fetchImaginationSyncExecutionState
 } from '../services/api';
 
 export default function NotificationsLogsView() {
@@ -101,10 +102,16 @@ export default function NotificationsLogsView() {
         console.warn('Grant all requests fallback:', e);
       }
 
-      // 2. Apply all safe proposals
+      // 2. Apply all safe proposals with multi-agent sync - wait for completion
       try {
         const propRes = await applyAllProposals();
         if (propRes && propRes.applied_count) appliedCount += propRes.applied_count;
+        
+        // Poll for multi-agent sync completion if sync was started
+        if (propRes && propRes.state && propRes.state.is_running) {
+          setToastMsg('⚡ Agentes multi-área procesando propuestas en paralelo...');
+          await pollSyncCompletion();
+        }
       } catch (e) {
         console.warn('Apply all proposals fallback:', e);
       }
@@ -112,15 +119,37 @@ export default function NotificationsLogsView() {
       // 3. Mark all notifications as read & applied
       await markNotificationsRead(null);
       
+      // 4. Force refresh from backend after sync
+      await loadNotifications();
+      
       const total = appliedCount > 0 ? appliedCount : data.notifications.length;
       setToastMsg(`✨ ¡${total} solicitudes y propuestas aplicadas exitosamente con agentes en segundo plano!`);
       setTimeout(() => setToastMsg(''), 4500);
-      await loadNotifications();
     } catch (err) {
       setToastMsg(`⚠️ Aplicado con advertencia: ${err.message}`);
       setTimeout(() => setToastMsg(''), 4500);
     } finally {
       setIsApplyingAll(false);
+    }
+  };
+
+  const pollSyncCompletion = async () => {
+    const maxAttempts = 30; // 30 seconds max
+    for (let i = 0; i < maxAttempts; i++) {
+      await new Promise(r => setTimeout(r, 1000));
+      try {
+        const state = await fetchImaginationSyncExecutionState();
+        if (state && !state.is_running) {
+          // Sync completed, refresh notifications
+          await loadNotifications();
+          break;
+        }
+        if (state && state.global_progress_pct !== undefined) {
+          setToastMsg(`⚡ Procesando con agentes: ${state.global_progress_pct}% (${state.completed_tasks}/${state.total_tasks})`);
+        }
+      } catch (e) {
+        console.warn('Poll sync state error:', e);
+      }
     }
   };
 

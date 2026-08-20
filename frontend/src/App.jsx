@@ -70,10 +70,11 @@ import GatewayModal from './components/GatewayModal';
 import UniversalDeviceModal from './components/UniversalDeviceModal';
 import ThemePickerModal from './components/ThemePickerModal';
 import UniversalFileViewerModal from './components/UniversalFileViewerModal';
-import { ChatWebSocketClient, fetchStatus, fetchSystemNotifications } from './services/api';
+import { ChatWebSocketClient, fetchStatus, fetchSystemNotifications, autoDetectAndSetLiveTunnel, getGatewayUrl } from './services/api';
 import { webCognition } from './services/webCognition';
 import { deviceContextDetector } from './services/deviceContextDetector';
 import { omniVoice } from './services/omniVoice';
+import { sovereignBroadcastBus } from './services/sovereignBroadcastBus';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('chat');
@@ -85,6 +86,13 @@ export default function App() {
     }
     return true;
   });
+
+  const handleTabChange = (tabId, broadcast = true) => {
+    setActiveTab(tabId);
+    if (broadcast) {
+      sovereignBroadcastBus.emit('sync_active_tab', { tabId });
+    }
+  };
 
   const toggleSidebar = () => {
     setIsSidebarVisible((prev) => {
@@ -103,6 +111,16 @@ export default function App() {
   const [fileViewerState, setFileViewerState] = useState({ isOpen: false, path: null, title: '' });
   const [deviceProfile, setDeviceProfile] = useState(null);
 
+  // Global cross-window / cross-device synchronization bus
+  useEffect(() => {
+    const unsubscribe = sovereignBroadcastBus.subscribe((msg) => {
+      if (msg.type === 'sync_active_tab' && msg.payload?.tabId) {
+        setActiveTab(msg.payload.tabId);
+      }
+    });
+    return unsubscribe;
+  }, []);
+
   // Global listener for opening files/folders anywhere in the app
   useEffect(() => {
     const handleOpenFile = (e) => {
@@ -118,6 +136,7 @@ export default function App() {
     window.addEventListener('open-file-viewer', handleOpenFile);
     return () => window.removeEventListener('open-file-viewer', handleOpenFile);
   }, []);
+
 
   // Chat Sessions & Folders State
   const [folders, setFolders] = useState(() => {
@@ -262,6 +281,14 @@ export default function App() {
 
   // Initial Status & WebSocket Connection
   useEffect(() => {
+    // Auto-detect live Cloudflare tunnel URL when running on an external host (Vercel, etc)
+    const isExternalHost = typeof window !== 'undefined' &&
+      window.location.hostname !== 'localhost' &&
+      window.location.hostname !== '127.0.0.1';
+    if (isExternalHost) {
+      autoDetectAndSetLiveTunnel().catch(() => {});
+    }
+
     fetchStatus()
       .then((data) => {
         setEnvData(data.environment);
@@ -638,7 +665,7 @@ export default function App() {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
                 className={`w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   isActive
                     ? 'bg-gradient-to-r from-cyan-500/20 to-purple-500/15 border border-cyan-500/40 text-cyan-200 shadow-md shadow-cyan-950/40'
@@ -748,7 +775,7 @@ export default function App() {
 
             {/* Notifications */}
             <button
-              onClick={() => setActiveTab('notifications')}
+              onClick={() => handleTabChange('notifications')}
               className="text-xs px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 font-mono transition-colors flex items-center gap-1.5 relative whitespace-nowrap"
               title="Notificaciones & Logs Ramificados"
             >
@@ -761,7 +788,7 @@ export default function App() {
 
             {/* Quick Shortcuts: VoiceStudio, Creaciones, Cerebros (Responsive) */}
             <button
-              onClick={() => setActiveTab('voice_studio')}
+              onClick={() => handleTabChange('voice_studio')}
               className={`text-xs px-2.5 py-1 rounded-lg font-mono transition-colors flex items-center gap-1.5 font-bold whitespace-nowrap ${
                 activeTab === 'voice_studio'
                   ? 'bg-cyan-500/30 border border-cyan-400 text-cyan-200'
@@ -774,7 +801,7 @@ export default function App() {
             </button>
 
             <button
-              onClick={() => setActiveTab('projects')}
+              onClick={() => handleTabChange('projects')}
               className={`text-xs px-2.5 py-1 rounded-lg font-mono transition-colors flex items-center gap-1.5 font-bold whitespace-nowrap ${
                 activeTab === 'projects' || activeTab === 'creations'
                   ? 'bg-emerald-500/30 border border-emerald-400 text-emerald-200'
@@ -787,7 +814,7 @@ export default function App() {
             </button>
 
             <button
-              onClick={() => setActiveTab('cerebros')}
+              onClick={() => handleTabChange('cerebros')}
               className={`hidden lg:flex text-xs px-2.5 py-1 rounded-lg font-mono transition-colors items-center gap-1.5 whitespace-nowrap ${
                 activeTab === 'cerebros'
                   ? 'bg-purple-500/30 border border-purple-400 text-purple-200'
@@ -817,7 +844,7 @@ export default function App() {
               <button
                 key={tab.id}
                 onClick={() => {
-                  setActiveTab(tab.id);
+                  handleTabChange(tab.id);
                   setIsMobileMenuOpen(false);
                 }}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold ${
@@ -851,9 +878,9 @@ export default function App() {
               onForkSession={handleForkSession}
               onRegenerate={handleRegenerate}
               activeNodes={activeNodes}
-              onOpenExplorer={() => setActiveTab('explorer')}
+              onOpenExplorer={() => handleTabChange('explorer')}
               activePersona={activePersona}
-              onOpenPersonalities={() => setActiveTab('personalities')}
+              onOpenPersonalities={() => handleTabChange('personalities')}
               onSelectPersona={(id) => setActivePersonaId(id)}
               sessions={sessions}
               activeSessionId={activeSessionId}
@@ -866,7 +893,7 @@ export default function App() {
             />
           )}
 
-          {activeTab === 'voice_studio' && <VoiceStudioView onBackToChat={() => setActiveTab('chat')} />}
+          {activeTab === 'voice_studio' && <VoiceStudioView onBackToChat={() => handleTabChange('chat')} />}
           {(activeTab === 'projects' || activeTab === 'creations') && <ProjectsView />}
           {activeTab === 'sensorium' && <Sensorium360View />}
           {(activeTab === 'imagination' || activeTab === 'dream') && <IntuitiveImaginationView />}
@@ -882,7 +909,7 @@ export default function App() {
               activePersonaId={activePersonaId}
               onSelectPersona={(id) => {
                 setActivePersonaId(id);
-                setActiveTab('chat');
+                handleTabChange('chat');
               }}
               onUpdateSettings={(newSet) => setSettings((prev) => ({ ...prev, ...newSet }))}
             />
@@ -890,7 +917,7 @@ export default function App() {
 
           {activeTab === 'swarm' && <AgentSwarmView />}
           {activeTab === 'browser' && <BrowserViewport />}
-          {activeTab === 'explorer' && <ComputerFileExplorer onFileSelectForChat={() => setActiveTab('chat')} />}
+          {activeTab === 'explorer' && <ComputerFileExplorer onFileSelectForChat={() => handleTabChange('chat')} />}
           {activeTab === 'workflows' && <WorkflowsView />}
           {activeTab === 'vault' && <SkillsVaultView />}
           {activeTab === 'installer' && <UniversalInstallerHub />}
@@ -958,7 +985,7 @@ export default function App() {
           return (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => handleTabChange(item.id)}
               className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
                 isActive
                   ? 'text-cyan-300 font-bold bg-cyan-500/20 shadow-md shadow-cyan-950/50'
