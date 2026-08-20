@@ -148,7 +148,7 @@ class IntuitiveImaginationEngine:
         
         # Concurrency & Request Threshold Limits
         self.max_concurrent_processes: int = 3
-        self.max_accumulated_requests_threshold: int = 5
+        self.max_accumulated_requests_threshold: int = 500
         self.max_proposals_per_agent_limit: int = 4
         self.auto_sync_all_proposals_enabled: bool = True
         self.is_paused_due_to_threshold: bool = False
