@@ -7,8 +7,8 @@ import {
   Sparkles, 
   Activity, 
   Cpu, 
-  GitBranch, 
-  HardDrive, 
+  GitBranch,
+  HardDrive,
   RotateCcw, 
   RefreshCw, 
   Clock, 
@@ -20,7 +20,8 @@ import {
   Zap,
   ShieldAlert,
   ShieldCheck,
-  Play
+  Play,
+  ArrowRight
 } from 'lucide-react';
 import { 
   fetchSystemNotifications, 
@@ -30,7 +31,8 @@ import {
   applySingleNotification,
   deleteSingleNotification,
   clearAllNotifications,
-  fetchImaginationSyncExecutionState
+  fetchImaginationSyncExecutionState,
+  fetchAuthOrchestratorStatus
 } from '../services/api';
 
 export default function NotificationsLogsView() {
@@ -40,6 +42,7 @@ export default function NotificationsLogsView() {
   const [isApplyingAll, setIsApplyingAll] = useState(false);
   const [actionInProgress, setActionInProgress] = useState(null);
   const [toastMsg, setToastMsg] = useState('');
+  const [orchStatus, setOrchStatus] = useState(null);
 
   const loadNotifications = async () => {
     try {
@@ -58,9 +61,22 @@ export default function NotificationsLogsView() {
     }
   };
 
+  const loadOrchStatus = async () => {
+    try {
+      const st = await fetchAuthOrchestratorStatus();
+      if (st) setOrchStatus(st);
+    } catch (err) {
+      console.warn('Error loading orchestrator status:', err);
+    }
+  };
+
   useEffect(() => {
     loadNotifications();
-    const interval = setInterval(loadNotifications, 8000);
+    loadOrchStatus();
+    const interval = setInterval(() => {
+      loadNotifications();
+      loadOrchStatus();
+    }, 8000);
     return () => clearInterval(interval);
   }, []);
 
@@ -338,7 +354,7 @@ export default function NotificationsLogsView() {
           className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-bold flex items-center gap-2 cursor-pointer shadow-md shadow-emerald-500/20 transition-all disabled:opacity-50"
         >
           <Sparkles className={`w-3.5 h-3.5 ${isApplyingAll ? 'animate-spin' : ''}`} />
-          <span>{isApplyingAll ? 'Sincronizando Agentes...' : '✨ Autorizar y Aplicar Todas con Agentes en 2do Plano'}</span>
+          <span>{isApplyingAll ? 'Sincronizando Agentes...' : '✨ Autorizar y Aplicar Todas con Agentes en 2do Plano · v2.2-Orch'}</span>
         </button>
       </div>
 
@@ -445,44 +461,146 @@ export default function NotificationsLogsView() {
           </div>
         </div>
 
-        {/* SECTION 2: ÁRBOL DE LOGS RAMIFICADOS EN SEGUNDO PLANO */}
-        <div className="p-4 rounded-2xl bg-black/60 border border-white/10 space-y-4 flex flex-col justify-between">
+        {/* SECTION 2: AGENTE DE ORQUESTACIÓN INTELIGENTE DE AUTORIZACIONES (1.58-bit) */}
+        <div className="p-4 rounded-2xl bg-black/60 border border-emerald-500/20 space-y-4 flex flex-col justify-between">
           <div className="space-y-3">
+            {/* Header del agente */}
             <div className="flex items-center justify-between pb-2 border-b border-white/10">
               <span className="font-bold text-white flex items-center gap-2 text-sm">
-                <GitBranch className="w-4 h-4 text-cyan-400" />
-                Árbol de Procesos Ramificados en Background
+                <Bot className={`w-4 h-4 text-emerald-400 ${orchStatus?.is_busy ? 'animate-spin' : ''}`} />
+                Agente de Orquestación Inteligente de Autorizaciones
               </span>
-              <span className="text-[10px] text-slate-500 font-mono">
-                {data.branching_logs?.length || 0} ramas registradas
+              <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
+                orchStatus?.is_busy
+                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 animate-pulse'
+                  : 'bg-white/5 text-slate-400 border-white/10'
+              }`}>
+                {orchStatus?.is_busy ? '⚡ Procesando' : '💤 En espera'}
               </span>
             </div>
 
-            <div className="space-y-3 max-h-[480px] overflow-y-auto pr-1 custom-scrollbar">
-              {(data.branching_logs || []).map((tree, ti) => (
-                <div
-                  key={tree.id || ti}
-                  className="p-3 rounded-xl bg-[#0a0d16] border border-cyan-500/20 space-y-2"
-                >
-                  <div className="flex items-center justify-between text-xs">
+            {/* Stats del agente */}
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                <div className="text-sm font-bold text-emerald-300">{orchStatus?.orchestrations_run || 0}</div>
+                <div className="text-[9px] text-slate-400">Orquestaciones</div>
+              </div>
+              <div className="p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
+                <div className="text-sm font-bold text-cyan-300">
+                  {orchStatus?.last_run?.processed_count || 0}
+                </div>
+                <div className="text-[9px] text-slate-400">Procesadas</div>
+              </div>
+              <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                <div className="text-sm font-bold text-amber-300">
+                  {orchStatus?.last_run?.storage_events || 0}
+                </div>
+                <div className="text-[9px] text-slate-400">Medios akt.</div>
+              </div>
+            </div>
+
+            {/* Lista de enrutamientos del último run */}
+            <div className="space-y-2 max-h-[360px] overflow-y-auto pr-1 custom-scrollbar">
+              {!orchStatus?.last_run?.processed?.length ? (
+                <div className="p-4 rounded-xl bg-black/40 border border-white/5 text-center text-slate-500 italic text-[11px]">
+                  Presiona «Autorizar y Aplicar Todas» para que el agente orqueste<br/>
+                  el enrutamiento inteligente de las solicitudes acumuladas.
+                </div>
+              ) : (
+                orchStatus.last_run.processed.map((p, i) => (
+                  <div key={p.notif_id || i} className="p-2.5 rounded-xl bg-[#0a0d16] border border-emerald-500/20 space-y-1.5">
+                    {/* Tema / proceso */}
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-bold text-white text-[11px] truncate flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                        {p.theme}
+                      </span>
+                      <span className="text-[9px] text-slate-500 font-mono shrink-0">
+                        Prioridad {p.priority}/10
+                      </span>
+                    </div>
+
+                    {/* Enrutamiento: proceso → agente → cerebro → personalidad */}
+                    <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-mono">
+                      <span className="text-slate-400 bg-white/5 px-1.5 py-0.5 rounded border border-white/5">
+                        {p.process_label || p.process_type}
+                      </span>
+                      <ArrowRight className="w-3 h-3 text-emerald-400" />
+                      <span className="text-emerald-300 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/30 font-bold capitalize">
+                        {p.agent}
+                      </span>
+                      <ArrowRight className="w-3 h-3 text-cyan-400" />
+                      <span
+                        className="px-1.5 py-0.5 rounded border font-bold"
+                        style={{ color: p.brain_color || '#00f0ff', borderColor: (p.brain_color || '#00f0ff') + '55', background: (p.brain_color || '#00f0ff') + '15' }}
+                      >
+                        🧠 {p.brain_name}
+                      </span>
+                      <ArrowRight className="w-3 h-3 text-pink-400" />
+                      <span className="text-pink-300 bg-pink-500/10 px-1.5 py-0.5 rounded border border-pink-500/30">
+                        {p.personality_name}
+                      </span>
+                    </div>
+
+                    {/* Fases de enrutamiento */}
+                    <div className="space-y-0.5 pl-2 border-l-2 border-emerald-500/20">
+                      {(p.routing_steps || []).map((s) => (
+                        <div key={s.step} className="flex items-center gap-1.5 text-[9px] text-slate-400">
+                          <CheckCircle2 className="w-2.5 h-2.5 text-emerald-500 shrink-0" />
+                          <span>{s.label}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Relaciones con otras tareas */}
+                    {p.relations?.length > 0 && (
+                      <div className="text-[9px] text-slate-500 font-mono flex items-center gap-1">
+                        <GitBranch className="w-2.5 h-2.5 text-cyan-400" />
+                        {p.relations.length} relación(es) de contexto detectada(s)
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Fallidas (si las hay) */}
+            {orchStatus?.last_run?.failed?.length > 0 && (
+              <div className="p-2 rounded-lg bg-rose-500/10 border border-rose-500/20 text-[10px] text-rose-300">
+                {orchStatus.last_run.failed.length} notificación(es) sin rama asociada (sistema) — no requieren agente.
+              </div>
+            )}
+          </div>
+
+          {/* Árbol de ramas en segundo plano (contexto histórico) */}
+          <div className="space-y-2 pt-2 border-t border-white/10">
+            <span className="font-bold text-white flex items-center gap-2 text-xs">
+              <GitBranch className="w-3.5 h-3.5 text-cyan-400" />
+              Árbol de Procesos Ramificados
+              <span className="text-[10px] text-slate-500 font-mono">
+                {data.branching_logs?.length || 0} ramas
+              </span>
+            </span>
+            <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1 custom-scrollbar">
+              {(data.branching_logs || []).slice(0, 6).map((tree, ti) => (
+                <div key={tree.id || ti} className="p-2.5 rounded-xl bg-[#0a0d16] border border-cyan-500/20 space-y-1.5">
+                  <div className="flex items-center justify-between text-[11px]">
                     <span className="font-bold text-cyan-300 flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-cyan-400" />
                       {tree.root_process}
                     </span>
-                    <span className="text-[10px] text-slate-500 font-mono">
+                    <span className="text-[9px] text-slate-500 font-mono">
                       {new Date(tree.timestamp * 1000).toLocaleTimeString()}
                     </span>
                   </div>
-
-                  {/* Branches */}
                   <div className="space-y-1 pl-3 border-l-2 border-cyan-500/30">
-                    {(tree.branches || []).map((b, bi) => (
-                      <div key={bi} className="p-1.5 rounded bg-black/40 flex items-center justify-between text-[11px] text-slate-300">
-                        <div className="flex items-center gap-2">
-                          <span className="text-cyan-400 text-[10px]">↳</span>
-                          <span>{b.step}</span>
+                    {(tree.branches || []).slice(0, 4).map((b, bi) => (
+                      <div key={bi} className="p-1 rounded bg-black/40 flex items-center justify-between text-[10px] text-slate-300">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-cyan-400 text-[9px]">↳</span>
+                          <span className="truncate">{b.step}</span>
                         </div>
-                        <span className="text-[10px] text-slate-400 font-mono">{b.latency_ms}ms</span>
+                        <span className="text-[9px] text-slate-400 font-mono">{b.latency_ms}ms</span>
                       </div>
                     ))}
                   </div>

@@ -1858,6 +1858,10 @@ export async function executeAllNotificationsInList(notifIds) {
   });
 }
 
+export async function fetchAuthOrchestratorStatus() {
+  return apiFetch('/notifications/auth_orchestrator_status');
+}
+
 export async function fetchImaginationSyncExecutionState() {
   return apiFetch('/imagination/sync_execution_state');
 }

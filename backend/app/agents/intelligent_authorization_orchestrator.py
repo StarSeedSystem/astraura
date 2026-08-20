@@ -27,6 +27,9 @@ import re
 from datetime import datetime
 from typing import Dict, List, Any, Optional
 
+# DREAM_PROCESS_TYPES es constante de módulo (no atributo de instancia)
+from ..core.intuitive_imagination_engine import DREAM_PROCESS_TYPES
+
 # Importación perezosa para evitar ciclos en el arranque de FastAPI
 _intuitive = None
 _notifications = None
@@ -409,9 +412,26 @@ class IntelligentAuthorizationOrchestrator:
                         "notif_id": it["id"],
                         "branch_id": branch.get("id"),
                         "agent": it["agent"],
+                        "agent_area": AGENT_AREA.get(it["agent"], "area_project_management"),
                         "process_type": it["process_type"],
+                        "process_label": next((p.get("name") for p in DREAM_PROCESS_TYPES
+                                               if p.get("id") == it["process_type"]), it["process_type"]),
                         "priority": it["priority"],
+                        "theme": branch.get("theme") or branch.get("title") or "Proceso autónomo",
+                        "brain_id": it["brain"].get("id"),
+                        "brain_name": it["brain"].get("name", "Cerebro Génesis"),
+                        "brain_color": it["brain"].get("color", "#00f0ff"),
+                        "personality_id": it["personality"].get("id"),
+                        "personality_name": it["personality"].get("name", "Aurora"),
                         "relations": it.get("relations", []),
+                        "status": "executed",
+                        "routing_steps": [
+                            {"step": 1, "label": f"Infiriendo tipo de proceso → {it['process_type']}", "done": True},
+                            {"step": 2, "label": f"Enrutando a agente dedicado → {it['agent']} ({AGENT_AREA.get(it['agent'], 'area_project_management')})", "done": True},
+                            {"step": 3, "label": f"Contexto 1.58-bit → personalidad '{it['personality'].get('name','Aurora')}' @ cerebro '{it['brain'].get('name','Génesis')}'", "done": True},
+                            {"step": 4, "label": "Concediendo autorización (exocórtex StarSeed)", "done": True},
+                            {"step": 5, "label": "Despachando tarea al enjambre + 8 fases de ejecución", "done": True},
+                        ],
                     })
                 except Exception as exc:
                     failed.append({"notif_id": it["id"], "error": str(exc)})
@@ -445,6 +465,38 @@ class IntelligentAuthorizationOrchestrator:
             return summary
         finally:
             self.is_busy = False
+
+    # ─────────────────────────────────────────────────────────────────────
+    # Estado vivo para el frontend (panel del agente de orquestación)
+    # ─────────────────────────────────────────────────────────────────────
+    def get_status(self) -> Dict[str, Any]:
+        """Devuelve el estado actual del agente de orquestación para la UI."""
+        _resolve()
+        last = self.last_orchestration or {}
+        # Agentes involucrados en el último run con conteo
+        agents_involved = {}
+        for p in last.get("processed", []):
+            a = p.get("agent", "athena")
+            agents_involved[a] = agents_involved.get(a, 0) + 1
+        return {
+            "is_busy": self.is_busy,
+            "orchestrations_run": self.orchestrations_run,
+            "agent_name": "Agente de Orquestación Inteligente de Autorizaciones",
+            "agent_id": "auth_orchestrator",
+            "last_run": {
+                "processed_count": last.get("processed_count", 0),
+                "failed_count": last.get("failed_count", 0),
+                "agent_executions": last.get("agent_executions", {}),
+                "storage_events": last.get("storage_events", 0),
+                "elapsed_seconds": last.get("elapsed_seconds", 0),
+                "message": last.get("message", ""),
+                "processed": last.get("processed", []),
+                "failed": last.get("failed", []),
+            },
+            "agents_involved": agents_involved,
+            "process_to_agent_map": PROCESS_TO_AGENT,
+            "agent_area_map": AGENT_AREA,
+        }
 
 
 # Instancia global singleton

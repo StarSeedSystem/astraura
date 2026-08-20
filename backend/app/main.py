@@ -2550,6 +2550,11 @@ async def register_folder_from_filesystem(req: Dict[str, Any]):
 
 # ================= System Notifications & Branching Logs APIs =================
 
+@app.get("/api/notifications/auth_orchestrator_status")
+async def get_auth_orchestrator_status():
+    """Estado vivo del Agente de Orquestación Inteligente de Autorizaciones (1.58-bit)."""
+    return intelligent_authorization_orchestrator.get_status()
+
 @app.get("/api/notifications")
 async def get_system_notifications():
     system_notifications_engine.sync_with_imagination(intuitive_imagination_engine.branches)
