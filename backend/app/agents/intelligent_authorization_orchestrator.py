@@ -177,7 +177,8 @@ class IntelligentAuthorizationOrchestrator:
             draining = pending_total > self.MAX_BALANCED_QUEUE
             self._draining_mode = draining
             if draining:
-                # DRENAJE: procesar TODAS las pendientes para no acumular
+                # DRENAJE: procesar TODAS las pendientes en paralelo (workers=16)
+                # para superar la tasa de generación del ecosistema vivo.
                 batch = pending[:]
                 mode_label = "DRENAJE (priorizando completado de tareas pendientes)"
             else:
@@ -191,7 +192,7 @@ class IntelligentAuthorizationOrchestrator:
 
             import threading
             t = threading.Thread(
-                target=lambda: asyncio.run(self.orchestrate_list(batch)), daemon=True
+                target=lambda: asyncio.run(self.orchestrate_list(batch, force=True)), daemon=True
             )
             t.start()
             return {
@@ -456,6 +457,26 @@ class IntelligentAuthorizationOrchestrator:
             print(f"⚠️ [AuthOrchestrator] Error registrando en exocórtex: {e}")
             return False
 
+    def _run_workflow_safe(self, branch: Dict[str, Any], it: Dict[str, Any]):
+        """Ejecuta el flujo pesado de 8 fases (1.58-bit) en segundo plano, sin
+        bloquear el vaciado de notificaciones. Registra en exocórtex y traslada
+        la rama de proceso en segundo plano visible."""
+        try:
+            workflow = _intuitive.run_automated_execution_workflow([branch])
+            result = workflow if isinstance(workflow, dict) else {"status": "ok"}
+        except Exception as e:
+            print(f"⚠️ [AuthOrchestrator] workflow bg: {e}")
+            result = {"status": "ok", "warn": str(e)}
+        try:
+            self._record_in_exocortex(branch, it.get("notif"), it.get("personality"),
+                                 it.get("brain"), it.get("agent"), result)
+        except Exception as e:
+            print(f"⚠️ [AuthOrchestrator] exocortex bg: {e}")
+        try:
+            self._register_background_branch(it, branch, result)
+        except Exception as e:
+            print(f"⚠️ [AuthOrchestrator] bg_branch bg: {e}")
+
     # ─────────────────────────────────────────────────────────────────────
     # Bucle principal: orquesta una lista de notificaciones
     # ─────────────────────────────────────────────────────────────────────
@@ -561,32 +582,30 @@ class IntelligentAuthorizationOrchestrator:
             #    que los procesos imaginativos en segundo plano de menor prioridad),
             #    y se SINCRONIZA con todo el ecosistema 1.58-bit interconectado.
             agent_executions = {a: 0 for a in set(PROCESS_TO_AGENT.values())}
-            for it in ordered:
+            # Procesamiento PARALELO: cada solicitud se autoriza, elimina de la vista
+            # y se traslada a su agente de inmediato; el flujo pesado de 8 fases corre
+            # en paralelo (hasta 8 workers) para superar la tasa de generación del
+            # ecosistema vivo y EVITAR que las notificaciones se acumulen.
+            from concurrent.futures import ThreadPoolExecutor
+            lock = __import__('threading').Lock()
+
+            def _process_one(it):
                 try:
                     branch = it["branch"]
-                    # Refinar propuesta con contexto 1.58-bit
                     refined = self._refine_proposal(branch, it["personality"], it["brain"])
-                    # Fusionar campos refinados en la rama original en memoria
                     branch.update(refined)
-
-                    # FASE 1: Conceder autorización (registra en exocórtex)
                     grant = _intuitive.grant_and_apply_request(branch.get("id"))
                     if not grant.get("success"):
-                        failed.append({"notif_id": it["id"], "error": grant.get("error", "grant falló")})
-                        continue
-
-                    # FASE 1.5: MARCAR NOTIFICACIÓN APLICADA DE INMEDIATO.
-                    # Esto hace que desaparezca de la vista de Notificaciones al
-                    # instante (no se acumula) mientras el trabajo pesado ocurre
-                    # en segundo plano con los agentes 1.58-bit interconectados.
+                        return {"ok": False, "notif_id": it["id"], "error": grant.get("error", "grant falló")}
+                    # Eliminar de la vista de inmediato (no se acumula)
                     try:
-                        _notifications.apply_notification(it["id"])
-                    except Exception as e:
-                        print(f"⚠️ [AuthOrchestrator] apply_notification: {e}")
-
-                    # FASE 2: TRASLADAR a la lista de tareas del agente correspondiente
-                    #         con prioridad CRÍTICA (10) → va al FRENTE de la cola del
-                    #         swarm para ejecutarse ANTES que otros procesos imaginativos.
+                        _notifications.delete_single_notification(it["id"])
+                    except Exception:
+                        try:
+                            _notifications.apply_notification(it["id"])
+                        except Exception:
+                            pass
+                    # Trasladar a la cola del agente con prioridad crítica 10
                     try:
                         _swarm.dispatch_task(
                             area_id=AGENT_AREA.get(it["agent"], "area_project_management"),
@@ -596,34 +615,24 @@ class IntelligentAuthorizationOrchestrator:
                             priority_level=10,
                             origin="authorization_orchestrator",
                         )
-                        agent_executions[it["agent"]] = agent_executions.get(it["agent"], 0) + 1
+                        with lock:
+                            agent_executions[it["agent"]] = agent_executions.get(it["agent"], 0) + 1
                     except Exception as e:
-                        print(f"⚠️ [AuthOrchestrator] dispatch_task falló para {it['agent']}: {e}")
+                        print(f"⚠️ [AuthOrchestrator] dispatch_task {it['agent']}: {e}")
+                    # El flujo pesado de 8 fases (1.58-bit) corre en SEGUNDO PLANO
+                    # (fire-and-forget) para no bloquear el vaciado de notificaciones.
+                    import threading as _th
+                    _th.Thread(target=self._run_workflow_safe, args=(branch, it), daemon=True).start()
+                    return {"ok": True, "notif_id": it["id"], "it": it, "branch": branch, "result": {"status": "queued"}}
+                except Exception as exc:
+                    return {"ok": False, "notif_id": it["id"], "error": str(exc)}
 
-                    # FASE 3: Ejecutar flujo completo de agentes (8 fases del sistema 1.58-bit)
-                    #         en su PROPIA try para que nunca bloquee el traslado/marcado.
-                    try:
-                        workflow = _intuitive.run_automated_execution_workflow([branch])
-                        result = workflow if isinstance(workflow, dict) else {"status": "ok"}
-                    except Exception as e:
-                        print(f"⚠️ [AuthOrchestrator] workflow: {e}")
-                        result = {"status": "ok", "warn": str(e)}
+            with ThreadPoolExecutor(max_workers=16) as ex:
+                results = list(ex.map(_process_one, ordered))
 
-                    # FASE 4: Registrar en exocórtex StarSeed con cerebro + personalidad + memoria
-                    try:
-                        self._record_in_exocortex(branch, it["notif"], it["personality"],
-                                             it["brain"], it["agent"], result)
-                    except Exception as e:
-                        print(f"⚠️ [AuthOrchestrator] exocortex: {e}")
-
-                    # FASE 4.5: TRASLADAR a la LISTA DE TAREAS DE PROCESOS EN SEGUNDO
-                    #          PLANO del sistema (visible en IntuitiveImaginationView /
-                    #          AgentBackgroundTasksZone) como rama de proceso activo.
-                    try:
-                        self._register_background_branch(it, branch, result)
-                    except Exception as e:
-                        print(f"⚠️ [AuthOrchestrator] bg_branch: {e}")
-
+            for r in results:
+                if r.get("ok"):
+                    it = r["it"]; branch = r["branch"]; result = r["result"]
                     processed.append({
                         "notif_id": it["id"],
                         "branch_id": branch.get("id"),
@@ -647,12 +656,12 @@ class IntelligentAuthorizationOrchestrator:
                             {"step": 2, "label": f"Enrutando a agente dedicado → {it['agent']} ({AGENT_AREA.get(it['agent'], 'area_project_management')})", "done": True},
                             {"step": 3, "label": f"Contexto 1.58-bit → personalidad '{it['personality'].get('name','Aurora')}' @ cerebro '{it['brain'].get('name','Génesis')}'", "done": True},
                             {"step": 4, "label": "Concediendo autorización (exocórtex StarSeed)", "done": True},
-                            {"step": 5, "label": f"Trasladando a cola de tareas de {it['agent']} [PRIORIDAD CRÍTICA 10] → ejecuta ANTES que procesos imaginativos", "done": True},
+                            {"step": 5, "label": f"Trasladando a cola de tareas de {it['agent']} [PRIORIDAD CRÍTICA 10]", "done": True},
                             {"step": 6, "label": "Sincronizando con Director + Orquestador + Personalidades + Memorias 1.58-bit", "done": True},
                         ],
                     })
-                except Exception as exc:
-                    failed.append({"notif_id": it["id"], "error": str(exc)})
+                else:
+                    failed.append({"notif_id": r.get("notif_id"), "error": r.get("error", "desconocido")})
 
             # 4. SINCRONIZAR TODO EL ECOSISTEMA 1.58-BIT INTERCONECTADO
             #    (Director Orquestrador, Administrador de Prioridades, Agente
