@@ -1,15 +1,457 @@
 {
   "notifications": [
     {
+      "id": "notif_req_branch_1787273561",
+      "title": "⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_bg_branch.py, IDEA.md'. Hipótesis: Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_bg_branch.py, IDEA.md' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787273561.709533,
+      "read": false,
+      "branch_id": "branch_1787273561",
+      "status": "pending",
+      "action_type": "grant_authorization"
+    },
+    {
+      "id": "notif_req_branch_1787273563",
+      "title": "⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Hipótesis: Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787273563.49281,
+      "read": false,
+      "branch_id": "branch_1787273563",
+      "status": "pending",
+      "action_type": "grant_authorization"
+    },
+    {
+      "id": "notif_1787273566",
+      "title": "⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
+      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 1.",
+      "category": "Almacenamiento & Memoria",
+      "severity": "success",
+      "timestamp": 1787273566.048418,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787273565",
+      "title": "⚡ Medio Detectado: Almacenamiento Externo / SSD USB (/Volumes)",
+      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 2.",
+      "category": "Almacenamiento & Memoria",
+      "severity": "success",
+      "timestamp": 1787273565.1763651,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787273564",
+      "title": "⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' clasificada como [LOW]. Esperando tu confirmación en la pestaña de Propuestas.",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787273564.337665,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787273563",
+      "title": "⚡ Medio Detectado: Workspace Soberano Local (IA 1.58 bit)",
+      "message": "Enrutamiento a brain_genesis activado. 14 archivos indexados. Procesos disparados: 2.",
+      "category": "Almacenamiento & Memoria",
+      "severity": "success",
+      "timestamp": 1787273563.44848,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787273562",
+      "title": "⚠️ Solicitud de Aprobación de Mejora: Auto-Reflexión & Optimización de Código ARM NEON",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_bg_branch.py, IDEA.md' clasificada como [HIGH]. Esperando tu confirmación en la pestaña de Propuestas.",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787273562.553507,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787273560",
+      "title": "✅ Permiso Concedido: Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ",
+      "message": "La solicitud fue autorizada y aplicada en el exocórtex.",
+      "category": "Autorización Soberana",
+      "severity": "success",
+      "timestamp": 1787273560.3158138,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_req_branch_1787273549",
+      "title": "⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_bg_branch.py, IDEA.md'. Hipótesis: Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_bg_branch.py, IDEA.md' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787273549.7161548,
+      "read": true,
+      "branch_id": "branch_1787273549",
+      "status": "applied",
+      "action_type": "grant_authorization",
+      "applied_at": 1787273560.343049
+    },
+    {
+      "id": "notif_req_branch_1787273551",
+      "title": "⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Hipótesis: Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787273551.423607,
+      "read": true,
+      "branch_id": "branch_1787273551",
+      "status": "applied",
+      "action_type": "grant_authorization",
+      "applied_at": 1787273560.397452
+    },
+    {
+      "id": "notif_1787273553",
+      "title": "⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
+      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 1.",
+      "category": "Almacenamiento & Memoria",
+      "severity": "success",
+      "timestamp": 1787273553.1288269,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "applied",
+      "applied_at": 1787273559.510797
+    },
+    {
+      "id": "notif_1787273552",
+      "title": "⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' clasificada como [LOW]. Esperando tu confirmación en la pestaña de Propuestas.",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787273552.2582788,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "applied",
+      "applied_at": 1787273559.879471
+    },
+    {
+      "id": "notif_1787273551",
+      "title": "⚡ Medio Detectado: Workspace Soberano Local (IA 1.58 bit)",
+      "message": "Enrutamiento a brain_genesis activado. 14 archivos indexados. Procesos disparados: 2.",
+      "category": "Almacenamiento & Memoria",
+      "severity": "success",
+      "timestamp": 1787273551.3925009,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787273550",
+      "title": "⚠️ Solicitud de Aprobación de Mejora: Auto-Reflexión & Optimización de Código ARM NEON",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_bg_branch.py, IDEA.md' clasificada como [HIGH]. Esperando tu confirmación en la pestaña de Propuestas.",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787273550.4952152,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_req_branch_1787273417",
+      "title": "⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_bg_branch.py, IDEA.md'. Hipótesis: Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_bg_branch.py, IDEA.md' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787273417.150722,
+      "read": false,
+      "branch_id": "branch_1787273417",
+      "status": "pending",
+      "action_type": "grant_authorization"
+    },
+    {
+      "id": "notif_req_branch_1787273418",
+      "title": "⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Hipótesis: Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787273418.9027572,
+      "read": false,
+      "branch_id": "branch_1787273418",
+      "status": "pending",
+      "action_type": "grant_authorization"
+    },
+    {
+      "id": "notif_1787273421",
+      "title": "⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
+      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 1.",
+      "category": "Almacenamiento & Memoria",
+      "severity": "success",
+      "timestamp": 1787273421.3983932,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787273420",
+      "title": "⚡ Medio Detectado: Almacenamiento Externo / SSD USB (/Volumes)",
+      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 2.",
+      "category": "Almacenamiento & Memoria",
+      "severity": "success",
+      "timestamp": 1787273420.580826,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787273419",
+      "title": "⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' clasificada como [LOW]. Esperando tu confirmación en la pestaña de Propuestas.",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787273419.713761,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787273418",
+      "title": "⚡ Medio Detectado: Workspace Soberano Local (IA 1.58 bit)",
+      "message": "Enrutamiento a brain_genesis activado. 14 archivos indexados. Procesos disparados: 2.",
+      "category": "Almacenamiento & Memoria",
+      "severity": "success",
+      "timestamp": 1787273418.872832,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787273417",
+      "title": "⚠️ Solicitud de Aprobación de Mejora: Auto-Reflexión & Optimización de Código ARM NEON",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_bg_branch.py, IDEA.md' clasificada como [HIGH]. Esperando tu confirmación en la pestaña de Propuestas.",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787273417.9817312,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787273415",
+      "title": "✅ Permiso Concedido: Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ",
+      "message": "La solicitud fue autorizada y aplicada en el exocórtex.",
+      "category": "Autorización Soberana",
+      "severity": "success",
+      "timestamp": 1787273415.761736,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_req_branch_1787273404",
+      "title": "⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_bg_branch.py, IDEA.md'. Hipótesis: Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_bg_branch.py, IDEA.md' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787273404.2893991,
+      "read": true,
+      "branch_id": "branch_1787273404",
+      "status": "applied",
+      "action_type": "grant_authorization",
+      "applied_at": 1787273415.790864
+    },
+    {
+      "id": "notif_req_branch_1787273406",
+      "title": "⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Hipótesis: Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787273406.4494,
+      "read": true,
+      "branch_id": "branch_1787273406",
+      "status": "applied",
+      "action_type": "grant_authorization",
+      "applied_at": 1787273415.831788
+    },
+    {
+      "id": "notif_1787273408",
+      "title": "⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
+      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 1.",
+      "category": "Almacenamiento & Memoria",
+      "severity": "success",
+      "timestamp": 1787273408.09851,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "applied",
+      "applied_at": 1787273415.7383199
+    },
+    {
+      "id": "notif_1787273407",
+      "title": "⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' clasificada como [LOW]. Esperando tu confirmación en la pestaña de Propuestas.",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787273407.2213671,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "applied",
+      "applied_at": 1787273415.7409122
+    },
+    {
+      "id": "notif_1787273406",
+      "title": "⚡ Medio Detectado: Workspace Soberano Local (IA 1.58 bit)",
+      "message": "Enrutamiento a brain_genesis activado. 14 archivos indexados. Procesos disparados: 2.",
+      "category": "Almacenamiento & Memoria",
+      "severity": "success",
+      "timestamp": 1787273406.409683,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787273405",
+      "title": "⚠️ Solicitud de Aprobación de Mejora: Auto-Reflexión & Optimización de Código ARM NEON",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_bg_branch.py, IDEA.md' clasificada como [HIGH]. Esperando tu confirmación en la pestaña de Propuestas.",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787273405.485746,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_req_branch_1787273203",
+      "title": "⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, IDEA.md, README.md'. Hipótesis: Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, IDEA.md, README.md' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787273203.620656,
+      "read": false,
+      "branch_id": "branch_1787273203",
+      "status": "pending",
+      "action_type": "grant_authorization"
+    },
+    {
+      "id": "notif_req_branch_1787273205",
+      "title": "⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Hipótesis: Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787273205.264564,
+      "read": false,
+      "branch_id": "branch_1787273205",
+      "status": "pending",
+      "action_type": "grant_authorization"
+    },
+    {
+      "id": "notif_1787273207",
+      "title": "⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
+      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 1.",
+      "category": "Almacenamiento & Memoria",
+      "severity": "success",
+      "timestamp": 1787273207.688426,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787273206",
+      "title": "⚡ Medio Detectado: Almacenamiento Externo / SSD USB (/Volumes)",
+      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 2.",
+      "category": "Almacenamiento & Memoria",
+      "severity": "success",
+      "timestamp": 1787273206.842707,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787273205",
+      "title": "⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' clasificada como [LOW]. Esperando tu confirmación en la pestaña de Propuestas.",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787273205.2260458,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787273204",
+      "title": "⚠️ Solicitud de Aprobación de Mejora: Auto-Reflexión & Optimización de Código ARM NEON",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, IDEA.md, README.md' clasificada como [HIGH]. Esperando tu confirmación en la pestaña de Propuestas.",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787273204.426819,
+      "read": false,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787272839",
+      "title": "✅ Permisos Concedidos: 2 Solicitudes Autorizadas",
+      "message": "Se concedieron todos los permisos para 2 solicitudes. Los agentes ejecutarán las tareas automáticamente.",
+      "category": "Autorización Soberana",
+      "severity": "success",
+      "timestamp": 1787272839.189153,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "applied",
+      "applied_at": 1787273202.250047
+    },
+    {
+      "id": "notif_1787272750",
+      "title": "✨ Auto-Mejora Aplicada: Sueño Lúcido Ciberdélico (UI, Arte & 3D)",
+      "message": "Se aplicó automáticamente: 'Shader Ciberdélico y Geometría Sagrada para Cuernavaca'. Todos los subsistemas sincronizados.",
+      "category": "Imaginación Intuitiva",
+      "severity": "success",
+      "timestamp": 1787272750.911631,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "applied",
+      "applied_at": 1787273202.252676
+    },
+    {
       "id": "notif_req_branch_1787272141",
       "title": "⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
       "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_one.py, IDEA.md'. Hipótesis: Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_one.py, IDEA.md' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
       "category": "Solicitud de Autorización",
       "severity": "warning",
       "timestamp": 1787272141.289654,
-      "read": false,
+      "read": true,
       "branch_id": "branch_1787272141",
-      "status": "pending",
+      "status": "applied",
       "action_type": "grant_authorization"
     },
     {
@@ -19,9 +461,9 @@
       "category": "Solicitud de Autorización",
       "severity": "warning",
       "timestamp": 1787272144.400314,
-      "read": false,
+      "read": true,
       "branch_id": "branch_1787272144",
-      "status": "pending",
+      "status": "applied",
       "action_type": "grant_authorization"
     },
     {
@@ -31,10 +473,11 @@
       "category": "Almacenamiento & Memoria",
       "severity": "success",
       "timestamp": 1787272148.81469,
-      "read": false,
+      "read": true,
       "action_type": null,
       "branch_id": null,
-      "status": "pending"
+      "status": "applied",
+      "applied_at": 1787273202.2558799
     },
     {
       "id": "notif_1787272147",
@@ -43,7 +486,7 @@
       "category": "Almacenamiento & Memoria",
       "severity": "success",
       "timestamp": 1787272147.378767,
-      "read": false,
+      "read": true,
       "action_type": null,
       "branch_id": null,
       "status": "pending"
@@ -55,7 +498,7 @@
       "category": "Solicitud de Autorización",
       "severity": "warning",
       "timestamp": 1787272145.961568,
-      "read": false,
+      "read": true,
       "action_type": null,
       "branch_id": null,
       "status": "pending"
@@ -67,7 +510,7 @@
       "category": "Almacenamiento & Memoria",
       "severity": "success",
       "timestamp": 1787272144.28609,
-      "read": false,
+      "read": true,
       "action_type": null,
       "branch_id": null,
       "status": "pending"
@@ -79,7 +522,7 @@
       "category": "Solicitud de Autorización",
       "severity": "warning",
       "timestamp": 1787272142.7577531,
-      "read": false,
+      "read": true,
       "action_type": null,
       "branch_id": null,
       "status": "pending"
@@ -91,7 +534,7 @@
       "category": "Autorización Soberana",
       "severity": "success",
       "timestamp": 1787272139.0453298,
-      "read": false,
+      "read": true,
       "action_type": null,
       "branch_id": null,
       "status": "pending"
@@ -103,7 +546,7 @@
       "category": "Autorización Soberana",
       "severity": "success",
       "timestamp": 1787272138.587466,
-      "read": false,
+      "read": true,
       "action_type": null,
       "branch_id": null,
       "status": "pending"
@@ -302,475 +745,262 @@
       "status": "applied",
       "action_type": "grant_authorization",
       "applied_at": 1787272138.7873092
-    },
-    {
-      "id": "notif_req_branch_1787271663",
-      "title": "⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Hipótesis: Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787271663.342675,
-      "read": true,
-      "branch_id": "branch_1787271663",
-      "status": "applied",
-      "action_type": "grant_authorization",
-      "applied_at": 1787272139.09243
-    },
-    {
-      "id": "notif_1787271671",
-      "title": "⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 1.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787271671.636642,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787272135.392195
-    },
-    {
-      "id": "notif_1787271668",
-      "title": "⚡ Medio Detectado: Almacenamiento Externo / SSD USB (/Volumes)",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787271668.3920798,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787272135.397614
-    },
-    {
-      "id": "notif_1787271665",
-      "title": "⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' clasificada como [LOW]. Esperando tu confirmación en la pestaña de Propuestas.",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787271665.138635,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787272135.40351
-    },
-    {
-      "id": "notif_1787271663",
-      "title": "⚡ Medio Detectado: Workspace Soberano Local (IA 1.58 bit)",
-      "message": "Enrutamiento a brain_genesis activado. 14 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787271663.264899,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787272135.40835
-    },
-    {
-      "id": "notif_1787271659",
-      "title": "⚠️ Solicitud de Aprobación de Mejora: Auto-Reflexión & Optimización de Código ARM NEON",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_one.py, IDEA.md' clasificada como [HIGH]. Esperando tu confirmación en la pestaña de Propuestas.",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787271659.0111208,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787272135.413225
-    },
-    {
-      "id": "notif_1787271652",
-      "title": "✅ Permiso Concedido: Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ",
-      "message": "La solicitud fue autorizada y aplicada en el exocórtex.",
-      "category": "Autorización Soberana",
-      "severity": "success",
-      "timestamp": 1787271652.899449,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787272135.418184
-    },
-    {
-      "id": "notif_req_branch_1787271631",
-      "title": "⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_one.py, IDEA.md'. Hipótesis: Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_one.py, IDEA.md' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787271631.137894,
-      "read": true,
-      "branch_id": "branch_1787271631",
-      "status": "applied",
-      "action_type": "grant_authorization",
-      "applied_at": 1787272138.856458
-    },
-    {
-      "id": "notif_req_branch_1787271638",
-      "title": "⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Hipótesis: Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787271638.075954,
-      "read": true,
-      "branch_id": "branch_1787271638",
-      "status": "applied",
-      "action_type": "grant_authorization",
-      "applied_at": 1787272139.1712372
-    },
-    {
-      "id": "notif_1787271647",
-      "title": "⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 1.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787271647.3424242,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787272138.4935858
-    },
-    {
-      "id": "notif_1787271644",
-      "title": "⚡ Medio Detectado: Almacenamiento Externo / SSD USB (/Volumes)",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787271644.32148,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787272138.498083
-    },
-    {
-      "id": "notif_1787271641",
-      "title": "⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' clasificada como [LOW]. Esperando tu confirmación en la pestaña de Propuestas.",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787271641.513185,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787272138.502389
-    },
-    {
-      "id": "notif_1787271638",
-      "title": "⚡ Medio Detectado: Workspace Soberano Local (IA 1.58 bit)",
-      "message": "Enrutamiento a brain_genesis activado. 14 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787271638.039886,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787272138.506826
-    },
-    {
-      "id": "notif_1787271637",
-      "title": "✨ Auto-Mejora Aplicada: Sueño REM Cognitivo (Consolidación Sináptica)",
-      "message": "Se aplicó automáticamente: 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_one.py, IDEA.md'. Todos los subsistemas sincronizados.",
-      "category": "Imaginación Intuitiva",
-      "severity": "success",
-      "timestamp": 1787271637.9557178,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787272138.510823
-    },
-    {
-      "id": "notif_1787271634",
-      "title": "⚠️ Solicitud de Aprobación de Mejora: Auto-Reflexión & Optimización de Código ARM NEON",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_one.py, IDEA.md' clasificada como [HIGH]. Esperando tu confirmación en la pestaña de Propuestas.",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787271634.863132,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787272138.514828
-    },
-    {
-      "id": "notif_1787271625",
-      "title": "✅ Permiso Concedido: Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, IDEA.md, README.md",
-      "message": "La solicitud fue autorizada y aplicada en el exocórtex.",
-      "category": "Autorización Soberana",
-      "severity": "success",
-      "timestamp": 1787271625.8203468,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787272138.51883
-    },
-    {
-      "id": "notif_req_branch_1787271582",
-      "title": "⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, IDEA.md, README.md'. Hipótesis: Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, IDEA.md, README.md' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787271582.3126779,
-      "read": true,
-      "branch_id": "branch_1787271582",
-      "status": "applied",
-      "action_type": "grant_authorization",
-      "applied_at": 1787271625.932526
-    },
-    {
-      "id": "notif_req_branch_1787271584",
-      "title": "⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Hipótesis: Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787271584.63043,
-      "read": true,
-      "branch_id": "branch_1787271584",
-      "status": "applied",
-      "action_type": "grant_authorization",
-      "applied_at": 1787271653.015528
-    },
-    {
-      "id": "notif_1787271588",
-      "title": "⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 1.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787271588.777644,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787271671.980816
-    },
-    {
-      "id": "notif_1787271587",
-      "title": "⚡ Medio Detectado: Almacenamiento Externo / SSD USB (/Volumes)",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787271587.235074,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787272138.5237172
-    },
-    {
-      "id": "notif_1787271585",
-      "title": "⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' clasificada como [LOW]. Esperando tu confirmación en la pestaña de Propuestas.",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787271585.844264,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787272138.528383
-    },
-    {
-      "id": "notif_1787271584",
-      "title": "⚡ Medio Detectado: Workspace Soberano Local (IA 1.58 bit)",
-      "message": "Enrutamiento a brain_genesis activado. 14 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787271584.590336,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787272138.53316
-    },
-    {
-      "id": "notif_1787271583",
-      "title": "⚠️ Solicitud de Aprobación de Mejora: Auto-Reflexión & Optimización de Código ARM NEON",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, IDEA.md, README.md' clasificada como [HIGH]. Esperando tu confirmación en la pestaña de Propuestas.",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787271583.437514,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787272138.537554
-    },
-    {
-      "id": "notif_1787271580",
-      "title": "✅ Permiso Concedido: Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ",
-      "message": "La solicitud fue autorizada y aplicada en el exocórtex.",
-      "category": "Autorización Soberana",
-      "severity": "success",
-      "timestamp": 1787271580.45438,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787272138.5415208
-    },
-    {
-      "id": "notif_req_branch_1787271565",
-      "title": "⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, IDEA.md, README.md'. Hipótesis: Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, IDEA.md, README.md' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787271565.626732,
-      "read": true,
-      "branch_id": "branch_1787271565",
-      "status": "applied",
-      "action_type": "grant_authorization",
-      "applied_at": 1787271580.511539
-    },
-    {
-      "id": "notif_req_branch_1787271568",
-      "title": "⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Hipótesis: Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787271568.1076632,
-      "read": true,
-      "branch_id": "branch_1787271568",
-      "status": "applied",
-      "action_type": "grant_authorization",
-      "applied_at": 1787271580.598582
-    },
-    {
-      "id": "notif_1787271572",
-      "title": "⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 1.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787271572.096951,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787271580.1274612
-    },
-    {
-      "id": "notif_1787271570",
-      "title": "⚡ Medio Detectado: Almacenamiento Externo / SSD USB (/Volumes)",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787271570.693593,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787271580.131656
-    },
-    {
-      "id": "notif_1787271569",
-      "title": "⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' clasificada como [LOW]. Esperando tu confirmación en la pestaña de Propuestas.",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787271569.251744,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787271580.1357539
-    },
-    {
-      "id": "notif_1787271568",
-      "title": "⚡ Medio Detectado: Workspace Soberano Local (IA 1.58 bit)",
-      "message": "Enrutamiento a brain_genesis activado. 14 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787271568.060107,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787271580.139047
-    },
-    {
-      "id": "notif_1787271566",
-      "title": "⚠️ Solicitud de Aprobación de Mejora: Auto-Reflexión & Optimización de Código ARM NEON",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, IDEA.md, README.md' clasificada como [HIGH]. Esperando tu confirmación en la pestaña de Propuestas.",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787271566.8476532,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787271580.1424372
-    },
-    {
-      "id": "notif_1787271211",
-      "title": "✅ Permisos Concedidos: 5 Solicitudes Autorizadas",
-      "message": "Se concedieron todos los permisos para 5 solicitudes. Los agentes ejecutarán las tareas automáticamente.",
-      "category": "Autorización Soberana",
-      "severity": "success",
-      "timestamp": 1787271211.486102,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787271580.1459332
-    },
-    {
-      "id": "notif_req_branch_1787271025",
-      "title": "⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_sync.py, IDEA.md'. Hipótesis: Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_sync.py, IDEA.md' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787271025.558479,
-      "read": true,
-      "branch_id": "branch_1787271025",
-      "status": "applied",
-      "action_type": "grant_authorization"
-    },
-    {
-      "id": "notif_req_branch_1787271028",
-      "title": "⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Hipótesis: Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787271028.84482,
-      "read": true,
-      "branch_id": "branch_1787271028",
-      "status": "applied",
-      "action_type": "grant_authorization"
-    },
-    {
-      "id": "notif_1787271033",
-      "title": "⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 1.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787271033.219433,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787271580.1493812
-    },
-    {
-      "id": "notif_1787271031",
-      "title": "⚡ Medio Detectado: Almacenamiento Externo / SSD USB (/Volumes)",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787271031.7409,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "applied",
-      "applied_at": 1787271580.152941
     }
   ],
   "branching_logs": [
+    {
+      "id": "log_apply_1787273560",
+      "root_process": "Aplicación de Solicitud: ⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
+      "timestamp": 1787273560.397454,
+      "status": "success",
+      "branches": [
+        {
+          "step": "Validación de Permisos de Usuario",
+          "status": "ok",
+          "latency_ms": 5
+        },
+        {
+          "step": "Ejecución de Acción por Agente Especializado",
+          "status": "ok",
+          "latency_ms": 42
+        },
+        {
+          "step": "Consolidación en Memoria Soberana",
+          "status": "ok",
+          "latency_ms": 12
+        }
+      ]
+    },
+    {
+      "id": "log_apply_1787273560",
+      "root_process": "Aplicación de Solicitud: ⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
+      "timestamp": 1787273560.343051,
+      "status": "success",
+      "branches": [
+        {
+          "step": "Validación de Permisos de Usuario",
+          "status": "ok",
+          "latency_ms": 5
+        },
+        {
+          "step": "Ejecución de Acción por Agente Especializado",
+          "status": "ok",
+          "latency_ms": 42
+        },
+        {
+          "step": "Consolidación en Memoria Soberana",
+          "status": "ok",
+          "latency_ms": 12
+        }
+      ]
+    },
+    {
+      "id": "log_apply_1787273559",
+      "root_process": "Aplicación de Solicitud: ⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
+      "timestamp": 1787273559.879473,
+      "status": "success",
+      "branches": [
+        {
+          "step": "Validación de Permisos de Usuario",
+          "status": "ok",
+          "latency_ms": 5
+        },
+        {
+          "step": "Ejecución de Acción por Agente Especializado",
+          "status": "ok",
+          "latency_ms": 42
+        },
+        {
+          "step": "Consolidación en Memoria Soberana",
+          "status": "ok",
+          "latency_ms": 12
+        }
+      ]
+    },
+    {
+      "id": "log_apply_1787273559",
+      "root_process": "Aplicación de Solicitud: ⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
+      "timestamp": 1787273559.5108008,
+      "status": "success",
+      "branches": [
+        {
+          "step": "Validación de Permisos de Usuario",
+          "status": "ok",
+          "latency_ms": 5
+        },
+        {
+          "step": "Ejecución de Acción por Agente Especializado",
+          "status": "ok",
+          "latency_ms": 42
+        },
+        {
+          "step": "Consolidación en Memoria Soberana",
+          "status": "ok",
+          "latency_ms": 12
+        }
+      ]
+    },
+    {
+      "id": "log_apply_1787273415",
+      "root_process": "Aplicación de Solicitud: ⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
+      "timestamp": 1787273415.831789,
+      "status": "success",
+      "branches": [
+        {
+          "step": "Validación de Permisos de Usuario",
+          "status": "ok",
+          "latency_ms": 5
+        },
+        {
+          "step": "Ejecución de Acción por Agente Especializado",
+          "status": "ok",
+          "latency_ms": 42
+        },
+        {
+          "step": "Consolidación en Memoria Soberana",
+          "status": "ok",
+          "latency_ms": 12
+        }
+      ]
+    },
+    {
+      "id": "log_apply_1787273415",
+      "root_process": "Aplicación de Solicitud: ⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
+      "timestamp": 1787273415.7908669,
+      "status": "success",
+      "branches": [
+        {
+          "step": "Validación de Permisos de Usuario",
+          "status": "ok",
+          "latency_ms": 5
+        },
+        {
+          "step": "Ejecución de Acción por Agente Especializado",
+          "status": "ok",
+          "latency_ms": 42
+        },
+        {
+          "step": "Consolidación en Memoria Soberana",
+          "status": "ok",
+          "latency_ms": 12
+        }
+      ]
+    },
+    {
+      "id": "log_apply_1787273415",
+      "root_process": "Aplicación de Solicitud: ⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
+      "timestamp": 1787273415.740913,
+      "status": "success",
+      "branches": [
+        {
+          "step": "Validación de Permisos de Usuario",
+          "status": "ok",
+          "latency_ms": 5
+        },
+        {
+          "step": "Ejecución de Acción por Agente Especializado",
+          "status": "ok",
+          "latency_ms": 42
+        },
+        {
+          "step": "Consolidación en Memoria Soberana",
+          "status": "ok",
+          "latency_ms": 12
+        }
+      ]
+    },
+    {
+      "id": "log_apply_1787273415",
+      "root_process": "Aplicación de Solicitud: ⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
+      "timestamp": 1787273415.738323,
+      "status": "success",
+      "branches": [
+        {
+          "step": "Validación de Permisos de Usuario",
+          "status": "ok",
+          "latency_ms": 5
+        },
+        {
+          "step": "Ejecución de Acción por Agente Especializado",
+          "status": "ok",
+          "latency_ms": 42
+        },
+        {
+          "step": "Consolidación en Memoria Soberana",
+          "status": "ok",
+          "latency_ms": 12
+        }
+      ]
+    },
+    {
+      "id": "log_apply_1787273202",
+      "root_process": "Aplicación de Solicitud: ⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
+      "timestamp": 1787273202.255882,
+      "status": "success",
+      "branches": [
+        {
+          "step": "Validación de Permisos de Usuario",
+          "status": "ok",
+          "latency_ms": 5
+        },
+        {
+          "step": "Ejecución de Acción por Agente Especializado",
+          "status": "ok",
+          "latency_ms": 42
+        },
+        {
+          "step": "Consolidación en Memoria Soberana",
+          "status": "ok",
+          "latency_ms": 12
+        }
+      ]
+    },
+    {
+      "id": "log_apply_1787273202",
+      "root_process": "Aplicación de Solicitud: ✨ Auto-Mejora Aplicada: Sueño Lúcido Ciberdélico (UI, Arte & 3D)",
+      "timestamp": 1787273202.252683,
+      "status": "success",
+      "branches": [
+        {
+          "step": "Validación de Permisos de Usuario",
+          "status": "ok",
+          "latency_ms": 5
+        },
+        {
+          "step": "Ejecución de Acción por Agente Especializado",
+          "status": "ok",
+          "latency_ms": 42
+        },
+        {
+          "step": "Consolidación en Memoria Soberana",
+          "status": "ok",
+          "latency_ms": 12
+        }
+      ]
+    },
+    {
+      "id": "log_apply_1787273202",
+      "root_process": "Aplicación de Solicitud: ✅ Permisos Concedidos: 2 Solicitudes Autorizadas",
+      "timestamp": 1787273202.250048,
+      "status": "success",
+      "branches": [
+        {
+          "step": "Validación de Permisos de Usuario",
+          "status": "ok",
+          "latency_ms": 5
+        },
+        {
+          "step": "Ejecución de Acción por Agente Especializado",
+          "status": "ok",
+          "latency_ms": 42
+        },
+        {
+          "step": "Consolidación en Memoria Soberana",
+          "status": "ok",
+          "latency_ms": 12
+        }
+      ]
+    },
     {
       "id": "log_apply_1787272139",
       "root_process": "Aplicación de Solicitud: ⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
@@ -1419,259 +1649,6 @@
       "id": "log_apply_1787272132",
       "root_process": "Aplicación de Solicitud: ⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
       "timestamp": 1787272132.167994,
-      "status": "success",
-      "branches": [
-        {
-          "step": "Validación de Permisos de Usuario",
-          "status": "ok",
-          "latency_ms": 5
-        },
-        {
-          "step": "Ejecución de Acción por Agente Especializado",
-          "status": "ok",
-          "latency_ms": 42
-        },
-        {
-          "step": "Consolidación en Memoria Soberana",
-          "status": "ok",
-          "latency_ms": 12
-        }
-      ]
-    },
-    {
-      "id": "log_apply_1787272132",
-      "root_process": "Aplicación de Solicitud: ⚡ Medio Detectado: Almacenamiento Externo / SSD USB (/Volumes)",
-      "timestamp": 1787272132.16222,
-      "status": "success",
-      "branches": [
-        {
-          "step": "Validación de Permisos de Usuario",
-          "status": "ok",
-          "latency_ms": 5
-        },
-        {
-          "step": "Ejecución de Acción por Agente Especializado",
-          "status": "ok",
-          "latency_ms": 42
-        },
-        {
-          "step": "Consolidación en Memoria Soberana",
-          "status": "ok",
-          "latency_ms": 12
-        }
-      ]
-    },
-    {
-      "id": "log_apply_1787272132",
-      "root_process": "Aplicación de Solicitud: ⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
-      "timestamp": 1787272132.156716,
-      "status": "success",
-      "branches": [
-        {
-          "step": "Validación de Permisos de Usuario",
-          "status": "ok",
-          "latency_ms": 5
-        },
-        {
-          "step": "Ejecución de Acción por Agente Especializado",
-          "status": "ok",
-          "latency_ms": 42
-        },
-        {
-          "step": "Consolidación en Memoria Soberana",
-          "status": "ok",
-          "latency_ms": 12
-        }
-      ]
-    },
-    {
-      "id": "log_apply_1787272128",
-      "root_process": "Aplicación de Solicitud: ⚠️ Solicitud de Aprobación de Mejora: Auto-Reflexión & Optimización de Código ARM NEON",
-      "timestamp": 1787272128.2042298,
-      "status": "success",
-      "branches": [
-        {
-          "step": "Validación de Permisos de Usuario",
-          "status": "ok",
-          "latency_ms": 5
-        },
-        {
-          "step": "Ejecución de Acción por Agente Especializado",
-          "status": "ok",
-          "latency_ms": 42
-        },
-        {
-          "step": "Consolidación en Memoria Soberana",
-          "status": "ok",
-          "latency_ms": 12
-        }
-      ]
-    },
-    {
-      "id": "log_apply_1787272128",
-      "root_process": "Aplicación de Solicitud: ⚡ Medio Detectado: Workspace Soberano Local (IA 1.58 bit)",
-      "timestamp": 1787272128.198577,
-      "status": "success",
-      "branches": [
-        {
-          "step": "Validación de Permisos de Usuario",
-          "status": "ok",
-          "latency_ms": 5
-        },
-        {
-          "step": "Ejecución de Acción por Agente Especializado",
-          "status": "ok",
-          "latency_ms": 42
-        },
-        {
-          "step": "Consolidación en Memoria Soberana",
-          "status": "ok",
-          "latency_ms": 12
-        }
-      ]
-    },
-    {
-      "id": "log_apply_1787272128",
-      "root_process": "Aplicación de Solicitud: ⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
-      "timestamp": 1787272128.1934562,
-      "status": "success",
-      "branches": [
-        {
-          "step": "Validación de Permisos de Usuario",
-          "status": "ok",
-          "latency_ms": 5
-        },
-        {
-          "step": "Ejecución de Acción por Agente Especializado",
-          "status": "ok",
-          "latency_ms": 42
-        },
-        {
-          "step": "Consolidación en Memoria Soberana",
-          "status": "ok",
-          "latency_ms": 12
-        }
-      ]
-    },
-    {
-      "id": "log_apply_1787272128",
-      "root_process": "Aplicación de Solicitud: ⚡ Medio Detectado: Almacenamiento Externo / SSD USB (/Volumes)",
-      "timestamp": 1787272128.187948,
-      "status": "success",
-      "branches": [
-        {
-          "step": "Validación de Permisos de Usuario",
-          "status": "ok",
-          "latency_ms": 5
-        },
-        {
-          "step": "Ejecución de Acción por Agente Especializado",
-          "status": "ok",
-          "latency_ms": 42
-        },
-        {
-          "step": "Consolidación en Memoria Soberana",
-          "status": "ok",
-          "latency_ms": 12
-        }
-      ]
-    },
-    {
-      "id": "log_apply_1787272128",
-      "root_process": "Aplicación de Solicitud: ⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
-      "timestamp": 1787272128.182747,
-      "status": "success",
-      "branches": [
-        {
-          "step": "Validación de Permisos de Usuario",
-          "status": "ok",
-          "latency_ms": 5
-        },
-        {
-          "step": "Ejecución de Acción por Agente Especializado",
-          "status": "ok",
-          "latency_ms": 42
-        },
-        {
-          "step": "Consolidación en Memoria Soberana",
-          "status": "ok",
-          "latency_ms": 12
-        }
-      ]
-    },
-    {
-      "id": "log_apply_1787271671",
-      "root_process": "Aplicación de Solicitud: ⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
-      "timestamp": 1787271671.980824,
-      "status": "success",
-      "branches": [
-        {
-          "step": "Validación de Permisos de Usuario",
-          "status": "ok",
-          "latency_ms": 5
-        },
-        {
-          "step": "Ejecución de Acción por Agente Especializado",
-          "status": "ok",
-          "latency_ms": 42
-        },
-        {
-          "step": "Consolidación en Memoria Soberana",
-          "status": "ok",
-          "latency_ms": 12
-        }
-      ]
-    },
-    {
-      "id": "log_apply_1787271653",
-      "root_process": "Aplicación de Solicitud: ⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
-      "timestamp": 1787271653.01554,
-      "status": "success",
-      "branches": [
-        {
-          "step": "Validación de Permisos de Usuario",
-          "status": "ok",
-          "latency_ms": 5
-        },
-        {
-          "step": "Ejecución de Acción por Agente Especializado",
-          "status": "ok",
-          "latency_ms": 42
-        },
-        {
-          "step": "Consolidación en Memoria Soberana",
-          "status": "ok",
-          "latency_ms": 12
-        }
-      ]
-    },
-    {
-      "id": "log_apply_1787271625",
-      "root_process": "Aplicación de Solicitud: ⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
-      "timestamp": 1787271625.932534,
-      "status": "success",
-      "branches": [
-        {
-          "step": "Validación de Permisos de Usuario",
-          "status": "ok",
-          "latency_ms": 5
-        },
-        {
-          "step": "Ejecución de Acción por Agente Especializado",
-          "status": "ok",
-          "latency_ms": 42
-        },
-        {
-          "step": "Consolidación en Memoria Soberana",
-          "status": "ok",
-          "latency_ms": 12
-        }
-      ]
-    },
-    {
-      "id": "log_apply_1787271580",
-      "root_process": "Aplicación de Solicitud: ⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
-      "timestamp": 1787271580.5985868,
       "status": "success",
       "branches": [
         {
