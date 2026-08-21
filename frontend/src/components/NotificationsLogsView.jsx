@@ -22,7 +22,9 @@ import {
   ShieldCheck,
   Play,
   ArrowRight,
-  Bot
+  Bot,
+  Globe,
+  Server
 } from 'lucide-react';
 import { 
   fetchSystemNotifications, 

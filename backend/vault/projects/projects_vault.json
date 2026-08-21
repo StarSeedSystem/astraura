@@ -97,7 +97,7 @@
       "description": "Núcleo del sistema operativo cognitivo.",
       "type": "automatic",
       "created_at": 1786741520.5937548,
-      "updated_at": 1787279941.750068,
+      "updated_at": 1787280400.881715,
       "linked_creations": [
         "creation_neon_kernel_v2",
         "creation_dataset_ternary_v2",
@@ -225,17 +225,17 @@
         }
       ],
       "key_memories": [
+        "Axioma (hermes): Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b [Auditado por Director]",
+        "Axioma (athena): Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1 [Auditado por Director]",
+        "Axioma (oneiros): Auto-Reactivación: Forja de Shaders & Prototipos Visuales [Auditado por Director]",
+        "Axioma (daedalus): Orquestación General: Consolidar 5 tareas de autorización recién co... [Auditado por Director]",
         "Axioma (daedalus): Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits [Auditado por Director]",
         "Axioma (daedalus): Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana [Auditado por Director]",
         "Axioma (mnemosyne): Auto-Reactivación: Sincronización & Poda del Grafo de Memoria [Auditado por Director]",
         "Axioma (hephaestus): Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b [Auditado por Director]",
         "Axioma (daedalus): Sincronización de Versiones y Diffing de Entregables Multi-Agente [Auditado por Director]",
         "Axioma (hephaestus): Compactación de Huella de Memoria RAM para Modelos de 1.58 Bits [Auditado por Director]",
-        "Axioma (hephaestus): ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob [Auditado por Director]",
-        "Axioma (hermes): ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient [Auditado por Director]",
-        "Axioma (hephaestus): Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM [Auditado por Director]",
-        "Axioma (hephaestus): Auto-Reactivación: Auditoría de Código & Archivos Locales [Auditado por Director]",
-        "Axioma (athena): Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1 [Auditado por Director]"
+        "Axioma (hephaestus): ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob [Auditado por Director]"
       ],
       "linked_folders": [
         "/Users/alex/Documents/IA 1.58 bit/backend/app/core",
@@ -248,6 +248,330 @@
         "/Users/alex/Documents/IA 1.58 bit/backend/app/core/optimización_neon_1.58b.md"
       ],
       "logs_history": [
+        {
+          "timestamp": 1787280400.881728,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787280400.8816729,
+          "action": "Entregable Verificado: Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+        },
+        {
+          "timestamp": 1787280385.8116071,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280375.783475,
+          "action": "Entregable Verificado: Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280360.757849,
+          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+        },
+        {
+          "timestamp": 1787280360.739569,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280355.7275698,
+          "action": "Entregable Verificado: Sincronización de Versiones y Diffing de Entregables Multi-Agente",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280335.620266,
+          "action": "Entregable Verificado: Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280335.613329,
+          "action": "Entregable Verificado: Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280335.605073,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280315.554214,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280307.552491,
+          "action": "Entregable Verificado: Sincronización de Versiones y Diffing de Entregables Multi-Agente",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280289.402533,
+          "action": "Entregable Verificado: Sincronización de Versiones y Diffing de Entregables Multi-Agente",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280289.392902,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280283.284275,
+          "action": "Entregable Verificado: Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280257.870037,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280252.857596,
+          "action": "Entregable Verificado: Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280242.8389928,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280237.823084,
+          "action": "Entregable Verificado: Sincronización de Versiones y Diffing de Entregables Multi-Agente",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280222.756513,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280212.731379,
+          "action": "Entregable Verificado: Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280212.719479,
+          "action": "Entregable Verificado: Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280197.6234071,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280192.603522,
+          "action": "Entregable Verificado: Sincronización de Versiones y Diffing de Entregables Multi-Agente",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280172.5430799,
+          "action": "Entregable Verificado: Sincronización de Versiones y Diffing de Entregables Multi-Agente",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280172.4396958,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280167.417589,
+          "action": "Entregable Verificado: Sincronización de Versiones y Diffing de Entregables Multi-Agente",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280152.387518,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280142.368696,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787280142.368654,
+          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
+        },
+        {
+          "timestamp": 1787280132.2917252,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280127.272897,
+          "action": "Entregable Verificado: Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280127.2586188,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787280127.258566,
+          "action": "Entregable Verificado: Auto-Reactivación: Forja de Shaders & Prototipos Visuales",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
+        },
+        {
+          "timestamp": 1787280107.177793,
+          "action": "Entregable Verificado: Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280107.169578,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280092.137501,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280087.120499,
+          "action": "Entregable Verificado: Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280072.1021981,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280067.086167,
+          "action": "Entregable Verificado: Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280067.078042,
+          "action": "Entregable Verificado: Sincronización de Versiones y Diffing de Entregables Multi-Agente",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280046.991442,
+          "action": "Entregable Verificado: Sincronización de Versiones y Diffing de Entregables Multi-Agente",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280046.9824488,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280026.954633,
+          "action": "Entregable Verificado: Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280026.9467268,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280021.933674,
+          "action": "Entregable Verificado: Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280006.900655,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787280001.885513,
+          "action": "Entregable Verificado: Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787279986.8633778,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787279981.843648,
+          "action": "Entregable Verificado: Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787279981.8336341,
+          "action": "Entregable Verificado: Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787279961.7900422,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787279961.790003,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787279956.774592,
+          "action": "Entregable Verificado: Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
         {
           "timestamp": 1787279941.750077,
           "action": "Modificación de Proyecto",
@@ -283,330 +607,6 @@
           "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279901.59955,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787279901.5995252,
-          "action": "Entregable Verificado: Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279901.5925398,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279886.506075,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279876.489888,
-          "action": "Entregable Verificado: Sincronización de Versiones y Diffing de Entregables Multi-Agente",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279876.484342,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279861.414338,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279851.384671,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279841.370956,
-          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
-        },
-        {
-          "timestamp": 1787279836.359564,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279831.3510451,
-          "action": "Entregable Verificado: Compactación de Huella de Memoria RAM para Modelos de 1.58 Bits",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
-        },
-        {
-          "timestamp": 1787279831.3439438,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787279831.343921,
-          "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
-        },
-        {
-          "timestamp": 1787279821.325556,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279806.297888,
-          "action": "Entregable Verificado: Sincronización de Versiones y Diffing de Entregables Multi-Agente",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279806.286392,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279791.243826,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787279791.2438002,
-          "action": "Entregable Verificado: Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
-        },
-        {
-          "timestamp": 1787279791.237571,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279776.2099578,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279766.168504,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279761.152686,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787279761.15266,
-          "action": "Entregable Verificado: Sincronización de Versiones y Diffing de Entregables Multi-Agente",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279751.125035,
-          "action": "Entregable Verificado: Compactación de Huella de Memoria RAM para Modelos de 1.58 Bits",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
-        },
-        {
-          "timestamp": 1787279751.11107,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279736.0917811,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279721.040747,
-          "action": "Entregable Verificado: Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279720.995795,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279710.963116,
-          "action": "Entregable Verificado: Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
-        },
-        {
-          "timestamp": 1787279705.9450371,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279690.866132,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279680.829364,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279670.797815,
-          "action": "Entregable Verificado: Compactación de Huella de Memoria RAM para Modelos de 1.58 Bits",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
-        },
-        {
-          "timestamp": 1787279670.7870421,
-          "action": "Entregable Verificado: Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
-        },
-        {
-          "timestamp": 1787279665.642772,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279645.58061,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279630.43824,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787279630.4382138,
-          "action": "Entregable Verificado: Compactación de Huella de Memoria RAM para Modelos de 1.58 Bits",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
-        },
-        {
-          "timestamp": 1787279630.406015,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787279630.405993,
-          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
-        },
-        {
-          "timestamp": 1787279630.395046,
-          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787279630.380254,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787279630.3802292,
-          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787279630.34078,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279620.259975,
-          "action": "Entregable Verificado: Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279605.033082,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279594.977847,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279589.948621,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787279589.94858,
-          "action": "Entregable Verificado: Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
-        },
-        {
-          "timestamp": 1787279571.5698152,
-          "action": "Entregable Verificado: Sincronización de Versiones y Diffing de Entregables Multi-Agente",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279571.528476,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279550.260811,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787279540.229902,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787279540.2298791,
-          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Código & Archivos Locales",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
         }
       ],
       "linked_processs": [
@@ -742,5 +742,5 @@
       "_metrics_cached_at": 1787279432.5491781
     }
   ],
-  "saved_at": 1787279941.750078
+  "saved_at": 1787280400.8817291
 }
