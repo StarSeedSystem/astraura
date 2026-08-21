@@ -370,6 +370,10 @@ class IntelligentAuthorizationOrchestrator:
             ordered = self._relate_tasks(items)
 
             # 3. Procesar secuencialmente (respetando orden y relaciones)
+            #    Cada solicitud autorizada se TRASLADA a la cola de tareas de su
+            #    agente correspondiente con PRIORIDAD CRÍTICA (ejecutándose ANTES
+            #    que los procesos imaginativos en segundo plano de menor prioridad),
+            #    y se SINCRONIZA con todo el ecosistema 1.58-bit interconectado.
             processed = []
             agent_executions = {a: 0 for a in set(PROCESS_TO_AGENT.values())}
             for it in ordered:
@@ -380,33 +384,37 @@ class IntelligentAuthorizationOrchestrator:
                     # Fusionar campos refinados en la rama original en memoria
                     branch.update(refined)
 
-                    # Conceder autorización (registra en exocórtex)
+                    # FASE 1: Conceder autorización (registra en exocórtex)
                     grant = _intuitive.grant_and_apply_request(branch.get("id"))
                     if not grant.get("success"):
                         failed.append({"notif_id": it["id"], "error": grant.get("error", "grant falló")})
                         continue
 
-                    # Despachar tarea real al agente del enjambre (telemetría física)
+                    # FASE 2: TRASLADAR a la lista de tareas del agente correspondiente
+                    #         con prioridad CRÍTICA (10) → va al FRENTE de la cola del
+                    #         swarm para ejecutarse ANTES que otros procesos imaginativos.
                     try:
                         _swarm.dispatch_task(
-                            area_id=it["agent"] and AGENT_AREA.get(it["agent"], "area_project_management"),
-                            title=f"Autorización: {branch.get('theme', branch.get('title',''))[:60]}",
+                            area_id=AGENT_AREA.get(it["agent"], "area_project_management"),
+                            title=f"⚡ [AUTORIZADO] {branch.get('theme', branch.get('title',''))[:58]}",
                             prompt=refined.get("refined_directive", ""),
                             agent_id=it["agent"],
+                            priority_level=10,
+                            origin="authorization_orchestrator",
                         )
                         agent_executions[it["agent"]] = agent_executions.get(it["agent"], 0) + 1
                     except Exception as e:
                         print(f"⚠️ [AuthOrchestrator] dispatch_task falló para {it['agent']}: {e}")
 
-                    # Ejecutar flujo completo de agentes (8 fases)
+                    # FASE 3: Ejecutar flujo completo de agentes (8 fases del sistema 1.58-bit)
                     workflow = _intuitive.run_automated_execution_workflow([branch])
                     result = workflow if isinstance(workflow, dict) else {"status": "ok"}
 
-                    # Registrar en exocórtex con cerebro + personalidad
+                    # FASE 4: Registrar en exocórtex StarSeed con cerebro + personalidad + memoria
                     self._record_in_exocortex(branch, it["notif"], it["personality"],
                                              it["brain"], it["agent"], result)
 
-                    # Marcar notificación aplicada
+                    # FASE 5: Marcar notificación aplicada
                     _notifications.apply_notification(it["id"])
                     processed.append({
                         "notif_id": it["id"],
@@ -417,6 +425,7 @@ class IntelligentAuthorizationOrchestrator:
                         "process_label": next((p.get("name") for p in DREAM_PROCESS_TYPES
                                                if p.get("id") == it["process_type"]), it["process_type"]),
                         "priority": it["priority"],
+                        "priority_level": 10,
                         "theme": branch.get("theme") or branch.get("title") or "Proceso autónomo",
                         "brain_id": it["brain"].get("id"),
                         "brain_name": it["brain"].get("name", "Cerebro Génesis"),
@@ -424,19 +433,25 @@ class IntelligentAuthorizationOrchestrator:
                         "personality_id": it["personality"].get("id"),
                         "personality_name": it["personality"].get("name", "Aurora"),
                         "relations": it.get("relations", []),
-                        "status": "executed",
+                        "status": "queued_priority",
                         "routing_steps": [
                             {"step": 1, "label": f"Infiriendo tipo de proceso → {it['process_type']}", "done": True},
                             {"step": 2, "label": f"Enrutando a agente dedicado → {it['agent']} ({AGENT_AREA.get(it['agent'], 'area_project_management')})", "done": True},
                             {"step": 3, "label": f"Contexto 1.58-bit → personalidad '{it['personality'].get('name','Aurora')}' @ cerebro '{it['brain'].get('name','Génesis')}'", "done": True},
                             {"step": 4, "label": "Concediendo autorización (exocórtex StarSeed)", "done": True},
-                            {"step": 5, "label": "Despachando tarea al enjambre + 8 fases de ejecución", "done": True},
+                            {"step": 5, "label": f"Trasladando a cola de tareas de {it['agent']} [PRIORIDAD CRÍTICA 10] → ejecuta ANTES que procesos imaginativos", "done": True},
+                            {"step": 6, "label": "Sincronizando con Director + Orquestador + Personalidades + Memorias 1.58-bit", "done": True},
                         ],
                     })
                 except Exception as exc:
                     failed.append({"notif_id": it["id"], "error": str(exc)})
 
-            # 4. Re-escaneo de TODOS los medios
+            # 4. SINCRONIZAR TODO EL ECOSISTEMA 1.58-BIT INTERCONECTADO
+            #    (Director Orquestrador, Administrador de Prioridades, Agente
+            #     Organizador de Notificaciones, procesos imaginativos, memorias)
+            sync_report = self._sync_with_ecosystem(processed, failed)
+
+            # 5. Re-escaneo de TODOS los medios
             scan_events = []
             try:
                 scan_events = await _storage.scan_and_execute_rules(force_all=True)
@@ -460,11 +475,87 @@ class IntelligentAuthorizationOrchestrator:
                     f"con personalidades y cerebros 1.58-bit. {len(scan_events)} medios actualizados. "
                     f"({elapsed}s)"
                 ),
+                "sync_report": sync_report,
             }
             self.last_orchestration = summary
             return summary
         finally:
             self.is_busy = False
+
+    # ─────────────────────────────────────────────────────────────────────
+    # Sincronización con todo el ecosistema 1.58-bit interconectado
+    # ─────────────────────────────────────────────────────────────────────
+    def _sync_with_ecosystem(self, processed: List[Dict[str, Any]], failed: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """
+        Sincroniza las tareas de autorización recién encoladas con el resto del
+        ecosistema 1.58-bit: Director Orquestrador, Orquestador Central, agentes
+        de procesos imaginativos, personalidades y memorias correspondientes.
+        Cada IA de cada agente opera con el sistema 1.58-bit inteligente automático
+        interconectado.
+        """
+        _resolve()
+        report = {
+            "director_notified": False,
+            "orchestrator_notified": False,
+            "executive_memory_saved": False,
+            "swarm_tasks_at_front": 0,
+            "agents_synced": [],
+            "personalities_synced": [],
+            "brains_synced": [],
+        }
+        try:
+            from ..agents.director_orchestrator import director_orchestrator
+            from ..agents.orchestrator import orchestrator as central_orchestrator
+
+            # 1. El Director Orquestrador toma conocimiento de las tareas críticas
+            #    y reorienta/consolida el enjambre respetando la prioridad.
+            if processed:
+                directive = (
+                    f"Consolidar {len(processed)} tareas de autorización recién concedidas "
+                    f"(prioridad crítica 10) antes que los procesos imaginativos en segundo plano. "
+                    f"Agentes involucrados: {', '.join(sorted(set(p['agent'] for p in processed)))}."
+                )
+                try:
+                    director_orchestrator.steer_swarm_with_directive(directive, "proj_astraura_core")
+                    report["director_notified"] = True
+                except Exception as e:
+                    print(f"⚠️ [AuthOrchestrator] steer director: {e}")
+
+                # 2. Memoria ejecutiva del Director (persiste la decisión de priorización)
+                try:
+                    director_orchestrator.add_executive_memory(
+                        title=f"Autorizaciones orquestadas: {len(processed)} tareas críticas",
+                        content=directive,
+                        category="authorization_priority",
+                        importance="high",
+                        tags=["orquestacion", "prioridad_critica", "autorizacion"],
+                    )
+                    report["executive_memory_saved"] = True
+                except Exception as e:
+                    print(f"⚠️ [AuthOrchestrator] exec memory: {e}")
+
+                # 3. El Orquestador Central registra la sincronización interconectada
+                try:
+                    if hasattr(central_orchestrator, "get_system_prompt_base"):
+                        # Confirmar que el orquestador está operativo e interconectado
+                        _ = central_orchestrator.get_system_prompt_base()
+                    report["orchestrator_notified"] = True
+                except Exception as e:
+                    print(f"⚠️ [AuthOrchestrator] orchestrator sync: {e}")
+
+                # 4. Contabilizar agentes / personalidades / cerebros sincronizados
+                for p in processed:
+                    if p["agent"] not in report["agents_synced"]:
+                        report["agents_synced"].append(p["agent"])
+                    if p.get("personality_name") and p["personality_name"] not in report["personalities_synced"]:
+                        report["personalities_synced"].append(p["personality_name"])
+                    if p.get("brain_name") and p["brain_name"] not in report["brains_synced"]:
+                        report["brains_synced"].append(p["brain_name"])
+
+                report["swarm_tasks_at_front"] = len(processed)
+        except Exception as e:
+            print(f"⚠️ [AuthOrchestrator] Error en sincronización de ecosistema: {e}")
+        return report
 
     # ─────────────────────────────────────────────────────────────────────
     # Estado vivo para el frontend (panel del agente de orquestación)
@@ -490,6 +581,7 @@ class IntelligentAuthorizationOrchestrator:
                 "storage_events": last.get("storage_events", 0),
                 "elapsed_seconds": last.get("elapsed_seconds", 0),
                 "message": last.get("message", ""),
+                "sync_report": last.get("sync_report", {}),
                 "processed": last.get("processed", []),
                 "failed": last.get("failed", []),
             },

@@ -1,501 +1,96 @@
 {
   "notifications": [
     {
-      "id": "notif_1787267931",
-      "title": "⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 1.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787267931.472491,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787267930",
-      "title": "⚡ Medio Detectado: Almacenamiento Externo / SSD USB (/Volumes)",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787267930.6276128,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787267929",
-      "title": "⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' clasificada como [LOW]. Esperando tu confirmación en la pestaña de Propuestas.",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787267929.734064,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787267928",
-      "title": "⚡ Medio Detectado: Workspace Soberano Local (IA 1.58 bit)",
-      "message": "Enrutamiento a brain_genesis activado. 15 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787267928.049951,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787267925",
-      "title": "✅ Permiso Concedido: Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ",
-      "message": "La solicitud fue autorizada y aplicada en el exocórtex.",
-      "category": "Autorización Soberana",
-      "severity": "success",
-      "timestamp": 1787267925.763181,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_req_branch_1787267910",
+      "id": "notif_req_branch_1787271025",
       "title": "⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _verify_orch.py, _test_orch_full.py'. Hipótesis: Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _verify_orch.py, _test_orch_full.py' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_sync.py, IDEA.md'. Hipótesis: Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_sync.py, IDEA.md' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
       "category": "Solicitud de Autorización",
       "severity": "warning",
-      "timestamp": 1787267910.2503612,
-      "read": true,
-      "branch_id": "branch_1787267910",
-      "status": "applied",
-      "action_type": "grant_authorization",
-      "applied_at": 1787267925.788259
-    },
-    {
-      "id": "notif_req_branch_1787267911",
-      "title": "⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Hipótesis: Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787267911.952119,
-      "read": true,
-      "branch_id": "branch_1787267911",
-      "status": "applied",
-      "action_type": "grant_authorization",
-      "applied_at": 1787267925.866567
-    },
-    {
-      "id": "notif_1787267914",
-      "title": "⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 1.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787267914.503792,
+      "timestamp": 1787271025.558479,
       "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787267913",
-      "title": "⚡ Medio Detectado: Almacenamiento Externo / SSD USB (/Volumes)",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787267913.637501,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787267912",
-      "title": "⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' clasificada como [LOW]. Esperando tu confirmación en la pestaña de Propuestas.",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787267912.771113,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787267911",
-      "title": "⚡ Medio Detectado: Workspace Soberano Local (IA 1.58 bit)",
-      "message": "Enrutamiento a brain_genesis activado. 15 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787267911.061707,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787267909",
-      "title": "✅ Permiso Concedido: Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _verify_orch.py, _test_orch_full.py",
-      "message": "La solicitud fue autorizada y aplicada en el exocórtex.",
-      "category": "Autorización Soberana",
-      "severity": "success",
-      "timestamp": 1787267909.4682581,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_req_branch_1787267820",
-      "title": "⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _verify_orch.py, _test_orch_full.py'. Hipótesis: Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _verify_orch.py, _test_orch_full.py' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787267820.23922,
-      "read": true,
-      "branch_id": "branch_1787267820",
-      "status": "applied",
-      "action_type": "grant_authorization",
-      "applied_at": 1787267909.490886
-    },
-    {
-      "id": "notif_req_branch_1787267821",
-      "title": "⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Hipótesis: Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787267821.971296,
-      "read": true,
-      "branch_id": "branch_1787267821",
-      "status": "applied",
-      "action_type": "grant_authorization",
-      "applied_at": 1787267925.908386
-    },
-    {
-      "id": "notif_req_branch_1787267904",
-      "title": "⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _verify_orch.py, _test_orch_full.py'. Hipótesis: Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _verify_orch.py, _test_orch_full.py' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787267904.3849542,
-      "read": true,
-      "branch_id": "branch_1787267904",
-      "status": "applied",
-      "action_type": "grant_authorization",
-      "applied_at": 1787267925.8284428
-    },
-    {
-      "id": "notif_req_branch_1787267906",
-      "title": "⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Hipótesis: Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787267906.025326,
-      "read": true,
-      "branch_id": "branch_1787267906",
-      "status": "applied",
+      "branch_id": "branch_1787271025",
+      "status": "pending",
       "action_type": "grant_authorization"
     },
     {
-      "id": "notif_1787267908",
-      "title": "⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 1.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787267908.49107,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787267907",
-      "title": "⚡ Medio Detectado: Almacenamiento Externo / SSD USB (/Volumes)",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787267907.6582,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787267906",
-      "title": "⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' clasificada como [LOW]. Esperando tu confirmación en la pestaña de Propuestas.",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787267906.016434,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787267905",
-      "title": "✨ Auto-Mejora Aplicada: Sueño REM Cognitivo (Consolidación Sináptica)",
-      "message": "Se aplicó automáticamente: 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _verify_orch.py, _test_orch_full.py'. Todos los subsistemas sincronizados.",
-      "category": "Imaginación Intuitiva",
-      "severity": "success",
-      "timestamp": 1787267905.207075,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787267824",
-      "title": "⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 1.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787267824.5792902,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787267823",
-      "title": "⚡ Medio Detectado: Almacenamiento Externo / SSD USB (/Volumes)",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787267823.768086,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787267822",
-      "title": "⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' clasificada como [LOW]. Esperando tu confirmación en la pestaña de Propuestas.",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787267822.844675,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787267821",
-      "title": "⚡ Medio Detectado: Workspace Soberano Local (IA 1.58 bit)",
-      "message": "Enrutamiento a brain_genesis activado. 15 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787267821.092958,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787267818",
-      "title": "✅ Permiso Concedido: Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _verify_orch.py, _test_orch_full.py",
-      "message": "La solicitud fue autorizada y aplicada en el exocórtex.",
-      "category": "Autorización Soberana",
-      "severity": "success",
-      "timestamp": 1787267818.733002,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_req_branch_1787267773",
-      "title": "⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _verify_orch.py, _test_orch_full.py'. Hipótesis: Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _verify_orch.py, _test_orch_full.py' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787267773.0904992,
-      "read": true,
-      "branch_id": "branch_1787267773",
-      "status": "applied",
-      "action_type": "grant_authorization",
-      "applied_at": 1787267818.7497861
-    },
-    {
-      "id": "notif_req_branch_1787267774",
+      "id": "notif_req_branch_1787271028",
       "title": "⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
       "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Hipótesis: Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
       "category": "Solicitud de Autorización",
       "severity": "warning",
-      "timestamp": 1787267774.7136881,
-      "read": true,
-      "branch_id": "branch_1787267774",
-      "status": "applied",
-      "action_type": "grant_authorization",
-      "applied_at": 1787267925.9633348
+      "timestamp": 1787271028.84482,
+      "read": false,
+      "branch_id": "branch_1787271028",
+      "status": "pending",
+      "action_type": "grant_authorization"
     },
     {
-      "id": "notif_1787267777",
+      "id": "notif_1787271033",
       "title": "⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
       "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 1.",
       "category": "Almacenamiento & Memoria",
       "severity": "success",
-      "timestamp": 1787267777.182583,
+      "timestamp": 1787271033.219433,
       "read": false,
       "action_type": null,
       "branch_id": null,
       "status": "pending"
     },
     {
-      "id": "notif_1787267776",
+      "id": "notif_1787271031",
       "title": "⚡ Medio Detectado: Almacenamiento Externo / SSD USB (/Volumes)",
       "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 2.",
       "category": "Almacenamiento & Memoria",
       "severity": "success",
-      "timestamp": 1787267776.350761,
+      "timestamp": 1787271031.7409,
       "read": false,
       "action_type": null,
       "branch_id": null,
       "status": "pending"
     },
     {
-      "id": "notif_1787267775",
+      "id": "notif_1787271030",
       "title": "⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
       "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' clasificada como [LOW]. Esperando tu confirmación en la pestaña de Propuestas.",
       "category": "Solicitud de Autorización",
       "severity": "warning",
-      "timestamp": 1787267775.563576,
+      "timestamp": 1787271030.2870378,
       "read": false,
       "action_type": null,
       "branch_id": null,
       "status": "pending"
     },
     {
-      "id": "notif_1787267774",
+      "id": "notif_1787271028",
       "title": "⚡ Medio Detectado: Workspace Soberano Local (IA 1.58 bit)",
-      "message": "Enrutamiento a brain_genesis activado. 15 archivos indexados. Procesos disparados: 2.",
+      "message": "Enrutamiento a brain_genesis activado. 14 archivos indexados. Procesos disparados: 2.",
       "category": "Almacenamiento & Memoria",
       "severity": "success",
-      "timestamp": 1787267774.68305,
+      "timestamp": 1787271028.770196,
       "read": false,
       "action_type": null,
       "branch_id": null,
       "status": "pending"
     },
     {
-      "id": "notif_1787267773",
+      "id": "notif_1787271027",
       "title": "⚠️ Solicitud de Aprobación de Mejora: Auto-Reflexión & Optimización de Código ARM NEON",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _verify_orch.py, _test_orch_full.py' clasificada como [HIGH]. Esperando tu confirmación en la pestaña de Propuestas.",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_sync.py, IDEA.md' clasificada como [HIGH]. Esperando tu confirmación en la pestaña de Propuestas.",
       "category": "Solicitud de Autorización",
       "severity": "warning",
-      "timestamp": 1787267773.8462899,
+      "timestamp": 1787271027.163428,
       "read": false,
       "action_type": null,
       "branch_id": null,
       "status": "pending"
     },
     {
-      "id": "notif_1787267772",
+      "id": "notif_1787271023",
       "title": "✅ Permiso Concedido: Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ",
       "message": "La solicitud fue autorizada y aplicada en el exocórtex.",
       "category": "Autorización Soberana",
       "severity": "success",
-      "timestamp": 1787267772.190706,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_req_branch_1787267750",
-      "title": "⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _verify_orch.py, _test_orch_full.py'. Hipótesis: Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _verify_orch.py, _test_orch_full.py' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787267750.183939,
-      "read": true,
-      "branch_id": "branch_1787267750",
-      "status": "applied",
-      "action_type": "grant_authorization",
-      "applied_at": 1787267772.212113
-    },
-    {
-      "id": "notif_req_branch_1787267751",
-      "title": "⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Hipótesis: Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787267751.865664,
-      "read": true,
-      "branch_id": "branch_1787267751",
-      "status": "applied",
-      "action_type": "grant_authorization",
-      "applied_at": 1787267772.245535
-    },
-    {
-      "id": "notif_1787267754",
-      "title": "⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 1.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787267754.380264,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787267753",
-      "title": "⚡ Medio Detectado: Almacenamiento Externo / SSD USB (/Volumes)",
-      "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787267753.514613,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787267752",
-      "title": "⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' clasificada como [LOW]. Esperando tu confirmación en la pestaña de Propuestas.",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787267752.6820228,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787267751",
-      "title": "⚡ Medio Detectado: Workspace Soberano Local (IA 1.58 bit)",
-      "message": "Enrutamiento a brain_genesis activado. 15 archivos indexados. Procesos disparados: 2.",
-      "category": "Almacenamiento & Memoria",
-      "severity": "success",
-      "timestamp": 1787267751.8322592,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787267750",
-      "title": "⚠️ Solicitud de Aprobación de Mejora: Auto-Reflexión & Optimización de Código ARM NEON",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _verify_orch.py, _test_orch_full.py' clasificada como [HIGH]. Esperando tu confirmación en la pestaña de Propuestas.",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787267750.9931169,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787267748",
-      "title": "✅ Permiso Concedido: Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ",
-      "message": "La solicitud fue autorizada y aplicada en el exocórtex.",
-      "category": "Autorización Soberana",
-      "severity": "success",
-      "timestamp": 1787267748.750004,
+      "timestamp": 1787271023.119822,
       "read": false,
       "action_type": null,
       "branch_id": null,
@@ -511,231 +106,862 @@
       "read": true,
       "branch_id": "branch_1787267724",
       "status": "applied",
-      "action_type": "grant_authorization",
-      "applied_at": 1787267748.772904
+      "action_type": "grant_authorization"
     },
     {
-      "id": "notif_req_branch_1787267725",
+      "id": "notif_req_branch_1787267773",
+      "title": "⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _verify_orch.py, _test_orch_full.py'. Hipótesis: Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _verify_orch.py, _test_orch_full.py' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787267773.0904992,
+      "read": true,
+      "branch_id": "branch_1787267773",
+      "status": "applied",
+      "action_type": "grant_authorization"
+    },
+    {
+      "id": "notif_req_branch_1787267906",
       "title": "⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
       "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Hipótesis: Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
       "category": "Solicitud de Autorización",
       "severity": "warning",
-      "timestamp": 1787267725.747426,
+      "timestamp": 1787267906.025326,
       "read": true,
-      "branch_id": "branch_1787267725",
+      "branch_id": "branch_1787267906",
       "status": "applied",
-      "action_type": "grant_authorization",
-      "applied_at": 1787267748.858164
+      "action_type": "grant_authorization"
     },
     {
-      "id": "notif_1787267728",
+      "id": "notif_req_branch_1787267927",
+      "title": "⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _verify_orch.py, _test_orch_full.py'. Hipótesis: Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _verify_orch.py, _test_orch_full.py' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787267927.269829,
+      "read": true,
+      "branch_id": "branch_1787267927",
+      "status": "applied",
+      "action_type": "grant_authorization",
+      "applied_at": 1787271023.158269
+    },
+    {
+      "id": "notif_req_branch_1787267928",
+      "title": "⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Hipótesis: Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787267928.915088,
+      "read": true,
+      "branch_id": "branch_1787267928",
+      "status": "applied",
+      "action_type": "grant_authorization",
+      "applied_at": 1787271023.280597
+    },
+    {
+      "id": "notif_req_branch_1787270999",
+      "title": "⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_sync.py, IDEA.md'. Hipótesis: Integrando la semilla 'Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_sync.py, IDEA.md' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787270999.393012,
+      "read": true,
+      "branch_id": "branch_1787270999",
+      "status": "applied",
+      "action_type": "grant_authorization",
+      "applied_at": 1787271023.219083
+    },
+    {
+      "id": "notif_req_branch_1787271005",
+      "title": "⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): '. Hipótesis: Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
+      "category": "Solicitud de Autorización",
+      "severity": "warning",
+      "timestamp": 1787271005.393075,
+      "read": true,
+      "branch_id": "branch_1787271005",
+      "status": "applied",
+      "action_type": "grant_authorization",
+      "applied_at": 1787271023.3507059
+    },
+    {
+      "id": "notif_1787271010",
       "title": "⚡ Medio Detectado: Carpeta de Shaders & Assets 3D",
       "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 1.",
       "category": "Almacenamiento & Memoria",
       "severity": "success",
-      "timestamp": 1787267728.122923,
+      "timestamp": 1787271010.139389,
       "read": false,
       "action_type": null,
       "branch_id": null,
       "status": "pending"
     },
     {
-      "id": "notif_1787267727",
+      "id": "notif_1787271008",
       "title": "⚡ Medio Detectado: Almacenamiento Externo / SSD USB (/Volumes)",
       "message": "Enrutamiento a brain_genesis activado. 0 archivos indexados. Procesos disparados: 2.",
       "category": "Almacenamiento & Memoria",
       "severity": "success",
-      "timestamp": 1787267727.29407,
+      "timestamp": 1787271008.456128,
       "read": false,
       "action_type": null,
       "branch_id": null,
       "status": "pending"
     },
     {
-      "id": "notif_1787267726",
+      "id": "notif_1787271006",
       "title": "⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
       "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' clasificada como [LOW]. Esperando tu confirmación en la pestaña de Propuestas.",
       "category": "Solicitud de Autorización",
       "severity": "warning",
-      "timestamp": 1787267726.511091,
+      "timestamp": 1787271006.9793978,
       "read": false,
       "action_type": null,
       "branch_id": null,
       "status": "pending"
     },
     {
-      "id": "notif_1787267725",
+      "id": "notif_1787271005",
       "title": "⚡ Medio Detectado: Workspace Soberano Local (IA 1.58 bit)",
-      "message": "Enrutamiento a brain_genesis activado. 15 archivos indexados. Procesos disparados: 2.",
+      "message": "Enrutamiento a brain_genesis activado. 14 archivos indexados. Procesos disparados: 2.",
       "category": "Almacenamiento & Memoria",
       "severity": "success",
-      "timestamp": 1787267725.7139661,
+      "timestamp": 1787271005.3260741,
       "read": false,
       "action_type": null,
       "branch_id": null,
       "status": "pending"
     },
     {
-      "id": "notif_1787267724",
+      "id": "notif_1787271003",
       "title": "⚠️ Solicitud de Aprobación de Mejora: Auto-Reflexión & Optimización de Código ARM NEON",
-      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _verify_orch.py, _test_orch_full.py' clasificada como [HIGH]. Esperando tu confirmación en la pestaña de Propuestas.",
+      "message": "Propuesta 'Exploración Intuitiva: Ingesta Automática de Workspace Soberano Local (IA 1.58 bit): vercel.json, vercel.backup.json, _test_sync.py, IDEA.md' clasificada como [HIGH]. Esperando tu confirmación en la pestaña de Propuestas.",
       "category": "Solicitud de Autorización",
       "severity": "warning",
-      "timestamp": 1787267724.9193752,
+      "timestamp": 1787271003.139201,
       "read": false,
       "action_type": null,
       "branch_id": null,
       "status": "pending"
     },
     {
-      "id": "notif_1787267681",
-      "title": "✨ Auto-Mejora Aplicada: Simulación Predictiva & Tendencias",
-      "message": "Se aplicó automáticamente: 'Simulación Predictiva & Contexto Sensorial en Cuernavaca, México'. Todos los subsistemas sincronizados.",
+      "id": "notif_1787270891",
+      "title": "✨ Auto-Mejora Aplicada: Sueño Lúcido Ciberdélico (UI, Arte & 3D)",
+      "message": "Se aplicó automáticamente: 'Shader Ciberdélico y Geometría Sagrada para Cuernavaca'. Todos los subsistemas sincronizados.",
       "category": "Imaginación Intuitiva",
       "severity": "success",
-      "timestamp": 1787267681.6858912,
+      "timestamp": 1787270891.69629,
       "read": false,
       "action_type": null,
       "branch_id": null,
       "status": "pending"
     },
     {
-      "id": "notif_req_branch_1787267077",
-      "title": "⚠️ Solicitud de Autorización: Mutación Evolutiva Inter-Cerebros",
-      "message": "Propuesta 'Mutación Sináptica Inter-Cerebros: Génesis ✕ Hephaestus'. Hipótesis: Fusión de las habilidades de razonamiento ontológico con la generación de código de bajo nivel.",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787267077.365053,
-      "read": true,
-      "branch_id": "branch_1787267077",
-      "status": "applied",
-      "action_type": "grant_authorization",
-      "applied_at": 1787267748.81695
-    },
-    {
-      "id": "notif_1787267078",
-      "title": "⚠️ Solicitud de Aprobación de Mejora: Mutación Evolutiva Inter-Cerebros",
-      "message": "Propuesta 'Mutación Sináptica Inter-Cerebros: Génesis ✕ Hephaestus' clasificada como [HIGH]. Esperando tu confirmación en la pestaña de Propuestas.",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787267078.7476978,
-      "read": false,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787266566",
-      "title": "✅ Permisos Concedidos: 3 Solicitudes Aplicadas",
-      "message": "Se autorizaron y aplicaron exitosamente todas las 3 solicitudes pendientes en segundo plano.",
+      "id": "notif_1787270297",
+      "title": "✅ Permisos Concedidos: 1 Solicitudes Autorizadas",
+      "message": "Se concedieron todos los permisos para 1 solicitudes. Los agentes ejecutarán las tareas automáticamente.",
       "category": "Autorización Soberana",
       "severity": "success",
-      "timestamp": 1787266566.550377,
+      "timestamp": 1787270297.892656,
       "read": true,
       "action_type": null,
       "branch_id": null,
       "status": "applied",
-      "applied_at": 1787266928.734608
+      "applied_at": 1787270305.9363341
     },
     {
-      "id": "notif_req_branch_1787266476",
+      "id": "notif_req_branch_1787270287",
       "title": "⚠️ Solicitud de Autorización: Mutación Evolutiva Inter-Cerebros",
       "message": "Propuesta 'Mutación Sináptica Inter-Cerebros: Génesis ✕ Hephaestus'. Hipótesis: Fusión de las habilidades de razonamiento ontológico con la generación de código de bajo nivel.",
       "category": "Solicitud de Autorización",
       "severity": "warning",
-      "timestamp": 1787266476.5720131,
+      "timestamp": 1787270287.666912,
       "read": true,
-      "branch_id": "branch_1787266476",
+      "branch_id": "branch_1787270287",
       "status": "applied",
       "action_type": "grant_authorization"
     },
     {
-      "id": "notif_1787266478",
+      "id": "notif_1787270289",
       "title": "⚠️ Solicitud de Aprobación de Mejora: Mutación Evolutiva Inter-Cerebros",
       "message": "Propuesta 'Mutación Sináptica Inter-Cerebros: Génesis ✕ Hephaestus' clasificada como [HIGH]. Esperando tu confirmación en la pestaña de Propuestas.",
       "category": "Solicitud de Autorización",
       "severity": "warning",
-      "timestamp": 1787266478.328613,
+      "timestamp": 1787270289.181014,
       "read": true,
       "action_type": null,
       "branch_id": null,
       "status": "applied",
-      "applied_at": 1787266929.7621188
+      "applied_at": 1787270307.086397
     },
     {
-      "id": "notif_req_branch_1787265873",
-      "title": "⚠️ Solicitud de Autorización: Mutación Evolutiva Inter-Cerebros",
-      "message": "Propuesta 'Mutación Sináptica Inter-Cerebros: Génesis ✕ Hephaestus'. Hipótesis: Fusión de las habilidades de razonamiento ontológico con la generación de código de bajo nivel.",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787265873.93853,
-      "read": true,
-      "branch_id": "branch_1787265873",
-      "status": "applied",
-      "action_type": "grant_authorization"
-    },
-    {
-      "id": "notif_1787265875",
-      "title": "⚠️ Solicitud de Aprobación de Mejora: Mutación Evolutiva Inter-Cerebros",
-      "message": "Propuesta 'Mutación Sináptica Inter-Cerebros: Génesis ✕ Hephaestus' clasificada como [HIGH]. Esperando tu confirmación en la pestaña de Propuestas.",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787265875.3366652,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_req_branch_1787265271",
-      "title": "⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Simulación Predictiva & Contexto Sensorial en Cuernavaca, México'. Hipótesis: Proyectando la evolución cognitiva de Astraura ante fluctuaciones ambientales (24.5°C, Parcialmente Nublado).",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787265271.199671,
-      "read": true,
-      "branch_id": "branch_1787265271",
-      "status": "applied",
-      "action_type": "grant_authorization"
-    },
-    {
-      "id": "notif_1787265272",
-      "title": "⚠️ Solicitud de Aprobación de Mejora: Imaginación Contrafáctica / Cuántica",
-      "message": "Propuesta 'Simulación Predictiva & Contexto Sensorial en Cuernavaca, México' clasificada como [LOW]. Esperando tu confirmación en la pestaña de Propuestas.",
-      "category": "Solicitud de Autorización",
-      "severity": "warning",
-      "timestamp": 1787265272.5159621,
-      "read": true,
-      "action_type": null,
-      "branch_id": null,
-      "status": "pending"
-    },
-    {
-      "id": "notif_1787264685",
-      "title": "✅ Permisos Concedidos: 1 Solicitudes Aplicadas",
-      "message": "Se autorizaron y aplicaron exitosamente todas las 1 solicitudes pendientes en segundo plano.",
+      "id": "notif_1787270287",
+      "title": "✅ Permisos Concedidos: 7 Solicitudes Autorizadas",
+      "message": "Se concedieron todos los permisos para 7 solicitudes. Los agentes ejecutarán las tareas automáticamente.",
       "category": "Autorización Soberana",
       "severity": "success",
-      "timestamp": 1787264685.929795,
+      "timestamp": 1787270287.356413,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "applied",
+      "applied_at": 1787270308.168652
+    },
+    {
+      "id": "notif_1787270282",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270282.646017,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "applied",
+      "applied_at": 1787270309.0023072
+    },
+    {
+      "id": "notif_1787270277",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270277.629046,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "applied",
+      "applied_at": 1787270309.953365
+    },
+    {
+      "id": "notif_1787270272",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270272.616686,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "applied",
+      "applied_at": 1787270311.002269
+    },
+    {
+      "id": "notif_1787270267",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270267.604566,
       "read": true,
       "action_type": null,
       "branch_id": null,
       "status": "pending"
     },
     {
-      "id": "notif_req_branch_1787264668",
-      "title": "⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
-      "message": "Propuesta 'Auto-Optimización de Código: install_and_run.sh'. Hipótesis: Reestructurar bucles SIMD en 'install_and_run.sh' para aprovechar los registros vectoriales ARM64 NEON de 128 bits.",
-      "category": "Solicitud de Autorización",
+      "id": "notif_1787270262",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
       "severity": "warning",
-      "timestamp": 1787264668.534028,
+      "timestamp": 1787270262.5855832,
       "read": true,
-      "branch_id": "branch_1787264668",
-      "status": "applied",
-      "action_type": "grant_authorization"
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270257",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270257.567698,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270252",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270252.549058,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270247",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270247.533246,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270242",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270242.513974,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270237",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270237.498946,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270232",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270232.484925,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270227",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270227.4692302,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270222",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270222.455818,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270217",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270217.440475,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270212",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270212.426475,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270207",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270207.413183,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270202",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270202.3962061,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270197",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270197.380374,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270192",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270192.363243,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270187",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270187.343799,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270182",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270182.330807,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270177",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270177.317355,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270172",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270172.301922,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270167",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270167.284522,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270162",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270162.269696,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270157",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270157.255121,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270152",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270152.24117,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270147",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270147.229559,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270142",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270142.213952,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270137",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270137.196699,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270132",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270132.182306,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270127",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270127.167124,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270122",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270122.15135,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270117",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270117.135618,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
+    },
+    {
+      "id": "notif_1787270112",
+      "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "message": "Se alcanzó el límite de 7 solicitudes pendientes (5 máx). Los procesos de imaginación se han detenido automáticamente hasta autorizar o descartar propuestas.",
+      "category": "Gobernanza de Solicitudes",
+      "severity": "warning",
+      "timestamp": 1787270112.121845,
+      "read": true,
+      "action_type": null,
+      "branch_id": null,
+      "status": "pending"
     }
   ],
   "branching_logs": [
+    {
+      "id": "log_apply_1787271023",
+      "root_process": "Aplicación de Solicitud: ⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
+      "timestamp": 1787271023.350713,
+      "status": "success",
+      "branches": [
+        {
+          "step": "Validación de Permisos de Usuario",
+          "status": "ok",
+          "latency_ms": 5
+        },
+        {
+          "step": "Ejecución de Acción por Agente Especializado",
+          "status": "ok",
+          "latency_ms": 42
+        },
+        {
+          "step": "Consolidación en Memoria Soberana",
+          "status": "ok",
+          "latency_ms": 12
+        }
+      ]
+    },
+    {
+      "id": "log_apply_1787271023",
+      "root_process": "Aplicación de Solicitud: ⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",
+      "timestamp": 1787271023.2806022,
+      "status": "success",
+      "branches": [
+        {
+          "step": "Validación de Permisos de Usuario",
+          "status": "ok",
+          "latency_ms": 5
+        },
+        {
+          "step": "Ejecución de Acción por Agente Especializado",
+          "status": "ok",
+          "latency_ms": 42
+        },
+        {
+          "step": "Consolidación en Memoria Soberana",
+          "status": "ok",
+          "latency_ms": 12
+        }
+      ]
+    },
+    {
+      "id": "log_apply_1787271023",
+      "root_process": "Aplicación de Solicitud: ⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
+      "timestamp": 1787271023.2190888,
+      "status": "success",
+      "branches": [
+        {
+          "step": "Validación de Permisos de Usuario",
+          "status": "ok",
+          "latency_ms": 5
+        },
+        {
+          "step": "Ejecución de Acción por Agente Especializado",
+          "status": "ok",
+          "latency_ms": 42
+        },
+        {
+          "step": "Consolidación en Memoria Soberana",
+          "status": "ok",
+          "latency_ms": 12
+        }
+      ]
+    },
+    {
+      "id": "log_apply_1787271023",
+      "root_process": "Aplicación de Solicitud: ⚠️ Solicitud de Autorización: Auto-Reflexión & Optimización de Código ARM NEON",
+      "timestamp": 1787271023.1582751,
+      "status": "success",
+      "branches": [
+        {
+          "step": "Validación de Permisos de Usuario",
+          "status": "ok",
+          "latency_ms": 5
+        },
+        {
+          "step": "Ejecución de Acción por Agente Especializado",
+          "status": "ok",
+          "latency_ms": 42
+        },
+        {
+          "step": "Consolidación en Memoria Soberana",
+          "status": "ok",
+          "latency_ms": 12
+        }
+      ]
+    },
+    {
+      "id": "log_apply_1787270311",
+      "root_process": "Aplicación de Solicitud: ⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "timestamp": 1787270311.002274,
+      "status": "success",
+      "branches": [
+        {
+          "step": "Validación de Permisos de Usuario",
+          "status": "ok",
+          "latency_ms": 5
+        },
+        {
+          "step": "Ejecución de Acción por Agente Especializado",
+          "status": "ok",
+          "latency_ms": 42
+        },
+        {
+          "step": "Consolidación en Memoria Soberana",
+          "status": "ok",
+          "latency_ms": 12
+        }
+      ]
+    },
+    {
+      "id": "log_apply_1787270309",
+      "root_process": "Aplicación de Solicitud: ⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "timestamp": 1787270309.95337,
+      "status": "success",
+      "branches": [
+        {
+          "step": "Validación de Permisos de Usuario",
+          "status": "ok",
+          "latency_ms": 5
+        },
+        {
+          "step": "Ejecución de Acción por Agente Especializado",
+          "status": "ok",
+          "latency_ms": 42
+        },
+        {
+          "step": "Consolidación en Memoria Soberana",
+          "status": "ok",
+          "latency_ms": 12
+        }
+      ]
+    },
+    {
+      "id": "log_apply_1787270309",
+      "root_process": "Aplicación de Solicitud: ⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
+      "timestamp": 1787270309.002311,
+      "status": "success",
+      "branches": [
+        {
+          "step": "Validación de Permisos de Usuario",
+          "status": "ok",
+          "latency_ms": 5
+        },
+        {
+          "step": "Ejecución de Acción por Agente Especializado",
+          "status": "ok",
+          "latency_ms": 42
+        },
+        {
+          "step": "Consolidación en Memoria Soberana",
+          "status": "ok",
+          "latency_ms": 12
+        }
+      ]
+    },
+    {
+      "id": "log_apply_1787270308",
+      "root_process": "Aplicación de Solicitud: ✅ Permisos Concedidos: 7 Solicitudes Autorizadas",
+      "timestamp": 1787270308.1686568,
+      "status": "success",
+      "branches": [
+        {
+          "step": "Validación de Permisos de Usuario",
+          "status": "ok",
+          "latency_ms": 5
+        },
+        {
+          "step": "Ejecución de Acción por Agente Especializado",
+          "status": "ok",
+          "latency_ms": 42
+        },
+        {
+          "step": "Consolidación en Memoria Soberana",
+          "status": "ok",
+          "latency_ms": 12
+        }
+      ]
+    },
+    {
+      "id": "log_apply_1787270307",
+      "root_process": "Aplicación de Solicitud: ⚠️ Solicitud de Aprobación de Mejora: Mutación Evolutiva Inter-Cerebros",
+      "timestamp": 1787270307.086402,
+      "status": "success",
+      "branches": [
+        {
+          "step": "Validación de Permisos de Usuario",
+          "status": "ok",
+          "latency_ms": 5
+        },
+        {
+          "step": "Ejecución de Acción por Agente Especializado",
+          "status": "ok",
+          "latency_ms": 42
+        },
+        {
+          "step": "Consolidación en Memoria Soberana",
+          "status": "ok",
+          "latency_ms": 12
+        }
+      ]
+    },
+    {
+      "id": "log_apply_1787270305",
+      "root_process": "Aplicación de Solicitud: ✅ Permisos Concedidos: 1 Solicitudes Autorizadas",
+      "timestamp": 1787270305.936339,
+      "status": "success",
+      "branches": [
+        {
+          "step": "Validación de Permisos de Usuario",
+          "status": "ok",
+          "latency_ms": 5
+        },
+        {
+          "step": "Ejecución de Acción por Agente Especializado",
+          "status": "ok",
+          "latency_ms": 42
+        },
+        {
+          "step": "Consolidación en Memoria Soberana",
+          "status": "ok",
+          "latency_ms": 12
+        }
+      ]
+    },
     {
       "id": "log_apply_1787267925",
       "root_process": "Aplicación de Solicitud: ⚠️ Solicitud de Autorización: Imaginación Contrafáctica / Cuántica",

@@ -1,0 +1,14 @@
+{
+  "task_id": "task_1787270751_15",
+  "agent_id": "athena",
+  "title": "Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+  "timestamp": 1787270781.175831,
+  "target_project_id": "proj_astraura_core",
+  "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/telemetry",
+  "scanned_files_count": 0,
+  "hardware_telemetry": {
+    "pid": 5100,
+    "ram_rss_mb": 36.6,
+    "cpu_percent": 0.0
+  }
+}

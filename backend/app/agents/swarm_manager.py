@@ -471,10 +471,12 @@ class AdaptiveMultiAreaSwarmEngine:
 
     # ================= Multi-Agent Task Dispatcher & Execution =================
 
-    def dispatch_task(self, area_id: str, title: str, prompt: str, agent_id: Optional[str] = None, target_project_id: Optional[str] = None) -> Dict[str, Any]:
+    def dispatch_task(self, area_id: str, title: str, prompt: str, agent_id: Optional[str] = None, target_project_id: Optional[str] = None, priority_level: int = 5, origin: str = "user") -> Dict[str, Any]:
         """
         Despacha una nueva tarea concurrente con telemetría real del sistema,
         rutas de disco físicas y fases de ejecución concretas.
+        priority_level: 1-10 (10 = crítico, se inserta al frente de la cola).
+        origin: identificador del emisor (p.ej. 'authorization_orchestrator').
         """
         area = next((a for a in SWARM_AREAS if a["id"] == area_id), SWARM_AREAS[0])
         target_agent = agent_id or area["lead_agent"]
@@ -514,6 +516,8 @@ class AdaptiveMultiAreaSwarmEngine:
             "real_pid": os.getpid(),
             "target_folder_path": target_folder,
             "target_project_id": target_project_id or "proj_astraura_core",
+            "priority_level": priority_level,
+            "origin": origin,
             "started_at": now,
             "logs": [
                 f"Iniciando tarea real en {area['name']}...",

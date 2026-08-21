@@ -21,7 +21,8 @@ import {
   ShieldAlert,
   ShieldCheck,
   Play,
-  ArrowRight
+  ArrowRight,
+  Bot
 } from 'lucide-react';
 import { 
   fetchSystemNotifications, 
@@ -563,6 +564,50 @@ export default function NotificationsLogsView() {
                 ))
               )}
             </div>
+
+            {/* Sincronización del Ecosistema 1.58-bit interconectado */}
+            {orchStatus?.last_run?.sync_report && (() => {
+              const sr = orchStatus.last_run.sync_report;
+              const anySync = sr.director_notified || sr.orchestrator_notified || sr.executive_memory_saved;
+              if (!anySync && !sr.agents_synced?.length) return null;
+              return (
+                <div className="p-2.5 rounded-xl bg-gradient-to-r from-purple-950/40 via-cyan-950/30 to-emerald-950/40 border border-cyan-500/30 space-y-1.5">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-cyan-300">
+                    <Sparkles className="w-3 h-3" />
+                    Sincronización del Ecosistema 1.58-bit
+                  </div>
+                  <div className="grid grid-cols-2 gap-1 text-[9px] font-mono">
+                    <span className={`flex items-center gap-1 ${sr.director_notified ? 'text-emerald-400' : 'text-slate-500'}`}>
+                      <CheckCircle2 className="w-2.5 h-2.5" /> Director Orquestrador
+                    </span>
+                    <span className={`flex items-center gap-1 ${sr.orchestrator_notified ? 'text-emerald-400' : 'text-slate-500'}`}>
+                      <CheckCircle2 className="w-2.5 h-2.5" /> Orquestador Central
+                    </span>
+                    <span className={`flex items-center gap-1 ${sr.executive_memory_saved ? 'text-emerald-400' : 'text-slate-500'}`}>
+                      <CheckCircle2 className="w-2.5 h-2.5" /> Memoria Ejecutiva
+                    </span>
+                    <span className="flex items-center gap-1 text-emerald-400">
+                      <CheckCircle2 className="w-2.5 h-2.5" /> {sr.swarm_tasks_at_front || 0} tareas al frente
+                    </span>
+                  </div>
+                  {sr.agents_synced?.length > 0 && (
+                    <div className="text-[9px] text-slate-400 font-mono">
+                      🤖 Agentes: {sr.agents_synced.join(', ')}
+                    </div>
+                  )}
+                  {sr.personalities_synced?.length > 0 && (
+                    <div className="text-[9px] text-pink-300 font-mono">
+                      💠 Personalidades: {sr.personalities_synced.join(', ')}
+                    </div>
+                  )}
+                  {sr.brains_synced?.length > 0 && (
+                    <div className="text-[9px] text-cyan-300 font-mono">
+                      🧠 Cerebros: {sr.brains_synced.join(', ')}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             {/* Fallidas (si las hay) */}
             {orchStatus?.last_run?.failed?.length > 0 && (
