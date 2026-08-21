@@ -107,6 +107,7 @@ class IntelligentAuthorizationOrchestrator:
         self.orchestrations_run = 0
         self.last_orchestration = None
         self.is_busy = False
+        self._draining_mode = False
         self.auto_mode = self._load_auto_mode()
         print("✨ [AuthOrchestrator] Agente de Orquestación Inteligente de Autorizaciones inicializado.")
         print(f"   {'🟢' if self.auto_mode else '⚪'} Auto-Orquestación en 2do plano: {'ACTIVA' if self.auto_mode else 'apagada'}")
@@ -133,13 +134,31 @@ class IntelligentAuthorizationOrchestrator:
         print(f"✨ [AuthOrchestrator] Auto-Orquestación en 2do plano {'ACTIVADA' if self.auto_mode else 'APAGADA'}")
         return {"success": True, "auto_mode": self.auto_mode}
 
+    # Umbral de equilibrio: si la cola de pendientes supera esto, el agente entra
+    # en MODO DRENAJE (coordina con Director + agentes para priorizar el completado
+    # de tareas antes de seguir imaginando).
+    MAX_BALANCED_QUEUE = 20
+    # Tamaño de lote en modo normal
+    NORMAL_BATCH = 5
+    # Tamaño de lote en modo drenaje (acumulación)
+    DRAIN_BATCH = 12
+
     def tick_auto_mode(self) -> Dict[str, Any]:
         """
         Disparado periódicamente por el scheduler. Si auto_mode está activo y
         hay notificaciones con botón de autorizar/aplicar pendientes, las
         procesa automáticamente con los agentes del enjambre (1.58-bit).
-        Se ejecuta en un HILO SEPARADO para NO bloquear el event loop de
-        uvicorn (las respuestas HTTP siguen respondiendo).
+
+        LÓGICA DE AUTORREGULACIÓN INTELIGENTE:
+          - Mide el tamaño de la cola de pendientes.
+          - Si la cola está equilibrada (<= MAX_BALANCED_QUEUE): procesa en lotes
+            normales y deja a los agentes continuar imaginando.
+          - Si la cola CRECE por encima del umbral (se acumula): el agente entra
+            en MODO DRENAJE, se pone de acuerdo con el Director Orquestrador y los
+            demás agentes, prioriza el uso de los agentes para COMPLETAR las tareas
+            pendientes (lotes grandes, prioridad crítica 10) y SÓLO cuando la cola
+            vuelve a un nivel balanceado libera a los agentes para "continuar imaginando".
+        Se ejecuta en un HILO SEPARADO para NO bloquear el event loop de uvicorn.
         """
         if not self.auto_mode:
             return {"ran": False, "reason": "auto_mode_off"}
@@ -149,17 +168,80 @@ class IntelligentAuthorizationOrchestrator:
         try:
             pending = [n["id"] for n in _notifications.notifications
                        if n.get("status") not in ("applied", "resolved")]
-            if not pending:
+            pending_total = len(pending)
+            if pending_total == 0:
+                self._draining_mode = False
                 return {"ran": False, "reason": "no_pending"}
-            # Lote pequeño por tick para mantener ritmo sostenible y no saturar
-            batch = pending[:5]
+
+            # Decidir modo según el tamaño de la cola
+            draining = pending_total > self.MAX_BALANCED_QUEUE
+            self._draining_mode = draining
+            if draining:
+                batch = pending[:self.DRAIN_BATCH]
+                mode_label = "DRENAJE (priorizando completado de tareas pendientes)"
+            else:
+                batch = pending[:self.NORMAL_BATCH]
+                mode_label = "EQUILIBRADO (procesando y dejando imaginar)"
+
+            # Si hay acumulación, coordinarse con el Director y los agentes
+            coordination = {}
+            if draining:
+                coordination = self._coordinate_drainage(pending_total, len(batch))
+
             import threading
-            t = threading.Thread(target=lambda: asyncio.run(self.orchestrate_list(batch)), daemon=True)
+            t = threading.Thread(
+                target=lambda: asyncio.run(self.orchestrate_list(batch)), daemon=True
+            )
             t.start()
-            return {"ran": True, "dispatched": len(batch), "pending_total": len(pending)}
+            return {
+                "ran": True,
+                "dispatched": len(batch),
+                "pending_total": pending_total,
+                "mode": "drain" if draining else "balanced",
+                "mode_label": mode_label,
+                "coordination": coordination,
+            }
         except Exception as e:
             print(f"⚠️ [AuthOrchestrator] Error en tick_auto_mode: {e}")
             return {"ran": False, "error": str(e)}
+
+    def _coordinate_drainage(self, pending_total: int, batch_size: int) -> Dict[str, Any]:
+        """
+        Cuando la cola se acumula, el agente se pone de acuerdo con el Director
+        Orquestrador y los demás agentes para priorizar el completado de las tareas
+        pendientes en lugar de seguir imaginando. Devuelve el reporte de coordinación.
+        """
+        report = {"director_notified": False, "directive": "", "agents_reprioritized": []}
+        try:
+            from ..agents.director_orchestrator import director_orchestrator
+            directive = (
+                f"MODO DRENAJE ACTIVADO: {pending_total} solicitudes pendientes superan el "
+                f"umbral de equilibrio ({self.MAX_BALANCED_QUEUE}). Priorizar el uso de los "
+                f"agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) "
+                f"para COMPLETAR estas {batch_size} tareas críticas ENVIADAS AHORA antes que "
+                f"cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola "
+                f"a un nivel balanceado; luego reanudar imaginación normal."
+            )
+            director_orchestrator.steer_swarm_with_directive(directive, "proj_astraura_core")
+            report["director_notified"] = True
+            report["directive"] = directive
+            report["agents_reprioritized"] = [
+                "hephaestus", "oneiros", "mnemosyne", "hermes", "athena", "architectus", "daedalus"
+            ]
+            # Memoria ejecutiva del Director sobre la decisión de drenaje
+            try:
+                director_orchestrator.add_executive_memory(
+                    title=f"Modo Drenaje de Autorizaciones: {pending_total} pendientes",
+                    content=directive,
+                    category="authorization_drainage",
+                    importance="critical",
+                    tags=["drenaje", "prioridad", "autorizacion", "coordinacion"],
+                )
+            except Exception:
+                pass
+        except Exception as e:
+            print(f"⚠️ [AuthOrchestrator] coord drainage: {e}")
+        return report
 
     # ─────────────────────────────────────────────────────────────────────
     # Utilidades de contexto 1.58-bit
@@ -738,6 +820,9 @@ class IntelligentAuthorizationOrchestrator:
         return {
             "is_busy": self.is_busy,
             "orchestrations_run": self.orchestrations_run,
+            "auto_mode": self.auto_mode,
+            "draining_mode": self._draining_mode,
+            "max_balanced_queue": self.MAX_BALANCED_QUEUE,
             "agent_name": "Agente de Orquestación Inteligente de Autorizaciones",
             "agent_id": "auth_orchestrator",
             "last_run": {

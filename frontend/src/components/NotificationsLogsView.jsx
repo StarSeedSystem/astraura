@@ -544,6 +544,15 @@ export default function NotificationsLogsView() {
               }`}>
                 {orchStatus?.is_busy ? '⚡ Procesando' : '💤 En espera'}
               </span>
+              <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
+                orchStatus?.draining_mode
+                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 animate-pulse'
+                  : 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30'
+              }`}>
+                {orchStatus?.draining_mode
+                  ? `🌊 MODO DRENAJE (cola > ${orchStatus?.max_balanced_queue ?? 20})`
+                  : '⚖️ EQUILIBRADO (imaginando)'}
+              </span>
             </div>
 
             {/* Stats del agente */}

@@ -37,8 +37,8 @@
         "swarm_max_percent": 45,
         "capacity_mode": "auto"
       },
-      "last_detected_at": 1787280390.828523,
-      "last_detected_formatted": "20/08/2026 20:46:30",
+      "last_detected_at": 1787281295.852798,
+      "last_detected_formatted": "20/08/2026 21:01:35",
       "status": "connected"
     },
     {
@@ -78,8 +78,8 @@
         "swarm_max_percent": 50,
         "capacity_mode": "high_performance"
       },
-      "last_detected_at": 1787280390.828523,
-      "last_detected_formatted": "20/08/2026 20:46:30",
+      "last_detected_at": 1787281281.853674,
+      "last_detected_formatted": "20/08/2026 21:01:21",
       "status": "connected"
     },
     {
@@ -118,10 +118,10 @@
         "swarm_max_percent": 35,
         "capacity_mode": "auto"
       },
-      "last_detected_at": 1787280388.401632,
-      "last_detected_formatted": "20/08/2026 20:46:28",
+      "last_detected_at": 1787281281.853674,
+      "last_detected_formatted": "20/08/2026 21:01:21",
       "status": "connected"
     }
   ],
-  "updated_at": 1787280405.414366
+  "updated_at": 1787281296.281209
 }
