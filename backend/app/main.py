@@ -2663,8 +2663,9 @@ async def apply_all_notifications_from_list(req: ApplyAllFromListRequest):
     correspondientes. Relaciona tareas, determina orden por prioridad/dependencias, refina
     cada propuesta según contexto y actualiza TODOS los medios al final.**"""
 
-    # Delegar a la capa de orquestación inteligente (relación + enrutamiento + exocórtex + medios)
-    result = await intelligent_authorization_orchestrator.orchestrate_list(req.notif_ids)
+    # Delegar a la capa de orquestación inteligente (relación + enrutamiento + exocórtex + medios).
+    # force=True: acción explícita del usuario → siempre procesa TODAS las pendientes de inmediato.
+    result = await intelligent_authorization_orchestrator.orchestrate_list(req.notif_ids, force=True)
 
     if not result.get("success"):
         return result

@@ -177,7 +177,8 @@ class IntelligentAuthorizationOrchestrator:
             draining = pending_total > self.MAX_BALANCED_QUEUE
             self._draining_mode = draining
             if draining:
-                batch = pending[:self.DRAIN_BATCH]
+                # DRENAJE: procesar TODAS las pendientes para no acumular
+                batch = pending[:]
                 mode_label = "DRENAJE (priorizando completado de tareas pendientes)"
             else:
                 batch = pending[:self.NORMAL_BATCH]
@@ -458,13 +459,18 @@ class IntelligentAuthorizationOrchestrator:
     # ─────────────────────────────────────────────────────────────────────
     # Bucle principal: orquesta una lista de notificaciones
     # ─────────────────────────────────────────────────────────────────────
-    async def orchestrate_list(self, notif_ids: List[str]) -> Dict[str, Any]:
+    async def orchestrate_list(self, notif_ids: List[str], force: bool = False) -> Dict[str, Any]:
         """
         Procesa en lote las notificaciones de autorización con agentes reales
         del enjambre, relación inteligente y re-escaneo de medios.
+
+        force=True permite que la acción EXPLÍCITA del usuario (botón "Aplicar
+        Todas") se ejecute aunque el auto-tick esté ocupado, para garantizar que
+        el usuario siempre pueda trasladar TODAS las solicitudes pendientes de
+        inmediato (prioridad crítica con el agente).
         """
         _resolve()
-        if self.is_busy:
+        if self.is_busy and not force:
             return {"success": False, "error": "Orquestador ocupado en otra ejecución."}
         self.is_busy = True
         self.orchestrations_run += 1

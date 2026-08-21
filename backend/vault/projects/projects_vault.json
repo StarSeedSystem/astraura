@@ -89,7 +89,7 @@
         "total_loc": 0,
         "integrity_verdict": "VERIFIED_100_REAL"
       },
-      "_metrics_cached_at": 1787280695.7575831
+      "_metrics_cached_at": 1787281377.378592
     },
     {
       "id": "proj_astraura_core",
@@ -97,7 +97,7 @@
       "description": "Núcleo del sistema operativo cognitivo.",
       "type": "automatic",
       "created_at": 1786741520.5937548,
-      "updated_at": 1787281295.837472,
+      "updated_at": 1787282047.9751968,
       "linked_creations": [
         "creation_neon_kernel_v2",
         "creation_dataset_ternary_v2",
@@ -225,17 +225,17 @@
         }
       ],
       "key_memories": [
-        "Axioma (oneiros): Forja Visual: MODO DRENAJE ACTIVADO: 53 solicitudes pendien... [Auditado por Director]",
-        "Axioma (daedalus): Orquestación General: Consolidar 12 tareas de autorización recién c... [Auditado por Director]",
-        "Axioma (oneiros): Forja Visual: MODO DRENAJE ACTIVADO: 40 solicitudes pendien... [Auditado por Director]",
-        "Axioma (daedalus): Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits [Auditado por Director]",
-        "Axioma (mnemosyne): Poda y Reestructuración del Grafo Sináptico de Memoria StarSeed [Auditado por Director]",
-        "Axioma (oneiros): ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Carpeta de Sh [Auditado por Director]",
         "Axioma (daedalus): Orquestación General: Consolidar 5 tareas de autorización recién co... [Auditado por Director]",
-        "Axioma (mnemosyne): Auto-Reactivación: Sincronización & Poda del Grafo de Memoria [Auditado por Director]",
+        "Axioma (hephaestus): Auto-Reactivación: Auditoría de Código & Archivos Locales [Auditado por Director]",
+        "Axioma (athena): Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1 [Auditado por Director]",
         "Axioma (oneiros): Auto-Reactivación: Forja de Shaders & Prototipos Visuales [Auditado por Director]",
-        "Axioma (hermes): ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient [Auditado por Director]",
-        "Axioma (hermes): Mapeo de Referencias Académicas y Citaciones para StarSeed OS [Auditado por Director]"
+        "Axioma (oneiros): Forja Visual: MODO DRENAJE ACTIVADO: 30 solicitudes pendien... [Auditado por Director]",
+        "Axioma (daedalus): Orquestación General: Consolidar 30 tareas de autorización recién c... [Auditado por Director]",
+        "Axioma (daedalus): Orquestación General: Consolidar 29 tareas de autorización recién c... [Auditado por Director]",
+        "Axioma (oneiros): Forja Visual: MODO DRENAJE ACTIVADO: 136 solicitudes pendie... [Auditado por Director]",
+        "Axioma (hephaestus): Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b [Auditado por Director]",
+        "Axioma (hermes): Mapeo de Referencias Académicas y Citaciones para StarSeed OS [Auditado por Director]",
+        "Axioma (oneiros): Forja Visual: MODO DRENAJE ACTIVADO: 131 solicitudes pendie... [Auditado por Director]"
       ],
       "linked_folders": [
         "/Users/alex/Documents/IA 1.58 bit/backend/app/core",
@@ -249,364 +249,364 @@
       ],
       "logs_history": [
         {
-          "timestamp": 1787281295.837482,
+          "timestamp": 1787282047.975212,
           "action": "Modificación de Proyecto",
           "agent": "Alex Bordón / Daedalus",
           "details": "Proyecto actualizado y sincronizado en el grafo."
         },
         {
-          "timestamp": 1787281295.837443,
-          "action": "Entregable Verificado: Forja Visual: MODO DRENAJE ACTIVADO: 53 solicitudes pendien...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
-        },
-        {
-          "timestamp": 1787281275.705869,
-          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787281275.6903691,
-          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787281275.6713111,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787281275.671247,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 12 tareas de autorización recién c...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787281260.631576,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787281260.631528,
-          "action": "Entregable Verificado: Forja Visual: MODO DRENAJE ACTIVADO: 40 solicitudes pendien...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
-        },
-        {
-          "timestamp": 1787281255.592844,
-          "action": "Entregable Verificado: Mapeo de Referencias Académicas y Citaciones para StarSeed OS",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787281255.577499,
-          "action": "Entregable Verificado: Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787281250.548661,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787281250.5486,
-          "action": "Entregable Verificado: Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787281250.535017,
-          "action": "Entregable Verificado: Mapeo de Referencias Académicas y Citaciones para StarSeed OS",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787281078.6856298,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787281078.685448,
-          "action": "Entregable Verificado: Poda y Reestructuración del Grafo Sináptico de Memoria StarSeed",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
-        },
-        {
-          "timestamp": 1787281078.661636,
-          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787281078.606865,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787281078.606776,
-          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Carpeta de Sh",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
-        },
-        {
-          "timestamp": 1787281078.399442,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787281078.3993542,
+          "timestamp": 1787282047.975154,
           "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
         },
         {
-          "timestamp": 1787281048.069365,
+          "timestamp": 1787282042.9571571,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787282042.957116,
+          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Código & Archivos Locales",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
+        },
+        {
+          "timestamp": 1787282042.945429,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787282042.9453812,
           "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
         },
         {
-          "timestamp": 1787281038.00587,
+          "timestamp": 1787282042.932169,
           "action": "Modificación de Proyecto",
           "agent": "Alex Bordón / Daedalus",
           "details": "Proyecto actualizado y sincronizado en el grafo."
         },
         {
-          "timestamp": 1787281038.005816,
-          "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: mnemosyne."
-        },
-        {
-          "timestamp": 1787281037.992838,
-          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787281037.979126,
-          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787281037.9654112,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787281032.9401011,
-          "action": "Entregable Verificado: Mapeo de Referencias Académicas y Citaciones para StarSeed OS",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787281032.926375,
-          "action": "Entregable Verificado: Mapeo de Referencias Académicas y Citaciones para StarSeed OS",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787281032.850354,
-          "action": "Entregable Verificado: Mapeo de Referencias Académicas y Citaciones para StarSeed OS",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787281032.783655,
-          "action": "Entregable Verificado: Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787281032.765564,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787281032.7655091,
+          "timestamp": 1787282042.932118,
           "action": "Entregable Verificado: Auto-Reactivación: Forja de Shaders & Prototipos Visuales",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
         },
         {
-          "timestamp": 1787280992.462411,
+          "timestamp": 1787282037.9017549,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787282037.9017138,
+          "action": "Entregable Verificado: Forja Visual: MODO DRENAJE ACTIVADO: 30 solicitudes pendien...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
+        },
+        {
+          "timestamp": 1787282037.8924868,
+          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+        },
+        {
+          "timestamp": 1787282037.881912,
+          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+        },
+        {
+          "timestamp": 1787282037.8717818,
+          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+        },
+        {
+          "timestamp": 1787282037.862381,
+          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+        },
+        {
+          "timestamp": 1787282037.852465,
+          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+        },
+        {
+          "timestamp": 1787282037.84415,
+          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+        },
+        {
+          "timestamp": 1787282037.8344362,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787282037.834301,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 30 tareas de autorización recién c...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787282037.82459,
+          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+        },
+        {
+          "timestamp": 1787282037.813419,
+          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+        },
+        {
+          "timestamp": 1787282037.8000891,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787282037.800043,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 29 tareas de autorización recién c...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787281988.751723,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787281988.751679,
+          "action": "Entregable Verificado: Forja Visual: MODO DRENAJE ACTIVADO: 136 solicitudes pendie...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
+        },
+        {
+          "timestamp": 1787281955.8255382,
+          "action": "Entregable Verificado: Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
+        },
+        {
+          "timestamp": 1787281955.8163462,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787281955.816297,
+          "action": "Entregable Verificado: Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
+        },
+        {
+          "timestamp": 1787281955.806765,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787281955.80671,
+          "action": "Entregable Verificado: Mapeo de Referencias Académicas y Citaciones para StarSeed OS",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+        },
+        {
+          "timestamp": 1787281955.7989042,
+          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+        },
+        {
+          "timestamp": 1787281955.7908008,
+          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+        },
+        {
+          "timestamp": 1787281955.780461,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 12 tareas de autorización recién c...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787281808.5693948,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787281808.5693219,
+          "action": "Entregable Verificado: Forja Visual: MODO DRENAJE ACTIVADO: 131 solicitudes pendie...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
+        },
+        {
+          "timestamp": 1787281788.397438,
+          "action": "Entregable Verificado: Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+        },
+        {
+          "timestamp": 1787281788.3809679,
+          "action": "Entregable Verificado: Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
+        },
+        {
+          "timestamp": 1787281788.341959,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787281788.341904,
+          "action": "Entregable Verificado: Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
+        },
+        {
+          "timestamp": 1787281788.32225,
+          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
+        },
+        {
+          "timestamp": 1787281788.307297,
+          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+        },
+        {
+          "timestamp": 1787281788.2948842,
+          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+        },
+        {
+          "timestamp": 1787281788.2817101,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 12 tareas de autorización recién c...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787281768.212547,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787281768.2125142,
+          "action": "Entregable Verificado: Forja Visual: MODO DRENAJE ACTIVADO: 126 solicitudes pendie...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
+        },
+        {
+          "timestamp": 1787281748.132968,
+          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
+        },
+        {
+          "timestamp": 1787281748.088716,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787281748.0886478,
+          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hephaestus."
+        },
+        {
+          "timestamp": 1787281748.0695932,
+          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+        },
+        {
+          "timestamp": 1787281748.0518742,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787281748.0517812,
+          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+        },
+        {
+          "timestamp": 1787281747.99405,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787281747.993974,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 12 tareas de autorización recién c...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1787281737.936497,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787281737.936425,
           "action": "Entregable Verificado: Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
         },
         {
-          "timestamp": 1787280992.440341,
+          "timestamp": 1787281737.917063,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1787281737.916992,
           "action": "Entregable Verificado: Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
         },
         {
-          "timestamp": 1787280992.422654,
-          "action": "Entregable Verificado: Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787280992.399611,
-          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787280992.3810408,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787280968.5184588,
-          "action": "Entregable Verificado: Síntesis Comparativa de Arquitecturas: Transformers vs Ternary BitNet",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787280948.421736,
-          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787280948.309828,
+          "timestamp": 1787281732.8833122,
           "action": "Modificación de Proyecto",
           "agent": "Alex Bordón / Daedalus",
           "details": "Proyecto actualizado y sincronizado en el grafo."
         },
         {
-          "timestamp": 1787280948.309643,
-          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
+          "timestamp": 1787281732.883261,
+          "action": "Entregable Verificado: Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
           "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: athena."
         },
         {
-          "timestamp": 1787280947.8492858,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787280927.7167711,
+          "timestamp": 1787281717.649339,
           "action": "Modificación de Proyecto",
           "agent": "Alex Bordón / Daedalus",
           "details": "Proyecto actualizado y sincronizado en el grafo."
         },
         {
-          "timestamp": 1787280927.716577,
-          "action": "Entregable Verificado: Mapeo de Referencias Académicas y Citaciones para StarSeed OS",
+          "timestamp": 1787281717.649267,
+          "action": "Entregable Verificado: Forja Visual: MODO DRENAJE ACTIVADO: 115 solicitudes pendie...",
           "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787280912.668019,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787280912.667973,
-          "action": "Entregable Verificado: Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787280912.656907,
-          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787280912.6392488,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787280887.5472589,
-          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787280887.5261009,
-          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787280887.507089,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787280872.468103,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1787280872.468053,
-          "action": "Entregable Verificado: Síntesis Comparativa de Arquitecturas: Transformers vs Ternary BitNet",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787280857.439494,
-          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787280857.414422,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787280852.397102,
-          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787280832.356179,
-          "action": "Entregable Verificado: Mapeo de Referencias Académicas y Citaciones para StarSeed OS",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787280827.3426719,
-          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
-        },
-        {
-          "timestamp": 1787280827.326838,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1787280822.301839,
-          "action": "Entregable Verificado: ⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 100%). Agente: hermes."
+          "details": "Aprobado por Director Metis (Score: 100%). Agente: oneiros."
         }
       ],
       "linked_processs": [
@@ -628,12 +628,12 @@
         }
       ],
       "_physical_metrics": {
-        "total_bytes_formatted": "2.92 MB",
+        "total_bytes_formatted": "2.93 MB",
         "total_files": 182,
-        "total_loc": 16102,
+        "total_loc": 16187,
         "integrity_verdict": "VERIFIED_100_REAL"
       },
-      "_metrics_cached_at": 1787280695.805213
+      "_metrics_cached_at": 1787281377.4380858
     },
     {
       "id": "proj_cyberdelic_arts",
@@ -739,8 +739,8 @@
         "total_loc": 0,
         "integrity_verdict": "VERIFIED_100_REAL"
       },
-      "_metrics_cached_at": 1787280695.8054988
+      "_metrics_cached_at": 1787281377.4383051
     }
   ],
-  "saved_at": 1787281295.837483
+  "saved_at": 1787282047.975214
 }

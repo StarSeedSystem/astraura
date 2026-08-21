@@ -410,19 +410,24 @@ export default function NotificationsLogsView() {
           <span>{isApplyingAll ? 'Sincronizando Agentes...' : '✨ Autorizar y Aplicar Todas con Agentes en 2do Plano · v2.2-Orch'}</span>
         </button>
 
+        {/* SWITCH Auto-Orquestación en 2do Plano */}
         <button
           onClick={handleToggleAutoMode}
           disabled={isTogglingAuto}
-          className={`px-4 py-2 rounded-xl font-bold flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50 border ${
-            autoMode
-              ? 'bg-emerald-500/20 border-emerald-400/50 text-emerald-300 shadow-md shadow-emerald-500/20'
-              : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
-          }`}
+          role="switch"
+          aria-checked={autoMode}
           title="Mantiene la orquestación de autorizaciones funcionando automáticamente en segundo plano"
+          className={`relative inline-flex h-7 w-14 shrink-0 items-center rounded-full transition-colors cursor-pointer disabled:opacity-50 border ${
+            autoMode
+              ? 'bg-emerald-500 border-emerald-400/50 shadow-md shadow-emerald-500/30'
+              : 'bg-slate-700 border-white/10'
+          }`}
         >
-          <span className={`w-2.5 h-2.5 rounded-full ${autoMode ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'}`} />
-          <span>{autoMode ? '🟢 Auto-Orquestación ACTIVA (2do Plano)' : '⚪ Auto-Orquestación en 2do Plano'}</span>
+          <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${autoMode ? 'translate-x-8' : 'translate-x-1'}`} />
         </button>
+        <span className={`text-[12px] font-bold ${autoMode ? 'text-emerald-300' : 'text-slate-400'}`}>
+          {autoMode ? '🟢 Auto-Orquestación ACTIVA (2do Plano)' : '⚪ Auto-Orquestación en 2do Plano'}
+        </span>
       </div>
 
       {/* Main Grid: Notifications on Left, Branching Logs on Right */}
