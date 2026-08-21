@@ -491,10 +491,11 @@ DEFAULT_AGENTS_BY_BRAIN = {
     ]
 }
 
-def scan_context_folder_metrics(folder_path: str) -> Dict[str, Any]:
+def scan_context_folder_metrics(folder_path: str, max_files: int = 20000) -> Dict[str, Any]:
     """
     Escanea un folder del dispositivo y calcula métricas de capacidad,
     número de archivos y desglose de extensiones.
+    Se limita a max_files para no saturar el GIL ni bloquear el backend.
     """
     p = Path(folder_path).expanduser().resolve()
     if not p.exists() or not p.is_dir():
@@ -518,6 +519,15 @@ def scan_context_folder_metrics(folder_path: str) -> Dict[str, Any]:
                 fp = Path(root) / f
                 if fp.is_file() and not fp.is_symlink():
                     file_count += 1
+                    if file_count > max_files:
+                        return {
+                            "exists": True,
+                            "path": str(p),
+                            "file_count": file_count,
+                            "size_mb": round(total_size / (1024.0 * 1024.0), 2),
+                            "types_breakdown": dict(sorted(types.items(), key=lambda x: x[1], reverse=True)[:8]),
+                            "status": "Omitido: directorio muy grande (>%d archivos)" % max_files
+                        }
                     try:
                         sz = fp.stat().st_size
                         total_size += sz
@@ -556,30 +566,7 @@ class CerebrosManager:
         self.cerebros_file = self.storage_dir / "cerebros_registry.json"
         self.active_brain_id = "brain_genesis"
         self.cerebros: List[Dict[str, Any]] = []
-        # Caché de métricas de carpetas (se recalcula en background para no
-        # bloquear el event loop de uvicorn en /api/cerebros).
-        self._folder_metrics_cache: Dict[str, Dict[str, Any]] = {}
-        self._metrics_lock = threading.Lock()
         self._initialize()
-        self._start_metrics_thread()
-
-    def _start_metrics_thread(self):
-        """Recalcula las métricas de carpetas en background (no bloquea requests)."""
-        def _loop():
-            import time as _t
-            while True:
-                try:
-                    for b in self.cerebros:
-                        for cf in (b.get("context_folders") or []):
-                            p = cf.get("path")
-                            if p:
-                                with self._metrics_lock:
-                                    self._folder_metrics_cache[p] = scan_context_folder_metrics(p)
-                except Exception:
-                    pass
-                _t.sleep(30)
-        t = threading.Thread(target=_loop, daemon=True)
-        t.start()
 
     def _initialize(self):
         if self.cerebros_file.exists():
@@ -1026,12 +1013,12 @@ class CerebrosManager:
             if "context_folders" in b:
                 for cf in b["context_folders"]:
                     if cf.get("path"):
-                        # Usar métricas cacheadas (recalculadas en background)
-                        with self._metrics_lock:
-                            cf["metrics"] = self._folder_metrics_cache.get(cf["path"], {
-                                "exists": True, "path": cf["path"], "file_count": 0,
-                                "size_mb": 0, "types_breakdown": {}, "status": "Calculando…"
-                            })
+                        # Métricas bajo demanda (el frontend las pide por separado
+                        # para no saturar el backend con escaneos de disco).
+                        cf["metrics"] = {
+                            "exists": True, "path": cf["path"], "file_count": 0,
+                            "size_mb": 0, "types_breakdown": {}, "status": "Disponible bajo demanda"
+                        }
         return {
             "active_brain_id": self.active_brain_id,
             "cerebros": self.cerebros,

@@ -27,6 +27,7 @@ from .memory.vector_store import vector_store
 from .memory.document_indexer import document_indexer
 from .memory.background_learner import background_learner
 from .cerebros.cerebros_manager import cerebros_manager
+from .cerebros.cerebros_manager import scan_context_folder_metrics
 from .personalities.personality_engine import personality_engine
 from .agents.orchestrator import orchestrator
 from .agents.swarm_manager import swarm_manager
@@ -1096,6 +1097,16 @@ async def auto_detect_storage_brains():
         return {"success": True, "detected": detected}
     except Exception as e:
         return {"success": False, "error": str(e)[:200], "detected": []}
+
+@app.get("/api/cerebros/context_metrics")
+async def cerebro_context_metrics(path: str):
+    """Calcula métricas de una carpeta de contexto bajo demanda (no bloquea el event loop)."""
+    import asyncio
+    try:
+        metrics = await asyncio.to_thread(scan_context_folder_metrics, path)
+        return {"success": True, "metrics": metrics}
+    except Exception as e:
+        return {"success": False, "error": str(e)[:200]}
 
 class ActivateBrainRequest(BaseModel):
     brain_id: str
