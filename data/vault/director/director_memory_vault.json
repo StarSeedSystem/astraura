@@ -15,601 +15,18 @@
     "default_master_directive": "Supervisión continua, balance de hardware M1 y enrutamiento inteligente de activos a proyectos.",
     "retention_logs_count": 50
   },
-  "tasks_supervised_count": 521,
-  "verifications_completed_count": 11362,
-  "routings_performed_count": 11360,
-  "active_directive": "Consolidar 24 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
+  "tasks_supervised_count": 690,
+  "verifications_completed_count": 11805,
+  "routings_performed_count": 11803,
+  "active_directive": "MODO DRENAJE ACTIVADO: 22 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 22 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
   "executive_memories": [
     {
-      "id": "mem_dir_1787287395_32",
-      "title": "Autorizaciones orquestadas: 24 tareas críticas",
-      "content": "Consolidar 24 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
-      "category": "authorization_priority",
-      "importance": "high",
-      "timestamp": 1787287395.892179,
-      "tags": [
-        "orquestacion",
-        "prioridad_critica",
-        "autorizacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787287395_90",
-      "title": "Directiva Aplicada: Consolidar 24 tareas de autorizació...",
-      "content": "Se emitió la directriz 'Consolidar 24 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787287395.888063,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787287350_11",
-      "title": "Modo Drenaje de Autorizaciones: 24 pendientes",
-      "content": "MODO DRENAJE ACTIVADO: 24 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 24 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
-      "category": "authorization_drainage",
-      "importance": "critical",
-      "timestamp": 1787287350.6353412,
-      "tags": [
-        "drenaje",
-        "prioridad",
-        "autorizacion",
-        "coordinacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787287350_92",
-      "title": "Directiva Aplicada: MODO DRENAJE ACTIVADO: 24 solicitud...",
-      "content": "Se emitió la directriz 'MODO DRENAJE ACTIVADO: 24 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 24 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.' enrutando tareas hacia oneiros con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787287350.630454,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787287330_22",
-      "title": "Autorizaciones orquestadas: 37 tareas críticas",
-      "content": "Consolidar 37 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hephaestus, hermes, system.",
-      "category": "authorization_priority",
-      "importance": "high",
-      "timestamp": 1787287330.528221,
-      "tags": [
-        "orquestacion",
-        "prioridad_critica",
-        "autorizacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787287330_86",
-      "title": "Directiva Aplicada: Consolidar 37 tareas de autorizació...",
-      "content": "Se emitió la directriz 'Consolidar 37 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hephaestus, hermes, system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787287330.510978,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787287264_47",
-      "title": "Modo Drenaje de Autorizaciones: 37 pendientes",
-      "content": "MODO DRENAJE ACTIVADO: 37 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 37 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
-      "category": "authorization_drainage",
-      "importance": "critical",
-      "timestamp": 1787287264.602047,
-      "tags": [
-        "drenaje",
-        "prioridad",
-        "autorizacion",
-        "coordinacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787287264_84",
-      "title": "Directiva Aplicada: MODO DRENAJE ACTIVADO: 37 solicitud...",
-      "content": "Se emitió la directriz 'MODO DRENAJE ACTIVADO: 37 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 37 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.' enrutando tareas hacia oneiros con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787287264.597008,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787287209_54",
-      "title": "Modo Drenaje de Autorizaciones: 37 pendientes",
-      "content": "MODO DRENAJE ACTIVADO: 37 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 37 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
-      "category": "authorization_drainage",
-      "importance": "critical",
-      "timestamp": 1787287209.635056,
-      "tags": [
-        "drenaje",
-        "prioridad",
-        "autorizacion",
-        "coordinacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787287209_20",
-      "title": "Directiva Aplicada: MODO DRENAJE ACTIVADO: 37 solicitud...",
-      "content": "Se emitió la directriz 'MODO DRENAJE ACTIVADO: 37 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 37 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.' enrutando tareas hacia oneiros con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787287209.630645,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787287192_35",
-      "title": "Autorizaciones orquestadas: 40 tareas críticas",
-      "content": "Consolidar 40 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hephaestus, hermes, system.",
-      "category": "authorization_priority",
-      "importance": "high",
-      "timestamp": 1787287192.823193,
-      "tags": [
-        "orquestacion",
-        "prioridad_critica",
-        "autorizacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787287192_56",
-      "title": "Directiva Aplicada: Consolidar 40 tareas de autorizació...",
-      "content": "Se emitió la directriz 'Consolidar 40 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hephaestus, hermes, system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787287192.8015418,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787287114_69",
-      "title": "Modo Drenaje de Autorizaciones: 40 pendientes",
-      "content": "MODO DRENAJE ACTIVADO: 40 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 40 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
-      "category": "authorization_drainage",
-      "importance": "critical",
-      "timestamp": 1787287114.0581892,
-      "tags": [
-        "drenaje",
-        "prioridad",
-        "autorizacion",
-        "coordinacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787287114_66",
-      "title": "Directiva Aplicada: MODO DRENAJE ACTIVADO: 40 solicitud...",
-      "content": "Se emitió la directriz 'MODO DRENAJE ACTIVADO: 40 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 40 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.' enrutando tareas hacia oneiros con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787287114.050614,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787287093_11",
-      "title": "Autorizaciones orquestadas: 34 tareas críticas",
-      "content": "Consolidar 34 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hephaestus, hermes, system.",
-      "category": "authorization_priority",
-      "importance": "high",
-      "timestamp": 1787287093.670464,
-      "tags": [
-        "orquestacion",
-        "prioridad_critica",
-        "autorizacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787287093_80",
-      "title": "Directiva Aplicada: Consolidar 34 tareas de autorizació...",
-      "content": "Se emitió la directriz 'Consolidar 34 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hephaestus, hermes, system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787287093.6283321,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787287018_92",
-      "title": "Modo Drenaje de Autorizaciones: 34 pendientes",
-      "content": "MODO DRENAJE ACTIVADO: 34 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 34 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
-      "category": "authorization_drainage",
-      "importance": "critical",
-      "timestamp": 1787287018.485274,
-      "tags": [
-        "drenaje",
-        "prioridad",
-        "autorizacion",
-        "coordinacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787287018_73",
-      "title": "Directiva Aplicada: MODO DRENAJE ACTIVADO: 34 solicitud...",
-      "content": "Se emitió la directriz 'MODO DRENAJE ACTIVADO: 34 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 34 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.' enrutando tareas hacia oneiros con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787287018.4830878,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787287001_15",
-      "title": "Autorizaciones orquestadas: 32 tareas críticas",
-      "content": "Consolidar 32 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hephaestus, hermes, system.",
-      "category": "authorization_priority",
-      "importance": "high",
-      "timestamp": 1787287001.467371,
-      "tags": [
-        "orquestacion",
-        "prioridad_critica",
-        "autorizacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787287001_81",
-      "title": "Directiva Aplicada: Consolidar 32 tareas de autorizació...",
-      "content": "Se emitió la directriz 'Consolidar 32 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hephaestus, hermes, system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787287001.377378,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286938_77",
-      "title": "Modo Drenaje de Autorizaciones: 32 pendientes",
-      "content": "MODO DRENAJE ACTIVADO: 32 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 32 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
-      "category": "authorization_drainage",
-      "importance": "critical",
-      "timestamp": 1787286938.0483189,
-      "tags": [
-        "drenaje",
-        "prioridad",
-        "autorizacion",
-        "coordinacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286938_83",
-      "title": "Directiva Aplicada: MODO DRENAJE ACTIVADO: 32 solicitud...",
-      "content": "Se emitió la directriz 'MODO DRENAJE ACTIVADO: 32 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 32 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.' enrutando tareas hacia oneiros con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787286938.043684,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286917_99",
-      "title": "Autorizaciones orquestadas: 25 tareas críticas",
-      "content": "Consolidar 25 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hephaestus, hermes, system.",
-      "category": "authorization_priority",
-      "importance": "high",
-      "timestamp": 1787286917.281151,
-      "tags": [
-        "orquestacion",
-        "prioridad_critica",
-        "autorizacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286917_64",
-      "title": "Directiva Aplicada: Consolidar 25 tareas de autorizació...",
-      "content": "Se emitió la directriz 'Consolidar 25 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hephaestus, hermes, system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787286917.2735941,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286862_44",
-      "title": "Modo Drenaje de Autorizaciones: 25 pendientes",
-      "content": "MODO DRENAJE ACTIVADO: 25 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 25 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
-      "category": "authorization_drainage",
-      "importance": "critical",
-      "timestamp": 1787286862.5029938,
-      "tags": [
-        "drenaje",
-        "prioridad",
-        "autorizacion",
-        "coordinacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286862_37",
-      "title": "Directiva Aplicada: MODO DRENAJE ACTIVADO: 25 solicitud...",
-      "content": "Se emitió la directriz 'MODO DRENAJE ACTIVADO: 25 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 25 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.' enrutando tareas hacia oneiros con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787286862.4987872,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286845_11",
-      "title": "Autorizaciones orquestadas: 27 tareas críticas",
-      "content": "Consolidar 27 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hephaestus, hermes, system.",
-      "category": "authorization_priority",
-      "importance": "high",
-      "timestamp": 1787286845.1442392,
-      "tags": [
-        "orquestacion",
-        "prioridad_critica",
-        "autorizacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286845_96",
-      "title": "Directiva Aplicada: Consolidar 27 tareas de autorizació...",
-      "content": "Se emitió la directriz 'Consolidar 27 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hephaestus, hermes, system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787286845.111019,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286788_67",
-      "title": "Modo Drenaje de Autorizaciones: 27 pendientes",
-      "content": "MODO DRENAJE ACTIVADO: 27 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 27 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
-      "category": "authorization_drainage",
-      "importance": "critical",
-      "timestamp": 1787286788.5920682,
-      "tags": [
-        "drenaje",
-        "prioridad",
-        "autorizacion",
-        "coordinacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286788_53",
-      "title": "Directiva Aplicada: MODO DRENAJE ACTIVADO: 27 solicitud...",
-      "content": "Se emitió la directriz 'MODO DRENAJE ACTIVADO: 27 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 27 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.' enrutando tareas hacia oneiros con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787286788.58723,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286773_39",
-      "title": "Autorizaciones orquestadas: 27 tareas críticas",
-      "content": "Consolidar 27 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hephaestus, hermes, system.",
-      "category": "authorization_priority",
-      "importance": "high",
-      "timestamp": 1787286773.2004108,
-      "tags": [
-        "orquestacion",
-        "prioridad_critica",
-        "autorizacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286772_68",
-      "title": "Directiva Aplicada: Consolidar 27 tareas de autorizació...",
-      "content": "Se emitió la directriz 'Consolidar 27 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hephaestus, hermes, system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787286772.922047,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286721_35",
-      "title": "Modo Drenaje de Autorizaciones: 27 pendientes",
-      "content": "MODO DRENAJE ACTIVADO: 27 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 27 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
-      "category": "authorization_drainage",
-      "importance": "critical",
-      "timestamp": 1787286721.321244,
-      "tags": [
-        "drenaje",
-        "prioridad",
-        "autorizacion",
-        "coordinacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286721_67",
-      "title": "Directiva Aplicada: MODO DRENAJE ACTIVADO: 27 solicitud...",
-      "content": "Se emitió la directriz 'MODO DRENAJE ACTIVADO: 27 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 27 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.' enrutando tareas hacia oneiros con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787286721.315795,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286705_60",
-      "title": "Autorizaciones orquestadas: 27 tareas críticas",
-      "content": "Consolidar 27 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hephaestus, hermes, system.",
-      "category": "authorization_priority",
-      "importance": "high",
-      "timestamp": 1787286705.397501,
-      "tags": [
-        "orquestacion",
-        "prioridad_critica",
-        "autorizacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286705_63",
-      "title": "Directiva Aplicada: Consolidar 27 tareas de autorizació...",
-      "content": "Se emitió la directriz 'Consolidar 27 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hephaestus, hermes, system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787286705.385309,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286645_29",
-      "title": "Modo Drenaje de Autorizaciones: 27 pendientes",
-      "content": "MODO DRENAJE ACTIVADO: 27 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 27 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
-      "category": "authorization_drainage",
-      "importance": "critical",
-      "timestamp": 1787286645.495886,
-      "tags": [
-        "drenaje",
-        "prioridad",
-        "autorizacion",
-        "coordinacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286645_48",
-      "title": "Directiva Aplicada: MODO DRENAJE ACTIVADO: 27 solicitud...",
-      "content": "Se emitió la directriz 'MODO DRENAJE ACTIVADO: 27 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 27 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.' enrutando tareas hacia oneiros con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787286645.482344,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286619_93",
-      "title": "Autorizaciones orquestadas: 26 tareas críticas",
-      "content": "Consolidar 26 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hephaestus, hermes, system.",
-      "category": "authorization_priority",
-      "importance": "high",
-      "timestamp": 1787286619.5709388,
-      "tags": [
-        "orquestacion",
-        "prioridad_critica",
-        "autorizacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286619_46",
-      "title": "Directiva Aplicada: Consolidar 26 tareas de autorizació...",
-      "content": "Se emitió la directriz 'Consolidar 26 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hephaestus, hermes, system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787286619.4971142,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286579_88",
-      "title": "Modo Drenaje de Autorizaciones: 26 pendientes",
-      "content": "MODO DRENAJE ACTIVADO: 26 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 26 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
-      "category": "authorization_drainage",
-      "importance": "critical",
-      "timestamp": 1787286579.841336,
-      "tags": [
-        "drenaje",
-        "prioridad",
-        "autorizacion",
-        "coordinacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286579_41",
-      "title": "Directiva Aplicada: MODO DRENAJE ACTIVADO: 26 solicitud...",
-      "content": "Se emitió la directriz 'MODO DRENAJE ACTIVADO: 26 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 26 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.' enrutando tareas hacia oneiros con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787286579.837185,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286557_71",
-      "title": "Autorizaciones orquestadas: 22 tareas críticas",
-      "content": "Consolidar 22 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hermes, system.",
-      "category": "authorization_priority",
-      "importance": "high",
-      "timestamp": 1787286557.151196,
-      "tags": [
-        "orquestacion",
-        "prioridad_critica",
-        "autorizacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286557_10",
-      "title": "Directiva Aplicada: Consolidar 22 tareas de autorizació...",
-      "content": "Se emitió la directriz 'Consolidar 22 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hermes, system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1787286557.137204,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
-    },
-    {
-      "id": "mem_dir_1787286514_36",
+      "id": "mem_dir_1787291111_31",
       "title": "Modo Drenaje de Autorizaciones: 22 pendientes",
       "content": "MODO DRENAJE ACTIVADO: 22 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 22 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
       "category": "authorization_drainage",
       "importance": "critical",
-      "timestamp": 1787286514.477314,
+      "timestamp": 1787291111.205452,
       "tags": [
         "drenaje",
         "prioridad",
@@ -618,12 +35,12 @@
       ]
     },
     {
-      "id": "mem_dir_1787286514_37",
+      "id": "mem_dir_1787291111_29",
       "title": "Directiva Aplicada: MODO DRENAJE ACTIVADO: 22 solicitud...",
       "content": "Se emitió la directriz 'MODO DRENAJE ACTIVADO: 22 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 22 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.' enrutando tareas hacia oneiros con asignación al proyecto 'proj_astraura_core'.",
       "category": "directive_history",
       "importance": "medium",
-      "timestamp": 1787286514.471151,
+      "timestamp": 1787291111.199269,
       "tags": [
         "directiva_usuario",
         "delegación",
@@ -631,12 +48,12 @@
       ]
     },
     {
-      "id": "mem_dir_1787286483_70",
-      "title": "Autorizaciones orquestadas: 23 tareas críticas",
-      "content": "Consolidar 23 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hermes, system.",
+      "id": "mem_dir_1787291010_76",
+      "title": "Autorizaciones orquestadas: 5 tareas críticas",
+      "content": "Consolidar 5 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
       "category": "authorization_priority",
       "importance": "high",
-      "timestamp": 1787286483.746777,
+      "timestamp": 1787291010.6171799,
       "tags": [
         "orquestacion",
         "prioridad_critica",
@@ -644,12 +61,12 @@
       ]
     },
     {
-      "id": "mem_dir_1787286483_13",
-      "title": "Directiva Aplicada: Consolidar 23 tareas de autorizació...",
-      "content": "Se emitió la directriz 'Consolidar 23 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hermes, system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
+      "id": "mem_dir_1787291010_94",
+      "title": "Directiva Aplicada: Consolidar 5 tareas de autorización...",
+      "content": "Se emitió la directriz 'Consolidar 5 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
       "category": "directive_history",
       "importance": "medium",
-      "timestamp": 1787286483.668448,
+      "timestamp": 1787291010.5582132,
       "tags": [
         "directiva_usuario",
         "delegación",
@@ -657,12 +74,38 @@
       ]
     },
     {
-      "id": "mem_dir_1787286448_48",
-      "title": "Modo Drenaje de Autorizaciones: 23 pendientes",
-      "content": "MODO DRENAJE ACTIVADO: 23 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 23 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
+      "id": "mem_dir_1787290904_43",
+      "title": "Autorizaciones orquestadas: 22 tareas críticas",
+      "content": "Consolidar 22 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
+      "category": "authorization_priority",
+      "importance": "high",
+      "timestamp": 1787290904.354493,
+      "tags": [
+        "orquestacion",
+        "prioridad_critica",
+        "autorizacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290904_67",
+      "title": "Directiva Aplicada: Consolidar 22 tareas de autorizació...",
+      "content": "Se emitió la directriz 'Consolidar 22 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290904.310571,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290784_79",
+      "title": "Modo Drenaje de Autorizaciones: 22 pendientes",
+      "content": "MODO DRENAJE ACTIVADO: 22 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 22 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
       "category": "authorization_drainage",
       "importance": "critical",
-      "timestamp": 1787286448.153916,
+      "timestamp": 1787290784.6760929,
       "tags": [
         "drenaje",
         "prioridad",
@@ -671,12 +114,564 @@
       ]
     },
     {
-      "id": "mem_dir_1787286448_29",
-      "title": "Directiva Aplicada: MODO DRENAJE ACTIVADO: 23 solicitud...",
-      "content": "Se emitió la directriz 'MODO DRENAJE ACTIVADO: 23 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 23 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.' enrutando tareas hacia oneiros con asignación al proyecto 'proj_astraura_core'.",
+      "id": "mem_dir_1787290784_63",
+      "title": "Directiva Aplicada: MODO DRENAJE ACTIVADO: 22 solicitud...",
+      "content": "Se emitió la directriz 'MODO DRENAJE ACTIVADO: 22 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 22 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.' enrutando tareas hacia oneiros con asignación al proyecto 'proj_astraura_core'.",
       "category": "directive_history",
       "importance": "medium",
-      "timestamp": 1787286448.1425111,
+      "timestamp": 1787290784.671016,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290746_61",
+      "title": "Autorizaciones orquestadas: 5 tareas críticas",
+      "content": "Consolidar 5 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
+      "category": "authorization_priority",
+      "importance": "high",
+      "timestamp": 1787290746.987873,
+      "tags": [
+        "orquestacion",
+        "prioridad_critica",
+        "autorizacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290746_70",
+      "title": "Directiva Aplicada: Consolidar 5 tareas de autorización...",
+      "content": "Se emitió la directriz 'Consolidar 5 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290746.9833732,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290682_44",
+      "title": "Autorizaciones orquestadas: 21 tareas críticas",
+      "content": "Consolidar 21 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
+      "category": "authorization_priority",
+      "importance": "high",
+      "timestamp": 1787290682.695203,
+      "tags": [
+        "orquestacion",
+        "prioridad_critica",
+        "autorizacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290682_68",
+      "title": "Directiva Aplicada: Consolidar 21 tareas de autorizació...",
+      "content": "Se emitió la directriz 'Consolidar 21 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290682.678804,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290620_80",
+      "title": "Modo Drenaje de Autorizaciones: 21 pendientes",
+      "content": "MODO DRENAJE ACTIVADO: 21 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 21 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
+      "category": "authorization_drainage",
+      "importance": "critical",
+      "timestamp": 1787290620.233621,
+      "tags": [
+        "drenaje",
+        "prioridad",
+        "autorizacion",
+        "coordinacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290620_64",
+      "title": "Directiva Aplicada: MODO DRENAJE ACTIVADO: 21 solicitud...",
+      "content": "Se emitió la directriz 'MODO DRENAJE ACTIVADO: 21 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 21 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.' enrutando tareas hacia oneiros con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290620.2265742,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290597_50",
+      "title": "Autorizaciones orquestadas: 27 tareas críticas",
+      "content": "Consolidar 27 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hephaestus, system.",
+      "category": "authorization_priority",
+      "importance": "high",
+      "timestamp": 1787290597.79328,
+      "tags": [
+        "orquestacion",
+        "prioridad_critica",
+        "autorizacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290597_47",
+      "title": "Directiva Aplicada: Consolidar 27 tareas de autorizació...",
+      "content": "Se emitió la directriz 'Consolidar 27 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hephaestus, system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290597.748018,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290536_55",
+      "title": "Modo Drenaje de Autorizaciones: 27 pendientes",
+      "content": "MODO DRENAJE ACTIVADO: 27 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 27 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
+      "category": "authorization_drainage",
+      "importance": "critical",
+      "timestamp": 1787290536.8001652,
+      "tags": [
+        "drenaje",
+        "prioridad",
+        "autorizacion",
+        "coordinacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290536_84",
+      "title": "Directiva Aplicada: MODO DRENAJE ACTIVADO: 27 solicitud...",
+      "content": "Se emitió la directriz 'MODO DRENAJE ACTIVADO: 27 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 27 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.' enrutando tareas hacia oneiros con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290536.795601,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290518_17",
+      "title": "Autorizaciones orquestadas: 5 tareas críticas",
+      "content": "Consolidar 5 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
+      "category": "authorization_priority",
+      "importance": "high",
+      "timestamp": 1787290518.717421,
+      "tags": [
+        "orquestacion",
+        "prioridad_critica",
+        "autorizacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290518_14",
+      "title": "Directiva Aplicada: Consolidar 5 tareas de autorización...",
+      "content": "Se emitió la directriz 'Consolidar 5 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290518.7122371,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290499_17",
+      "title": "Autorizaciones orquestadas: 28 tareas críticas",
+      "content": "Consolidar 28 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
+      "category": "authorization_priority",
+      "importance": "high",
+      "timestamp": 1787290499.521013,
+      "tags": [
+        "orquestacion",
+        "prioridad_critica",
+        "autorizacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290499_49",
+      "title": "Directiva Aplicada: Consolidar 28 tareas de autorizació...",
+      "content": "Se emitió la directriz 'Consolidar 28 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290499.514097,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290461_10",
+      "title": "Modo Drenaje de Autorizaciones: 28 pendientes",
+      "content": "MODO DRENAJE ACTIVADO: 28 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 28 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
+      "category": "authorization_drainage",
+      "importance": "critical",
+      "timestamp": 1787290461.336837,
+      "tags": [
+        "drenaje",
+        "prioridad",
+        "autorizacion",
+        "coordinacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290461_80",
+      "title": "Directiva Aplicada: MODO DRENAJE ACTIVADO: 28 solicitud...",
+      "content": "Se emitió la directriz 'MODO DRENAJE ACTIVADO: 28 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 28 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.' enrutando tareas hacia oneiros con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290461.3306081,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290445_28",
+      "title": "Autorizaciones orquestadas: 5 tareas críticas",
+      "content": "Consolidar 5 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
+      "category": "authorization_priority",
+      "importance": "high",
+      "timestamp": 1787290445.8411741,
+      "tags": [
+        "orquestacion",
+        "prioridad_critica",
+        "autorizacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290445_56",
+      "title": "Directiva Aplicada: Consolidar 5 tareas de autorización...",
+      "content": "Se emitió la directriz 'Consolidar 5 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290445.8310661,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290423_96",
+      "title": "Autorizaciones orquestadas: 5 tareas críticas",
+      "content": "Consolidar 5 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
+      "category": "authorization_priority",
+      "importance": "high",
+      "timestamp": 1787290423.790459,
+      "tags": [
+        "orquestacion",
+        "prioridad_critica",
+        "autorizacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290423_42",
+      "title": "Directiva Aplicada: Consolidar 5 tareas de autorización...",
+      "content": "Se emitió la directriz 'Consolidar 5 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290423.785414,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290395_63",
+      "title": "Autorizaciones orquestadas: 5 tareas críticas",
+      "content": "Consolidar 5 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
+      "category": "authorization_priority",
+      "importance": "high",
+      "timestamp": 1787290395.672975,
+      "tags": [
+        "orquestacion",
+        "prioridad_critica",
+        "autorizacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290395_67",
+      "title": "Directiva Aplicada: Consolidar 5 tareas de autorización...",
+      "content": "Se emitió la directriz 'Consolidar 5 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290395.667212,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290375_71",
+      "title": "Autorizaciones orquestadas: 21 tareas críticas",
+      "content": "Consolidar 21 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
+      "category": "authorization_priority",
+      "importance": "high",
+      "timestamp": 1787290375.918447,
+      "tags": [
+        "orquestacion",
+        "prioridad_critica",
+        "autorizacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290375_76",
+      "title": "Directiva Aplicada: Consolidar 21 tareas de autorizació...",
+      "content": "Se emitió la directriz 'Consolidar 21 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290375.914248,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290350_29",
+      "title": "Modo Drenaje de Autorizaciones: 21 pendientes",
+      "content": "MODO DRENAJE ACTIVADO: 21 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 21 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
+      "category": "authorization_drainage",
+      "importance": "critical",
+      "timestamp": 1787290350.604766,
+      "tags": [
+        "drenaje",
+        "prioridad",
+        "autorizacion",
+        "coordinacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290350_80",
+      "title": "Directiva Aplicada: MODO DRENAJE ACTIVADO: 21 solicitud...",
+      "content": "Se emitió la directriz 'MODO DRENAJE ACTIVADO: 21 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 21 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.' enrutando tareas hacia oneiros con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290350.6013288,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290336_17",
+      "title": "Autorizaciones orquestadas: 5 tareas críticas",
+      "content": "Consolidar 5 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
+      "category": "authorization_priority",
+      "importance": "high",
+      "timestamp": 1787290336.637735,
+      "tags": [
+        "orquestacion",
+        "prioridad_critica",
+        "autorizacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290336_78",
+      "title": "Directiva Aplicada: Consolidar 5 tareas de autorización...",
+      "content": "Se emitió la directriz 'Consolidar 5 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290336.631742,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290312_38",
+      "title": "Autorizaciones orquestadas: 21 tareas críticas",
+      "content": "Consolidar 21 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
+      "category": "authorization_priority",
+      "importance": "high",
+      "timestamp": 1787290312.8593678,
+      "tags": [
+        "orquestacion",
+        "prioridad_critica",
+        "autorizacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290312_57",
+      "title": "Directiva Aplicada: Consolidar 21 tareas de autorizació...",
+      "content": "Se emitió la directriz 'Consolidar 21 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290312.854408,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290284_48",
+      "title": "Modo Drenaje de Autorizaciones: 21 pendientes",
+      "content": "MODO DRENAJE ACTIVADO: 21 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 21 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
+      "category": "authorization_drainage",
+      "importance": "critical",
+      "timestamp": 1787290284.881938,
+      "tags": [
+        "drenaje",
+        "prioridad",
+        "autorizacion",
+        "coordinacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290284_73",
+      "title": "Directiva Aplicada: MODO DRENAJE ACTIVADO: 21 solicitud...",
+      "content": "Se emitió la directriz 'MODO DRENAJE ACTIVADO: 21 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 21 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.' enrutando tareas hacia oneiros con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290284.8790998,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290261_37",
+      "title": "Autorizaciones orquestadas: 5 tareas críticas",
+      "content": "Consolidar 5 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
+      "category": "authorization_priority",
+      "importance": "high",
+      "timestamp": 1787290261.8201432,
+      "tags": [
+        "orquestacion",
+        "prioridad_critica",
+        "autorizacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290261_17",
+      "title": "Directiva Aplicada: Consolidar 5 tareas de autorización...",
+      "content": "Se emitió la directriz 'Consolidar 5 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290261.81592,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290239_83",
+      "title": "Autorizaciones orquestadas: 26 tareas críticas",
+      "content": "Consolidar 26 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hermes, system.",
+      "category": "authorization_priority",
+      "importance": "high",
+      "timestamp": 1787290239.723634,
+      "tags": [
+        "orquestacion",
+        "prioridad_critica",
+        "autorizacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290239_60",
+      "title": "Directiva Aplicada: Consolidar 26 tareas de autorizació...",
+      "content": "Se emitió la directriz 'Consolidar 26 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hermes, system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290239.6569421,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290203_17",
+      "title": "Modo Drenaje de Autorizaciones: 26 pendientes",
+      "content": "MODO DRENAJE ACTIVADO: 26 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 26 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
+      "category": "authorization_drainage",
+      "importance": "critical",
+      "timestamp": 1787290203.908232,
+      "tags": [
+        "drenaje",
+        "prioridad",
+        "autorizacion",
+        "coordinacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290203_49",
+      "title": "Directiva Aplicada: MODO DRENAJE ACTIVADO: 26 solicitud...",
+      "content": "Se emitió la directriz 'MODO DRENAJE ACTIVADO: 26 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 26 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.' enrutando tareas hacia oneiros con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290203.897561,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290166_60",
+      "title": "Autorizaciones orquestadas: 5 tareas críticas",
+      "content": "Consolidar 5 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
+      "category": "authorization_priority",
+      "importance": "high",
+      "timestamp": 1787290166.7437131,
+      "tags": [
+        "orquestacion",
+        "prioridad_critica",
+        "autorizacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290166_37",
+      "title": "Directiva Aplicada: Consolidar 5 tareas de autorización...",
+      "content": "Se emitió la directriz 'Consolidar 5 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290166.738985,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290142_50",
+      "title": "Autorizaciones orquestadas: 5 tareas críticas",
+      "content": "Consolidar 5 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
+      "category": "authorization_priority",
+      "importance": "high",
+      "timestamp": 1787290142.215133,
+      "tags": [
+        "orquestacion",
+        "prioridad_critica",
+        "autorizacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1787290142_61",
+      "title": "Directiva Aplicada: Consolidar 5 tareas de autorización...",
+      "content": "Se emitió la directriz 'Consolidar 5 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1787290142.208106,
       "tags": [
         "directiva_usuario",
         "delegación",
@@ -686,16 +681,36 @@
   ],
   "decision_history": [
     {
-      "id": "dec_1787287395_784",
-      "timestamp": 1787287395.886094,
-      "action": "Emisión de Directiva: 'Consolidar 24 tareas de autorización recién conced...'",
-      "directive": "Consolidar 24 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
+      "id": "dec_renew_1787291146_85",
+      "timestamp": 1787291146.368033,
+      "action": "Renovación Inteligente de Tarea: athena",
+      "agent_id": "athena",
+      "target_project": "proj_astraura_core",
+      "reasoning": "Tarea anterior 'Calibración de Sensores de Entorno y Resonancia Acústica' auditada (100%). Renovando automáticamente con 'Auditoría Continua de Sensores Físicos, Térmica M1 y Batería'.",
+      "status": "renewed"
+    },
+    {
+      "id": "route_1787291146_921",
+      "timestamp": 1787291146.3612769,
+      "action": "Enrutamiento & Adjunto: 'Calibración de Sensores de Entorno y Resonancia Acústica'",
+      "agent_id": "athena",
+      "target_project": "proj_astraura_core",
+      "target_cerebro": "brain_athena",
+      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/telemetry",
+      "reasoning": "Entregable de athena vinculado con éxito a proj_astraura_core, brain_athena y carpeta local.",
+      "status": "attached"
+    },
+    {
+      "id": "dec_1787291111_423",
+      "timestamp": 1787291111.197116,
+      "action": "Emisión de Directiva: 'MODO DRENAJE ACTIVADO: 22 solicitudes pendientes s...'",
+      "directive": "MODO DRENAJE ACTIVADO: 22 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 22 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
       "dispatched_count": 1,
       "dispatched_actions": [
         {
-          "agent": "daedalus",
-          "task_title": "Orquestación General: Consolidar 24 tareas de autorización recién c...",
-          "area": "area_project_management"
+          "agent": "oneiros",
+          "task_title": "Forja Visual: MODO DRENAJE ACTIVADO: 22 solicitudes pendien...",
+          "area": "area_creative_synthesis"
         }
       ],
       "target_project": "proj_astraura_core",
@@ -703,118 +718,18 @@
       "status": "in_progress"
     },
     {
-      "id": "dec_renew_1787287392_27",
-      "timestamp": 1787287392.789356,
-      "action": "Renovación Inteligente de Tarea: oneiros",
-      "agent_id": "oneiros",
-      "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior 'Forja Visual: MODO DRENAJE ACTIVADO: 24 solicitudes pendien...' auditada (100%). Renovando automáticamente con 'Generación de Mallas y Texturas Dinámicas para la Bóveda de Creaciones'.",
-      "status": "renewed"
-    },
-    {
-      "id": "route_1787287392_487",
-      "timestamp": 1787287392.782184,
-      "action": "Enrutamiento & Adjunto: 'Forja Visual: MODO DRENAJE ACTIVADO: 24 solicitudes pendien...'",
-      "agent_id": "oneiros",
-      "target_project": "proj_astraura_core",
-      "target_cerebro": "brain_oneiros",
-      "target_folder": "/Users/alex/Documents/IA 1.58 bit/frontend/src/components",
-      "reasoning": "Entregable de oneiros vinculado con éxito a proj_astraura_core, brain_oneiros y carpeta local.",
-      "status": "attached"
-    },
-    {
-      "id": "dec_renew_1787287372_53",
-      "timestamp": 1787287372.678561,
-      "action": "Renovación Inteligente de Tarea: hermes",
-      "agent_id": "hermes",
-      "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient' auditada (100%). Renovando automáticamente con 'Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b'.",
-      "status": "renewed"
-    },
-    {
-      "id": "route_1787287372_940",
-      "timestamp": 1787287372.672748,
-      "action": "Enrutamiento & Adjunto: '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient'",
-      "agent_id": "hermes",
-      "target_project": "proj_astraura_core",
-      "target_cerebro": "brain_hermes",
-      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/research",
-      "reasoning": "Entregable de hermes vinculado con éxito a proj_astraura_core, brain_hermes y carpeta local.",
-      "status": "attached"
-    },
-    {
-      "id": "dec_renew_1787287372_78",
-      "timestamp": 1787287372.6665092,
-      "action": "Renovación Inteligente de Tarea: hermes",
-      "agent_id": "hermes",
-      "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient' auditada (100%). Renovando automáticamente con 'Mapeo de Referencias Académicas y Citaciones para StarSeed OS'.",
-      "status": "renewed"
-    },
-    {
-      "id": "route_1787287372_967",
-      "timestamp": 1787287372.659347,
-      "action": "Enrutamiento & Adjunto: '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient'",
-      "agent_id": "hermes",
-      "target_project": "proj_astraura_core",
-      "target_cerebro": "brain_hermes",
-      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/research",
-      "reasoning": "Entregable de hermes vinculado con éxito a proj_astraura_core, brain_hermes y carpeta local.",
-      "status": "attached"
-    },
-    {
-      "id": "dec_renew_1787287372_67",
-      "timestamp": 1787287372.6529229,
-      "action": "Renovación Inteligente de Tarea: hermes",
-      "agent_id": "hermes",
-      "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient' auditada (100%). Renovando automáticamente con 'Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b'.",
-      "status": "renewed"
-    },
-    {
-      "id": "route_1787287372_893",
-      "timestamp": 1787287372.646162,
-      "action": "Enrutamiento & Adjunto: '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient'",
-      "agent_id": "hermes",
-      "target_project": "proj_astraura_core",
-      "target_cerebro": "brain_hermes",
-      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/research",
-      "reasoning": "Entregable de hermes vinculado con éxito a proj_astraura_core, brain_hermes y carpeta local.",
-      "status": "attached"
-    },
-    {
-      "id": "dec_renew_1787287372_89",
-      "timestamp": 1787287372.64155,
-      "action": "Renovación Inteligente de Tarea: hermes",
-      "agent_id": "hermes",
-      "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient' auditada (100%). Renovando automáticamente con 'Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b'.",
-      "status": "renewed"
-    },
-    {
-      "id": "route_1787287372_733",
-      "timestamp": 1787287372.630395,
-      "action": "Enrutamiento & Adjunto: '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient'",
-      "agent_id": "hermes",
-      "target_project": "proj_astraura_core",
-      "target_cerebro": "brain_hermes",
-      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/research",
-      "reasoning": "Entregable de hermes vinculado con éxito a proj_astraura_core, brain_hermes y carpeta local.",
-      "status": "attached"
-    },
-    {
-      "id": "dec_renew_1787287372_71",
-      "timestamp": 1787287372.626571,
+      "id": "dec_renew_1787291111_80",
+      "timestamp": 1787291111.180726,
       "action": "Renovación Inteligente de Tarea: daedalus",
       "agent_id": "daedalus",
       "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior 'Orquestación General: Consolidar 37 tareas de autorización recién c...' auditada (100%). Renovando automáticamente con 'Sincronización de Versiones y Diffing de Entregables Multi-Agente'.",
+      "reasoning": "Tarea anterior 'Sincronización de Versiones y Diffing de Entregables Multi-Agente' auditada (100%). Renovando automáticamente con 'Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana'.",
       "status": "renewed"
     },
     {
-      "id": "route_1787287372_335",
-      "timestamp": 1787287372.6141472,
-      "action": "Enrutamiento & Adjunto: 'Orquestación General: Consolidar 37 tareas de autorización recién c...'",
+      "id": "route_1787291111_909",
+      "timestamp": 1787291111.173762,
+      "action": "Enrutamiento & Adjunto: 'Sincronización de Versiones y Diffing de Entregables Multi-Agente'",
       "agent_id": "daedalus",
       "target_project": "proj_astraura_core",
       "target_cerebro": "brain_genesis",
@@ -823,68 +738,88 @@
       "status": "attached"
     },
     {
-      "id": "dec_renew_1787287367_59",
-      "timestamp": 1787287367.603554,
-      "action": "Renovación Inteligente de Tarea: hephaestus",
-      "agent_id": "hephaestus",
+      "id": "dec_renew_1787291111_29",
+      "timestamp": 1787291111.1638558,
+      "action": "Renovación Inteligente de Tarea: oneiros",
+      "agent_id": "oneiros",
       "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob' auditada (100%). Renovando automáticamente con 'Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM'.",
+      "reasoning": "Tarea anterior 'Generación de Mallas y Texturas Dinámicas para la Bóveda de Creaciones' auditada (100%). Renovando automáticamente con 'Síntesis de Shader Procedural WebGL Reactivo al Sensorium Ambiental'.",
       "status": "renewed"
     },
     {
-      "id": "route_1787287367_876",
-      "timestamp": 1787287367.595816,
-      "action": "Enrutamiento & Adjunto: '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob'",
-      "agent_id": "hephaestus",
+      "id": "route_1787291111_895",
+      "timestamp": 1787291111.152406,
+      "action": "Enrutamiento & Adjunto: 'Generación de Mallas y Texturas Dinámicas para la Bóveda de Creaciones'",
+      "agent_id": "oneiros",
       "target_project": "proj_astraura_core",
-      "target_cerebro": "brain_hephaestus",
-      "target_folder": "/Users/alex/Documents/IA 1.58 bit/backend/app",
-      "reasoning": "Entregable de hephaestus vinculado con éxito a proj_astraura_core, brain_hephaestus y carpeta local.",
+      "target_cerebro": "brain_oneiros",
+      "target_folder": "/Users/alex/Documents/IA 1.58 bit/frontend/src/components",
+      "reasoning": "Entregable de oneiros vinculado con éxito a proj_astraura_core, brain_oneiros y carpeta local.",
       "status": "attached"
     },
     {
-      "id": "dec_renew_1787287367_42",
-      "timestamp": 1787287367.5905879,
-      "action": "Renovación Inteligente de Tarea: hephaestus",
-      "agent_id": "hephaestus",
+      "id": "dec_renew_1787291111_44",
+      "timestamp": 1787291111.144877,
+      "action": "Renovación Inteligente de Tarea: athena",
+      "agent_id": "athena",
       "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob' auditada (100%). Renovando automáticamente con 'Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b'.",
+      "reasoning": "Tarea anterior 'Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1' auditada (100%). Renovando automáticamente con 'Calibración de Sensores de Entorno y Resonancia Acústica'.",
       "status": "renewed"
     },
     {
-      "id": "route_1787287367_546",
-      "timestamp": 1787287367.582494,
-      "action": "Enrutamiento & Adjunto: '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob'",
-      "agent_id": "hephaestus",
+      "id": "route_1787291111_862",
+      "timestamp": 1787291111.129793,
+      "action": "Enrutamiento & Adjunto: 'Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1'",
+      "agent_id": "athena",
       "target_project": "proj_astraura_core",
-      "target_cerebro": "brain_hephaestus",
-      "target_folder": "/Users/alex/Documents/IA 1.58 bit/backend/app",
-      "reasoning": "Entregable de hephaestus vinculado con éxito a proj_astraura_core, brain_hephaestus y carpeta local.",
+      "target_cerebro": "brain_athena",
+      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/telemetry",
+      "reasoning": "Entregable de athena vinculado con éxito a proj_astraura_core, brain_athena y carpeta local.",
       "status": "attached"
     },
     {
-      "id": "dec_renew_1787287367_78",
-      "timestamp": 1787287367.576715,
-      "action": "Renovación Inteligente de Tarea: hephaestus",
-      "agent_id": "hephaestus",
+      "id": "dec_renew_1787291100_57",
+      "timestamp": 1787291100.957571,
+      "action": "Renovación Inteligente de Tarea: athena",
+      "agent_id": "athena",
       "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob' auditada (100%). Renovando automáticamente con 'Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b'.",
+      "reasoning": "Tarea anterior 'Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana' auditada (100%). Renovando automáticamente con 'Calibración de Sensores de Entorno y Resonancia Acústica'.",
       "status": "renewed"
     },
     {
-      "id": "route_1787287367_889",
-      "timestamp": 1787287367.56454,
-      "action": "Enrutamiento & Adjunto: '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob'",
-      "agent_id": "hephaestus",
+      "id": "route_1787291100_154",
+      "timestamp": 1787291100.946383,
+      "action": "Enrutamiento & Adjunto: 'Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana'",
+      "agent_id": "athena",
       "target_project": "proj_astraura_core",
-      "target_cerebro": "brain_hephaestus",
-      "target_folder": "/Users/alex/Documents/IA 1.58 bit/backend/app",
-      "reasoning": "Entregable de hephaestus vinculado con éxito a proj_astraura_core, brain_hephaestus y carpeta local.",
+      "target_cerebro": "brain_athena",
+      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/telemetry",
+      "reasoning": "Entregable de athena vinculado con éxito a proj_astraura_core, brain_athena y carpeta local.",
       "status": "attached"
     },
     {
-      "id": "dec_renew_1787287357_72",
-      "timestamp": 1787287357.538982,
+      "id": "dec_renew_1787291095_26",
+      "timestamp": 1787291095.839099,
+      "action": "Renovación Inteligente de Tarea: daedalus",
+      "agent_id": "daedalus",
+      "target_project": "proj_astraura_core",
+      "reasoning": "Tarea anterior 'Sincronización de Versiones y Diffing de Entregables Multi-Agente' auditada (100%). Renovando automáticamente con 'Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits'.",
+      "status": "renewed"
+    },
+    {
+      "id": "route_1787291095_391",
+      "timestamp": 1787291095.830147,
+      "action": "Enrutamiento & Adjunto: 'Sincronización de Versiones y Diffing de Entregables Multi-Agente'",
+      "agent_id": "daedalus",
+      "target_project": "proj_astraura_core",
+      "target_cerebro": "brain_genesis",
+      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/vault/projects",
+      "reasoning": "Entregable de daedalus vinculado con éxito a proj_astraura_core, brain_genesis y carpeta local.",
+      "status": "attached"
+    },
+    {
+      "id": "dec_renew_1787291069_28",
+      "timestamp": 1787291069.216341,
       "action": "Renovación Inteligente de Tarea: oneiros",
       "agent_id": "oneiros",
       "target_project": "proj_astraura_core",
@@ -892,8 +827,8 @@
       "status": "renewed"
     },
     {
-      "id": "route_1787287357_387",
-      "timestamp": 1787287357.52607,
+      "id": "route_1787291069_118",
+      "timestamp": 1787291069.196882,
       "action": "Enrutamiento & Adjunto: 'Forja de Prototipos de Interfaces Intuitivas de Resonancia Sináptica'",
       "agent_id": "oneiros",
       "target_project": "proj_astraura_core",
@@ -903,112 +838,98 @@
       "status": "attached"
     },
     {
-      "id": "dec_1787287350_777",
-      "timestamp": 1787287350.627341,
-      "action": "Emisión de Directiva: 'MODO DRENAJE ACTIVADO: 24 solicitudes pendientes s...'",
-      "directive": "MODO DRENAJE ACTIVADO: 24 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 24 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
-      "dispatched_count": 1,
-      "dispatched_actions": [
-        {
-          "agent": "oneiros",
-          "task_title": "Forja Visual: MODO DRENAJE ACTIVADO: 24 solicitudes pendien...",
-          "area": "area_creative_synthesis"
-        }
-      ],
+      "id": "dec_renew_1787291069_41",
+      "timestamp": 1787291069.1855948,
+      "action": "Renovación Inteligente de Tarea: daedalus",
+      "agent_id": "daedalus",
       "target_project": "proj_astraura_core",
-      "reasoning": "El Director Metis descompuso la directriz y activó 1 agentes del enjambre con prioridades calibradas.",
-      "status": "in_progress"
-    },
-    {
-      "id": "dec_renew_1787287350_89",
-      "timestamp": 1787287350.617034,
-      "action": "Renovación Inteligente de Tarea: hermes",
-      "agent_id": "hermes",
-      "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior 'Mapeo de Referencias Académicas y Citaciones para StarSeed OS' auditada (100%). Renovando automáticamente con 'Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b'.",
+      "reasoning": "Tarea anterior 'Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits' auditada (100%). Renovando automáticamente con 'Sincronización de Versiones y Diffing de Entregables Multi-Agente'.",
       "status": "renewed"
     },
     {
-      "id": "route_1787287350_167",
-      "timestamp": 1787287350.613108,
-      "action": "Enrutamiento & Adjunto: 'Mapeo de Referencias Académicas y Citaciones para StarSeed OS'",
-      "agent_id": "hermes",
+      "id": "route_1787291069_443",
+      "timestamp": 1787291069.173049,
+      "action": "Enrutamiento & Adjunto: 'Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits'",
+      "agent_id": "daedalus",
       "target_project": "proj_astraura_core",
-      "target_cerebro": "brain_hermes",
-      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/research",
-      "reasoning": "Entregable de hermes vinculado con éxito a proj_astraura_core, brain_hermes y carpeta local.",
+      "target_cerebro": "brain_genesis",
+      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/vault/projects",
+      "reasoning": "Entregable de daedalus vinculado con éxito a proj_astraura_core, brain_genesis y carpeta local.",
       "status": "attached"
     },
     {
-      "id": "dec_renew_1787287350_83",
-      "timestamp": 1787287350.6106958,
-      "action": "Renovación Inteligente de Tarea: hermes",
-      "agent_id": "hermes",
+      "id": "dec_renew_1787291058_87",
+      "timestamp": 1787291058.357365,
+      "action": "Renovación Inteligente de Tarea: athena",
+      "agent_id": "athena",
       "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior 'Síntesis Comparativa de Arquitecturas: Transformers vs Ternary BitNet' auditada (100%). Renovando automáticamente con 'Mapeo de Referencias Académicas y Citaciones para StarSeed OS'.",
+      "reasoning": "Tarea anterior 'Calibración de Sensores de Entorno y Resonancia Acústica' auditada (100%). Renovando automáticamente con 'Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana'.",
       "status": "renewed"
     },
     {
-      "id": "route_1787287350_245",
-      "timestamp": 1787287350.604699,
-      "action": "Enrutamiento & Adjunto: 'Síntesis Comparativa de Arquitecturas: Transformers vs Ternary BitNet'",
-      "agent_id": "hermes",
+      "id": "route_1787291058_280",
+      "timestamp": 1787291058.348587,
+      "action": "Enrutamiento & Adjunto: 'Calibración de Sensores de Entorno y Resonancia Acústica'",
+      "agent_id": "athena",
       "target_project": "proj_astraura_core",
-      "target_cerebro": "brain_hermes",
-      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/research",
-      "reasoning": "Entregable de hermes vinculado con éxito a proj_astraura_core, brain_hermes y carpeta local.",
+      "target_cerebro": "brain_athena",
+      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/telemetry",
+      "reasoning": "Entregable de athena vinculado con éxito a proj_astraura_core, brain_athena y carpeta local.",
       "status": "attached"
     },
     {
-      "id": "dec_renew_1787287350_28",
-      "timestamp": 1787287350.602113,
-      "action": "Renovación Inteligente de Tarea: hephaestus",
-      "agent_id": "hephaestus",
+      "id": "dec_renew_1787291053_58",
+      "timestamp": 1787291053.186549,
+      "action": "Renovación Inteligente de Tarea: daedalus",
+      "agent_id": "daedalus",
       "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior 'Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b' auditada (100%). Renovando automáticamente con 'Compactación de Huella de Memoria RAM para Modelos de 1.58 Bits'.",
+      "reasoning": "Tarea anterior 'Orquestación General: Consolidar 5 tareas de autorización recién co...' auditada (100%). Renovando automáticamente con 'Sincronización de Versiones y Diffing de Entregables Multi-Agente'.",
       "status": "renewed"
     },
     {
-      "id": "route_1787287350_710",
-      "timestamp": 1787287350.5924459,
-      "action": "Enrutamiento & Adjunto: 'Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b'",
-      "agent_id": "hephaestus",
+      "id": "route_1787291053_128",
+      "timestamp": 1787291053.171204,
+      "action": "Enrutamiento & Adjunto: 'Orquestación General: Consolidar 5 tareas de autorización recién co...'",
+      "agent_id": "daedalus",
       "target_project": "proj_astraura_core",
-      "target_cerebro": "brain_hephaestus",
-      "target_folder": "/Users/alex/Documents/IA 1.58 bit/backend/app",
-      "reasoning": "Entregable de hephaestus vinculado con éxito a proj_astraura_core, brain_hephaestus y carpeta local.",
+      "target_cerebro": "brain_genesis",
+      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/vault/projects",
+      "reasoning": "Entregable de daedalus vinculado con éxito a proj_astraura_core, brain_genesis y carpeta local.",
       "status": "attached"
     },
     {
-      "id": "dec_1787287330_863",
-      "timestamp": 1787287330.467027,
-      "action": "Emisión de Directiva: 'Consolidar 37 tareas de autorización recién conced...'",
-      "directive": "Consolidar 37 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: hephaestus, hermes, system.",
-      "dispatched_count": 1,
-      "dispatched_actions": [
-        {
-          "agent": "daedalus",
-          "task_title": "Orquestación General: Consolidar 37 tareas de autorización recién c...",
-          "area": "area_project_management"
-        }
-      ],
+      "id": "dec_renew_1787291025_72",
+      "timestamp": 1787291025.5778902,
+      "action": "Renovación Inteligente de Tarea: daedalus",
+      "agent_id": "daedalus",
       "target_project": "proj_astraura_core",
-      "reasoning": "El Director Metis descompuso la directriz y activó 1 agentes del enjambre con prioridades calibradas.",
-      "status": "in_progress"
+      "reasoning": "Tarea anterior 'Sincronización de Versiones y Diffing de Entregables Multi-Agente' auditada (100%). Renovando automáticamente con 'Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits'.",
+      "status": "renewed"
     },
     {
-      "id": "dec_renew_1787287315_12",
-      "timestamp": 1787287315.0355752,
+      "id": "route_1787291025_484",
+      "timestamp": 1787291025.566731,
+      "action": "Enrutamiento & Adjunto: 'Sincronización de Versiones y Diffing de Entregables Multi-Agente'",
+      "agent_id": "daedalus",
+      "target_project": "proj_astraura_core",
+      "target_cerebro": "brain_genesis",
+      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/vault/projects",
+      "reasoning": "Entregable de daedalus vinculado con éxito a proj_astraura_core, brain_genesis y carpeta local.",
+      "status": "attached"
+    },
+    {
+      "id": "dec_renew_1787291025_45",
+      "timestamp": 1787291025.549439,
       "action": "Renovación Inteligente de Tarea: oneiros",
       "agent_id": "oneiros",
       "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior 'Forja Visual: MODO DRENAJE ACTIVADO: 37 solicitudes pendien...' auditada (100%). Renovando automáticamente con 'Forja de Prototipos de Interfaces Intuitivas de Resonancia Sináptica'.",
+      "reasoning": "Tarea anterior 'Auto-Reactivación: Forja de Shaders & Prototipos Visuales' auditada (100%). Renovando automáticamente con 'Forja de Prototipos de Interfaces Intuitivas de Resonancia Sináptica'.",
       "status": "renewed"
     },
     {
-      "id": "route_1787287315_686",
-      "timestamp": 1787287315.028852,
-      "action": "Enrutamiento & Adjunto: 'Forja Visual: MODO DRENAJE ACTIVADO: 37 solicitudes pendien...'",
+      "id": "route_1787291025_860",
+      "timestamp": 1787291025.536365,
+      "action": "Enrutamiento & Adjunto: 'Auto-Reactivación: Forja de Shaders & Prototipos Visuales'",
       "agent_id": "oneiros",
       "target_project": "proj_astraura_core",
       "target_cerebro": "brain_oneiros",
@@ -1017,17 +938,74 @@
       "status": "attached"
     },
     {
-      "id": "dec_renew_1787287310_78",
-      "timestamp": 1787287310.016501,
-      "action": "Renovación Inteligente de Tarea: hephaestus",
-      "agent_id": "hephaestus",
+      "id": "dec_renew_1787291014_74",
+      "timestamp": 1787291014.8014138,
+      "action": "Renovación Inteligente de Tarea: athena",
+      "agent_id": "athena",
       "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior 'Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM' auditada (100%). Renovando automáticamente con 'Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b'.",
+      "reasoning": "Tarea anterior 'Auditoría Continua de Sensores Físicos, Térmica M1 y Batería' auditada (100%). Renovando automáticamente con 'Calibración de Sensores de Entorno y Resonancia Acústica'.",
       "status": "renewed"
     },
     {
-      "id": "route_1787287310_835",
-      "timestamp": 1787287310.010318,
+      "id": "route_1787291014_828",
+      "timestamp": 1787291014.7893178,
+      "action": "Enrutamiento & Adjunto: 'Auditoría Continua de Sensores Físicos, Térmica M1 y Batería'",
+      "agent_id": "athena",
+      "target_project": "proj_astraura_core",
+      "target_cerebro": "brain_athena",
+      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/telemetry",
+      "reasoning": "Entregable de athena vinculado con éxito a proj_astraura_core, brain_athena y carpeta local.",
+      "status": "attached"
+    },
+    {
+      "id": "dec_renew_1787291014_73",
+      "timestamp": 1787291014.7847638,
+      "action": "Renovación Inteligente de Tarea: daedalus",
+      "agent_id": "daedalus",
+      "target_project": "proj_astraura_core",
+      "reasoning": "Tarea anterior 'Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits' auditada (100%). Renovando automáticamente con 'Sincronización de Versiones y Diffing de Entregables Multi-Agente'.",
+      "status": "renewed"
+    },
+    {
+      "id": "route_1787291014_139",
+      "timestamp": 1787291014.7730958,
+      "action": "Enrutamiento & Adjunto: 'Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits'",
+      "agent_id": "daedalus",
+      "target_project": "proj_astraura_core",
+      "target_cerebro": "brain_genesis",
+      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/vault/projects",
+      "reasoning": "Entregable de daedalus vinculado con éxito a proj_astraura_core, brain_genesis y carpeta local.",
+      "status": "attached"
+    },
+    {
+      "id": "dec_1787291010_141",
+      "timestamp": 1787291010.5429919,
+      "action": "Emisión de Directiva: 'Consolidar 5 tareas de autorización recién concedi...'",
+      "directive": "Consolidar 5 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
+      "dispatched_count": 1,
+      "dispatched_actions": [
+        {
+          "agent": "daedalus",
+          "task_title": "Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "area": "area_project_management"
+        }
+      ],
+      "target_project": "proj_astraura_core",
+      "reasoning": "El Director Metis descompuso la directriz y activó 1 agentes del enjambre con prioridades calibradas.",
+      "status": "in_progress"
+    },
+    {
+      "id": "dec_renew_1787291009_39",
+      "timestamp": 1787291009.4312582,
+      "action": "Renovación Inteligente de Tarea: hephaestus",
+      "agent_id": "hephaestus",
+      "target_project": "proj_astraura_core",
+      "reasoning": "Tarea anterior 'Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM' auditada (100%). Renovando automáticamente con 'Compactación de Huella de Memoria RAM para Modelos de 1.58 Bits'.",
+      "status": "renewed"
+    },
+    {
+      "id": "route_1787291009_528",
+      "timestamp": 1787291009.421026,
       "action": "Enrutamiento & Adjunto: 'Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM'",
       "agent_id": "hephaestus",
       "target_project": "proj_astraura_core",
@@ -1037,701 +1015,224 @@
       "status": "attached"
     },
     {
-      "id": "dec_renew_1787287309_96",
-      "timestamp": 1787287309.9979079,
-      "action": "Renovación Inteligente de Tarea: hermes",
-      "agent_id": "hermes",
+      "id": "dec_renew_1787290983_54",
+      "timestamp": 1787290983.493707,
+      "action": "Renovación Inteligente de Tarea: daedalus",
+      "agent_id": "daedalus",
       "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior 'Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b' auditada (100%). Renovando automáticamente con 'Síntesis Comparativa de Arquitecturas: Transformers vs Ternary BitNet'.",
+      "reasoning": "Tarea anterior 'Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits' auditada (100%). Renovando automáticamente con 'Sincronización de Versiones y Diffing de Entregables Multi-Agente'.",
       "status": "renewed"
     },
     {
-      "id": "route_1787287309_189",
-      "timestamp": 1787287309.984788,
-      "action": "Enrutamiento & Adjunto: 'Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b'",
-      "agent_id": "hermes",
+      "id": "route_1787290983_825",
+      "timestamp": 1787290983.485348,
+      "action": "Enrutamiento & Adjunto: 'Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits'",
+      "agent_id": "daedalus",
       "target_project": "proj_astraura_core",
-      "target_cerebro": "brain_hermes",
-      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/research",
-      "reasoning": "Entregable de hermes vinculado con éxito a proj_astraura_core, brain_hermes y carpeta local.",
+      "target_cerebro": "brain_genesis",
+      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/vault/projects",
+      "reasoning": "Entregable de daedalus vinculado con éxito a proj_astraura_core, brain_genesis y carpeta local.",
       "status": "attached"
     },
     {
-      "id": "dec_renew_1787287309_43",
-      "timestamp": 1787287309.97212,
-      "action": "Renovación Inteligente de Tarea: hermes",
-      "agent_id": "hermes",
+      "id": "dec_renew_1787290972_14",
+      "timestamp": 1787290972.9576478,
+      "action": "Renovación Inteligente de Tarea: daedalus",
+      "agent_id": "daedalus",
       "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior 'Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b' auditada (100%). Renovando automáticamente con 'Mapeo de Referencias Académicas y Citaciones para StarSeed OS'.",
+      "reasoning": "Tarea anterior 'Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana' auditada (100%). Renovando automáticamente con 'Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits'.",
       "status": "renewed"
     },
     {
-      "id": "route_1787287309_833",
-      "timestamp": 1787287309.9461179,
-      "action": "Enrutamiento & Adjunto: 'Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b'",
-      "agent_id": "hermes",
+      "id": "route_1787290972_630",
+      "timestamp": 1787290972.948013,
+      "action": "Enrutamiento & Adjunto: 'Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana'",
+      "agent_id": "daedalus",
       "target_project": "proj_astraura_core",
-      "target_cerebro": "brain_hermes",
-      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/research",
-      "reasoning": "Entregable de hermes vinculado con éxito a proj_astraura_core, brain_hermes y carpeta local.",
+      "target_cerebro": "brain_genesis",
+      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/vault/projects",
+      "reasoning": "Entregable de daedalus vinculado con éxito a proj_astraura_core, brain_genesis y carpeta local.",
       "status": "attached"
     },
     {
-      "id": "dec_renew_1787287289_33",
-      "timestamp": 1787287289.914481,
+      "id": "dec_renew_1787290972_42",
+      "timestamp": 1787290972.9364321,
+      "action": "Renovación Inteligente de Tarea: athena",
+      "agent_id": "athena",
+      "target_project": "proj_astraura_core",
+      "reasoning": "Tarea anterior 'Calibración de Sensores de Entorno y Resonancia Acústica' auditada (100%). Renovando automáticamente con 'Auditoría Continua de Sensores Físicos, Térmica M1 y Batería'.",
+      "status": "renewed"
+    },
+    {
+      "id": "route_1787290972_344",
+      "timestamp": 1787290972.9158,
+      "action": "Enrutamiento & Adjunto: 'Calibración de Sensores de Entorno y Resonancia Acústica'",
+      "agent_id": "athena",
+      "target_project": "proj_astraura_core",
+      "target_cerebro": "brain_athena",
+      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/telemetry",
+      "reasoning": "Entregable de athena vinculado con éxito a proj_astraura_core, brain_athena y carpeta local.",
+      "status": "attached"
+    },
+    {
+      "id": "dec_renew_1787290967_47",
+      "timestamp": 1787290967.7263,
+      "action": "Renovación Inteligente de Tarea: hephaestus",
+      "agent_id": "hephaestus",
+      "target_project": "proj_astraura_core",
+      "reasoning": "Tarea anterior 'Compactación de Huella de Memoria RAM para Modelos de 1.58 Bits' auditada (100%). Renovando automáticamente con 'Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM'.",
+      "status": "renewed"
+    },
+    {
+      "id": "route_1787290967_735",
+      "timestamp": 1787290967.698126,
+      "action": "Enrutamiento & Adjunto: 'Compactación de Huella de Memoria RAM para Modelos de 1.58 Bits'",
+      "agent_id": "hephaestus",
+      "target_project": "proj_astraura_core",
+      "target_cerebro": "brain_hephaestus",
+      "target_folder": "/Users/alex/Documents/IA 1.58 bit/backend/app",
+      "reasoning": "Entregable de hephaestus vinculado con éxito a proj_astraura_core, brain_hephaestus y carpeta local.",
+      "status": "attached"
+    },
+    {
+      "id": "dec_renew_1787290940_77",
+      "timestamp": 1787290940.972406,
+      "action": "Renovación Inteligente de Tarea: daedalus",
+      "agent_id": "daedalus",
+      "target_project": "proj_astraura_core",
+      "reasoning": "Tarea anterior 'Orquestación General: Consolidar 22 tareas de autorización recién c...' auditada (100%). Renovando automáticamente con 'Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits'.",
+      "status": "renewed"
+    },
+    {
+      "id": "route_1787290940_408",
+      "timestamp": 1787290940.94947,
+      "action": "Enrutamiento & Adjunto: 'Orquestación General: Consolidar 22 tareas de autorización recién c...'",
+      "agent_id": "daedalus",
+      "target_project": "proj_astraura_core",
+      "target_cerebro": "brain_genesis",
+      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/vault/projects",
+      "reasoning": "Entregable de daedalus vinculado con éxito a proj_astraura_core, brain_genesis y carpeta local.",
+      "status": "attached"
+    },
+    {
+      "id": "dec_renew_1787290930_62",
+      "timestamp": 1787290930.6480792,
+      "action": "Renovación Inteligente de Tarea: athena",
+      "agent_id": "athena",
+      "target_project": "proj_astraura_core",
+      "reasoning": "Tarea anterior 'Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana' auditada (100%). Renovando automáticamente con 'Calibración de Sensores de Entorno y Resonancia Acústica'.",
+      "status": "renewed"
+    },
+    {
+      "id": "route_1787290930_289",
+      "timestamp": 1787290930.6384928,
+      "action": "Enrutamiento & Adjunto: 'Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana'",
+      "agent_id": "athena",
+      "target_project": "proj_astraura_core",
+      "target_cerebro": "brain_athena",
+      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/telemetry",
+      "reasoning": "Entregable de athena vinculado con éxito a proj_astraura_core, brain_athena y carpeta local.",
+      "status": "attached"
+    },
+    {
+      "id": "dec_renew_1787290930_62",
+      "timestamp": 1787290930.622623,
+      "action": "Renovación Inteligente de Tarea: daedalus",
+      "agent_id": "daedalus",
+      "target_project": "proj_astraura_core",
+      "reasoning": "Tarea anterior 'Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits' auditada (100%). Renovando automáticamente con 'Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana'.",
+      "status": "renewed"
+    },
+    {
+      "id": "route_1787290930_569",
+      "timestamp": 1787290930.612447,
+      "action": "Enrutamiento & Adjunto: 'Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits'",
+      "agent_id": "daedalus",
+      "target_project": "proj_astraura_core",
+      "target_cerebro": "brain_genesis",
+      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/vault/projects",
+      "reasoning": "Entregable de daedalus vinculado con éxito a proj_astraura_core, brain_genesis y carpeta local.",
+      "status": "attached"
+    },
+    {
+      "id": "dec_renew_1787290925_65",
+      "timestamp": 1787290925.29732,
+      "action": "Renovación Inteligente de Tarea: hephaestus",
+      "agent_id": "hephaestus",
+      "target_project": "proj_astraura_core",
+      "reasoning": "Tarea anterior 'Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b' auditada (100%). Renovando automáticamente con 'Compactación de Huella de Memoria RAM para Modelos de 1.58 Bits'.",
+      "status": "renewed"
+    },
+    {
+      "id": "route_1787290925_908",
+      "timestamp": 1787290925.284708,
+      "action": "Enrutamiento & Adjunto: 'Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b'",
+      "agent_id": "hephaestus",
+      "target_project": "proj_astraura_core",
+      "target_cerebro": "brain_hephaestus",
+      "target_folder": "/Users/alex/Documents/IA 1.58 bit/backend/app",
+      "reasoning": "Entregable de hephaestus vinculado con éxito a proj_astraura_core, brain_hephaestus y carpeta local.",
+      "status": "attached"
+    },
+    {
+      "id": "dec_renew_1787290909_50",
+      "timestamp": 1787290909.6118011,
       "action": "Renovación Inteligente de Tarea: oneiros",
       "agent_id": "oneiros",
       "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior 'Forja Visual: MODO DRENAJE ACTIVADO: 37 solicitudes pendien...' auditada (100%). Renovando automáticamente con 'Síntesis de Shader Procedural WebGL Reactivo al Sensorium Ambiental'.",
+      "reasoning": "Tarea anterior 'Síntesis de Shader Procedural WebGL Reactivo al Sensorium Ambiental' auditada (100%). Renovando automáticamente con 'Forja de Prototipos de Interfaces Intuitivas de Resonancia Sináptica'.",
       "status": "renewed"
     },
     {
-      "id": "route_1787287289_496",
-      "timestamp": 1787287289.90768,
-      "action": "Enrutamiento & Adjunto: 'Forja Visual: MODO DRENAJE ACTIVADO: 37 solicitudes pendien...'",
+      "id": "route_1787290909_877",
+      "timestamp": 1787290909.6001658,
+      "action": "Enrutamiento & Adjunto: 'Síntesis de Shader Procedural WebGL Reactivo al Sensorium Ambiental'",
       "agent_id": "oneiros",
       "target_project": "proj_astraura_core",
       "target_cerebro": "brain_oneiros",
       "target_folder": "/Users/alex/Documents/IA 1.58 bit/frontend/src/components",
       "reasoning": "Entregable de oneiros vinculado con éxito a proj_astraura_core, brain_oneiros y carpeta local.",
       "status": "attached"
-    },
-    {
-      "id": "dec_1787287264_254",
-      "timestamp": 1787287264.5924768,
-      "action": "Emisión de Directiva: 'MODO DRENAJE ACTIVADO: 37 solicitudes pendientes s...'",
-      "directive": "MODO DRENAJE ACTIVADO: 37 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 37 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
-      "dispatched_count": 1,
-      "dispatched_actions": [
-        {
-          "agent": "oneiros",
-          "task_title": "Forja Visual: MODO DRENAJE ACTIVADO: 37 solicitudes pendien...",
-          "area": "area_creative_synthesis"
-        }
-      ],
-      "target_project": "proj_astraura_core",
-      "reasoning": "El Director Metis descompuso la directriz y activó 1 agentes del enjambre con prioridades calibradas.",
-      "status": "in_progress"
-    },
-    {
-      "id": "dec_renew_1787287229_99",
-      "timestamp": 1787287229.993013,
-      "action": "Renovación Inteligente de Tarea: hermes",
-      "agent_id": "hermes",
-      "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient' auditada (100%). Renovando automáticamente con 'Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b'.",
-      "status": "renewed"
-    },
-    {
-      "id": "route_1787287229_331",
-      "timestamp": 1787287229.985578,
-      "action": "Enrutamiento & Adjunto: '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient'",
-      "agent_id": "hermes",
-      "target_project": "proj_astraura_core",
-      "target_cerebro": "brain_hermes",
-      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/research",
-      "reasoning": "Entregable de hermes vinculado con éxito a proj_astraura_core, brain_hermes y carpeta local.",
-      "status": "attached"
-    },
-    {
-      "id": "dec_renew_1787287229_57",
-      "timestamp": 1787287229.9778671,
-      "action": "Renovación Inteligente de Tarea: hermes",
-      "agent_id": "hermes",
-      "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient' auditada (100%). Renovando automáticamente con 'Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b'.",
-      "status": "renewed"
-    },
-    {
-      "id": "route_1787287229_887",
-      "timestamp": 1787287229.969249,
-      "action": "Enrutamiento & Adjunto: '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient'",
-      "agent_id": "hermes",
-      "target_project": "proj_astraura_core",
-      "target_cerebro": "brain_hermes",
-      "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/research",
-      "reasoning": "Entregable de hermes vinculado con éxito a proj_astraura_core, brain_hermes y carpeta local.",
-      "status": "attached"
-    },
-    {
-      "id": "dec_renew_1787287229_62",
-      "timestamp": 1787287229.960098,
-      "action": "Renovación Inteligente de Tarea: hephaestus",
-      "agent_id": "hephaestus",
-      "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob' auditada (100%). Renovando automáticamente con 'Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM'.",
-      "status": "renewed"
-    },
-    {
-      "id": "route_1787287229_246",
-      "timestamp": 1787287229.950134,
-      "action": "Enrutamiento & Adjunto: '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob'",
-      "agent_id": "hephaestus",
-      "target_project": "proj_astraura_core",
-      "target_cerebro": "brain_hephaestus",
-      "target_folder": "/Users/alex/Documents/IA 1.58 bit/backend/app",
-      "reasoning": "Entregable de hephaestus vinculado con éxito a proj_astraura_core, brain_hephaestus y carpeta local.",
-      "status": "attached"
-    },
-    {
-      "id": "dec_renew_1787287229_93",
-      "timestamp": 1787287229.943888,
-      "action": "Renovación Inteligente de Tarea: hephaestus",
-      "agent_id": "hephaestus",
-      "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob' auditada (100%). Renovando automáticamente con 'Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b'.",
-      "status": "renewed"
-    },
-    {
-      "id": "route_1787287229_478",
-      "timestamp": 1787287229.933121,
-      "action": "Enrutamiento & Adjunto: '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob'",
-      "agent_id": "hephaestus",
-      "target_project": "proj_astraura_core",
-      "target_cerebro": "brain_hephaestus",
-      "target_folder": "/Users/alex/Documents/IA 1.58 bit/backend/app",
-      "reasoning": "Entregable de hephaestus vinculado con éxito a proj_astraura_core, brain_hephaestus y carpeta local.",
-      "status": "attached"
-    },
-    {
-      "id": "dec_renew_1787287229_29",
-      "timestamp": 1787287229.9246469,
-      "action": "Renovación Inteligente de Tarea: hephaestus",
-      "agent_id": "hephaestus",
-      "target_project": "proj_astraura_core",
-      "reasoning": "Tarea anterior '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob' auditada (100%). Renovando automáticamente con 'Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b'.",
-      "status": "renewed"
-    },
-    {
-      "id": "route_1787287229_462",
-      "timestamp": 1787287229.892782,
-      "action": "Enrutamiento & Adjunto: '⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob'",
-      "agent_id": "hephaestus",
-      "target_project": "proj_astraura_core",
-      "target_cerebro": "brain_hephaestus",
-      "target_folder": "/Users/alex/Documents/IA 1.58 bit/backend/app",
-      "reasoning": "Entregable de hephaestus vinculado con éxito a proj_astraura_core, brain_hephaestus y carpeta local.",
-      "status": "attached"
     }
   ],
   "audit_log": [
     {
-      "id": "audit_1787287392_782",
-      "timestamp": 1787287392.782057,
-      "task_id": "task_1787287350_45",
-      "task_title": "Forja Visual: MODO DRENAJE ACTIVADO: 24 solicitudes pendien...",
-      "agent_id": "oneiros",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_oneiros_task_1787287350_45.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 423,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (423 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287372_672",
-      "timestamp": 1787287372.672648,
-      "task_id": "task_1787287330_98",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287330_98.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 427,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (427 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287372_659",
-      "timestamp": 1787287372.659265,
-      "task_id": "task_1787287330_53",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287330_53.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 427,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (427 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287372_646",
-      "timestamp": 1787287372.646004,
-      "task_id": "task_1787287330_51",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287330_51.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 429,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (429 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287372_630",
-      "timestamp": 1787287372.630301,
-      "task_id": "task_1787287330_38",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287330_38.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 427,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (427 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287372_613",
-      "timestamp": 1787287372.6138282,
-      "task_id": "task_1787287330_80",
-      "task_title": "Orquestación General: Consolidar 37 tareas de autorización recién c...",
-      "agent_id": "daedalus",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787287330_80.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 431,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (431 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287367_595",
-      "timestamp": 1787287367.595628,
-      "task_id": "task_1787287330_17",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob",
-      "agent_id": "hephaestus",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787287330_17.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 428,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (428 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287367_582",
-      "timestamp": 1787287367.582166,
-      "task_id": "task_1787287330_32",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob",
-      "agent_id": "hephaestus",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787287330_32.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 428,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (428 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287367_564",
-      "timestamp": 1787287367.564446,
-      "task_id": "task_1787287330_15",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob",
-      "agent_id": "hephaestus",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787287330_15.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 428,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (428 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287357_525",
-      "timestamp": 1787287357.525965,
-      "task_id": "task_1787287315_68",
-      "task_title": "Forja de Prototipos de Interfaces Intuitivas de Resonancia Sináptica",
-      "agent_id": "oneiros",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_oneiros_task_1787287315_68.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 428,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (428 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287350_613",
-      "timestamp": 1787287350.6130471,
-      "task_id": "task_1787287309_94",
-      "task_title": "Mapeo de Referencias Académicas y Citaciones para StarSeed OS",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287309_94.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 413,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (413 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287350_604",
-      "timestamp": 1787287350.6046212,
-      "task_id": "task_1787287310_89",
-      "task_title": "Síntesis Comparativa de Arquitecturas: Transformers vs Ternary BitNet",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287310_89.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 421,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (421 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287350_592",
-      "timestamp": 1787287350.5923011,
-      "task_id": "task_1787287310_96",
-      "task_title": "Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b",
-      "agent_id": "hephaestus",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787287310_96.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 427,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (427 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287315_028",
-      "timestamp": 1787287315.028715,
-      "task_id": "task_1787287264_37",
-      "task_title": "Forja Visual: MODO DRENAJE ACTIVADO: 37 solicitudes pendien...",
-      "agent_id": "oneiros",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_oneiros_task_1787287264_37.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 425,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (425 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287310_009",
-      "timestamp": 1787287310.009922,
-      "task_id": "task_1787287229_67",
-      "task_title": "Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM",
-      "agent_id": "hephaestus",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787287229_67.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 421,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (421 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287309_984",
-      "timestamp": 1787287309.9846342,
-      "task_id": "task_1787287229_34",
-      "task_title": "Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287229_34.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 433,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (433 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287309_945",
-      "timestamp": 1787287309.945936,
-      "task_id": "task_1787287229_88",
-      "task_title": "Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287229_88.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 433,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (433 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287289_907",
-      "timestamp": 1787287289.907587,
-      "task_id": "task_1787287209_57",
-      "task_title": "Forja Visual: MODO DRENAJE ACTIVADO: 37 solicitudes pendien...",
-      "agent_id": "oneiros",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_oneiros_task_1787287209_57.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 423,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (423 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287229_985",
-      "timestamp": 1787287229.9854112,
-      "task_id": "task_1787287191_45",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287191_45.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 427,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (427 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287229_969",
-      "timestamp": 1787287229.969165,
-      "task_id": "task_1787287191_67",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287191_67.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 427,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (427 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287229_950",
-      "timestamp": 1787287229.950044,
-      "task_id": "task_1787287191_25",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob",
-      "agent_id": "hephaestus",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787287191_25.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 429,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (429 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287229_932",
-      "timestamp": 1787287229.932493,
-      "task_id": "task_1787287191_89",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob",
-      "agent_id": "hephaestus",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787287191_89.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 429,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (429 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287229_892",
-      "timestamp": 1787287229.892681,
-      "task_id": "task_1787287192_57",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob",
-      "agent_id": "hephaestus",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787287192_57.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 429,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (429 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287229_875",
-      "timestamp": 1787287229.875314,
-      "task_id": "task_1787287192_81",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287192_81.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 429,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (429 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287229_858",
-      "timestamp": 1787287229.858328,
-      "task_id": "task_1787287192_65",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287192_65.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 427,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (427 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287229_822",
-      "timestamp": 1787287229.822853,
-      "task_id": "task_1787287192_97",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287192_97.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 429,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (429 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287229_728",
-      "timestamp": 1787287229.7284648,
-      "task_id": "task_1787287192_74",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287192_74.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 429,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (429 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287229_709",
-      "timestamp": 1787287229.7092009,
-      "task_id": "task_1787287192_93",
-      "task_title": "Orquestación General: Consolidar 40 tareas de autorización recién c...",
-      "agent_id": "daedalus",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787287192_93.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 433,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (433 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287219_674",
-      "timestamp": 1787287219.674096,
-      "task_id": "task_1787287179_42",
-      "task_title": "Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+      "id": "audit_1787291146_361",
+      "timestamp": 1787291146.361183,
+      "task_id": "task_1787291100_44",
+      "task_title": "Calibración de Sensores de Entorno y Resonancia Acústica",
       "agent_id": "athena",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_athena_task_1787287179_42.json",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_athena_task_1787291100_44.json",
       "artifact_verified_on_disk": true,
-      "artifact_bytes": 415,
+      "artifact_bytes": 409,
       "quality_score": 100,
       "quality_threshold": 85,
       "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (415 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (409 B). Fidelidad técnica del 100% (Umbral: 85%).",
       "status": "verified"
     },
     {
-      "id": "audit_1787287209_620",
-      "timestamp": 1787287209.620681,
-      "task_id": "task_1787287169_62",
-      "task_title": "Compactación de Huella de Memoria RAM para Modelos de 1.58 Bits",
-      "agent_id": "hephaestus",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787287169_62.json",
+      "id": "audit_1787291111_173",
+      "timestamp": 1787291111.173666,
+      "task_id": "task_1787291069_77",
+      "task_title": "Sincronización de Versiones y Diffing de Entregables Multi-Agente",
+      "agent_id": "daedalus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787291069_77.json",
       "artifact_verified_on_disk": true,
-      "artifact_bytes": 417,
+      "artifact_bytes": 424,
       "quality_score": 100,
       "quality_threshold": 85,
       "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (417 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (424 B). Fidelidad técnica del 100% (Umbral: 85%).",
       "status": "verified"
     },
     {
-      "id": "audit_1787287209_613",
-      "timestamp": 1787287209.613781,
-      "task_id": "task_1787287169_40",
-      "task_title": "Mapeo de Referencias Académicas y Citaciones para StarSeed OS",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287169_40.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 413,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (413 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287209_605",
-      "timestamp": 1787287209.6057339,
-      "task_id": "task_1787287169_13",
-      "task_title": "Síntesis Comparativa de Arquitecturas: Transformers vs Ternary BitNet",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287169_13.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 421,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (421 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287179_539",
-      "timestamp": 1787287179.539496,
-      "task_id": "task_1787287139_56",
-      "task_title": "Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
-      "agent_id": "athena",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_athena_task_1787287139_56.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 419,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (419 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287169_507",
-      "timestamp": 1787287169.507427,
-      "task_id": "task_1787287129_49",
-      "task_title": "Mapeo de Referencias Académicas y Citaciones para StarSeed OS",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287129_49.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 413,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (413 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287169_489",
-      "timestamp": 1787287169.489488,
-      "task_id": "task_1787287129_20",
-      "task_title": "Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287129_20.json",
+      "id": "audit_1787291111_152",
+      "timestamp": 1787291111.152319,
+      "task_id": "task_1787291069_75",
+      "task_title": "Generación de Mallas y Texturas Dinámicas para la Bóveda de Creaciones",
+      "agent_id": "oneiros",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_oneiros_task_1787291069_75.json",
       "artifact_verified_on_disk": true,
       "artifact_bytes": 434,
       "quality_score": 100,
@@ -1741,12 +1242,27 @@
       "status": "verified"
     },
     {
-      "id": "audit_1787287169_467",
-      "timestamp": 1787287169.467325,
-      "task_id": "task_1787287129_51",
-      "task_title": "Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM",
-      "agent_id": "hephaestus",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787287129_51.json",
+      "id": "audit_1787291111_129",
+      "timestamp": 1787291111.129707,
+      "task_id": "task_1787291069_19",
+      "task_title": "Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
+      "agent_id": "athena",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_athena_task_1787291069_19.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 418,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (418 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787291100_946",
+      "timestamp": 1787291100.94633,
+      "task_id": "task_1787291058_49",
+      "task_title": "Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
+      "agent_id": "athena",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_athena_task_1787291058_49.json",
       "artifact_verified_on_disk": true,
       "artifact_bytes": 420,
       "quality_score": 100,
@@ -1756,177 +1272,12 @@
       "status": "verified"
     },
     {
-      "id": "audit_1787287154_429",
-      "timestamp": 1787287154.4299111,
-      "task_id": "task_1787287114_19",
-      "task_title": "Forja Visual: MODO DRENAJE ACTIVADO: 40 solicitudes pendien...",
-      "agent_id": "oneiros",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_oneiros_task_1787287114_19.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 423,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (423 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287129_378",
-      "timestamp": 1787287129.378819,
-      "task_id": "task_1787287092_74",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob",
-      "agent_id": "hephaestus",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787287092_74.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 430,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (430 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287129_361",
-      "timestamp": 1787287129.361399,
-      "task_id": "task_1787287092_41",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287092_41.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 428,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (428 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287129_346",
-      "timestamp": 1787287129.346733,
-      "task_id": "task_1787287092_55",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287092_55.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 428,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (428 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287129_335",
-      "timestamp": 1787287129.335714,
-      "task_id": "task_1787287092_64",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287092_64.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 428,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (428 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287129_324",
-      "timestamp": 1787287129.324121,
-      "task_id": "task_1787287092_92",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob",
-      "agent_id": "hephaestus",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787287092_92.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 430,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (430 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287129_312",
-      "timestamp": 1787287129.312911,
-      "task_id": "task_1787287092_94",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287092_94.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 428,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (428 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287129_300",
-      "timestamp": 1787287129.300318,
-      "task_id": "task_1787287092_12",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Workspace Sob",
-      "agent_id": "hephaestus",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787287092_12.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 430,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (430 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287129_289",
-      "timestamp": 1787287129.2897532,
-      "task_id": "task_1787287092_85",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287092_85.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 428,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (428 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287129_274",
-      "timestamp": 1787287129.274834,
-      "task_id": "task_1787287093_37",
-      "task_title": "⚡ [AUTORIZADO] Exploración Intuitiva: Ingesta Automática de Almacenamient",
-      "agent_id": "hermes",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hermes_task_1787287093_37.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 428,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (428 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287129_261",
-      "timestamp": 1787287129.261062,
-      "task_id": "task_1787287093_93",
-      "task_title": "Orquestación General: Consolidar 34 tareas de autorización recién c...",
+      "id": "audit_1787291095_829",
+      "timestamp": 1787291095.829997,
+      "task_id": "task_1787291053_46",
+      "task_title": "Sincronización de Versiones y Diffing de Entregables Multi-Agente",
       "agent_id": "daedalus",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787287093_93.json",
-      "artifact_verified_on_disk": true,
-      "artifact_bytes": 432,
-      "quality_score": 100,
-      "quality_threshold": 85,
-      "verdict": "APROBADO",
-      "details": "Auditado por Director Metis. Entregable físico verificado en disco (432 B). Fidelidad técnica del 100% (Umbral: 85%).",
-      "status": "verified"
-    },
-    {
-      "id": "audit_1787287124_238",
-      "timestamp": 1787287124.238247,
-      "task_id": "task_1787287083_20",
-      "task_title": "Indexación Rápida de Fragmentos de Memoria Episódica en Bóveda",
-      "agent_id": "mnemosyne",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_mnemosyne_task_1787287083_20.json",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787291053_46.json",
       "artifact_verified_on_disk": true,
       "artifact_bytes": 425,
       "quality_score": 100,
@@ -1936,12 +1287,312 @@
       "status": "verified"
     },
     {
-      "id": "audit_1787287119_094",
-      "timestamp": 1787287119.094066,
-      "task_id": "task_1787287078_55",
+      "id": "audit_1787291069_196",
+      "timestamp": 1787291069.196737,
+      "task_id": "task_1787291025_95",
+      "task_title": "Forja de Prototipos de Interfaces Intuitivas de Resonancia Sináptica",
+      "agent_id": "oneiros",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_oneiros_task_1787291025_95.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 431,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (431 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787291069_172",
+      "timestamp": 1787291069.172618,
+      "task_id": "task_1787291025_29",
+      "task_title": "Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits",
+      "agent_id": "daedalus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787291025_29.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 420,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (420 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787291058_348",
+      "timestamp": 1787291058.3484511,
+      "task_id": "task_1787291014_21",
+      "task_title": "Calibración de Sensores de Entorno y Resonancia Acústica",
+      "agent_id": "athena",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_athena_task_1787291014_21.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 408,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (408 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787291053_170",
+      "timestamp": 1787291053.170961,
+      "task_id": "task_1787291010_67",
+      "task_title": "Orquestación General: Consolidar 5 tareas de autorización recién co...",
+      "agent_id": "daedalus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787291010_67.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 433,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (433 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787291025_566",
+      "timestamp": 1787291025.566637,
+      "task_id": "task_1787290983_12",
+      "task_title": "Sincronización de Versiones y Diffing de Entregables Multi-Agente",
+      "agent_id": "daedalus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787290983_12.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 426,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (426 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787291025_536",
+      "timestamp": 1787291025.536184,
+      "task_id": "task_1787290983_61",
+      "task_title": "Auto-Reactivación: Forja de Shaders & Prototipos Visuales",
+      "agent_id": "oneiros",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_oneiros_task_1787290983_61.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 422,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (422 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787291014_789",
+      "timestamp": 1787291014.7891672,
+      "task_id": "task_1787290972_98",
+      "task_title": "Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+      "agent_id": "athena",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_athena_task_1787290972_98.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 415,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (415 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787291014_773",
+      "timestamp": 1787291014.7730172,
+      "task_id": "task_1787290972_92",
+      "task_title": "Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits",
+      "agent_id": "daedalus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787290972_92.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 420,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (420 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787291009_420",
+      "timestamp": 1787291009.4209359,
+      "task_id": "task_1787290967_69",
+      "task_title": "Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM",
+      "agent_id": "hephaestus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787290967_69.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 421,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (421 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290983_485",
+      "timestamp": 1787290983.4852512,
+      "task_id": "task_1787290940_16",
+      "task_title": "Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits",
+      "agent_id": "daedalus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787290940_16.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 420,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (420 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290972_947",
+      "timestamp": 1787290972.9479308,
+      "task_id": "task_1787290930_53",
+      "task_title": "Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana",
+      "agent_id": "daedalus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787290930_53.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 427,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (427 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290972_915",
+      "timestamp": 1787290972.915686,
+      "task_id": "task_1787290930_30",
+      "task_title": "Calibración de Sensores de Entorno y Resonancia Acústica",
+      "agent_id": "athena",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_athena_task_1787290930_30.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 410,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (410 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290967_685",
+      "timestamp": 1787290967.685098,
+      "task_id": "task_1787290925_53",
       "task_title": "Compactación de Huella de Memoria RAM para Modelos de 1.58 Bits",
       "agent_id": "hephaestus",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787287078_55.json",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787290925_53.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 417,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (417 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290940_949",
+      "timestamp": 1787290940.9493482,
+      "task_id": "task_1787290904_71",
+      "task_title": "Orquestación General: Consolidar 22 tareas de autorización recién c...",
+      "agent_id": "daedalus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787290904_71.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 431,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (431 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290930_638",
+      "timestamp": 1787290930.638431,
+      "task_id": "task_1787290888_61",
+      "task_title": "Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
+      "agent_id": "athena",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_athena_task_1787290888_61.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 419,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (419 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290930_612",
+      "timestamp": 1787290930.61237,
+      "task_id": "task_1787290888_65",
+      "task_title": "Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits",
+      "agent_id": "daedalus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787290888_65.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 421,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (421 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290925_284",
+      "timestamp": 1787290925.2842171,
+      "task_id": "task_1787290883_48",
+      "task_title": "Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b",
+      "agent_id": "hephaestus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787290883_48.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 427,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (427 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290909_600",
+      "timestamp": 1787290909.600047,
+      "task_id": "task_1787290867_22",
+      "task_title": "Síntesis de Shader Procedural WebGL Reactivo al Sensorium Ambiental",
+      "agent_id": "oneiros",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_oneiros_task_1787290867_22.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 429,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (429 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290888_828",
+      "timestamp": 1787290888.82867,
+      "task_id": "task_1787290846_37",
+      "task_title": "Sincronización de Versiones y Diffing de Entregables Multi-Agente",
+      "agent_id": "daedalus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787290846_37.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 424,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (424 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290888_808",
+      "timestamp": 1787290888.808269,
+      "task_id": "task_1787290846_95",
+      "task_title": "Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+      "agent_id": "athena",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_athena_task_1787290846_95.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 415,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (415 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290883_585",
+      "timestamp": 1787290883.585424,
+      "task_id": "task_1787290841_57",
+      "task_title": "Compactación de Huella de Memoria RAM para Modelos de 1.58 Bits",
+      "agent_id": "hephaestus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787290841_57.json",
       "artifact_verified_on_disk": true,
       "artifact_bytes": 416,
       "quality_score": 100,
@@ -1951,12 +1602,237 @@
       "status": "verified"
     },
     {
-      "id": "audit_1787287119_084",
-      "timestamp": 1787287119.084606,
-      "task_id": "task_1787287078_95",
-      "task_title": "Compactación de Huella de Memoria RAM para Modelos de 1.58 Bits",
+      "id": "audit_1787290867_539",
+      "timestamp": 1787290867.539627,
+      "task_id": "task_1787290825_96",
+      "task_title": "Forja de Prototipos de Interfaces Intuitivas de Resonancia Sináptica",
+      "agent_id": "oneiros",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_oneiros_task_1787290825_96.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 431,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (431 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290846_609",
+      "timestamp": 1787290846.609519,
+      "task_id": "task_1787290805_36",
+      "task_title": "Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
+      "agent_id": "athena",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_athena_task_1787290805_36.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 420,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (420 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290846_587",
+      "timestamp": 1787290846.58754,
+      "task_id": "task_1787290805_65",
+      "task_title": "Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana",
+      "agent_id": "daedalus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787290805_65.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 427,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (427 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290841_493",
+      "timestamp": 1787290841.493132,
+      "task_id": "task_1787290800_83",
+      "task_title": "Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM",
       "agent_id": "hephaestus",
-      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787287078_95.json",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787290800_83.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 421,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (421 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290825_889",
+      "timestamp": 1787290825.8898282,
+      "task_id": "task_1787290784_51",
+      "task_title": "Forja Visual: MODO DRENAJE ACTIVADO: 22 solicitudes pendien...",
+      "agent_id": "oneiros",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_oneiros_task_1787290784_51.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 424,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (424 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290805_437",
+      "timestamp": 1787290805.437054,
+      "task_id": "task_1787290764_65",
+      "task_title": "Sincronización de Versiones y Diffing de Entregables Multi-Agente",
+      "agent_id": "daedalus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787290764_65.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 425,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (425 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290805_411",
+      "timestamp": 1787290805.4112399,
+      "task_id": "task_1787290764_98",
+      "task_title": "Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
+      "agent_id": "athena",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_athena_task_1787290764_98.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 419,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (419 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290800_304",
+      "timestamp": 1787290800.304685,
+      "task_id": "task_1787290759_24",
+      "task_title": "Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b",
+      "agent_id": "hephaestus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787290759_24.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 427,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (427 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290800_102",
+      "timestamp": 1787290800.102226,
+      "task_id": "task_1787290759_89",
+      "task_title": "Sincronización de Versiones y Diffing de Entregables Multi-Agente",
+      "agent_id": "daedalus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787290759_89.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 424,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (424 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290784_647",
+      "timestamp": 1787290784.647577,
+      "task_id": "task_1787290746_56",
+      "task_title": "Orquestación General: Consolidar 5 tareas de autorización recién co...",
+      "agent_id": "daedalus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787290746_56.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 431,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (431 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290764_184",
+      "timestamp": 1787290764.184633,
+      "task_id": "task_1787290723_71",
+      "task_title": "Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits",
+      "agent_id": "daedalus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787290723_71.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 419,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (419 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290759_046",
+      "timestamp": 1787290759.046574,
+      "task_id": "task_1787290718_42",
+      "task_title": "Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana",
+      "agent_id": "daedalus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787290718_42.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 426,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (426 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290759_033",
+      "timestamp": 1787290759.0330398,
+      "task_id": "task_1787290718_88",
+      "task_title": "Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM",
+      "agent_id": "hephaestus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787290718_88.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 421,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (421 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290759_024",
+      "timestamp": 1787290759.024102,
+      "task_id": "task_1787290718_11",
+      "task_title": "Calibración de Sensores de Entorno y Resonancia Acústica",
+      "agent_id": "athena",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_athena_task_1787290718_11.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 409,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (409 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290723_333",
+      "timestamp": 1787290723.333581,
+      "task_id": "task_1787290682_27",
+      "task_title": "Orquestación General: Consolidar 21 tareas de autorización recién c...",
+      "agent_id": "daedalus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787290682_27.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 432,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (432 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290718_180",
+      "timestamp": 1787290718.180685,
+      "task_id": "task_1787290677_53",
+      "task_title": "Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+      "agent_id": "athena",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_athena_task_1787290677_53.json",
       "artifact_verified_on_disk": true,
       "artifact_bytes": 416,
       "quality_score": 100,
@@ -1964,7 +1840,112 @@
       "verdict": "APROBADO",
       "details": "Auditado por Director Metis. Entregable físico verificado en disco (416 B). Fidelidad técnica del 100% (Umbral: 85%).",
       "status": "verified"
+    },
+    {
+      "id": "audit_1787290718_163",
+      "timestamp": 1787290718.163646,
+      "task_id": "task_1787290677_25",
+      "task_title": "Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b",
+      "agent_id": "hephaestus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787290677_25.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 426,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (426 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290718_145",
+      "timestamp": 1787290718.145867,
+      "task_id": "task_1787290677_13",
+      "task_title": "Sincronización de Versiones y Diffing de Entregables Multi-Agente",
+      "agent_id": "daedalus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787290677_13.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 425,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (425 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290697_654",
+      "timestamp": 1787290697.6542568,
+      "task_id": "task_1787290656_55",
+      "task_title": "Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
+      "agent_id": "mnemosyne",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_mnemosyne_task_1787290656_55.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 422,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (422 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290677_210",
+      "timestamp": 1787290677.210582,
+      "task_id": "task_1787290635_16",
+      "task_title": "Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits",
+      "agent_id": "daedalus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_daedalus_task_1787290635_16.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 421,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (421 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290677_178",
+      "timestamp": 1787290677.178707,
+      "task_id": "task_1787290635_50",
+      "task_title": "Compactación de Huella de Memoria RAM para Modelos de 1.58 Bits",
+      "agent_id": "hephaestus",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_hephaestus_task_1787290635_50.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 417,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (417 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290677_146",
+      "timestamp": 1787290677.146616,
+      "task_id": "task_1787290635_10",
+      "task_title": "Calibración de Sensores de Entorno y Resonancia Acústica",
+      "agent_id": "athena",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_athena_task_1787290635_10.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 410,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (410 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
+    },
+    {
+      "id": "audit_1787290661_999",
+      "timestamp": 1787290661.9991271,
+      "task_id": "task_1787290620_56",
+      "task_title": "Forja Visual: MODO DRENAJE ACTIVADO: 21 solicitudes pendien...",
+      "agent_id": "oneiros",
+      "artifact_file": "/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts/artifact_oneiros_task_1787290620_56.json",
+      "artifact_verified_on_disk": true,
+      "artifact_bytes": 423,
+      "quality_score": 100,
+      "quality_threshold": 85,
+      "verdict": "APROBADO",
+      "details": "Auditado por Director Metis. Entregable físico verificado en disco (423 B). Fidelidad técnica del 100% (Umbral: 85%).",
+      "status": "verified"
     }
   ],
-  "updated_at": 1787287395.892184
+  "updated_at": 1787291146.368045
 }
