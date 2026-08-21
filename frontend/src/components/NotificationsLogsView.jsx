@@ -133,14 +133,14 @@ export default function NotificationsLogsView() {
         console.warn('Apply all proposals fallback:', e);
       }
 
-      // 3. Procesar TODAS las notificaciones de la lista con los agentes reales
-      //    (cada notificación invoca su agente correspondiente con su personalidad,
-      //    cerebro y memoria 1.58-bit — no solo marcar como leído)
-      const pendingNotifs = data.notifications.filter(n =>
-        !n.read && (n.status === 'pending' || n.action_type === 'grant_authorization' ||
-                    n.category === 'Solicitud de Autorización')
+      // 3. Procesar TODAS las notificaciones que tienen el botón individual
+      //    "⚡ Autorizar y Aplicar" (cualquiera que no esté ya aplicada) —
+      //    se seleccionan automáticamente, se autorizan/aplican con su agente,
+      //    se trasladan a su lista de procesos y DESAPARECEN de la vista.
+      const actionableNotifs = data.notifications.filter(n =>
+        n.status !== 'applied' && n.status !== 'resolved'
       );
-      const notifIdsToProcess = pendingNotifs.map(n => n.id).filter(id => id);
+      const notifIdsToProcess = actionableNotifs.map(n => n.id).filter(id => id);
       let totalProcessed = appliedCount;
       if (notifIdsToProcess.length > 0) {
         try {
@@ -166,14 +166,22 @@ export default function NotificationsLogsView() {
         }
       }
 
-      // 4. Mark all notifications as read & applied
-      await markNotificationsRead(null);
-      
-      // 5. Force refresh from backend after sync
+      // 4. Marcar todas como leídas y REMOVER de la vista las ya procesadas
+      //    (desaparecen inmediatamente y pasan a las listas de tareas de su agente)
+      const processedIds = new Set(notifIdsToProcess);
+      setData(prev => ({
+        ...prev,
+        unread_count: 0,
+        notifications: prev.notifications.filter(n => !processedIds.has(n.id)),
+        branching_logs: prev.branching_logs,
+      }));
+      try { await markNotificationsRead(null); } catch (e) { /* noop */ }
+
+      // 5. Force refresh from backend after sync (confirma que desaparecieron)
       await loadNotifications();
-      
-      const total = appliedCount > 0 ? appliedCount : data.notifications.length;
-      setToastMsg(`✨ ¡${total} solicitudes y propuestas aplicadas exitosamente con agentes en segundo plano!`);
+
+      const total = notifIdsToProcess.length || (appliedCount > 0 ? appliedCount : data.notifications.length);
+      setToastMsg(`✨ ¡${total} solicitudes y propuestas autorizadas, aplicadas y trasladadas a sus agentes en segundo plano!`);
       setTimeout(() => setToastMsg(''), 4500);
     } catch (err) {
       setToastMsg(`⚠️ Aplicado con advertencia: ${err.message}`);

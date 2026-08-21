@@ -336,6 +336,7 @@ class IntelligentAuthorizationOrchestrator:
             # 1. Recolectar items válidos (notificación + rama)
             items = []
             failed = []
+            processed = []  # Definido aquí para que el manejo de "sin rama" pueda usarlo
             for nid in notif_ids:
                 notif = next((n for n in _notifications.notifications if n["id"] == nid), None)
                 if not notif:
@@ -346,8 +347,37 @@ class IntelligentAuthorizationOrchestrator:
                     b_id = nid.replace("notif_req_", "")
                 branch = next((b for b in _intuitive.branches if b.get("id") == b_id), None)
                 if not branch:
-                    # Notificación de sistema → marcar directo
-                    failed.append({"notif_id": nid, "error": "Sin rama asociada (sistema)"})
+                    # Notificación de sistema (sin rama/proceso) pero CON botón de
+                    # autorizar/aplicar → se aplica directo y se traslada como resuelta.
+                    # El usuario quiere que TODAS las notificaciones con botón desaparezcan
+                    # y pasen a su lista de procesos correspondiente automáticamente.
+                    try:
+                        _notifications.apply_notification(nid)
+                        processed.append({
+                            "notif_id": nid,
+                            "branch_id": None,
+                            "agent": "system",
+                            "agent_area": "area_sentinel_privacy",
+                            "process_type": "system_action",
+                            "process_label": notif.get("title", "Acción de sistema"),
+                            "priority": 5,
+                            "priority_level": 10,
+                            "theme": notif.get("title", "Acción de sistema"),
+                            "brain_id": None,
+                            "brain_name": "—",
+                            "brain_color": "#64748b",
+                            "personality_id": None,
+                            "personality_name": "Aurora",
+                            "relations": [],
+                            "status": "applied_direct",
+                            "routing_steps": [
+                                {"step": 1, "label": "Notificación de sistema con acción pendiente", "done": True},
+                                {"step": 2, "label": "Aplicando acción directa (sin rama de proceso imaginativo)", "done": True},
+                                {"step": 3, "label": "Marcando como resuelta y trasladando del registro", "done": True},
+                            ],
+                        })
+                    except Exception as e:
+                        failed.append({"notif_id": nid, "error": str(e)})
                     continue
                 proc = self._infer_process_type(branch)
                 agent = PROCESS_TO_AGENT.get(proc, "athena")
@@ -374,7 +404,6 @@ class IntelligentAuthorizationOrchestrator:
             #    agente correspondiente con PRIORIDAD CRÍTICA (ejecutándose ANTES
             #    que los procesos imaginativos en segundo plano de menor prioridad),
             #    y se SINCRONIZA con todo el ecosistema 1.58-bit interconectado.
-            processed = []
             agent_executions = {a: 0 for a in set(PROCESS_TO_AGENT.values())}
             for it in ordered:
                 try:

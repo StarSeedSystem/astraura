@@ -1,0 +1,14 @@
+{
+  "task_id": "task_1787272012_49",
+  "agent_id": "athena",
+  "title": "Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
+  "timestamp": 1787272042.945118,
+  "target_project_id": "proj_astraura_core",
+  "target_folder": "/Users/alex/Documents/IA 1.58 bit/data/telemetry",
+  "scanned_files_count": 0,
+  "hardware_telemetry": {
+    "pid": 8798,
+    "ram_rss_mb": 34.4,
+    "cpu_percent": 66.7
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "task_id": "task_1787271078_67",
+  "agent_id": "hephaestus",
+  "title": "Auto-Reactivación: Auditoría de Código & Archivos Locales",
+  "timestamp": 1787271108.592582,
+  "target_project_id": "proj_astraura_core",
+  "target_folder": "/Users/alex/Documents/IA 1.58 bit/backend/app",
+  "scanned_files_count": 1,
+  "hardware_telemetry": {
+    "pid": 7005,
+    "ram_rss_mb": 35.5,
+    "cpu_percent": 41.7
+  }
+}
