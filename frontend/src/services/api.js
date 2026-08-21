@@ -4,7 +4,7 @@
  * or falls back to autonomous in-browser cognitive exocortex when completely offline.
  */
 
-export const DEFAULT_HTTPS_GATEWAY = 'https://discussed-stuffed-oak-hudson.trycloudflare.com';
+export const DEFAULT_HTTPS_GATEWAY = 'https://communities-remind-agree-physicians.trycloudflare.com';
 
 // Gateway dinámico: se actualiza desde active_tunnel.json para que el frontend
 // SIEMPRE apunte al túnel actual (sin necesidad de rebuild cuando cambia la URL).
