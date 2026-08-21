@@ -2,6 +2,7 @@ import time
 import json
 import os
 import random
+import threading
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
@@ -555,7 +556,30 @@ class CerebrosManager:
         self.cerebros_file = self.storage_dir / "cerebros_registry.json"
         self.active_brain_id = "brain_genesis"
         self.cerebros: List[Dict[str, Any]] = []
+        # Caché de métricas de carpetas (se recalcula en background para no
+        # bloquear el event loop de uvicorn en /api/cerebros).
+        self._folder_metrics_cache: Dict[str, Dict[str, Any]] = {}
+        self._metrics_lock = threading.Lock()
         self._initialize()
+        self._start_metrics_thread()
+
+    def _start_metrics_thread(self):
+        """Recalcula las métricas de carpetas en background (no bloquea requests)."""
+        def _loop():
+            import time as _t
+            while True:
+                try:
+                    for b in self.cerebros:
+                        for cf in (b.get("context_folders") or []):
+                            p = cf.get("path")
+                            if p:
+                                with self._metrics_lock:
+                                    self._folder_metrics_cache[p] = scan_context_folder_metrics(p)
+                except Exception:
+                    pass
+                _t.sleep(30)
+        t = threading.Thread(target=_loop, daemon=True)
+        t.start()
 
     def _initialize(self):
         if self.cerebros_file.exists():
@@ -1002,7 +1026,12 @@ class CerebrosManager:
             if "context_folders" in b:
                 for cf in b["context_folders"]:
                     if cf.get("path"):
-                        cf["metrics"] = scan_context_folder_metrics(cf["path"])
+                        # Usar métricas cacheadas (recalculadas en background)
+                        with self._metrics_lock:
+                            cf["metrics"] = self._folder_metrics_cache.get(cf["path"], {
+                                "exists": True, "path": cf["path"], "file_count": 0,
+                                "size_mb": 0, "types_breakdown": {}, "status": "Calculando…"
+                            })
         return {
             "active_brain_id": self.active_brain_id,
             "cerebros": self.cerebros,
@@ -1014,6 +1043,65 @@ class CerebrosManager:
         if target:
             self._normalize_brain_schema(target)
         return target
+
+    def auto_detect_storage_brains(self) -> List[Dict[str, Any]]:
+        """Detecta automáticamente cerebros en almacenamientos conectados:
+        discos externos montados y Google Drive (si hay credenciales)."""
+        detected: List[Dict[str, Any]] = []
+        seen_ids = {b.get("id") for b in self.cerebros}
+
+        import platform
+        if platform.system() == "Darwin":
+            volume_roots = ["/Volumes"]
+        elif platform.system() == "Linux":
+            volume_roots = ["/mnt", "/media"]
+        else:
+            volume_roots = []
+        for vr in volume_roots:
+            vrp = Path(vr)
+            if not vrp.exists():
+                continue
+            try:
+                for vol in vrp.iterdir():
+                    if not vol.is_dir():
+                        continue
+                    candidates = [
+                        vol / "data" / "cerebros" / "cerebros_registry.json",
+                        vol / "IA 1.58 bit" / "data" / "cerebros" / "cerebros_registry.json",
+                    ]
+                    for cand in candidates:
+                        if cand.exists():
+                            try:
+                                data = json.loads(cand.read_text(encoding="utf-8"))
+                                for b in data.get("cerebros", []):
+                                    if b.get("id") and b["id"] not in seen_ids:
+                                        seen_ids.add(b["id"])
+                                        detected.append({
+                                            "id": b["id"],
+                                            "name": b.get("name", b["id"]),
+                                            "source_type": "external_disk",
+                                            "source_path": str(cand.parent),
+                                            "source_label": f"Disco: {vol.name}",
+                                        })
+                            except Exception:
+                                pass
+            except Exception:
+                pass
+
+        try:
+            gdrive_token = Path("/Users/alex/Documents/IA 1.58 bit/data/cerebros/gdrive_token.json")
+            if gdrive_token.exists():
+                detected.append({
+                    "id": "gdrive_brain_vault",
+                    "name": "Bóveda Cerebral en Google Drive",
+                    "source_type": "google_drive",
+                    "source_path": "gdrive://cerebros",
+                    "source_label": "Google Drive Conectado",
+                })
+        except Exception:
+            pass
+
+        return detected
 
     def activate_brain(self, brain_id: str) -> bool:
         for b in self.cerebros:

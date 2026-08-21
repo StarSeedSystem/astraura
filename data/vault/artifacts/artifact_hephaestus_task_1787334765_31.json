@@ -1,0 +1,14 @@
+{
+  "task_id": "task_1787334765_31",
+  "agent_id": "hephaestus",
+  "title": "Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b",
+  "timestamp": 1787334795.332003,
+  "target_project_id": "proj_astraura_core",
+  "target_folder": "/Users/alex/Documents/IA 1.58 bit/backend/app",
+  "scanned_files_count": 1,
+  "hardware_telemetry": {
+    "pid": 38970,
+    "ram_rss_mb": 710.0,
+    "cpu_percent": 84.2
+  }
+}

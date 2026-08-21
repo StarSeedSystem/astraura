@@ -1086,6 +1086,17 @@ async def get_openviking_memory():
 async def get_all_cerebros():
     return cerebros_manager.get_cerebros()
 
+@app.get("/api/cerebros/auto_detect")
+async def auto_detect_storage_brains():
+    """Detecta automáticamente cerebros en almacenamientos conectados
+    (discos externos montados, Google Drive si hay token) sin bloquear."""
+    import asyncio
+    try:
+        detected = await asyncio.to_thread(cerebros_manager.auto_detect_storage_brains)
+        return {"success": True, "detected": detected}
+    except Exception as e:
+        return {"success": False, "error": str(e)[:200], "detected": []}
+
 class ActivateBrainRequest(BaseModel):
     brain_id: str
 

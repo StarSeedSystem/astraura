@@ -56,6 +56,7 @@ import {
   activateBrain, 
   saveBrain, 
   deleteBrain,
+  autoDetectStorageBrains,
   fetchBrainSynapticTree,
   attachBrainMemory,
   controlBrainProcess,
@@ -144,8 +145,26 @@ export default function CerebrosView() {
     color: '#00f0ff',
     active_persona: 'astraura_prime'
   });
+  const [detectedBrains, setDetectedBrains] = useState([]);
+  const [detecting, setDetecting] = useState(false);
 
-  const canvasRef = useRef(null);
+  const handleAutoDetect = async () => {
+    setDetecting(true);
+    try {
+      const res = await autoDetectStorageBrains();
+      if (res && res.detected) setDetectedBrains(res.detected);
+      if (res && res.detected && res.detected.length > 0) {
+        setToastMessage(`🔍 ${res.detected.length} cerebro(s) detectado(s) en almacenamientos conectados`);
+      } else {
+        setToastMessage('🔍 No se detectaron cerebros externos nuevos');
+      }
+    } catch (e) {
+      setToastMessage('Error al detectar almacenamientos');
+    } finally {
+      setDetecting(false);
+      setTimeout(() => setToastMessage(''), 4000);
+    }
+  };
   const cameraRef = useRef({
     rotX: 0.2,
     rotY: 0,
@@ -1555,6 +1574,13 @@ export default function CerebrosView() {
                   </div>
                   <div className="flex items-center gap-2">
                     <button
+                      onClick={handleAutoDetect}
+                      className="px-3 py-1.5 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 text-xs font-bold flex items-center gap-1.5"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${detecting ? 'animate-spin' : ''}`} />
+                      {detecting ? 'Detectando…' : '🔍 Detectar Almacenamientos'}
+                    </button>
+                    <button
                       onClick={handleSyncAllSources}
                       className="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 text-xs font-bold flex items-center gap-1.5"
                     >
@@ -1576,6 +1602,41 @@ export default function CerebrosView() {
                       Almacén
                     </button>
                   </div>
+
+                  {detectedBrains.length > 0 && (
+                    <div className="mt-3 p-3 rounded-xl bg-purple-500/10 border border-purple-500/30">
+                      <h5 className="text-xs font-bold text-purple-300 flex items-center gap-1.5 mb-2">
+                        🔍 Cerebros Detectados en Almacenamientos Conectados
+                      </h5>
+                      <div className="space-y-2">
+                        {detectedBrains.map((d) => (
+                          <div key={d.id} className="flex items-center justify-between gap-2 p-2 rounded-lg bg-black/40 border border-white/10">
+                            <div className="min-w-0">
+                              <span className="text-xs font-bold text-white block truncate">{d.name}</span>
+                              <span className="text-[10px] text-slate-400 font-mono">{d.source_label} · {d.source_type}</span>
+                            </div>
+                            <button
+                              onClick={async () => {
+                                try {
+                                  await activateBrain(d.id);
+                                  setToastMessage(`✅ Cerebro enlazado: ${d.name}`);
+                                  const res = await fetchCerebros();
+                                  setCerebrosData(res);
+                                  setSelectedBrainId(d.id);
+                                } catch (e) {
+                                  setToastMessage('Error al enlazar cerebro detectado');
+                                }
+                                setTimeout(() => setToastMessage(''), 4000);
+                              }}
+                              className="px-3 py-1 rounded-lg bg-purple-500/30 hover:bg-purple-500/40 text-purple-200 text-[11px] font-bold shrink-0"
+                            >
+                              Enlazar
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
