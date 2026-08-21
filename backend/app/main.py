@@ -2553,7 +2553,17 @@ async def register_folder_from_filesystem(req: Dict[str, Any]):
 @app.get("/api/notifications/auth_orchestrator_status")
 async def get_auth_orchestrator_status():
     """Estado vivo del Agente de Orquestación Inteligente de Autorizaciones (1.58-bit)."""
-    return intelligent_authorization_orchestrator.get_status()
+    status = intelligent_authorization_orchestrator.get_status()
+    status["auto_mode"] = intelligent_authorization_orchestrator.auto_mode
+    return status
+
+class AuthAutoModeRequest(BaseModel):
+    enabled: bool
+
+@app.post("/api/notifications/auth_orchestrator_auto")
+async def set_auth_orchestrator_auto(req: AuthAutoModeRequest):
+    """Activa/desactiva la Auto-Orquestación de Autorizaciones en 2do plano (siempre activa)."""
+    return intelligent_authorization_orchestrator.set_auto_mode(req.enabled)
 
 @app.get("/api/notifications")
 async def get_system_notifications():

@@ -33,7 +33,8 @@ import {
   deleteSingleNotification,
   clearAllNotifications,
   fetchImaginationSyncExecutionState,
-  fetchAuthOrchestratorStatus
+  fetchAuthOrchestratorStatus,
+  setAuthOrchestratorAuto,
 } from '../services/api';
 
 export default function NotificationsLogsView() {
@@ -44,6 +45,26 @@ export default function NotificationsLogsView() {
   const [actionInProgress, setActionInProgress] = useState(null);
   const [toastMsg, setToastMsg] = useState('');
   const [orchStatus, setOrchStatus] = useState(null);
+  const [autoMode, setAutoMode] = useState(false);
+  const [isTogglingAuto, setIsTogglingAuto] = useState(false);
+
+  const handleToggleAutoMode = async () => {
+    setIsTogglingAuto(true);
+    try {
+      const res = await setAuthOrchestratorAuto(!autoMode);
+      if (res && res.success) {
+        setAutoMode(!!res.auto_mode);
+        setToastMsg(res.auto_mode
+          ? '🟢 Auto-Orquestación ACTIVA: el agente procesará las autorizaciones automáticamente en 2do plano.'
+          : '⚪ Auto-Orquestación apagada.');
+      }
+    } catch (e) {
+      console.warn('Toggle auto-mode error:', e);
+    } finally {
+      setIsTogglingAuto(false);
+      setTimeout(() => setToastMsg(''), 4000);
+    }
+  };
 
   const loadNotifications = async () => {
     try {
@@ -65,7 +86,10 @@ export default function NotificationsLogsView() {
   const loadOrchStatus = async () => {
     try {
       const st = await fetchAuthOrchestratorStatus();
-      if (st) setOrchStatus(st);
+      if (st) {
+        setOrchStatus(st);
+        if (typeof st.auto_mode === 'boolean') setAutoMode(st.auto_mode);
+      }
     } catch (err) {
       console.warn('Error loading orchestrator status:', err);
     }
@@ -314,6 +338,12 @@ export default function NotificationsLogsView() {
         </div>
 
         <div className="flex items-center gap-2">
+          {autoMode && (
+            <span className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-bold animate-pulse">
+              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+              🤖 Auto-Orquestación ACTIVA
+            </span>
+          )}
           {data.unread_count > 0 && (
             <button
               onClick={handleMarkAllRead}
@@ -364,6 +394,20 @@ export default function NotificationsLogsView() {
         >
           <Sparkles className={`w-3.5 h-3.5 ${isApplyingAll ? 'animate-spin' : ''}`} />
           <span>{isApplyingAll ? 'Sincronizando Agentes...' : '✨ Autorizar y Aplicar Todas con Agentes en 2do Plano · v2.2-Orch'}</span>
+        </button>
+
+        <button
+          onClick={handleToggleAutoMode}
+          disabled={isTogglingAuto}
+          className={`px-4 py-2 rounded-xl font-bold flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50 border ${
+            autoMode
+              ? 'bg-emerald-500/20 border-emerald-400/50 text-emerald-300 shadow-md shadow-emerald-500/20'
+              : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+          }`}
+          title="Mantiene la orquestación de autorizaciones funcionando automáticamente en segundo plano"
+        >
+          <span className={`w-2.5 h-2.5 rounded-full ${autoMode ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'}`} />
+          <span>{autoMode ? '🟢 Auto-Orquestación ACTIVA (2do Plano)' : '⚪ Auto-Orquestación en 2do Plano'}</span>
         </button>
       </div>
 

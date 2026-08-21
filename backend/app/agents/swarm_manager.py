@@ -735,6 +735,15 @@ class AdaptiveMultiAreaSwarmEngine:
                         s["last_result"] = f"Ciclo ejecutado a las {time.strftime('%H:%M:%S')}. Todo nominal."
                         self._save_state()
 
+                # 4. Auto-Orquestación de Autorizaciones en 2do plano (siempre activa)
+                try:
+                    from app.agents.intelligent_authorization_orchestrator import intelligent_authorization_orchestrator
+                    tick = intelligent_authorization_orchestrator.tick_auto_mode()
+                    if tick.get("ran"):
+                        print(f"🤖 [AuthOrchestrator] Auto-tick procesó {tick.get('processed')} notificaciones en 2do plano.")
+                except Exception as e:
+                    print(f"⚠️ [AuthOrchestrator] Error en auto-tick del scheduler: {e}")
+
                 # Save updated tasks
                 self._save_state()
 

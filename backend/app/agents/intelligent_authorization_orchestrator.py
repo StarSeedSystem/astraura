@@ -25,6 +25,7 @@ import json
 import time
 import re
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Any, Optional
 
 # DREAM_PROCESS_TYPES es constante de módulo (no atributo de instancia)
@@ -100,11 +101,65 @@ _LOW_PRIORITY_KW = ["cosmetic", "estetica", "decor", "minor", "menor", "opcional
 class IntelligentAuthorizationOrchestrator:
     """Orquestador inteligente de autorizaciones en 2do plano (1.58-bit)."""
 
+    AUTO_MODE_FILE = Path("/Users/alex/Documents/IA 1.58 bit/data/vault/astraura_auth_auto_mode.json")
+
     def __init__(self):
         self.orchestrations_run = 0
         self.last_orchestration = None
         self.is_busy = False
+        self.auto_mode = self._load_auto_mode()
         print("✨ [AuthOrchestrator] Agente de Orquestación Inteligente de Autorizaciones inicializado.")
+        print(f"   {'🟢' if self.auto_mode else '⚪'} Auto-Orquestación en 2do plano: {'ACTIVA' if self.auto_mode else 'apagada'}")
+
+    def _load_auto_mode(self) -> bool:
+        try:
+            if self.AUTO_MODE_FILE.exists():
+                return bool(json.loads(self.AUTO_MODE_FILE.read_text(encoding="utf-8")).get("enabled", False))
+        except Exception:
+            pass
+        return False
+
+    def _save_auto_mode(self):
+        try:
+            self.AUTO_MODE_FILE.parent.mkdir(parents=True, exist_ok=True)
+            self.AUTO_MODE_FILE.write_text(json.dumps({"enabled": self.auto_mode}, indent=2), encoding="utf-8")
+        except Exception as e:
+            print(f"⚠️ [AuthOrchestrator] No se pudo guardar auto_mode: {e}")
+
+    def set_auto_mode(self, enabled: bool) -> Dict[str, Any]:
+        """Activa/desactiva la orquestación automática en segundo plano."""
+        self.auto_mode = bool(enabled)
+        self._save_auto_mode()
+        print(f"✨ [AuthOrchestrator] Auto-Orquestación en 2do plano {'ACTIVADA' if self.auto_mode else 'APAGADA'}")
+        return {"success": True, "auto_mode": self.auto_mode}
+
+    def tick_auto_mode(self) -> Dict[str, Any]:
+        """
+        Disparado periódicamente por el scheduler. Si auto_mode está activo y
+        hay notificaciones con botón de autorizar/aplicar pendientes, las
+        procesa automáticamente con los agentes del enjambre (1.58-bit).
+        Se ejecuta en un HILO SEPARADO para NO bloquear el event loop de
+        uvicorn (las respuestas HTTP siguen respondiendo).
+        """
+        if not self.auto_mode:
+            return {"ran": False, "reason": "auto_mode_off"}
+        if self.is_busy:
+            return {"ran": False, "reason": "busy"}
+        _resolve()
+        try:
+            pending = [n["id"] for n in _notifications.notifications
+                       if n.get("status") not in ("applied", "resolved")]
+            if not pending:
+                return {"ran": False, "reason": "no_pending"}
+            # Lote pequeño por tick para mantener ritmo sostenible y no saturar
+            batch = pending[:5]
+            import threading
+            t = threading.Thread(target=lambda: asyncio.run(self.orchestrate_list(batch)), daemon=True)
+            t.start()
+            return {"ran": True, "dispatched": len(batch), "pending_total": len(pending)}
+        except Exception as e:
+            print(f"⚠️ [AuthOrchestrator] Error en tick_auto_mode: {e}")
+            return {"ran": False, "error": str(e)}
 
     # ─────────────────────────────────────────────────────────────────────
     # Utilidades de contexto 1.58-bit
