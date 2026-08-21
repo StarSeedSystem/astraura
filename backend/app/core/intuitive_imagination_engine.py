@@ -135,6 +135,13 @@ class IntuitiveImaginationEngine:
         self.cycle_frequency_minutes = 5
         self.quantum_entropy_level = 0.75
         
+        # Embargo de solicitudes: cuando el Agente de Orquestación de Autorizaciones
+        # entra en MODO DRENAJE (se acumulan notificaciones), pone este flag en True
+        # para decirle a los agentes imaginativos que DEJEN DE ENVIAR SOLICITUDES de
+        # autorización y prioricen completar las tareas pendientes. Las ramas nuevas
+        # se auto-aprueban (requires_user_approval=False) en lugar de pedir permiso.
+        self.requests_embargoed = False
+        
         self.max_kb_per_minute = 45
         self.max_mb_per_hour = 2.5
         self.hourly_generated_kb = 24.8
@@ -237,6 +244,7 @@ class IntuitiveImaginationEngine:
                 self.max_swarm_global_percent = data.get("max_swarm_global_percent", 40)
                 self.allocated_cores = data.get("allocated_cores", 2)
                 self.quantum_entropy_level = data.get("quantum_entropy_level", 0.75)
+                self.requests_embargoed = data.get("requests_embargoed", False)
                 self.max_kb_per_minute = data.get("max_kb_per_minute", 45)
                 self.max_mb_per_hour = data.get("max_mb_per_hour", 2.5)
                 self.storage_target = data.get("storage_target", "local_vault")
@@ -280,6 +288,7 @@ class IntuitiveImaginationEngine:
                 "max_swarm_global_percent": self.max_swarm_global_percent,
                 "allocated_cores": self.allocated_cores,
                 "quantum_entropy_level": self.quantum_entropy_level,
+                "requests_embargoed": self.requests_embargoed,
                 "max_kb_per_minute": self.max_kb_per_minute,
                 "max_mb_per_hour": self.max_mb_per_hour,
                 "storage_target": self.storage_target,
@@ -564,7 +573,12 @@ class IntuitiveImaginationEngine:
         level_def = PERMISSION_LEVELS.get(policy_level, PERMISSION_LEVELS["auto_apply_safe"])
         
         # Does this proposal require explicit user authorization?
+        # Si el Agente de Orquestación tiene EMBARGO DE SOLICITUDES activo (modo
+        # drenaje por acumulación), las nuevas ramas se AUTO-APRUEBAN para que los
+        # agentes dejen de pedir permiso y prioricen completar las tareas pendientes.
         requires_approval = importance not in level_def["auto_threshold"]
+        if self.requests_embargoed:
+            requires_approval = False
         
         if custom_seed:
             theme = f"Exploración Intuitiva: {custom_seed}"
@@ -599,7 +613,12 @@ class IntuitiveImaginationEngine:
             status_value = "pending_approval"
             applied_by_val = None
         else:
-            if self.auto_sync_all_proposals_enabled:
+            if self.requests_embargoed:
+                # Durante el embargo, la rama va directo a EJECUCIÓN (los agentes
+                # completan la tarea pendiente en lugar de pedir autorización).
+                status_value = "pending_execution"
+                applied_by_val = "auth_orchestrator_embargo"
+            elif self.auto_sync_all_proposals_enabled:
                 status_value = "applied"
                 applied_by_val = "auto_sync_agent"
             else:

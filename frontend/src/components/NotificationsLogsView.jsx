@@ -562,6 +562,11 @@ export default function NotificationsLogsView() {
                   ? `🌊 MODO DRENAJE (cola > ${orchStatus?.max_balanced_queue ?? 20})`
                   : '⚖️ EQUILIBRADO (imaginando)'}
               </span>
+              {orchStatus?.requests_embargoed && (
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full border bg-rose-500/15 text-rose-300 border-rose-500/40 animate-pulse">
+                  🚫 Solicitudes en EMBarGO: agentes priorizan completar pendientes
+                </span>
+              )}
             </div>
 
             {/* Stats del agente */}

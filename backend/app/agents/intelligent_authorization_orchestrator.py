@@ -171,6 +171,14 @@ class IntelligentAuthorizationOrchestrator:
             pending_total = len(pending)
             if pending_total == 0:
                 self._draining_mode = False
+                # Cola vacía → liberar el embargo para que los agentes retomen
+                # la imaginación normal (vuelven a poder pedir autorización).
+                try:
+                    if _intuitive is not None and getattr(_intuitive, "requests_embargoed", False):
+                        _intuitive.requests_embargoed = False
+                        _intuitive._save_state()
+                except Exception:
+                    pass
                 return {"ran": False, "reason": "no_pending"}
 
             # Decidir modo según el tamaño de la cola
@@ -181,7 +189,23 @@ class IntelligentAuthorizationOrchestrator:
                 # para superar la tasa de generación del ecosistema vivo.
                 batch = pending[:]
                 mode_label = "DRENAJE (priorizando completado de tareas pendientes)"
+                # EMBARGO DE SOLICITUDES: decir a los agentes imaginativos que
+                # DEJEN DE ENVIAR solicitudes de autorización y prioricen completar
+                # las tareas pendientes (las ramas nuevas se auto-aprueban).
+                try:
+                    if _intuitive is not None:
+                        _intuitive.requests_embargoed = True
+                        _intuitive._save_state()
+                except Exception:
+                    pass
             else:
+                # EQUILIBRADO: liberar el embargo (volver a pedir autorización normal)
+                try:
+                    if _intuitive is not None and getattr(_intuitive, "requests_embargoed", False):
+                        _intuitive.requests_embargoed = False
+                        _intuitive._save_state()
+                except Exception:
+                    pass
                 batch = pending[:self.NORMAL_BATCH]
                 mode_label = "EQUILIBRADO (procesando y dejando imaginar)"
 
@@ -496,6 +520,17 @@ class IntelligentAuthorizationOrchestrator:
         self.is_busy = True
         self.orchestrations_run += 1
         started = time.time()
+        # EMBARGO temporal: mientras procesamos, los agentes imaginativos dejan de
+        # enviar nuevas solicitudes (se auto-aprueban) para no regenerar notificaciones
+        # durante el vaciado masivo. Se libera en el finally.
+        _embargoed_here = False
+        try:
+            if _intuitive is not None and not getattr(_intuitive, "requests_embargoed", False):
+                _intuitive.requests_embargoed = True
+                _intuitive._save_state()
+                _embargoed_here = True
+        except Exception:
+            pass
         try:
             # 1. Recolectar items válidos (notificación + rama)
             items = []
@@ -698,6 +733,14 @@ class IntelligentAuthorizationOrchestrator:
             return summary
         finally:
             self.is_busy = False
+            # Liberar el embargo solo si lo activamos nosotros (no pisar el del auto-tick)
+            if _embargoed_here:
+                try:
+                    if _intuitive is not None and getattr(_intuitive, "requests_embargoed", False):
+                        _intuitive.requests_embargoed = False
+                        _intuitive._save_state()
+                except Exception:
+                    pass
 
     # ─────────────────────────────────────────────────────────────────────
     # Traslado a la lista de tareas de procesos en segundo plano (visible)
@@ -855,6 +898,7 @@ class IntelligentAuthorizationOrchestrator:
             "orchestrations_run": self.orchestrations_run,
             "auto_mode": self.auto_mode,
             "draining_mode": self._draining_mode,
+            "requests_embargoed": bool(getattr(_intuitive, "requests_embargoed", False)),
             "max_balanced_queue": self.MAX_BALANCED_QUEUE,
             "agent_name": "Agente de Orquestación Inteligente de Autorizaciones",
             "agent_id": "auth_orchestrator",
