@@ -31,156 +31,48 @@ import {
 import { fetchStatus, fetchImaginationStatus, fetchDirectorStatus, fetchSwarmStatus, fetchEcosystemAgents } from '../services/api';
 import AgentTaskSummaryModal from './AgentTaskSummaryModal';
 import AgentFullWorkspaceModal from './AgentFullWorkspaceModal';
-import AgentPanel from './AgentPanel';
 
-const AGENT_PROFILES = [
-  {
-    id: 'hephaestus',
-    name: 'Hephaestus',
-    role: 'Ingeniería, Código ARM NEON & SIMD',
-    icon: Code2,
-    color: '#10b981',
-    defaultTask: 'Optimizando bucles vectoriales ARM64 NEON de 128-bit en kernel ternario 1.58b',
-    progress: 78,
-    cpuPercent: 18,
-    status: 'working',
-    used_personalities: [
-      { id: 'hephaestus', name: 'Hephaestus Forjador', color: '#10b981', archetype: 'Arquitecto de Silicio', voice_id: 'es-ES-AlvaroNeural' },
-      { id: 'astraura_prime', name: 'Astraura Prime', color: '#00f0ff', archetype: 'Zenith Ontocrático', voice_id: 'es-ES-ElviraNeural' }
-    ],
-    linked_cerebros: [
-      { id: 'brain_hephaestus', name: 'Cerebro Hephaestus' },
-      { id: 'brain_genesis', name: 'Cerebro Génesis' }
-    ],
-    logs: [
-      'Analizando registros vectoriales q0-q15...',
-      'Reduciendo 12 accesos a memoria L1...',
-      'Compilación de micro-kernel terminada exitosamente.'
-    ]
-  },
-  {
-    id: 'oneiros',
-    name: 'Oneiros',
-    role: 'Síntesis Creativa, Shaders & UI 3D',
-    icon: Wand2,
-    color: '#ec4899',
-    defaultTask: 'Forjando shaders GLSL WebGL volumétricos con resonancia sensorial',
-    progress: 62,
-    cpuPercent: 14,
-    status: 'working',
-    used_personalities: [
-      { id: 'oneiros', name: 'Oneiros Visionario', color: '#ec4899', archetype: 'Arquitecto Onírico', voice_id: 'es-ES-ElviraNeural' },
-      { id: 'kallisti', name: 'Kallisti Ciberdélica', color: '#ec4899', archetype: 'Musa Poética', voice_id: 'es-ES-PalomaNeural' }
-    ],
-    linked_cerebros: [
-      { id: 'brain_oneiros', name: 'Cerebro Oneiros' },
-      { id: 'brain_hermes', name: 'Cerebro Hermes' }
-    ],
-    logs: [
-      'Calculando curvatura de malla procedural...',
-      'Alineando espectro cromático con temperatura ambiental...',
-      'Boceto de shader renderizado a 60 FPS.'
-    ]
-  },
-  {
-    id: 'mnemosyne',
-    name: 'Mnemosyne',
-    role: 'Gobernanza Sináptica & Memoria StarSeed',
-    icon: Brain,
-    color: '#a855f7',
-    defaultTask: 'Sincronización & Poda del Grafo de Memoria en Bóveda Soberana',
-    progress: 91,
-    cpuPercent: 12,
-    status: 'working',
-    used_personalities: [
-      { id: 'mnemosyne', name: 'Mnemosyne Archivera', color: '#8b5cf6', archetype: 'Custodia del Exocórtex', voice_id: 'es-ES-ElviraNeural' },
-      { id: 'astraura_prime', name: 'Astraura Prime', color: '#00f0ff', archetype: 'Zenith Ontocrático', voice_id: 'es-ES-ElviraNeural' }
-    ],
-    linked_cerebros: [
-      { id: 'brain_mnemosyne', name: 'Cerebro Mnemosyne' },
-      { id: 'brain_genesis', name: 'Cerebro Génesis' }
-    ],
-    logs: [
-      'Indexando 48 conexiones semánticas...',
-      'Poda de nodos redundantes (+1.8 KB liberados)...',
-      'Grafo sináptico 100% armónico.'
-    ]
-  },
-  {
-    id: 'hermes',
-    name: 'Hermes',
-    role: 'Web Intel, Preprints & Tendencias',
-    icon: Globe,
-    color: '#00f0ff',
-    defaultTask: 'Rastreo continuo de preprints de arquitecturas BitNet y LLMs ternarios',
-    progress: 54,
-    cpuPercent: 10,
-    status: 'working',
-    used_personalities: [
-      { id: 'hermes', name: 'Hermes Mensajero', color: '#10b981', archetype: 'Explorador Web', voice_id: 'es-ES-JorgeNeural' },
-      { id: 'mnemosyne', name: 'Mnemosyne Archivera', color: '#8b5cf6', archetype: 'Grafo Semántico', voice_id: 'es-ES-ElviraNeural' }
-    ],
-    linked_cerebros: [
-      { id: 'brain_hermes', name: 'Cerebro Hermes' },
-      { id: 'brain_mnemosyne', name: 'Cerebro Mnemosyne' }
-    ],
-    logs: [
-      'Escaneando publicaciones recientes en arxiv...',
-      'Extrayendo patrones de cuantización ternaria...',
-      '3 síntesis añadidas a la memoria de tendencias.'
-    ]
-  },
-  {
-    id: 'athena',
-    name: 'Athena',
-    role: 'Sentinel, Privacidad 360° & Seguridad',
-    icon: Shield,
-    color: '#f59e0b',
-    defaultTask: 'Auditoría continua de sensores físicos, térmicos y permisos locales',
-    progress: 88,
-    cpuPercent: 8,
-    status: 'working',
-    used_personalities: [
-      { id: 'athena', name: 'Atenea Sentinel', color: '#3b82f6', archetype: 'Custodia SAIF 360°', voice_id: 'es-ES-ElviraNeural' },
-      { id: 'astraura_prime', name: 'Astraura Prime', color: '#00f0ff', archetype: 'Zenith Ontocrático', voice_id: 'es-ES-ElviraNeural' }
-    ],
-    linked_cerebros: [
-      { id: 'brain_athena', name: 'Cerebro Atenea' },
-      { id: 'brain_genesis', name: 'Cerebro Génesis' }
-    ],
-    logs: [
-      'Inspeccionando puertos de red locales...',
-      'Telemetría de batería M1: 95% nominal...',
-      'Directivas de privacidad verificadas.'
-    ]
-  },
-  {
-    id: 'genesis',
-    name: 'Génesis',
-    role: 'Núcleo Ontológico & Razonamiento',
-    icon: Layers,
-    color: '#6366f1',
-    defaultTask: 'Recombinación sináptica inter-cerebros y calibración de hipótesis',
-    progress: 45,
-    cpuPercent: 15,
-    status: 'working',
-    used_personalities: [
-      { id: 'astraura_prime', name: 'Astraura Prime', color: '#00f0ff', archetype: 'Zenith Ontocrático', voice_id: 'es-ES-ElviraNeural' },
-      { id: 'genesis_sovereign', name: 'Génesis Filósofo', color: '#fbbf24', archetype: 'Axiomas Soberanos', voice_id: 'es-ES-AlvaroNeural' }
-    ],
-    linked_cerebros: [
-      { id: 'brain_genesis', name: 'Cerebro Génesis' }
-    ],
-    logs: [
-      'Entrelazando axiomas lógicos con el exocórtex...',
-      'Calibrando entropía cuántica a 0.75...',
-      'Generando propuestas adaptativas para el usuario.'
-    ]
-  }
-];
+// Mapa de presentación por agente del registry (icono, color, personalidades,
+// cerebros) para enriquecer el grid de tareas en vivo con la MISMA información
+// que el resto del ecosistema (fuente única: /api/ecosystem/agents).
+const AGENT_PRESENTATION = {
+  hephaestus: { icon: Code2, color: '#10b981', personalities: [{ id: 'hephaestus', name: 'Hephaestus Forjador', color: '#10b981', archetype: 'Arquitecto de Silicio' }], cerebros: [{ id: 'brain_hephaestus', name: 'Cerebro Hephaestus' }] },
+  hermes: { icon: Globe, color: '#00f0ff', personalities: [{ id: 'hermes', name: 'Hermes Trismegisto', color: '#00f0ff', archetype: 'Mensajero Cósmico' }], cerebros: [{ id: 'brain_hermes', name: 'Cerebro Hermes' }] },
+  mnemosyne: { icon: Brain, color: '#a855f7', personalities: [{ id: 'mnemosyne', name: 'Mnemosyne Archivera', color: '#8b5cf6', archetype: 'Custodia del Exocórtex' }], cerebros: [{ id: 'brain_mnemosyne', name: 'Cerebro Mnemosyne' }] },
+  oneiros: { icon: Wand2, color: '#ec4899', personalities: [{ id: 'oneiros', name: 'Oneiros Visionario', color: '#ec4899', archetype: 'Arquitecto Onírico' }], cerebros: [{ id: 'brain_oneiros', name: 'Cerebro Oneiros' }] },
+  athena: { icon: Shield, color: '#f59e0b', personalities: [{ id: 'athena', name: 'Atenea Guardiana', color: '#f59e0b', archetype: 'Centinela de Privacidad' }], cerebros: [{ id: 'brain_athena', name: 'Cerebro Atenea' }] },
+  daedalus: { icon: Layers, color: '#22d3ee', personalities: [{ id: 'daedalus', name: 'Dédalo Arquitecto', color: '#22d3ee', archetype: 'Tejedor de Proyectos' }], cerebros: [{ id: 'brain_genesis', name: 'Cerebro Génesis' }] },
+  auth_orchestrator: { icon: Bot, color: '#34d399', personalities: [{ id: 'auth_orchestrator', name: 'Agente de Orquestación', color: '#34d399', archetype: 'Autorización Soberana' }], cerebros: [{ id: 'brain_genesis', name: 'Cerebro Génesis' }] },
+  director_orchestrator: { icon: Crown, color: '#a78bfa', personalities: [{ id: 'metis', name: 'Metis Directora', color: '#a78bfa', archetype: 'Zenith del Enjambre' }], cerebros: [{ id: 'brain_genesis', name: 'Cerebro Génesis' }] },
+  architectus_projectmaster: { icon: Sliders, color: '#38bdf8', personalities: [{ id: 'architectus', name: 'Architectus', color: '#38bdf8', archetype: 'ProjectMaster' }], cerebros: [{ id: 'brain_genesis', name: 'Cerebro Génesis' }] },
+  routing_storage_agent: { icon: Globe, color: '#2dd4bf', personalities: [{ id: 'routing', name: 'Agente de Enrutamiento', color: '#2dd4bf', archetype: 'Malla Multi-Dispositivo' }], cerebros: [{ id: 'brain_genesis', name: 'Cerebro Génesis' }] },
+};
+
+// Convierte un agente del registry a la forma que espera el grid de tareas en vivo.
+function mapRegistryToProfile(a, idx) {
+  const p = AGENT_PRESENTATION[a.id] || { icon: Bot, color: '#38bdf8', personalities: [], cerebros: [] };
+  return {
+    id: a.id,
+    name: a.name,
+    role: a.role,
+    icon: p.icon,
+    color: p.color,
+    defaultTask: a.config?.default_task || a.role,
+    progress: a.status_detail?.completed_tasks ? Math.min(100, a.status_detail.completed_tasks * 5) : 0,
+    cpuPercent: a.status_detail?.is_busy ? 15 : 4,
+    status: a.enabled ? 'working' : 'paused',
+    used_personalities: p.personalities,
+    linked_cerebros: p.cerebros,
+    logs: a.status_detail?.last_run?.message ? [a.status_detail.last_run.message] : [],
+    enabled: a.enabled,
+    emoji: a.emoji,
+    area: a.area,
+  };
+}
+
 
 export default function AgentBackgroundTasksZone({ onOpenDirectorModal }) {
-  const [agents, setAgents] = useState(AGENT_PROFILES);
+  const [agents, setAgents] = useState([]);
   const [directorStatus, setDirectorStatus] = useState(null);
   const [swarmStatus, setSwarmStatus] = useState(null);
   const [activeChatAgent, setActiveChatAgent] = useState(null);
@@ -206,7 +98,11 @@ export default function AgentBackgroundTasksZone({ onOpenDirectorModal }) {
       }
       try {
         const aRes = await fetchEcosystemAgents();
-        if (aRes && aRes.agents) setAllAgents(aRes.agents);
+        if (aRes && aRes.agents) {
+          setAllAgents(aRes.agents);
+          // Fuente única: los mismos agentes del registry que en Enjambre/Notificaciones
+          setAgents(aRes.agents.map(mapRegistryToProfile));
+        }
       } catch (e) { /* noop */ }
     };
     syncRealData();
@@ -301,7 +197,7 @@ export default function AgentBackgroundTasksZone({ onOpenDirectorModal }) {
                 👑 Supervisado por Astraura Director // Metis
               </span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                6 Agentes en Vivo
+                {agents.filter(a => a.status === 'working').length || agents.length} Agentes en Vivo
               </span>
             </div>
             <p className="text-[11px] text-slate-300 mt-0.5">
@@ -311,21 +207,6 @@ export default function AgentBackgroundTasksZone({ onOpenDirectorModal }) {
         </div>
 
         {/* Panel unificado de Agentes del Ecosistema (switches + config editable) */}
-        {allAgents.length > 0 && (
-          <div className="rounded-2xl bg-black/40 border border-cyan-500/20 p-3 space-y-2">
-            <div className="flex items-center gap-2 text-[11px] font-bold text-cyan-300">
-              <Bot className="w-3.5 h-3.5" />
-              Agentes del Ecosistema 1.58-bit · Activación & Configuración
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
-              {allAgents.map(a => (
-                <AgentPanel key={a.id} agent={a} onChanged={() => {
-                  fetchAllAgents().then(r => r && r.agents && setAllAgents(r.agents)).catch(() => {});
-                }} />
-              ))}
-            </div>
-          </div>
-        )}
 
         <div className="flex items-center gap-2 text-[11px]">
           {onOpenDirectorModal && (

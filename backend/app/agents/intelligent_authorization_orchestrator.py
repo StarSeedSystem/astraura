@@ -772,18 +772,15 @@ class IntelligentAuthorizationOrchestrator:
             return summary
         finally:
             self.is_busy = False
-            # Liberar el embargo solo si NO quedan ramas pendientes en el ecosistema.
-            # Si el motor de imaginación generó nuevas ramas pending_approval durante
-            # el procesamiento, el embargo se mantiene para que el auto-tick (o el
-            # siguiente ciclo) las conceda y sync_with_imagination no las regenere.
+            # Liberar SIEMPRE el embargo al terminar: el auto-tick lo reactivará
+            # en el siguiente ciclo si aún hay notificaciones pendientes. Si lo
+            # mantenemos atado a la ausencia de ramas pending_approval, el motor
+            # de imaginación queda CONGELADO para siempre (agentes "pausados").
             if _embargoed_here:
                 try:
-                    remaining = [b for b in (_intuitive.branches or [])
-                                 if b.get("status") == "pending_approval" or b.get("requires_user_approval")]
-                    if not remaining:
-                        if _intuitive is not None and getattr(_intuitive, "requests_embargoed", False):
-                            _intuitive.requests_embargoed = False
-                            _intuitive._save_state()
+                    if _intuitive is not None and getattr(_intuitive, "requests_embargoed", False):
+                        _intuitive.requests_embargoed = False
+                        _intuitive._save_state()
                 except Exception:
                     pass
 

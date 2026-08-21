@@ -92,7 +92,6 @@ import ProcessBranchesModal from './ProcessBranchesModal';
 import AgentEditorModal from './AgentEditorModal';
 import AgentApiManagerModal from './AgentApiManagerModal';
 import SynthesisReportModal from './SynthesisReportModal';
-import EcosystemAgentsPanel from './EcosystemAgentsPanel';
 
 export default function IntuitiveImaginationView() {
   const [activeSubTab, setActiveSubTab] = useState('processes'); // 'processes', 'agents_imagination', 'branches', 'creations', 'config'
@@ -738,9 +737,6 @@ export default function IntuitiveImaginationView() {
 
   return (
     <div className="h-full overflow-y-auto space-y-6 font-sans pr-1 pb-16 custom-scrollbar">
-      {/* Panel unificado de Agentes del Ecosistema 1.58-bit (todas las secciones) */}
-      <EcosystemAgentsPanel title="Agentes del Ecosistema · Imaginación Intuitiva 1.58b" filterSection="imagination" />
-
       {/* Toast Notification */}
       {toastMsg && (
         <div className="fixed bottom-6 right-6 z-50 p-4 rounded-2xl bg-gradient-to-r from-purple-900 to-cyan-900 border border-purple-400 text-white font-mono text-xs shadow-2xl animate-fade-in flex items-center gap-3">

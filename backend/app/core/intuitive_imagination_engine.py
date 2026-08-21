@@ -258,6 +258,12 @@ class IntuitiveImaginationEngine:
                 self.max_proposals_per_agent_limit = data.get("max_proposals_per_agent_limit", 4)
                 self.auto_sync_all_proposals_enabled = data.get("auto_sync_all_proposals_enabled", True)
                 self.is_paused_due_to_threshold = data.get("is_paused_due_to_threshold", False)
+                # Auto-sanidad: si está pausado pero YA no hay suficientes pendientes,
+                # liberar la pausa (evita que el ecosistema quede congelado para siempre).
+                if self.is_paused_due_to_threshold:
+                    _pr = [b for b in (data.get("branches") or []) if b.get("status") == "pending_approval" or b.get("requires_user_approval")]
+                    if len(_pr) < self.max_accumulated_requests_threshold:
+                        self.is_paused_due_to_threshold = False
                 
                 saved_policies = data.get("permission_policies", {})
                 if saved_policies:
@@ -514,7 +520,11 @@ class IntuitiveImaginationEngine:
         """
         # Check accumulated requests threshold
         pending_requests = [b for b in self.branches if b.get("status") == "pending_approval" or b.get("requires_user_approval")]
-        if len(pending_requests) >= self.max_accumulated_requests_threshold and not custom_seed:
+        # Auto-reactivación: si bajaron del umbral (o el orquestrador está drenando
+        # con embargo), liberar la pausa para que la imaginación retome.
+        if self.is_paused_due_to_threshold and (len(pending_requests) < self.max_accumulated_requests_threshold or getattr(self, "requests_embargoed", False)):
+            self.is_paused_due_to_threshold = False
+        if len(pending_requests) >= self.max_accumulated_requests_threshold and not custom_seed and not getattr(self, "requests_embargoed", False):
             self.is_paused_due_to_threshold = True
             system_notifications_engine.add_notification({
                 "title": "⚠️ Solicitudes Máximas Acumuladas: Procesos Pausados",
