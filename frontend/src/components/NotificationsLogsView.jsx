@@ -215,6 +215,11 @@ export default function NotificationsLogsView() {
       }));
       try { await markNotificationsRead(null); } catch (e) { /* noop */ }
 
+      // 4.5. Vaciar TODAS las notificaciones restantes (informativas del sistema
+      //      que el ecosistema genera en vivo) para que la lista quede limpia y
+      //      el usuario vea que se vaciaron completamente.
+      try { await clearAllNotifications(); } catch (e) { /* noop */ }
+
       // 5. Force refresh from backend after sync (confirma que desaparecieron)
       await loadNotifications();
 

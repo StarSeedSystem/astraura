@@ -133,6 +133,18 @@ class SystemNotificationsEngine:
         Sincroniza bidireccionalmente las propuestas pendientes de Imaginación Intuitiva con Notificaciones.
         Garantiza que ambas listas sean 100% idénticas.
         """
+        # Si el Agente de Orquestación tiene EMBARGO DE SOLICITUDES activo (modo
+        # drenaje), NO regeneramos notificaciones desde ramas pendientes: los agentes
+        # imaginativos ya dejaron de pedir autorización y el orquestrador está
+        # vaciando la cola. Regenerar aquí revertiría el vaciado. Solo marcamos las
+        # notificaciones existentes como aplicadas si su rama ya lo está.
+        embargoed = False
+        try:
+            from app.core.intuitive_imagination_engine import intuitive_imagination_engine
+            embargoed = bool(getattr(intuitive_imagination_engine, "requests_embargoed", False))
+        except Exception:
+            pass
+
         pending_branches = [b for b in branches if b.get("status") == "pending_approval" or b.get("requires_user_approval")]
         existing_branch_ids = set()
 
@@ -154,21 +166,22 @@ class SystemNotificationsEngine:
                     n["status"] = "applied"
                     n["read"] = True
 
-        for b in pending_branches:
-            b_id = b.get("id")
-            if b_id and b_id not in existing_branch_ids:
-                self.notifications.insert(0, {
-                    "id": f"notif_req_{b_id}",
-                    "title": f"⚠️ Solicitud de Autorización: {b.get('process_name', 'Imaginación')}",
-                    "message": f"Propuesta '{b.get('theme', 'Auto-mejora')}'. Hipótesis: {b.get('hypothesis', '')}",
-                    "category": "Solicitud de Autorización",
-                    "severity": "warning",
-                    "timestamp": b.get("timestamp", time.time()),
-                    "read": False,
-                    "branch_id": b_id,
-                    "status": "pending",
-                    "action_type": "grant_authorization"
-                })
+        if not embargoed:
+            for b in pending_branches:
+                b_id = b.get("id")
+                if b_id and b_id not in existing_branch_ids:
+                    self.notifications.insert(0, {
+                        "id": f"notif_req_{b_id}",
+                        "title": f"⚠️ Solicitud de Autorización: {b.get('process_name', 'Imaginación')}",
+                        "message": f"Propuesta '{b.get('theme', 'Auto-mejora')}'. Hipótesis: {b.get('hypothesis', '')}",
+                        "category": "Solicitud de Autorización",
+                        "severity": "warning",
+                        "timestamp": b.get("timestamp", time.time()),
+                        "read": False,
+                        "branch_id": b_id,
+                        "status": "pending",
+                        "action_type": "grant_authorization"
+                    })
         self._save()
 
     def add_branching_log(self, log_entry: Dict[str, Any]):

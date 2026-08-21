@@ -196,6 +196,14 @@ class IntelligentAuthorizationOrchestrator:
                     if _intuitive is not None:
                         _intuitive.requests_embargoed = True
                         _intuitive._save_state()
+                        # Conceder autorización a ramas pending_approval huérfanas
+                        # (sin notificación) para drenar TODA la cola del ecosistema.
+                        for b in (_intuitive.branches or []):
+                            if b.get("status") == "pending_approval" or b.get("requires_user_approval"):
+                                try:
+                                    _intuitive.grant_and_apply_request(b.get("id"))
+                                except Exception:
+                                    pass
                 except Exception:
                     pass
             else:
@@ -213,6 +221,21 @@ class IntelligentAuthorizationOrchestrator:
             coordination = {}
             if draining:
                 coordination = self._coordinate_drainage(pending_total, len(batch))
+
+                # EMBARGO + barrido de ramas huérfanas (arriba). Además, limpiar las
+                # notificaciones INFORMATIVAS del sistema (que el ecosistema genera
+                # en vivo) para que la lista se mantenga vacía durante el drenaje.
+                try:
+                    for n in list(_notifications.notifications):
+                        if n.get("status") in ("applied", "resolved"):
+                            continue
+                        if n.get("action_type") != "grant_authorization" and not n.get("id", "").startswith("notif_req_"):
+                            try:
+                                _notifications.delete_single_notification(n["id"])
+                            except Exception:
+                                pass
+                except Exception as e:
+                    print(f"⚠️ [AuthOrchestrator] limpieza informativas: {e}")
 
             import threading
             t = threading.Thread(
@@ -608,6 +631,22 @@ class IntelligentAuthorizationOrchestrator:
                     "personality": personality,
                 })
 
+            # Barrido de ramas pendientes HUÉRFANAS (sin notificación) del ecosistema:
+            # concederles autorización directa para que NO queden como pending_approval
+            # y el sync_with_imagination no las regenere al liberar el embargo.
+            try:
+                notified_branch_ids = {it["branch"].get("id") for it in items if it.get("branch")}
+                for b in _intuitive.branches:
+                    if b.get("id") in notified_branch_ids:
+                        continue
+                    if b.get("status") == "pending_approval" or b.get("requires_user_approval"):
+                        try:
+                            _intuitive.grant_and_apply_request(b.get("id"))
+                        except Exception:
+                            pass
+            except Exception as e:
+                print(f"⚠️ [AuthOrchestrator] barrido ramas huérfanas: {e}")
+
             # 2. Relacionar y ordenar
             ordered = self._relate_tasks(items)
 
@@ -733,12 +772,18 @@ class IntelligentAuthorizationOrchestrator:
             return summary
         finally:
             self.is_busy = False
-            # Liberar el embargo solo si lo activamos nosotros (no pisar el del auto-tick)
+            # Liberar el embargo solo si NO quedan ramas pendientes en el ecosistema.
+            # Si el motor de imaginación generó nuevas ramas pending_approval durante
+            # el procesamiento, el embargo se mantiene para que el auto-tick (o el
+            # siguiente ciclo) las conceda y sync_with_imagination no las regenere.
             if _embargoed_here:
                 try:
-                    if _intuitive is not None and getattr(_intuitive, "requests_embargoed", False):
-                        _intuitive.requests_embargoed = False
-                        _intuitive._save_state()
+                    remaining = [b for b in (_intuitive.branches or [])
+                                 if b.get("status") == "pending_approval" or b.get("requires_user_approval")]
+                    if not remaining:
+                        if _intuitive is not None and getattr(_intuitive, "requests_embargoed", False):
+                            _intuitive.requests_embargoed = False
+                            _intuitive._save_state()
                 except Exception:
                     pass
 
