@@ -2565,6 +2565,50 @@ async def set_auth_orchestrator_auto(req: AuthAutoModeRequest):
     """Activa/desactiva la Auto-Orquestación de Autorizaciones en 2do plano (siempre activa)."""
     return intelligent_authorization_orchestrator.set_auto_mode(req.enabled)
 
+# ================= Agent Registry (todos los agentes del ecosistema) =================
+
+from .agents.agent_registry import agent_registry
+
+@app.get("/api/ecosystem/agents")
+async def get_all_agents():
+    """Lista unificada de TODOS los agentes con estado en vivo y config editable."""
+    return {"success": True, "agents": agent_registry.get_all_agents()}
+
+@app.get("/api/ecosystem/agents/{agent_id}")
+async def get_single_agent(agent_id: str):
+    agent = agent_registry.get_agent(agent_id)
+    if not agent:
+        return {"success": False, "error": "Agente no encontrado"}
+    return {"success": True, "agent": agent}
+
+class AgentConfigRequest(BaseModel):
+    config: Dict[str, Any]
+
+@app.post("/api/ecosystem/agents/{agent_id}/config")
+async def update_agent_config(agent_id: str, req: AgentConfigRequest):
+    """Edita la configuración de un agente (todas sus secciones configurables)."""
+    return agent_registry.update_config(agent_id, req.config)
+
+class AgentEnableRequest(BaseModel):
+    enabled: bool
+
+@app.post("/api/ecosystem/agents/{agent_id}/toggle")
+async def toggle_agent_enabled(agent_id: str, req: AgentEnableRequest):
+    """Activa/desactiva un agente del ecosistema."""
+    return agent_registry.set_enabled(agent_id, req.enabled)
+
+# ================= Routing, Storage & Universal Sync Agent =================
+
+from .agents.routing_storage_agent import routing_storage_agent
+
+@app.get("/api/routing_storage/status")
+async def get_routing_storage_status():
+    return routing_storage_agent.get_status()
+
+@app.post("/api/routing_storage/sync")
+async def run_routing_storage_sync():
+    return await routing_storage_agent.run_sync_cycle()
+
 @app.get("/api/notifications")
 async def get_system_notifications():
     system_notifications_engine.sync_with_imagination(intuitive_imagination_engine.branches)

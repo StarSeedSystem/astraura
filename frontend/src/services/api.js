@@ -1869,6 +1869,32 @@ export async function setAuthOrchestratorAuto(enabled) {
   });
 }
 
+export async function updateAgentConfig(agentId, config) {
+  return apiFetch(`/ecosystem/agents/${agentId}/config`, {
+    method: 'POST',
+    body: JSON.stringify({ config }),
+  });
+}
+
+export async function toggleAgentEnabled(agentId, enabled) {
+  return apiFetch(`/ecosystem/agents/${agentId}/toggle`, {
+    method: 'POST',
+    body: JSON.stringify({ enabled }),
+  });
+}
+
+export async function fetchRoutingStorageStatus() {
+  return apiFetch('/routing_storage/status');
+}
+
+export async function fetchEcosystemAgents() {
+  return apiFetch('/ecosystem/agents');
+}
+
+export async function runRoutingStorageSync() {
+  return apiFetch('/routing_storage/sync', { method: 'POST' });
+}
+
 export async function fetchImaginationSyncExecutionState() {
   return apiFetch('/imagination/sync_execution_state');
 }

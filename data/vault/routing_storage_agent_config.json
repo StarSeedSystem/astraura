@@ -1,0 +1,41 @@
+{
+  "enabled": true,
+  "auto_detect_devices": true,
+  "auto_sync_brains_to_universal_apps": true,
+  "auto_organize_memories": true,
+  "realtime_mesh": true,
+  "scan_targets": [
+    "/Users/alex/Documents/IA 1.58 bit",
+    "/Users/alex/Documents",
+    "/Volumes",
+    "/Users/alex/Desktop",
+    "/Users/alex/Downloads"
+  ],
+  "device_roles": {
+    "macbook_pro_m1": {
+      "type": "laptop",
+      "processor": "Apple Silicon M1 (8-core CPU / 8-core GPU)",
+      "usage": "Procesamiento principal de inferencia 1.58b y orquestación",
+      "priority": 10
+    }
+  },
+  "sync_rules": [
+    {
+      "name": "Cerebros → Apps Universales",
+      "enabled": true,
+      "description": "Exporta cada cerebro a app autoejecutable universal."
+    },
+    {
+      "name": "Memorias → Cerebros",
+      "enabled": true,
+      "description": "Clasifica memorias detectadas en el cerebro correspondiente."
+    },
+    {
+      "name": "Fusión Multi-OS",
+      "enabled": true,
+      "description": "Une sistemas operativos conectados en una malla coherente."
+    }
+  ],
+  "max_concurrent_routes": 4,
+  "hardware_map": {}
+}

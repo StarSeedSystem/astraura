@@ -28,9 +28,10 @@ import {
   Crown,
   Folder
 } from 'lucide-react';
-import { fetchStatus, fetchImaginationStatus, fetchDirectorStatus, fetchSwarmStatus } from '../services/api';
+import { fetchStatus, fetchImaginationStatus, fetchDirectorStatus, fetchSwarmStatus, fetchEcosystemAgents } from '../services/api';
 import AgentTaskSummaryModal from './AgentTaskSummaryModal';
 import AgentFullWorkspaceModal from './AgentFullWorkspaceModal';
+import AgentPanel from './AgentPanel';
 
 const AGENT_PROFILES = [
   {
@@ -188,6 +189,7 @@ export default function AgentBackgroundTasksZone({ onOpenDirectorModal }) {
   const [chatMessages, setChatMessages] = useState({});
   const [userInput, setUserInput] = useState('');
   const [isReplying, setIsReplying] = useState(false);
+  const [allAgents, setAllAgents] = useState([]);
 
   // Periodic real-time sync with Director and Swarm Engine
   useEffect(() => {
@@ -202,9 +204,13 @@ export default function AgentBackgroundTasksZone({ onOpenDirectorModal }) {
       } catch (e) {
         // Silently continue
       }
+      try {
+        const aRes = await fetchEcosystemAgents();
+        if (aRes && aRes.agents) setAllAgents(aRes.agents);
+      } catch (e) { /* noop */ }
     };
     syncRealData();
-    const interval = setInterval(syncRealData, 2500);
+    const interval = setInterval(syncRealData, 8000);
     return () => clearInterval(interval);
   }, []);
 
@@ -303,6 +309,23 @@ export default function AgentBackgroundTasksZone({ onOpenDirectorModal }) {
             </p>
           </div>
         </div>
+
+        {/* Panel unificado de Agentes del Ecosistema (switches + config editable) */}
+        {allAgents.length > 0 && (
+          <div className="rounded-2xl bg-black/40 border border-cyan-500/20 p-3 space-y-2">
+            <div className="flex items-center gap-2 text-[11px] font-bold text-cyan-300">
+              <Bot className="w-3.5 h-3.5" />
+              Agentes del Ecosistema 1.58-bit · Activación & Configuración
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
+              {allAgents.map(a => (
+                <AgentPanel key={a.id} agent={a} onChanged={() => {
+                  fetchAllAgents().then(r => r && r.agents && setAllAgents(r.agents)).catch(() => {});
+                }} />
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="flex items-center gap-2 text-[11px]">
           {onOpenDirectorModal && (

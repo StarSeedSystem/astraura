@@ -3,6 +3,7 @@ import time
 import json
 import asyncio
 import random
+import threading
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 import psutil
@@ -740,9 +741,17 @@ class AdaptiveMultiAreaSwarmEngine:
                     from app.agents.intelligent_authorization_orchestrator import intelligent_authorization_orchestrator
                     tick = intelligent_authorization_orchestrator.tick_auto_mode()
                     if tick.get("ran"):
-                        print(f"🤖 [AuthOrchestrator] Auto-tick procesó {tick.get('processed')} notificaciones en 2do plano.")
+                        print(f"🤖 [AuthOrchestrator] Auto-tick procesó {tick.get('dispatched')} notificaciones en 2do plano.")
                 except Exception as e:
                     print(f"⚠️ [AuthOrchestrator] Error en auto-tick del scheduler: {e}")
+
+                # 5. Agente de Enrutamiento, Almacenamiento & Sincronización Universal
+                try:
+                    from app.agents.routing_storage_agent import routing_storage_agent
+                    if routing_storage_agent.config.get("enabled", True) and not routing_storage_agent.is_busy:
+                        threading.Thread(target=lambda: asyncio.run(routing_storage_agent.run_sync_cycle()), daemon=True).start()
+                except Exception as e:
+                    print(f"⚠️ [RoutingStorageAgent] Error en auto-tick del scheduler: {e}")
 
                 # Save updated tasks
                 self._save_state()

@@ -68,6 +68,7 @@ import {
 } from '../services/api';
 import AgentEditorModal from './AgentEditorModal';
 import AgentApiManagerModal from './AgentApiManagerModal';
+import EcosystemAgentsPanel from './EcosystemAgentsPanel';
 
 export default function AgentSwarmView() {
   const [swarmData, setSwarmData] = useState(null);
@@ -392,6 +393,8 @@ export default function AgentSwarmView() {
 
   return (
     <div className="flex flex-col h-full bg-[#08090d] rounded-2xl border border-white/10 overflow-hidden shadow-2xl p-4 sm:p-6 space-y-6 overflow-y-auto font-sans">
+      {/* Panel unificado de Agentes del Ecosistema (Capacidades Adaptativas & Multi-Área) */}
+      <EcosystemAgentsPanel title="Agentes del Ecosistema · Enjambre Multiagéntico" filterSection="swarm" />
       {/* Top Banner: Dynamic Adaptive Relative Capacity Governor */}
       <div className="p-6 rounded-3xl bg-gradient-to-r from-[#0d1624] via-[#101c30] to-[#0a121e] border border-cyan-500/30 shadow-2xl relative overflow-hidden">
         <div className="absolute -right-10 -top-10 w-72 h-72 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none" />

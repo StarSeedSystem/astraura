@@ -35,7 +35,10 @@ import {
   fetchImaginationSyncExecutionState,
   fetchAuthOrchestratorStatus,
   setAuthOrchestratorAuto,
+  fetchRoutingStorageStatus,
+  runRoutingStorageSync,
 } from '../services/api';
+import EcosystemAgentsPanel from './EcosystemAgentsPanel';
 
 export default function NotificationsLogsView() {
   const [data, setData] = useState({ unread_count: 0, notifications: [], branching_logs: [] });
@@ -47,6 +50,7 @@ export default function NotificationsLogsView() {
   const [orchStatus, setOrchStatus] = useState(null);
   const [autoMode, setAutoMode] = useState(false);
   const [isTogglingAuto, setIsTogglingAuto] = useState(false);
+  const [routingStatus, setRoutingStatus] = useState(null);
 
   const handleToggleAutoMode = async () => {
     setIsTogglingAuto(true);
@@ -98,9 +102,17 @@ export default function NotificationsLogsView() {
   useEffect(() => {
     loadNotifications();
     loadOrchStatus();
+    const loadRouting = async () => {
+      try {
+        const r = await fetchRoutingStorageStatus();
+        if (r) setRoutingStatus(r);
+      } catch (e) { /* noop */ }
+    };
+    loadRouting();
     const interval = setInterval(() => {
       loadNotifications();
       loadOrchStatus();
+      loadRouting();
     }, 8000);
     return () => clearInterval(interval);
   }, []);
@@ -667,6 +679,62 @@ export default function NotificationsLogsView() {
                 {orchStatus.last_run.failed.length} notificación(es) sin rama asociada (sistema) — no requieren agente.
               </div>
             )}
+
+            {/* SECTION 3: AGENTE DE ENRUTAMIENTO, ALMACENAMIENTO & SINCRONIZACIÓN UNIVERSAL */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-cyan-950/30 via-blue-950/20 to-emerald-950/20 border border-cyan-500/30 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-cyan-300" />
+                  <span className="font-bold text-cyan-200 text-sm">🌐 Enrutamiento, Almacenamiento & Sincronización Universal</span>
+                </div>
+                <span className={`text-[9px] px-2 py-0.5 rounded-full ${routingStatus?.enabled ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-600/30 text-slate-400'}`}>
+                  {routingStatus?.enabled ? '🟢 ACTIVO' : '⚪ apagado'}
+                </span>
+              </div>
+              <p className="text-[10px] text-slate-400 leading-snug">
+                Malla multi-dispositivo sincronizada en tiempo real: detección automática de memorias 1.58b StarSeed en almacenamientos conectados, fusión de sistemas operativos, enrutamiento automático de cerebros a apps universales y organización de toda la información del ecosistema.
+              </p>
+
+              {routingStatus && (
+                <div className="grid grid-cols-2 gap-2 text-[9px] font-mono">
+                  <div className="p-2 rounded-lg bg-black/40 border border-cyan-500/20">
+                    📡 Dispositivos: <span className="text-cyan-300">{routingStatus.detected_devices?.length || 0}</span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-black/40 border border-pink-500/20">
+                    🧠 Cerebros: <span className="text-pink-300">{routingStatus.brains_count || 0}</span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-black/40 border border-emerald-500/20">
+                    🔄 Syncs: <span className="text-emerald-300">{routingStatus.sync_runs || 0}</span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-black/40 border border-amber-500/20">
+                    ⚡ Estado: <span className="text-amber-300">{routingStatus.is_busy ? 'sincronizando' : 'idle'}</span>
+                  </div>
+                </div>
+              )}
+
+              {routingStatus?.detected_devices?.length > 0 && (
+                <div className="space-y-1 max-h-32 overflow-y-auto pr-1 custom-scrollbar">
+                  {routingStatus.detected_devices.slice(0, 5).map((d, i) => (
+                    <div key={i} className="flex items-center justify-between text-[9px] text-slate-400 font-mono bg-black/30 rounded px-2 py-1">
+                      <span className="flex items-center gap-1"><Server className="w-2.5 h-2.5 text-cyan-400" />{d.name}</span>
+                      <span className="text-slate-500">{d.type} • {d.processor}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={async () => {
+                    try { await runRoutingStorageSync(); setToastMsg('🌐 Sincronización universal de malla multi-dispositivo iniciada'); setTimeout(() => setToastMsg(''), 3500); } catch (e) { console.warn(e); }
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-cyan-500/20 border border-cyan-400/40 text-cyan-200 hover:bg-cyan-500/30 text-[11px] font-bold flex items-center gap-1.5 cursor-pointer"
+                >
+                  <RefreshCw className="w-3 h-3" /> Sincronizar Ahora
+                </button>
+                <EcosystemAgentsPanel title="Agente de Enrutamiento en Ecosistema" filterSection="routing" />
+              </div>
+            </div>
           </div>
 
           {/* Árbol de ramas en segundo plano (contexto histórico) */}
