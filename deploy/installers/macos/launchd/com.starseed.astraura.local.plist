@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.starseed.astraura</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/alex/Documents/IA 1.58 bit/.venv/bin/python</string>
+        <string>-m</string>
+        <string>uvicorn</string>
+        <string>app.main:app</string>
+        <string>--host</string>
+        <string>127.0.0.1</string>
+        <string>--port</string>
+        <string>8000</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/Users/alex/Documents/IA 1.58 bit</string>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+        <key>Crashed</key>
+        <true/>
+    </dict>
+    <key>StandardOutPath</key>
+    <string>/tmp/astraura_launchd.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/astraura_launchd_err.log</string>
+    <key>ProcessType</key>
+    <string>Standard</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        <key>LANG</key>
+        <string>es_ES.UTF-8</string>
+        <key>PYTHONPATH</key>
+        <string>/Users/alex/Documents/IA 1.58 bit/backend</string>
+    </dict>
+</dict>
+</plist>
