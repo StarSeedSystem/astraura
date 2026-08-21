@@ -407,27 +407,31 @@ export default function NotificationsLogsView() {
           className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-bold flex items-center gap-2 cursor-pointer shadow-md shadow-emerald-500/20 transition-all disabled:opacity-50"
         >
           <Sparkles className={`w-3.5 h-3.5 ${isApplyingAll ? 'animate-spin' : ''}`} />
-          <span>{isApplyingAll ? 'Sincronizando Agentes...' : '✨ Autorizar y Aplicar Todas con Agentes en 2do Plano · v2.2-Orch'}</span>
+          <span>{isApplyingAll ? 'Sincronizando Agentes...' : '✨ Autorizar y Aplicar Todas'}</span>
         </button>
 
         {/* SWITCH Auto-Orquestación en 2do Plano */}
-        <button
-          onClick={handleToggleAutoMode}
-          disabled={isTogglingAuto}
-          role="switch"
-          aria-checked={autoMode}
-          title="Mantiene la orquestación de autorizaciones funcionando automáticamente en segundo plano"
-          className={`relative inline-flex h-7 w-14 shrink-0 items-center rounded-full transition-colors cursor-pointer disabled:opacity-50 border ${
-            autoMode
-              ? 'bg-emerald-500 border-emerald-400/50 shadow-md shadow-emerald-500/30'
-              : 'bg-slate-700 border-white/10'
-          }`}
-        >
-          <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${autoMode ? 'translate-x-8' : 'translate-x-1'}`} />
-        </button>
-        <span className={`text-[12px] font-bold ${autoMode ? 'text-emerald-300' : 'text-slate-400'}`}>
-          {autoMode ? '🟢 Auto-Orquestación ACTIVA (2do Plano)' : '⚪ Auto-Orquestación en 2do Plano'}
-        </span>
+        <div className="flex items-center gap-2 ml-1">
+          <button
+            onClick={handleToggleAutoMode}
+            disabled={isTogglingAuto}
+            role="switch"
+            aria-checked={autoMode}
+            title="Activa la autogestión automática de las solicitudes de permisos por el Agente de Orquestación Inteligente de Autorizaciones en segundo plano"
+            className={`relative inline-flex h-7 w-14 shrink-0 items-center rounded-full transition-colors cursor-pointer disabled:opacity-50 border ${
+              autoMode
+                ? 'bg-emerald-500 border-emerald-400/50 shadow-md shadow-emerald-500/30'
+                : 'bg-slate-700 border-white/10'
+            }`}
+          >
+            <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${autoMode ? 'translate-x-8' : 'translate-x-1'}`} />
+          </button>
+          <span className={`text-[11px] font-bold leading-tight max-w-[220px] ${autoMode ? 'text-emerald-300' : 'text-slate-400'}`}>
+            {autoMode
+              ? '🟢 Autogestión de solicitudes de permisos con Agente de Orquestación Inteligente de Autorizaciones'
+              : '⚪ Autogestión de solicitudes de permisos con Agente de Orquestación Inteligente de Autorizaciones'}
+          </span>
+        </div>
       </div>
 
       {/* Main Grid: Notifications on Left, Branching Logs on Right */}

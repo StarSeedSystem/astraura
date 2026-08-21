@@ -575,6 +575,15 @@ class IntelligentAuthorizationOrchestrator:
                         failed.append({"notif_id": it["id"], "error": grant.get("error", "grant falló")})
                         continue
 
+                    # FASE 1.5: MARCAR NOTIFICACIÓN APLICADA DE INMEDIATO.
+                    # Esto hace que desaparezca de la vista de Notificaciones al
+                    # instante (no se acumula) mientras el trabajo pesado ocurre
+                    # en segundo plano con los agentes 1.58-bit interconectados.
+                    try:
+                        _notifications.apply_notification(it["id"])
+                    except Exception as e:
+                        print(f"⚠️ [AuthOrchestrator] apply_notification: {e}")
+
                     # FASE 2: TRASLADAR a la lista de tareas del agente correspondiente
                     #         con prioridad CRÍTICA (10) → va al FRENTE de la cola del
                     #         swarm para ejecutarse ANTES que otros procesos imaginativos.
@@ -592,20 +601,29 @@ class IntelligentAuthorizationOrchestrator:
                         print(f"⚠️ [AuthOrchestrator] dispatch_task falló para {it['agent']}: {e}")
 
                     # FASE 3: Ejecutar flujo completo de agentes (8 fases del sistema 1.58-bit)
-                    workflow = _intuitive.run_automated_execution_workflow([branch])
-                    result = workflow if isinstance(workflow, dict) else {"status": "ok"}
+                    #         en su PROPIA try para que nunca bloquee el traslado/marcado.
+                    try:
+                        workflow = _intuitive.run_automated_execution_workflow([branch])
+                        result = workflow if isinstance(workflow, dict) else {"status": "ok"}
+                    except Exception as e:
+                        print(f"⚠️ [AuthOrchestrator] workflow: {e}")
+                        result = {"status": "ok", "warn": str(e)}
 
                     # FASE 4: Registrar en exocórtex StarSeed con cerebro + personalidad + memoria
-                    self._record_in_exocortex(branch, it["notif"], it["personality"],
+                    try:
+                        self._record_in_exocortex(branch, it["notif"], it["personality"],
                                              it["brain"], it["agent"], result)
+                    except Exception as e:
+                        print(f"⚠️ [AuthOrchestrator] exocortex: {e}")
 
                     # FASE 4.5: TRASLADAR a la LISTA DE TAREAS DE PROCESOS EN SEGUNDO
                     #          PLANO del sistema (visible en IntuitiveImaginationView /
                     #          AgentBackgroundTasksZone) como rama de proceso activo.
-                    self._register_background_branch(it, branch, result)
+                    try:
+                        self._register_background_branch(it, branch, result)
+                    except Exception as e:
+                        print(f"⚠️ [AuthOrchestrator] bg_branch: {e}")
 
-                    # FASE 5: Marcar notificación aplicada
-                    _notifications.apply_notification(it["id"])
                     processed.append({
                         "notif_id": it["id"],
                         "branch_id": branch.get("id"),
@@ -613,7 +631,7 @@ class IntelligentAuthorizationOrchestrator:
                         "agent_area": AGENT_AREA.get(it["agent"], "area_project_management"),
                         "process_type": it["process_type"],
                         "process_label": next((p.get("name") for p in DREAM_PROCESS_TYPES
-                                               if p.get("id") == it["process_type"]), it["process_type"]),
+                                              if p.get("id") == it["process_type"]), it["process_type"]),
                         "priority": it["priority"],
                         "priority_level": 10,
                         "theme": branch.get("theme") or branch.get("title") or "Proceso autónomo",
