@@ -26,12 +26,10 @@
   "license": "MIT",
   "devDependencies": {
     "electron": "^32.0.0",
-    "electron-builder": "^25.0.0",
-    "electron-icon-builder": "^2.1.0"
+    "electron-builder": "^25.0.0"
   },
   "dependencies": {
-    "electron-store": "^10.0.0",
-    "node-pty": "^1.0.0"
+    "electron-store": "^10.0.0"
   },
   "build": {
     "appId": "com.starseed.astraura",
@@ -43,25 +41,25 @@
     "files": [
       "main.js",
       "preload.js",
-      "assets/**/*",
-      "resources/**/*"
+      "assets/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../frontend/dist",
+        "to": "frontend/dist"
+      }
     ],
     "mac": {
       "target": [
         "dmg",
         "zip"
       ],
-      "icon": "assets/icon.icns",
       "category": "public.app-category.developer-tools",
-      "hardenedRuntime": true,
-      "gatekeeperAssess": false,
-      "entitlements": "assets/entitlements.mac.plist",
-      "entitlementsInherit": "assets/entitlements.mac.plist"
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
     },
     "dmg": {
-      "title": "Astraura 1.58-Bit Installer",
-      "background": "assets/dmg-background.png",
-      "icon": "assets/icon.icns"
+      "title": "Astraura 1.58-Bit Installer"
     },
     "linux": {
       "target": [
@@ -69,13 +67,14 @@
         "deb",
         "rpm"
       ],
-      "icon": "assets/icon.png",
       "category": "Development",
       "maintainer": "StarSeed System <alexbordongarrigos@gmail.com>",
       "desktop": {
-        "Name": "Astraura 1.58-Bit",
-        "Comment": "Sovereign Multi-Agent Cognitive Engine",
-        "Categories": "Development;Science;Education;"
+        "entry": {
+          "Name": "Astraura 1.58-Bit",
+          "Comment": "Sovereign Multi-Agent Cognitive Engine",
+          "Categories": "Development;Science;Education;"
+        }
       }
     },
     "win": {
@@ -83,8 +82,6 @@
         "nsis",
         "portable"
       ],
-      "icon": "assets/icon.ico",
-      "publisherName": "StarSeed System",
       "verifyUpdateCodeSignature": false
     },
     "nsis": {

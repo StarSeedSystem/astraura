@@ -1,87 +1,37 @@
 /**
- * Astraura 1.58-Bit - Electron Preload Script
- * Secure IPC bridge between main process and renderer
+ * Astraura 1.58-Bit // Preload Script
+ * Secure bridge between Electron renderer and main process.
+ * Context isolation is enabled, so only explicitly exposed APIs are available.
  */
-
 const { contextBridge, ipcRenderer } = require('electron');
 
-// Expose protected methods that allow the renderer process to use
-// the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld('astraura', {
   // App info
   getInfo: () => ipcRenderer.invoke('app:get-info'),
   
   // Backend control
-  backend: {
-    start: () => ipcRenderer.invoke('backend:start'),
-    stop: () => ipcRenderer.invoke('backend:stop'),
-    status: () => ipcRenderer.invoke('backend:status')
-  },
+  startBackend: () => ipcRenderer.invoke('backend:start'),
+  stopBackend: () => ipcRenderer.invoke('backend:stop'),
+  backendStatus: () => ipcRenderer.invoke('backend:status'),
   
-  // Frontend control
-  frontend: {
-    reload: () => ipcRenderer.invoke('frontend:reload')
-  },
+  // Frontend
+  reload: () => ipcRenderer.invoke('frontend:reload'),
   
-  // Shell operations
-  shell: {
-    openExternal: (url) => ipcRenderer.invoke('shell:openExternal', url)
-  },
+  // Shell
+  openExternal: (url) => ipcRenderer.invoke('shell:openExternal', url),
   
-  // Dialog operations
-  dialog: {
-    saveFile: (options) => ipcRenderer.invoke('dialog:saveFile', options),
-    openFile: (options) => ipcRenderer.invoke('dialog:openFile', options)
-  },
+  // Dialogs
+  saveFile: (options) => ipcRenderer.invoke('dialog:saveFile', options),
+  openFile: (options) => ipcRenderer.invoke('dialog:openFile', options),
   
-  // Configuration store
-  store: {
-    get: (key) => ipcRenderer.invoke('store:get', key),
-    set: (key, value) => ipcRenderer.invoke('store:set', key, value)
-  },
+  // Store
+  getStore: (key) => ipcRenderer.invoke('store:get', key),
+  setStore: (key, value) => ipcRenderer.invoke('store:set', key, value),
   
-  // Window control
-  window: {
-    minimizeToTray: () => ipcRenderer.invoke('window:minimize-to-tray'),
-    show: () => ipcRenderer.invoke('window:show')
-  },
-  
-  // App control
-  app: {
-    quit: () => ipcRenderer.invoke('app:quit')
-  },
-  
-  // Event listeners
-  onBackendLog: (callback) => {
-    ipcRenderer.on('backend-log', (_, data) => callback(data));
-    return () => ipcRenderer.removeAllListeners('backend-log');
-  },
-  
-  onBackendError: (callback) => {
-    ipcRenderer.on('backend-error', (_, data) => callback(data));
-    return () => ipcRenderer.removeAllListeners('backend-error');
-  },
-  
-  onBackendStopped: (callback) => {
-    ipcRenderer.on('backend-stopped', (_, data) => callback(data));
-    return () => ipcRenderer.removeAllListeners('backend-stopped');
-  },
-  
-  onBackendStarted: (callback) => {
-    ipcRenderer.on('backend-started', (_, data) => callback(data));
-    return () => ipcRenderer.removeAllListeners('backend-started');
-  },
-  
-  onOpenSettings: (callback) => {
-    ipcRenderer.on('open-settings', (_, data) => callback(data));
-    return () => ipcRenderer.removeAllListeners('open-settings');
-  }
+  // Event subscriptions
+  onBackendLog: (cb) => ipcRenderer.on('backend-log', (_, data) => cb(data)),
+  onBackendError: (cb) => ipcRenderer.on('backend-error', (_, data) => cb(data)),
+  onBackendStarted: (cb) => ipcRenderer.on('backend-started', () => cb()),
+  onBackendStopped: (cb) => ipcRenderer.on('backend-stopped', (_, data) => cb(data)),
+  onOpenSettings: (cb) => ipcRenderer.on('open-settings', () => cb()),
 });
-
-// Also expose a minimal version for direct use
-contextBridge.exposeInMainWorld('electronAPI', {
-  platform: process.platform,
-  versions: process.versions
-});
-
-console.log('[Astraura Preload] Secure IPC bridge initialized');
