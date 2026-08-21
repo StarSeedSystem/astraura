@@ -6,16 +6,44 @@
 
 export const DEFAULT_HTTPS_GATEWAY = 'https://discussed-stuffed-oak-hudson.trycloudflare.com';
 
+// Gateway dinámico: se actualiza desde active_tunnel.json para que el frontend
+// SIEMPRE apunte al túnel actual (sin necesidad de rebuild cuando cambia la URL).
+let dynamicGateway = null;
+let gatewayResolved = false;
+
+async function refreshDynamicGateway() {
+  try {
+    const res = await fetch('/active_tunnel.json', { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.url && data.url.startsWith('http')) {
+        dynamicGateway = data.url.replace(/\/$/, '');
+        gatewayResolved = true;
+      }
+    }
+  } catch (e) {
+    // Si no hay active_tunnel.json (offline), usa el default.
+  }
+}
+
+// Refrescar el gateway al cargar y cada 30s.
+if (typeof window !== 'undefined') {
+  refreshDynamicGateway();
+  setInterval(refreshDynamicGateway, 30000);
+}
+
 export function getGatewayUrl() {
   if (typeof window !== 'undefined') {
     const custom = localStorage.getItem('astraura_backend_gateway');
     if (custom && custom.trim()) return custom.trim().replace(/\/$/, '');
     
-    // If running on localhost or 127.0.0.1
+    // Si corre en localhost/127.0.0.1, usar el backend local.
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       return '';
     }
-    // If deployed on Vercel or external host, default to the live HTTPS Cloudflare Tunnel
+    // En Vercel/app nativa/externo: usar el gateway dinámico (túnel actual)
+    // o el default si aún no se ha resuelto.
+    if (gatewayResolved && dynamicGateway) return dynamicGateway;
     return DEFAULT_HTTPS_GATEWAY;
   }
   return '';

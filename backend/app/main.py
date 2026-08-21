@@ -185,6 +185,25 @@ async def get_status():
         "swarm_status": swarm_manager.get_swarm_status()
     }
 
+@app.get("/active_tunnel.json")
+async def get_active_tunnel():
+    """Devuelve la URL del túnel activo (se actualiza dinámicamente por el
+    script de túnel sin necesidad de rebuild). El frontend lo consulta para
+    apuntar siempre al backend correcto desde cualquier medio."""
+    import json as _json
+    from pathlib import Path as _Path
+    candidates = [
+        _Path("/Users/alex/Documents/IA 1.58 bit/data/active_tunnel.json"),
+        _Path("/Users/alex/Documents/IA 1.58 bit/frontend/public/active_tunnel.json"),
+    ]
+    for c in candidates:
+        if c.exists():
+            try:
+                return _json.loads(c.read_text())
+            except Exception:
+                pass
+    return {"url": "", "status": "unknown"}
+
 @app.get("/api/profile")
 async def get_hardware_profile():
     return profiler.get_profile()
