@@ -1,11 +1,6 @@
 {
-  "active": true,
-  "url": "https://edinburgh-flash-immediate-requirements.trycloudflare.com",
-  "port": 8000,
-  "lan_ips": [
-    "192.168.0.14"
-  ],
-  "updated_at": 1787344692.719274,
-  "iso_time": "2026-08-21T20:38:12Z",
-  "provider": "cloudflare_quick_tunnel"
+  "url": "https://discussed-stuffed-oak-hudson.trycloudflare.com",
+  "updated_at": "2026-08-21T20:41:00Z",
+  "backend": "http://127.0.0.1:8000",
+  "status": "active"
 }

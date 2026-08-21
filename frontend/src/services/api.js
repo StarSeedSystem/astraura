@@ -4,7 +4,7 @@
  * or falls back to autonomous in-browser cognitive exocortex when completely offline.
  */
 
-export const DEFAULT_HTTPS_GATEWAY = 'https://optimum-forest-evans-spaces.trycloudflare.com';
+export const DEFAULT_HTTPS_GATEWAY = 'https://discussed-stuffed-oak-hudson.trycloudflare.com';
 
 export function getGatewayUrl() {
   if (typeof window !== 'undefined') {
