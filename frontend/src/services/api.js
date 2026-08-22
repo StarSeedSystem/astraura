@@ -465,6 +465,10 @@ export async function autoDetectStorageBrains() {
   return apiFetch('/cerebros/auto_detect');
 }
 
+export async function autoLinkStorageBrains() {
+  return apiFetch('/cerebros/auto_link', { method: 'POST' });
+}
+
 export async function activateBrain(brainId) {
   return apiFetch('/cerebros/activate', {
     method: 'POST',
