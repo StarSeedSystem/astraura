@@ -37,12 +37,14 @@ export function getGatewayUrl() {
     const custom = localStorage.getItem('astraura_backend_gateway');
     if (custom && custom.trim()) return custom.trim().replace(/\/$/, '');
     
-    // Si corre en localhost/127.0.0.1, usar el backend local.
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    const h = window.location.hostname;
+    // localhost/127.0.0.1 → backend local (relativo)
+    // *.vercel.app → Vercel proxyea /api/* a Cloud Run (relativo, sin CORS)
+    if (h === 'localhost' || h === '127.0.0.1' || h.endsWith('vercel.app')) {
       return '';
     }
-    // En Vercel/app nativa/externo: usar el gateway dinámico (túnel actual)
-    // o el default si aún no se ha resuelto.
+    // En cualquier otro host (acceso directo a Cloud Run, dominio propio):
+    // usar el gateway dinámico (Cloud Run) o el default (CORS habilitado).
     if (gatewayResolved && dynamicGateway) return dynamicGateway;
     return DEFAULT_HTTPS_GATEWAY;
   }
