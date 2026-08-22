@@ -57,6 +57,7 @@ import {
   saveBrain, 
   deleteBrain,
   autoDetectStorageBrains,
+  autoLinkStorageBrains,
   fetchBrainSynapticTree,
   attachBrainMemory,
   controlBrainProcess,
@@ -148,6 +149,19 @@ export default function CerebrosView() {
   const [detectedBrains, setDetectedBrains] = useState([]);
   const [detecting, setDetecting] = useState(false);
 
+  const handleAutoLink = async () => {
+    try {
+      const res = await autoLinkStorageBrains();
+      if (res && res.success && res.linked_count > 0) {
+        const fresh = await fetchCerebros();
+        setCerebrosData(fresh);
+        setToastMessage(`✅ ${res.linked_count} cerebro(s) vinculado(s) automáticamente desde almacenamientos conectados`);
+        setTimeout(() => setToastMessage(''), 4000);
+      }
+    } catch (e) {
+      // Silencioso: la vinculación automática es en segundo plano
+    }
+  };
   const handleAutoDetect = async () => {
     setDetecting(true);
     try {
@@ -219,6 +233,9 @@ export default function CerebrosView() {
 
   useEffect(() => {
     loadData();
+    // Agente de sincronización: vincular automáticamente cerebros de
+    // almacenamientos conectados al abrir la vista (mismo sistema multi-medio).
+    handleAutoLink();
   }, []);
 
   useEffect(() => {

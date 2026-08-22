@@ -91,6 +91,14 @@ async def lifespan(app: FastAPI):
     asyncio.create_task(swarm_manager.start_scheduler_loop())
     asyncio.create_task(storage_routing_engine.start_watcher_loop())
     
+    # 5b. Agente de Sincronización de Cerebros (vinculación automática desde
+    # cualquier almacenamiento conectado en tiempo real, multi-medio).
+    try:
+        cerebros_manager.start_background_sync()
+        print("🧠 Agente de Sincronización de Cerebros (auto-vinculación multi-almacenamiento): ACTIVO")
+    except Exception as e:
+        print(f"⚠️ No se pudo iniciar el agente de sincronización: {e}")
+    
     # 6. Start Sovereign Mesh Tunnel Manager (Cloudflare Quick Tunnel & LAN Discovery)
     try:
         from .core.tunnel_manager import tunnel_manager
@@ -1116,6 +1124,18 @@ async def auto_detect_storage_brains():
         return {"success": True, "detected": detected}
     except Exception as e:
         return {"success": False, "error": str(e)[:200], "detected": []}
+
+@app.post("/api/cerebros/auto_link")
+async def auto_link_storage_brains():
+    """Agente de sincronización: vincula automáticamente los cerebros
+    detectados en almacenamientos conectados al registry local (mismo
+    sistema en tiempo real desde cualquier medio)."""
+    import asyncio
+    try:
+        result = await asyncio.to_thread(cerebros_manager.auto_link_detected_brains)
+        return result
+    except Exception as e:
+        return {"success": False, "error": str(e)[:200]}
 
 @app.get("/api/cerebros/context_metrics")
 async def cerebro_context_metrics(path: str):

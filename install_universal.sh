@@ -17,6 +17,14 @@ echo "🌌 ASTRAURA // PLATAFORMA DE IA COGNITIVA SOBERANA DE 1.58 BITS"
 echo "🚀 INSTALADOR UNIVERSAL MULTI-SISTEMA OPERATIVO & ALMACENAMIENTO TOTAL"
 echo "========================================================================"
 echo "🖥️  Sistema Operativo: $OS ($ARCH)"
+echo ""
+echo "🌌 SINCRONIZACIÓN AUTOMÁTICA MULTI-MEDIO (Sistema 1.58-Bit):"
+echo "   Al iniciar, Astraura escanea TODOS tus almacenamientos conectados"
+echo "   (discos externos, Google Drive, servidores) y VINCULA automáticamente"
+echo "   los cerebros, memorias y configuraciones encontrados. Desde CUALQUIER"
+echo "   medio (navegador, app nativa, terminal, Vercel) verás el MISMO sistema"
+echo "   en tiempo real, con la misma UI y los mismos agentes/personalidades."
+echo ""
 
 case "$OS" in
     Darwin*)

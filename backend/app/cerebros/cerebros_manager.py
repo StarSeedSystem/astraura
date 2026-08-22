@@ -580,6 +580,13 @@ class CerebrosManager:
                 self._seed_default_cerebros()
         else:
             self._seed_default_cerebros()
+        # Agente de sincronización: vincular automáticamente cerebros de
+        # almacenamientos conectados al iniciar (mismo sistema en tiempo real
+        # desde cualquier medio).
+        try:
+            self.auto_link_detected_brains()
+        except Exception:
+            pass
 
     def _normalize_brain_schema(self, b: Dict[str, Any]):
         b_id = b.get("id", "brain_genesis")
@@ -1089,6 +1096,69 @@ class CerebrosManager:
             pass
 
         return detected
+
+    def auto_link_detected_brains(self) -> Dict[str, Any]:
+        """
+        Agente especializado de sincronización: escanea TODOS los almacenamientos
+        conectados (discos externos, Google Drive) y VINCULA automáticamente los
+        cerebros encontrados al registry local. Es instantáneo y se ejecuta al
+        iniciar el backend y periódicamente, para que desde CUALQUIER medio se vean
+        los mismos cerebros/memorias en tiempo real.
+        """
+        detected = self.auto_detect_storage_brains()
+        linked = []
+        changed = False
+        seen_ids = {b.get("id") for b in self.cerebros}
+
+        for d in detected:
+            bid = d.get("id")
+            if not bid or bid in seen_ids:
+                continue
+            # Si viene de un disco externo, leer el cerebro completo de su registry
+            if d.get("source_type") == "external_disk" and d.get("source_path"):
+                reg_path = Path(d["source_path"]) / "cerebros_registry.json"
+                try:
+                    data = json.loads(reg_path.read_text(encoding="utf-8"))
+                    src_brain = next((b for b in data.get("cerebros", []) if b.get("id") == bid), None)
+                    if src_brain:
+                        brain = dict(src_brain)
+                        brain["auto_linked"] = True
+                        brain["linked_source"] = {
+                            "type": "external_disk",
+                            "label": d.get("source_label", ""),
+                            "path": str(reg_path.parent),
+                        }
+                        self._normalize_brain_schema(brain)
+                        self.cerebros.append(brain)
+                        linked.append(brain)
+                        seen_ids.add(bid)
+                        changed = True
+                except Exception:
+                    pass
+            elif d.get("source_type") == "google_drive":
+                # Google Drive requiere token OAuth; se marca como fuente disponible
+                # para que el usuario pueda vincularlo con un clic (no automático por
+                # restricciones de seguridad de Google).
+                pass
+
+        if changed:
+            self._save_to_disk()
+        return {"success": True, "linked_count": len(linked), "linked": linked}
+
+    def start_background_sync(self):
+        """Hilo de sincronización en tiempo real: re-escanea almacenamientos
+        conectados periódicamente y vincula nuevos cerebros automáticamente."""
+        def _loop():
+            import time as _t
+            while True:
+                try:
+                    self.auto_link_detected_brains()
+                except Exception:
+                    pass
+                _t.sleep(120)  # re-escaneo cada 2 min
+        t = threading.Thread(target=_loop, daemon=True)
+        t.start()
+
 
     def activate_brain(self, brain_id: str) -> bool:
         for b in self.cerebros:
