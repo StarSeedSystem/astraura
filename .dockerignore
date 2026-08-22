@@ -1,0 +1,19 @@
+# Excluir del contexto de build de Cloud Run (reducir tamaño drásticamente)
+.venv/
+venv/
+data/
+frontend/
+node_modules/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+dist/
+build/
+desktop-app/
+deploy/
+install_universal.sh
+update_astraura.sh
+r2_credentials.local.json
+*.local.json
+.DS_Store
