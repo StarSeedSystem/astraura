@@ -26,6 +26,11 @@ echo "   medio (navegador, app nativa, terminal, Vercel) verás el MISMO sistema
 echo "   en tiempo real, con la misma UI y los mismos agentes/personalidades."
 echo ""
 
+# Configurar Cloudflare R2 para sincronización multi-dispositivo automática
+echo "☁️  Configurando sincronización global con Cloudflare R2..."
+chmod +x "$DIR/deploy/installers/setup_r2.sh" 2>/dev/null || true
+bash "$DIR/deploy/installers/setup_r2.sh" || echo "⚠️  R2 no configurado (opcional)."
+
 case "$OS" in
     Darwin*)
         echo "🍎 Detectado macOS ($ARCH). Ejecutando aprovisionador nativo..."

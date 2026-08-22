@@ -67,6 +67,14 @@ backend/app/core/vault_secrets.json
 *.pem
 *.key
 
+# --- Credenciales R2 (Cloudflare) locales: NUNCA commitear ---
+r2_credentials.local.json
+**/r2_credentials.local.json
+# El archivo en ~/.astraura/ también se ignora por estar fuera del repo,
+# pero por seguridad se excluye explícitamente si alguien lo copia al proyecto.
+astraura_r2_credentials.json
+*.r2_credentials.json
+
 # --- Archivos de IDE y Configuración Personal ---
 .vscode/
 .idea/

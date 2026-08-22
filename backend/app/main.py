@@ -99,6 +99,15 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"⚠️ No se pudo iniciar el agente de sincronización: {e}")
     
+    # 5c. Sincronización Global Multi-Dispositivo con Cloudflare R2 (memorias + config)
+    try:
+        from app.core import sync_engine
+        seed = sync_engine.pull_all(verbose=True)
+        sync_engine.start_background_sync()
+        print("☁️ Sincronización Global R2 (memorias + config en tiempo real): ACTIVA")
+    except Exception as e:
+        print(f"⚠️ No se pudo iniciar la sincronización R2: {e}")
+    
     # 6. Start Sovereign Mesh Tunnel Manager (Cloudflare Quick Tunnel & LAN Discovery)
     try:
         from .core.tunnel_manager import tunnel_manager
@@ -1134,6 +1143,19 @@ async def auto_link_storage_brains():
     try:
         result = await asyncio.to_thread(cerebros_manager.auto_link_detected_brains)
         return result
+    except Exception as e:
+        return {"success": False, "error": str(e)[:200]}
+
+@app.post("/api/sync/r2")
+async def sync_r2_force():
+    """Fuerza la sincronización global con R2 (pull seed + push mirror).
+    Permite propagar manualmente memorias/config a todos los dispositivos."""
+    import asyncio
+    try:
+        from app.core import sync_engine
+        pull = await asyncio.to_thread(sync_engine.pull_all)
+        push = await asyncio.to_thread(sync_engine.push_all)
+        return {"success": True, "pull": pull, "push": push}
     except Exception as e:
         return {"success": False, "error": str(e)[:200]}
 
