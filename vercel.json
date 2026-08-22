@@ -1,8 +1,0 @@
-{
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "https://astraura-backend-334237619848.us-central1.run.app/api/$1"
-    }
-  ]
-}
