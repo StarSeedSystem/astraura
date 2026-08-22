@@ -25,11 +25,19 @@ echo "   los cerebros, memorias y configuraciones encontrados. Desde CUALQUIER"
 echo "   medio (navegador, app nativa, terminal, Vercel) verás el MISMO sistema"
 echo "   en tiempo real, con la misma UI y los mismos agentes/personalidades."
 echo ""
+echo "🔄 ACTUALIZACIONES AUTOMÁTICAS: Astraura se actualiza SOLA desde GitHub"
+echo "   (main) cada hora en segundo plano. Siempre tendrás la última versión."
+echo ""
 
 # Configurar Cloudflare R2 para sincronización multi-dispositivo automática
 echo "☁️  Configurando sincronización global con Cloudflare R2..."
 chmod +x "$DIR/deploy/installers/setup_r2.sh" 2>/dev/null || true
 bash "$DIR/deploy/installers/setup_r2.sh" || echo "⚠️  R2 no configurado (opcional)."
+
+# Configurar actualizaciones automáticas desde GitHub (main)
+echo "🔄 Configurando actualizaciones automáticas desde GitHub..."
+chmod +x "$DIR/update_astraura.sh" 2>/dev/null || true
+bash "$DIR/update_astraura.sh" || echo "⚠️  Auto-update no configurado (opcional)."
 
 case "$OS" in
     Darwin*)
