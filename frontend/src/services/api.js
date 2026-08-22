@@ -39,12 +39,11 @@ export function getGatewayUrl() {
     
     const h = window.location.hostname;
     // localhost/127.0.0.1 → backend local (relativo)
-    // *.vercel.app → Vercel proxyea /api/* a Cloud Run (relativo, sin CORS)
-    if (h === 'localhost' || h === '127.0.0.1' || h.endsWith('vercel.app')) {
+    if (h === 'localhost' || h === '127.0.0.1') {
       return '';
     }
-    // En cualquier otro host (acceso directo a Cloud Run, dominio propio):
-    // usar el gateway dinámico (Cloud Run) o el default (CORS habilitado).
+    // En Vercel / app nativa / externo: usar el gateway dinámico (Cloud Run)
+    // o el default (CORS habilitado en el backend: access-control-allow-origin: *).
     if (gatewayResolved && dynamicGateway) return dynamicGateway;
     return DEFAULT_HTTPS_GATEWAY;
   }
