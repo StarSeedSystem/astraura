@@ -26,14 +26,25 @@ FALLBACK_CURL = "/usr/bin/curl"
 
 
 def _load_creds():
-    if not os.path.exists(CRED_FILE):
-        return None
-    try:
-        with open(CRED_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception as e:
-        logger.warning(f"No se pudieron leer credenciales Supabase: {e}")
-        return None
+    if os.path.exists(CRED_FILE):
+        try:
+            with open(CRED_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            logger.warning(f"No se pudieron leer credenciales Supabase: {e}")
+    # Fallback a env vars (Cloud Run / contenedores sin archivo local)
+    url = os.environ.get("SUPABASE_URL")
+    service = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+    anon = os.environ.get("SUPABASE_ANON_KEY")
+    if url and service:
+        ref = url.split("//")[1].split(".")[0] if "//" in url else ""
+        return {
+            "supabase_url": url,
+            "anon_key": anon or service,
+            "service_role_key": service,
+            "project_ref": ref,
+        }
+    return None
 
 
 def is_available():

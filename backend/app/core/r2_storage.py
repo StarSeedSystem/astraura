@@ -28,14 +28,25 @@ EMPTY_SHA = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 
 
 def _load_creds():
-    if not os.path.exists(CRED_FILE):
-        return None
-    try:
-        with open(CRED_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception as e:
-        logger.warning(f"No se pudieron leer credenciales R2: {e}")
-        return None
+    if os.path.exists(CRED_FILE):
+        try:
+            with open(CRED_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            logger.warning(f"No se pudieron leer credenciales R2: {e}")
+    # Fallback a env vars (Cloud Run / contenedores sin archivo local)
+    ak = os.environ.get("R2_ACCESS_KEY_ID")
+    sk = os.environ.get("R2_SECRET_ACCESS_KEY")
+    acct = os.environ.get("R2_ACCOUNT_ID")
+    if ak and sk and acct:
+        return {
+            "account_id": acct,
+            "access_key_id": ak,
+            "secret_access_key": sk,
+            "bucket": os.environ.get("R2_BUCKET", "astraura-shared"),
+            "endpoint": os.environ.get("R2_ENDPOINT", f"https://{acct}.r2.cloudflarestorage.com"),
+        }
+    return None
 
 
 def is_available():
