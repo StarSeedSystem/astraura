@@ -1143,6 +1143,13 @@ class CerebrosManager:
 
         if changed:
             self._save_to_disk()
+        # También sincronizar con R2 (almacenamiento compartido soberano)
+        try:
+            r2res = self.sync_with_r2()
+            if r2res.get("success") and r2res.get("linked_count"):
+                linked.extend(r2res["linked"])
+        except Exception:
+            pass
         return {"success": True, "linked_count": len(linked), "linked": linked}
 
     def start_background_sync(self):
@@ -1153,12 +1160,76 @@ class CerebrosManager:
             while True:
                 try:
                     self.auto_link_detected_brains()
+                    self.sync_with_r2()
                 except Exception:
                     pass
                 _t.sleep(120)  # re-escaneo cada 2 min
         t = threading.Thread(target=_loop, daemon=True)
         t.start()
 
+    # ===================== Sincronización con R2 (almacenamiento compartido) =====================
+    def sync_with_r2(self) -> Dict[str, Any]:
+        """Descarga el registry de cerebros desde R2 (almacenamiento compartido
+        soberano) y fusiona los cerebros encontrados con el registry local.
+        Permite que desde CUALQUIER dispositivo con credenciales R2 se vean los
+        mismos cerebros en tiempo real."""
+        try:
+            from app.core import r2_storage
+            if not r2_storage.is_available():
+                return {"success": False, "reason": "no-credentials"}
+            print("🧪 [R2] Intentando sincronizar cerebros desde Cloudflare R2...")
+            remote = r2_storage.download_json("cerebros/cerebros_registry.json")
+            if not remote or "cerebros" not in remote:
+                print("🧪 [R2] Sin registry remoto aún (primer uso). Se subirá el local.")
+                # Subir el registry local para sembrar R2
+                try:
+                    self.upload_to_r2()
+                    print("🧪 [R2] Registry local sembrado en R2 correctamente.")
+                except Exception as e:
+                    print(f"🧪 [R2] Error sembrando R2: {e}")
+                return {"success": False, "reason": "no-remote-registry"}
+            linked = []
+            seen_ids = {b.get("id") for b in self.cerebros}
+            for b in remote["cerebros"]:
+                bid = b.get("id")
+                if bid and bid not in seen_ids:
+                    brain = dict(b)
+                    brain["auto_linked"] = True
+                    brain["linked_source"] = {"type": "r2", "label": "Cloudflare R2 (Compartido)"}
+                    self._normalize_brain_schema(brain)
+                    self.cerebros.append(brain)
+                    linked.append(brain)
+                    seen_ids.add(bid)
+            if linked:
+                self._save_to_disk()
+            return {"success": True, "linked_count": len(linked), "linked": linked}
+        except Exception as e:
+            return {"success": False, "error": str(e)[:200]}
+
+    def upload_to_r2(self) -> bool:
+        """Sube el registry local de cerebros a R2 para que otros dispositivos
+        lo vean en tiempo real."""
+        try:
+            from app.core import r2_storage
+            if not r2_storage.is_available():
+                return False
+            data = {"active_brain_id": self.active_brain_id, "cerebros": self.cerebros}
+            return r2_storage.upload_json("cerebros/cerebros_registry.json", data)
+        except Exception:
+            return False
+
+    def _save_to_disk(self):
+        """Propaga el registry local a R2 (almacenamiento compartido) además
+        de guardarlo en disco."""
+        try:
+            with open(self.cerebros_file, "w", encoding="utf-8") as f:
+                json.dump({"active_brain_id": self.active_brain_id, "cerebros": self.cerebros}, f, indent=2, ensure_ascii=False)
+        except Exception:
+            pass
+        try:
+            self.upload_to_r2()
+        except Exception:
+            pass
 
     def activate_brain(self, brain_id: str) -> bool:
         for b in self.cerebros:
