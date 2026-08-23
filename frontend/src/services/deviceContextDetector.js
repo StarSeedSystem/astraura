@@ -4,6 +4,9 @@
  * Bridges local backend (http://127.0.0.1:8000) when available, or activates sovereign client mode.
  */
 
+// Gateway activo (custom / túnel / default) para sondear el puente antes que el localhost fijo.
+import { getGatewayUrl } from './api';
+
 class DeviceContextDetector {
   constructor() {
     this.deviceProfile = null;
@@ -112,25 +115,37 @@ class DeviceContextDetector {
       }
     } catch {}
 
-    // 7. Test Local Host Agent Bridge (http://127.0.0.1:8000)
-    let localBridge = { connected: false, latencyMs: null, hostData: null };
+    // 7. Test Host Agent Bridge: primero el gateway configurado (custom en localStorage / túnel / default),
+    //    después la sonda local directa (http://127.0.0.1:8000). Se reporta hostData del primero que responda.
+    let localBridge = { connected: false, latencyMs: null, hostData: null, endpoint: null };
+    const probeEndpoints = [];
     try {
-      const t0 = performance.now();
-      const ctrl = new AbortController();
-      const timeoutId = setTimeout(() => ctrl.abort(), 2000);
-      const res = await fetch('http://127.0.0.1:8000/api/status', { signal: ctrl.signal });
-      clearTimeout(timeoutId);
-      if (res.ok) {
-        const data = await res.json();
-        localBridge = {
-          connected: true,
-          latencyMs: Math.round(performance.now() - t0),
-          hostData: data
-        };
-        this.isLocalAgentConnected = true;
+      const gw = getGatewayUrl();
+      if (gw) probeEndpoints.push(`${gw.replace(/\/$/, '')}/api/status`);
+    } catch {}
+    probeEndpoints.push('http://127.0.0.1:8000/api/status');
+    this.isLocalAgentConnected = false;
+    for (const endpoint of [...new Set(probeEndpoints)]) {
+      try {
+        const t0 = performance.now();
+        const ctrl = new AbortController();
+        const timeoutId = setTimeout(() => ctrl.abort(), 2000);
+        const res = await fetch(endpoint, { signal: ctrl.signal });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const data = await res.json();
+          localBridge = {
+            connected: true,
+            latencyMs: Math.round(performance.now() - t0),
+            hostData: data,
+            endpoint
+          };
+          this.isLocalAgentConnected = true;
+          break;
+        }
+      } catch {
+        // Endpoint sin respuesta: se prueba el siguiente.
       }
-    } catch {
-      this.isLocalAgentConnected = false;
     }
 
     // 8. Permissions Status Audit

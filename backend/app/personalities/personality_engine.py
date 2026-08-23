@@ -9,6 +9,13 @@ import time
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 
+# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
+# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
+from pathlib import Path as _SSPath
+from ..core.config import settings as _ss_settings
+WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
+HOME = str(_SSPath.home()).rstrip("/")
+
 DEFAULT_TRAITS = {
     # Emociones & Afecto
     "empatia": 85,
@@ -612,7 +619,7 @@ PRESET_PERSONALITY_PROFILES = [
 class PersonalityEngine:
     def __init__(self, data_dir: Optional[str] = None):
         if data_dir is None:
-            self.data_dir = Path("/Users/alex/Documents/IA 1.58 bit/data/personalities")
+            self.data_dir = Path(f"{WORKSPACE}/data/personalities")
         else:
             self.data_dir = Path(data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)

@@ -130,7 +130,9 @@ llama_model_bitnet::graph::graph(const llama_model & model, const llm_graph_para
                 model.layers[il].ffn_gate, NULL, model.layers[il].ffn_gate_s,
                 NULL,                      NULL, NULL,
                 NULL,
-                LLM_FFN_SILU, LLM_FFN_PAR, il);
+                // (Astraura) BitNet-b1.58-2B-4T usa ReLU^2 (config.json `hidden_act: relu2`),
+                // no SiLU: con SiLU el modelo degenera (PPL x3, bucles). Ver scripts/verify_bitnet.sh.
+                LLM_FFN_RELU_SQR, LLM_FFN_PAR, il);
         cb(cur, "ffn_sub_out", il);
 
         cur = build_norm(cur,

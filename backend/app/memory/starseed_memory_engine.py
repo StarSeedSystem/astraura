@@ -1,3 +1,4 @@
+import re
 import os
 import json
 import time
@@ -24,7 +25,20 @@ class StarSeedMemoryEngine:
     y sincronización continua.
     """
     def __init__(self, storage_dir: Optional[Path] = None):
-        self.storage_dir = storage_dir or Path(__file__).resolve().parent.parent.parent / "data" / "starseed_memory_root"
+        # (Adenda 153) El memory root vive en DATA_DIR (raíz del repo /data), que es lo
+        # que sincroniza sync_engine («memory/starseed_memory.json»). Antes estaba en
+        # backend/data/ y esa sección NUNCA se sincronizaba. Migración única si el
+        # destino no existe y el legado sí.
+        from ..core.config import DATA_DIR as _DATA_DIR
+        legacy_dir = Path(__file__).resolve().parent.parent.parent / "data" / "starseed_memory_root"
+        self.storage_dir = storage_dir or (_DATA_DIR / "starseed_memory_root")
+        if storage_dir is None and not self.storage_dir.exists() and legacy_dir.exists():
+            try:
+                import shutil
+                shutil.copytree(legacy_dir, self.storage_dir)
+                print(f"🧠 [MemoryRoot] Migrado de {legacy_dir} a {self.storage_dir}")
+            except Exception as e:
+                print(f"🧠 [MemoryRoot] No se pudo migrar el memory root: {e}")
         self.storage_dir.mkdir(parents=True, exist_ok=True)
         self.manifest_path = self.storage_dir / "memory.manifest.json"
         self.recuerdos_path = self.storage_dir / "recuerdos_core.json"
@@ -275,10 +289,47 @@ class StarSeedMemoryEngine:
         except Exception:
             return {"branches": STARSEED_BRANCHES}
 
+    def search_documents(self, query: str, branch: Optional[str] = None, top_k: int = 5) -> List[Dict[str, Any]]:
+        """(Adenda 153) Búsqueda léxica simple por solapamiento de tokens (la usaba
+        layered_quantum_orchestrator sin existir → AttributeError)."""
+        tokens = {t for t in re.findall(r"[\wáéíóúñü]+", (query or "").lower()) if len(t) > 2}
+        scored: List[tuple] = []
+        for d in self.list_documents(branch):
+            text = f"{d.get('name', '')} {d.get('markdown', '')} {' '.join(d.get('tags', []) or [])}".lower()
+            hits = sum(1 for t in tokens if t in text)
+            if hits:
+                scored.append((hits, d))
+        scored.sort(key=lambda x: x[0], reverse=True)
+        return [d for _, d in scored[:max(1, top_k)]]
+
     def list_documents(self, branch: Optional[str] = None) -> List[Dict[str, Any]]:
         if branch:
             return [d for d in self.documents if d.get("branch") == branch]
         return self.documents
+
+    # (Adenda 153) Categorías que producen los motores AUTOMÁTICOS (imaginación,
+    # enrutamiento de medios, sueños, enjambre). Sin tope, el memory root creció a
+    # 33 789 documentos / 24 MB y se reescribía entero en cada alta. Se conservan
+    # como máximo `ASTRAURA_MAX_AUTOGEN_DOCS` por categoría (FIFO; defecto 150).
+    AUTOGEN_CATEGORY_RE = re.compile(r"^(Almacenamiento Enrutado|Exoc[oó]rtex (Autorizado|Sincronizado)|Imaginaci[oó]n|Sue[ñn]o)", re.I)
+
+    def is_autogen_doc(self, doc: Dict[str, Any]) -> bool:
+        cat = str(doc.get("category") or "")
+        return bool(self.AUTOGEN_CATEGORY_RE.match(cat))
+
+    def _trim_autogen(self, category: str) -> int:
+        try:
+            cap = max(10, int(os.environ.get("ASTRAURA_MAX_AUTOGEN_DOCS", "150")))
+        except Exception:
+            cap = 150
+        same = [d for d in self.documents if str(d.get("category") or "") == category]
+        if len(same) <= cap:
+            return 0
+        # Los documentos se insertan al principio (más nuevos primero): se podan los más antiguos.
+        keep_ids = {d.get("id") for d in same[:cap]}
+        before = len(self.documents)
+        self.documents = [d for d in self.documents if str(d.get("category") or "") != category or d.get("id") in keep_ids]
+        return before - len(self.documents)
 
     def create_or_update_document(self, doc_data: Dict[str, Any]) -> Dict[str, Any]:
         doc_id = doc_data.get("id") or f"doc_{int(time.time())}"
@@ -295,6 +346,8 @@ class StarSeedMemoryEngine:
             doc_data["updated_at"] = now
             self.documents.insert(0, doc_data)
             saved_doc = doc_data
+            if self.is_autogen_doc(doc_data):
+                self._trim_autogen(str(doc_data.get("category") or ""))
             
         self.save_documents()
         return saved_doc

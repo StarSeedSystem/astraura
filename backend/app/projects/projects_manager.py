@@ -8,6 +8,13 @@ import shutil
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple
 
+# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
+# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
+from pathlib import Path as _SSPath
+from ..core.config import settings as _ss_settings
+WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
+HOME = str(_SSPath.home()).rstrip("/")
+
 try:
     from app.memory.starseed_memory_engine import starseed_memory_engine
 except ImportError:
@@ -137,7 +144,7 @@ class ProjectsManager:
                 "Optimizado para cuantización ternaria ARM64 NEON 1.58b"
             ])
             p.setdefault("linked_folders", [
-                f"/Users/alex/Documents/IA 1.58 bit/data/projects/{p['id']}"
+                f"{WORKSPACE}/data/projects/{p['id']}"
             ])
             p.setdefault("linked_files", [])
             p.setdefault("linked_projects", [])
@@ -238,11 +245,11 @@ class ProjectsManager:
                     "Reducción total de FP32 a pesos ternarios {-1, 0, +1}"
                 ],
                 "linked_folders": [
-                    "/Users/alex/Documents/IA 1.58 bit/backend/app/core",
-                    "/Users/alex/Documents/IA 1.58 bit/backend/BitNet"
+                    f"{WORKSPACE}/backend/app/core",
+                    f"{WORKSPACE}/backend/BitNet"
                 ],
                 "linked_files": [
-                    "/Users/alex/Documents/IA 1.58 bit/backend/run_backend.py"
+                    f"{WORKSPACE}/backend/run_backend.py"
                 ],
                 "logs_history": [
                     {
@@ -321,7 +328,7 @@ class ProjectsManager:
                     "Diseño visual de baja entropía con estética dark-mode futurista"
                 ],
                 "linked_folders": [
-                    "/Users/alex/Documents/IA 1.58 bit/frontend/src/components"
+                    f"{WORKSPACE}/frontend/src/components"
                 ],
                 "linked_files": [],
                 "logs_history": [

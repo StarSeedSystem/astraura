@@ -18,7 +18,11 @@ class BitNetUnifiedEngine:
     """
     def __init__(self):
         self.engine_name = "Astraura 1.58b Cognitive Engine (Microsoft BitNet / Local Core)"
-        self.ollama_url = "http://127.0.0.1:11434"
+        # (Adenda 153 · StarSeed OS) Configurables por entorno: servidor Ollama y
+        # modelo preferido. Sin variables, se conserva el comportamiento previo
+        # (127.0.0.1:11434 y el primer modelo que liste /api/tags).
+        self.ollama_url = (os.environ.get("ASTRAURA_OLLAMA_URL") or "http://127.0.0.1:11434").rstrip("/")
+        self.preferred_model = (os.environ.get("ASTRAURA_OLLAMA_MODEL") or "").strip()
         self.active_model_name = "qwen2.5:1.5b (Neural Core) // BitNet b1.58"
         self.stats = {
             "tokens_generated": 0,
@@ -27,6 +31,9 @@ class BitNetUnifiedEngine:
             "memory_reduction": "8.0x vs FP16",
             "average_speed_tps": 58.6
         }
+        # (Ola 3) Prioridad de turno: los procesos de FONDO (cognition) ceden el
+        # paso mientras hay una generación INTERACTIVA (chat/orbe) en curso.
+        self._interactive_busy = 0
 
     async def get_available_ollama_models(self) -> List[str]:
         try:
@@ -39,12 +46,59 @@ class BitNetUnifiedEngine:
             pass
         return []
 
+    _ollama_probe_cache: Dict[str, Any] = {"at": 0.0, "models": []}
+
+    def probe_ollama_models_sync(self, ttl: float = 30.0) -> List[str]:
+        """(Adenda 153) Sonda SÍNCRONA y cacheada a Ollama para que /api/status diga la
+        verdad sin esperar a la primera generación."""
+        import time as _t
+        now = _t.time()
+        if now - float(self._ollama_probe_cache.get("at", 0)) < ttl:
+            return list(self._ollama_probe_cache.get("models") or [])
+        models: List[str] = []
+        try:
+            with httpx.Client(timeout=0.8) as client:
+                res = client.get(f"{self.ollama_url}/api/tags")
+                if res.status_code == 200:
+                    models = [m.get("name") for m in res.json().get("models", []) if m.get("name")]
+        except Exception:
+            models = []
+        self._ollama_probe_cache = {"at": now, "models": models}
+        return models
+
     def get_engine_status(self) -> Dict[str, Any]:
         cpp_status = bitnet_cpp_manager.check_status()
+        # (Adenda 153/155) Estado HONESTO del motor real: BitNet nativo si hay binario
+        # de servidor + GGUF (el manager lo sirve en caliente); si no, Ollama
+        # (modelo preferido/primero); si no, plantillas.
+        ollama_models = self.probe_ollama_models_sync()
+        server = bitnet_cpp_manager.server_status()
+        if cpp_status["is_compiled"] and cpp_status["models_available"] and bitnet_cpp_manager.server_binary() is not None:
+            real_mode = "bitnet-native"
+            estado = "listo" if server.get("ready") else ("cargando" if server.get("running") else "en frío (arranca al primer turno)")
+            model_label = f"BitNet b1.58 nativo · {Path(cpp_status['models_available'][0]['path']).name} · {estado}"
+        elif ollama_models:
+            real_mode = "ollama"
+            chosen = ollama_models[0]
+            if self.preferred_model:
+                for m in ollama_models:
+                    if m == self.preferred_model or m.split(":")[0] == self.preferred_model.split(":")[0]:
+                        chosen = m
+                        break
+            model_label = f"{chosen} (Ollama) // BitNet b1.58 pendiente"
+        else:
+            real_mode = "templates"
+            model_label = "sin modelo real (plantillas) — arranca Ollama o compila BitNet"
+        self.active_model_name = model_label
         return {
             "engine_name": self.engine_name,
-            "active_model": self.active_model_name,
+            "active_model": model_label,
+            "real_mode": real_mode,
+            "ollama_url": self.ollama_url,
+            "ollama_models": ollama_models[:12],
+            "preferred_model": self.preferred_model or None,
             "bitnet_cpp_installed": cpp_status["is_compiled"],
+            "bitnet_server": server,
             "models_on_disk": cpp_status["models_available"],
             "inference_mode": self.stats["inference_mode"],
             "quantization": self.stats["active_quantization"],
@@ -60,20 +114,69 @@ class BitNetUnifiedEngine:
         context_chunks: List[str] = None,
         tool_data: Dict[str, Any] = None,
         max_tokens: int = 2048,
-        temperature: float = 0.75
+        temperature: float = 0.75,
+        meta: Optional[Dict[str, Any]] = None,
+        priority: str = "interactive"
     ) -> AsyncGenerator[str, None]:
         """
         Streams natural language tokens token-by-token.
+        (OS · Ola 3) `meta` (opcional): dict que el motor rellena con
+        `meta["source"]` = "ollama" | "bitnet-native" | "reasoner" para que el
+        llamador sepa, sin carreras entre streams concurrentes, si el texto fue real.
+        `priority`: "interactive" (chat/orbe: pasa primero) · "background"
+        (imaginación/enjambre/director vía cognition: espera mientras el usuario
+        habla — en hardware con pocos núcleos el fondo no debe robar el turno).
         """
+        if meta is None:
+            meta = {}
+        if priority != "background":
+            self._interactive_busy += 1
+        try:
+            async for _tok in self._generate_stream_inner(
+                prompt=prompt, system_prompt=system_prompt, context_chunks=context_chunks,
+                tool_data=tool_data, max_tokens=max_tokens, temperature=temperature, meta=meta,
+                profile="background" if priority == "background" else "interactive",
+            ):
+                yield _tok
+        finally:
+            if priority != "background":
+                self._interactive_busy = max(0, self._interactive_busy - 1)
+
+    async def _generate_stream_inner(
+        self,
+        prompt: str,
+        system_prompt: str = "",
+        context_chunks: List[str] = None,
+        tool_data: Dict[str, Any] = None,
+        max_tokens: int = 2048,
+        temperature: float = 0.75,
+        meta: Optional[Dict[str, Any]] = None,
+        profile: str = "interactive"
+    ) -> AsyncGenerator[str, None]:
+        if meta is None:
+            meta = {}
         # 1. Try streaming from local high-performance neural engine (Ollama)
         ollama_models = await self.get_available_ollama_models()
         if ollama_models:
+            meta["source"] = "ollama"  # (OS · Ola 3)
+            # Modelo preferido por entorno (si está instalado); si no, el primero.
             model_to_use = ollama_models[0]
+            if self.preferred_model and self.preferred_model in ollama_models:
+                model_to_use = self.preferred_model
+            elif self.preferred_model:
+                for m in ollama_models:
+                    if m.split(":")[0] == self.preferred_model.split(":")[0]:
+                        model_to_use = m
+                        break
+            # Estado honesto: el modelo REAL que responde (antes era un texto fijo).
+            self.active_model_name = f"{model_to_use} (Ollama) // BitNet b1.58 pendiente"
             
             # Format clean, context-rich system prompt
             context_summary = ""
             if context_chunks and len(context_chunks) > 0:
-                clean_chunks = [c.replace("\n", " ").strip() for c in context_chunks[:3]]
+                # (OS · Ola 3) 6 fragmentos en vez de 3: el orquestador antepone hasta 3
+                # recuerdos Mem0 ([RECUERDO] …) y no deben desplazar a los documentos.
+                clean_chunks = [c.replace("\n", " ").strip() for c in context_chunks[:6]]
                 context_summary = "\n- " + "\n- ".join(clean_chunks)
             
             tool_summary = ""
@@ -196,39 +299,63 @@ class BitNetUnifiedEngine:
             except Exception as e:
                 print(f"[BitNetUnifiedEngine] Ollama streaming notice: {e}")
 
-        # 2. Try native C++ BitNet binary if GGUF model exists on disk
-        cpp_status = bitnet_cpp_manager.check_status()
-        available_models = cpp_status["models_available"]
-        if cpp_status["is_compiled"] and available_models:
-            model_path = available_models[0]["path"]
-            cli_path = settings.bitnet_path / "build" / "bin" / "llama-cli"
-            if cli_path.exists():
-                cmd = [
-                    str(cli_path),
-                    "-m", model_path,
-                    "-p", prompt,
-                    "-n", str(max_tokens),
-                    "-t", str(settings.threads),
-                    "-ngl", "0"
-                ]
-                try:
-                    proc = await asyncio.create_subprocess_exec(
-                        *cmd,
-                        stdout=asyncio.subprocess.PIPE,
-                        stderr=asyncio.subprocess.PIPE
-                    )
-                    while True:
-                        line = await proc.stdout.readline()
-                        if not line:
-                            break
-                        decoded = line.decode('utf-8', errors='ignore')
-                        self.stats["tokens_generated"] += len(decoded.split())
-                        yield decoded
-                    return
-                except Exception as e:
-                    print(f"[BitNetUnifiedEngine] C++ binary notice: {e}")
+        # 2. BitNet NATIVO (Ola 3): llama-server gestionado (streaming OpenAI-compatible).
+        #    Ya no se lanza llama-cli por petición (frío, sin plantilla de chat, sin
+        #    paralelismo): el manager mantiene UN servidor con el GGUF i2_s cargado.
+        base = await asyncio.to_thread(bitnet_cpp_manager.ensure_server, 120.0, profile)
+        if base and bitnet_cpp_manager.server_ready(profile):
+            meta["source"] = "bitnet-native"  # (OS · Ola 3)
+            # Presupuesto de contexto HONESTO: el modelo 2B-4T tiene 4096 posiciones.
+            # ~3.2 chars/token ⇒ recortamos system+prompt para dejar sitio a la respuesta
+            # (el orquestador puede mandar contextos enormes de memoria).
+            ctx_tokens = int(bitnet_cpp_manager.server_ctx or 4096)
+            gen_budget = max(128, min(int(max_tokens), max(128, ctx_tokens // 4)))
+            char_budget = max(2000, int((ctx_tokens - gen_budget - 64) * 3.2))
+            sys_txt = (system_prompt or "").strip()
+            if len(sys_txt) > char_budget // 3:
+                sys_txt = sys_txt[: char_budget // 3]
+            user_content = prompt
+            if context_chunks:
+                ctx_txt = "\n".join(f"[CONTEXTO] {c}" for c in context_chunks[:6] if c)
+                user_content = f"{ctx_txt}\n\n{prompt}" if ctx_txt else prompt
+            rest = char_budget - len(sys_txt)
+            if len(user_content) > rest:
+                user_content = user_content[-rest:]  # conserva el FINAL (el turno actual)
+            messages = []
+            if sys_txt:
+                messages.append({"role": "system", "content": sys_txt})
+            messages.append({"role": "user", "content": user_content})
+            payload = {
+                "messages": messages,
+                "max_tokens": gen_budget,
+                "temperature": float(temperature),
+                "top_p": 0.9,
+                "stream": True,
+            }
+            try:
+                async with httpx.AsyncClient(timeout=httpx.Timeout(300.0, connect=10.0)) as client:
+                    async with client.stream("POST", f"{base}/v1/chat/completions", json=payload) as res:
+                        res.raise_for_status()
+                        async for line in res.aiter_lines():
+                            if not line or not line.startswith("data:"):
+                                continue
+                            data = line[5:].strip()
+                            if not data or data == "[DONE]":
+                                continue
+                            try:
+                                delta = json.loads(data)["choices"][0].get("delta", {})
+                            except Exception:
+                                continue
+                            token = delta.get("content")
+                            if token:
+                                self.stats["tokens_generated"] += 1
+                                yield token
+                return
+            except Exception as e:
+                print(f"[BitNetUnifiedEngine] BitNet nativo (llama-server) aviso: {e}")
 
         # 3. Dynamic Natural Language Cognitive Reasoner Fallback
+        meta["source"] = "reasoner"  # (OS · Ola 3) plantilla, no inferencia real
         from ..agents.reasoner import reasoner
         full_response = await reasoner.synthesize_response(
             prompt=prompt,

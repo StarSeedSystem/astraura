@@ -6,6 +6,13 @@ import threading
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
+# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
+# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
+from pathlib import Path as _SSPath
+from ..core.config import settings as _ss_settings
+WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
+HOME = str(_SSPath.home()).rstrip("/")
+
 try:
     from ..memory.starseed_memory_engine import starseed_memory_engine
 except Exception:
@@ -559,7 +566,7 @@ class CerebrosManager:
     """
     def __init__(self, storage_dir: Optional[Path] = None):
         if storage_dir is None:
-            self.storage_dir = Path("/Users/alex/Documents/IA 1.58 bit/data/cerebros")
+            self.storage_dir = Path(f"{WORKSPACE}/data/cerebros")
         else:
             self.storage_dir = Path(storage_dir)
         self.storage_dir.mkdir(parents=True, exist_ok=True)
@@ -606,7 +613,7 @@ class CerebrosManager:
                     "id": "dest_local_default",
                     "name": "Almacén Local Soberano (Predeterminado)",
                     "type": "local_fs",
-                    "path": f"/Users/alex/Documents/IA 1.58 bit/data/cerebros/{b_id}",
+                    "path": f"{WORKSPACE}/data/cerebros/{b_id}",
                     "is_primary": True,
                     "sync_mode": "realtime_fs_watcher",
                     "enabled": True,
@@ -661,8 +668,8 @@ class CerebrosManager:
 
         if "context_folders" not in b or not b["context_folders"]:
             default_paths = [
-                "/Users/alex/Documents/IA 1.58 bit",
-                "/Users/alex/Documents/starseed-os-main"
+                f"{WORKSPACE}",
+                f"{HOME}/Documents/starseed-os-main"
             ]
             folders = []
             for p in default_paths:
@@ -711,7 +718,7 @@ class CerebrosManager:
                 },
                 "storage_backend": {
                     "type": "local_fs",
-                    "path": "/Users/alex/Documents/IA 1.58 bit/data/starseed_memory_root",
+                    "path": f"{WORKSPACE}/data/starseed_memory_root",
                     "cloud_sync": True,
                     "cloud_provider": "Vercel / Supabase"
                 },
@@ -727,12 +734,12 @@ class CerebrosManager:
                 "context_folders": [
                     {
                         "id": "ctx_ia_bit",
-                        "path": "/Users/alex/Documents/IA 1.58 bit",
+                        "path": f"{WORKSPACE}",
                         "label": "IA 1.58 bit (Workspace Principal)",
                         "access_mode": "read_write",
                         "resonance_weight": 95,
                         "enabled": True,
-                        "metrics": scan_context_folder_metrics("/Users/alex/Documents/IA 1.58 bit")
+                        "metrics": scan_context_folder_metrics(f"{WORKSPACE}")
                     }
                 ],
                 "md_layers": {
@@ -768,7 +775,7 @@ class CerebrosManager:
                 },
                 "storage_backend": {
                     "type": "local_fs",
-                    "path": "/Users/alex/Documents/IA 1.58 bit/backend/BitNet",
+                    "path": f"{WORKSPACE}/backend/BitNet",
                     "cloud_sync": False
                 },
                 "security_permissions": {
@@ -783,12 +790,12 @@ class CerebrosManager:
                 "context_folders": [
                     {
                         "id": "ctx_bitnet_cpp",
-                        "path": "/Users/alex/Documents/IA 1.58 bit/backend/BitNet",
+                        "path": f"{WORKSPACE}/backend/BitNet",
                         "label": "BitNet C++ Core",
                         "access_mode": "read_write",
                         "resonance_weight": 95,
                         "enabled": True,
-                        "metrics": scan_context_folder_metrics("/Users/alex/Documents/IA 1.58 bit/backend/BitNet")
+                        "metrics": scan_context_folder_metrics(f"{WORKSPACE}/backend/BitNet")
                     }
                 ],
                 "md_layers": {
@@ -839,12 +846,12 @@ class CerebrosManager:
                 "context_folders": [
                     {
                         "id": "ctx_web_data",
-                        "path": "/Users/alex/Documents/IA 1.58 bit/data",
+                        "path": f"{WORKSPACE}/data",
                         "label": "Astraura Data Root",
                         "access_mode": "read_write",
                         "resonance_weight": 90,
                         "enabled": True,
-                        "metrics": scan_context_folder_metrics("/Users/alex/Documents/IA 1.58 bit/data")
+                        "metrics": scan_context_folder_metrics(f"{WORKSPACE}/data")
                     }
                 ],
                 "md_layers": {
@@ -880,7 +887,7 @@ class CerebrosManager:
                 },
                 "storage_backend": {
                     "type": "local_fs",
-                    "path": "/Users/alex/Documents/IA 1.58 bit/data/security_vault",
+                    "path": f"{WORKSPACE}/data/security_vault",
                     "cloud_sync": False
                 },
                 "security_permissions": {
@@ -926,7 +933,7 @@ class CerebrosManager:
                 },
                 "storage_backend": {
                     "type": "local_fs",
-                    "path": "/Users/alex/Documents/IA 1.58 bit/data/imagination",
+                    "path": f"{WORKSPACE}/data/imagination",
                     "cloud_sync": True
                 },
                 "security_permissions": {
@@ -972,7 +979,7 @@ class CerebrosManager:
                 },
                 "storage_backend": {
                     "type": "local_fs",
-                    "path": "/Users/alex/Documents/IA 1.58 bit/data/starseed_memory_root",
+                    "path": f"{WORKSPACE}/data/starseed_memory_root",
                     "cloud_sync": True
                 },
                 "security_permissions": {
@@ -1083,7 +1090,7 @@ class CerebrosManager:
                 pass
 
         try:
-            gdrive_token = Path("/Users/alex/Documents/IA 1.58 bit/data/cerebros/gdrive_token.json")
+            gdrive_token = Path(f"{WORKSPACE}/data/cerebros/gdrive_token.json")
             if gdrive_token.exists():
                 detected.append({
                     "id": "gdrive_brain_vault",

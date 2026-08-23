@@ -26,6 +26,12 @@ RUN pip install --upgrade pip && pip install -r backend/requirements.txt
 # Copiar el backend completo
 COPY backend/ ./backend/
 
+# (Adenda 153) Control de acceso: en Cloud Run NO hay loopback de confianza, así que las
+# rutas peligrosas quedan cerradas salvo clave. Para exigir clave en TODO (recomendado si el
+# servicio es público): ASTRAURA_AUTH_MODE=key + ASTRAURA_API_KEY (y la misma clave como
+# ASTRAURA_158_KEY en el StarSeed OS). Ver backend/app/core/security.py.
+ENV ASTRAURA_AUTH_MODE=local-only
+
 # Puerto que inyecta Cloud Run (run_backend.py usa $PORT)
 ENV PORT=8080
 EXPOSE 8080

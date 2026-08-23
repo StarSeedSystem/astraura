@@ -9,6 +9,13 @@ from typing import Dict, Any, List, Optional
 import psutil
 import httpx
 
+# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
+# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
+from pathlib import Path as _SSPath
+from .config import settings as _ss_settings
+WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
+HOME = str(_SSPath.home()).rstrip("/")
+
 class SensoriumEngine:
     """
     Sensorium 360° y Motor de Conciencia Sensorial para StarSeed OS & Astraura 1.58b.
@@ -20,8 +27,8 @@ class SensoriumEngine:
         Giroscopio/Acelerómetro (ejes X, Y, Z), Cámaras, Batería, CPU (8 núcleos M1) y RAM unificada.
     """
     def __init__(self):
-        self.workspace_path = "/Users/alex/Documents/IA 1.58 bit"
-        self.data_dir = Path("/Users/alex/Documents/IA 1.58 bit/data/sensorium")
+        self.workspace_path = f"{WORKSPACE}"
+        self.data_dir = Path(f"{WORKSPACE}/data/sensorium")
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.location_file = self.data_dir / "sensorium_location.json"
 
@@ -135,6 +142,18 @@ class SensoriumEngine:
         now = time.time()
         if now - self.last_weather_fetch < 300: # Cache for 5 minutes
             return self.weather_data
+
+        # (OS · Ola 3) Air-Gap REAL: sin consultas meteorológicas externas; se devuelve
+        # el último valor en caché marcado como desconectado (sin tocar la red).
+        try:
+            from .privacy_manager import is_air_gapped
+            if is_air_gapped():
+                cached = dict(self.weather_data)
+                cached["status"] = "Air-Gap activo: consulta meteorológica omitida (caché local)"
+                cached["sources_used"] = []
+                return cached
+        except Exception:
+            pass
 
         temps = []
         humidities = []

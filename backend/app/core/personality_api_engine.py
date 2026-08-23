@@ -19,7 +19,20 @@ class PersonalityApiEngine:
     def __init__(self, data_dir: str = "data"):
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
-        self.storage_file = self.data_dir / "personality_apis.json"
+        # (Adenda 153) Las CLAVES viven FUERA del repo (~/.astraura/keys o ASTRAURA_KEYS_DIR).
+        # Migración única desde las ubicaciones antiguas (data/ y backend/data/, que
+        # acabaron commiteadas en git → rotar con scripts/rotate_keys.py).
+        from .security import keys_dir as _keys_dir
+        self.storage_file = _keys_dir() / "personality_apis.json"
+        if not self.storage_file.exists():
+            for legacy in (self.data_dir / "personality_apis.json", Path("data") / "personality_apis.json", Path("backend/data") / "personality_apis.json"):
+                try:
+                    if legacy.exists():
+                        self.storage_file.write_text(legacy.read_text(encoding="utf-8"), encoding="utf-8")
+                        print(f"🔐 [Seguridad] Claves migradas de {legacy} a {self.storage_file}. ROTA las claves: python3 scripts/rotate_keys.py")
+                        break
+                except Exception:
+                    pass
         
         self.default_scopes = {
             "read_memory": True,

@@ -11,6 +11,14 @@ class WebCrawlTool:
         if not url.startswith("http://") and not url.startswith("https://"):
             url = "https://" + url
 
+        # (OS · Ola 3) Air-Gap REAL: el crawler tampoco sale a la red.
+        try:
+            from ..core.privacy_manager import is_air_gapped, air_gap_block
+            if is_air_gapped():
+                return air_gap_block(url=url, content="", text="", markdown="")
+        except Exception:
+            pass
+
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"

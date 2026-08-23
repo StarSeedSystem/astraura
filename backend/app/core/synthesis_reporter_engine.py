@@ -6,6 +6,13 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 
+# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
+# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
+from pathlib import Path as _SSPath
+from .config import settings as _ss_settings
+WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
+HOME = str(_SSPath.home()).rstrip("/")
+
 class SynthesisReporterEngine:
     """
     Motor del Agente Especializado Cronista & Sintetizador (Hermes-Chronicler & Mnemosyne-Scribe).
@@ -19,7 +26,7 @@ class SynthesisReporterEngine:
     """
     def __init__(self, storage_dir: Optional[Path] = None):
         if storage_dir is None:
-            self.storage_dir = Path("/Users/alex/Documents/IA 1.58 bit/data")
+            self.storage_dir = Path(f"{WORKSPACE}/data")
         else:
             self.storage_dir = storage_dir
             
@@ -53,13 +60,75 @@ class SynthesisReporterEngine:
         except Exception as e:
             print(f"⚠️ [SynthesisReporter] Error guardando historial: {e}")
 
-    def generate_synthesis_report(
+    async def generate_synthesis_report_async(
         self,
         trigger_type: str = "imaginative_cycle",
         context_data: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
+        (OS · Ola 3) Variante asíncrona: pide al motor real el RESUMEN EJECUTIVO del
+        informe (cognition.generate) y delega en la versión síncrona, que conserva
+        su plantilla cuando no hay modelo. Es la que usan los ciclos asíncronos.
+        """
+        context_data = context_data or {}
+        llm_summary = None
+        try:
+            from . import cognition
+            if cognition.real_available():
+                llm_summary = await self._cognize_executive_summary(trigger_type, context_data)
+        except Exception:
+            llm_summary = None
+        return self.generate_synthesis_report(trigger_type=trigger_type, context_data=context_data, llm_summary=llm_summary)
+
+    async def _cognize_executive_summary(self, trigger_type: str, context_data: Dict[str, Any]) -> Optional[str]:
+        """(OS · Ola 3) Resumen ejecutivo real (3-5 frases, español). None si no sirve."""
+        from . import cognition
+        process_type = context_data.get("process_type") or {}
+        applied_items = context_data.get("applied_items") or []
+        proposals = context_data.get("proposals_generated") or []
+        facts = [
+            f"Tipo de síntesis: {trigger_type}",
+            f"Índice de síntesis: #{len(self.reports_history) + 1}",
+        ]
+        if isinstance(process_type, dict) and process_type.get("name"):
+            facts.append(f"Proceso imaginativo: {process_type.get('name')} ({process_type.get('category', '')})")
+        for key, label in (("theme", "Tema"), ("hypothesis", "Hipótesis"), ("insights", "Conclusiones"), ("project_name", "Proyecto")):
+            v = context_data.get(key)
+            if isinstance(v, str) and v.strip():
+                facts.append(f"{label}: {v.strip()[:240]}")
+        if applied_items:
+            themes = [str(i.get("theme", ""))[:70] for i in applied_items[:5] if isinstance(i, dict)]
+            facts.append(f"Propuestas aplicadas ({len(applied_items)}): {'; '.join(t for t in themes if t)}")
+        if proposals:
+            facts.append(f"Propuestas arquitectónicas generadas: {len(proposals)}")
+        if self.reports_history:
+            prev = self.reports_history[0]
+            facts.append(f"Síntesis previa: {prev.get('title', '')[:90]} ({prev.get('formatted_date', '')})")
+        system = (
+            "Eres Hermes-Chronicler, el cronista ejecutivo de Astraura 1.58-bit (StarSeed OS). "
+            "Redactas en español claro para el usuario, sin inventar cifras que no estén en los hechos."
+        )
+        prompt = (
+            "Redacta el RESUMEN EJECUTIVO de esta síntesis en un solo párrafo de 3-5 frases, "
+            "explicando qué se hizo, por qué importa y qué sigue. Solo texto, sin títulos ni JSON.\n\nHechos:\n- "
+            + "\n- ".join(facts)
+        )
+        res = await cognition.generate(prompt, system=system, max_tokens=220, temperature=0.5, timeout=60.0)
+        if not res.get("real"):
+            return None
+        text = " ".join(res["text"].split()).strip()
+        return text[:1200] if len(text) >= 40 else None
+
+    def generate_synthesis_report(
+        self,
+        trigger_type: str = "imaginative_cycle",
+        context_data: Optional[Dict[str, Any]] = None,
+        llm_summary: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
         Genera un informe comprensible, detallado y estructurado para el usuario.
+        (OS · Ola 3) `llm_summary`: resumen ejecutivo REAL ya generado (opcional);
+        si falta, se usa la plantilla y el informe se etiqueta generated_by="template".
         """
         start_perf = time.perf_counter()
         now = time.time()
@@ -366,6 +435,13 @@ class SynthesisReporterEngine:
             "safe_sandbox": True
         }
 
+        # (OS · Ola 3) Resumen ejecutivo real si el motor lo produjo; la plantilla queda como respaldo.
+        generated_by = "template"
+        template_summary = executive_summary
+        if llm_summary and isinstance(llm_summary, str) and len(llm_summary.strip()) >= 40:
+            executive_summary = llm_summary.strip()
+            generated_by = "llm"
+
         # Construcción del Objeto Completo de Informe
         report_object = {
             "id": report_id,
@@ -374,6 +450,8 @@ class SynthesisReporterEngine:
             "formatted_date": formatted_date,
             "title": title,
             "trigger_type": trigger_type,
+            "generated_by": generated_by,  # (OS · Ola 3) "llm" | "template"
+            "template_summary": template_summary if generated_by == "llm" else None,
             "author_agent": {
                 "id": "hermes_chronicler",
                 "name": "Hermes-Chronicler & Mnemosyne-Scribe",

@@ -8,6 +8,8 @@ import httpx
 from bs4 import BeautifulSoup
 from ..memory.starseed_memory_engine import starseed_memory_engine
 from ..memory.openviking_engine import openviking_memory
+# (OS · Ola 3) Air-Gap REAL: toda entrada de red del navegador se niega cuando está activo.
+from ..core.privacy_manager import is_air_gapped, air_gap_block
 
 class AstrauraBrowserAgent:
     """
@@ -40,6 +42,8 @@ class AstrauraBrowserAgent:
         """
         Performs universal free web search across global internet sources.
         """
+        if is_air_gapped():  # (OS · Ola 3)
+            return air_gap_block(query=query, total_results=0, results=[])
         encoded_query = urllib.parse.quote_plus(query)
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
@@ -125,6 +129,8 @@ class AstrauraBrowserAgent:
         and cross-references documentation to synthesize verified citations for 1.58b reasoning.
         """
         t0 = time.time()
+        if is_air_gapped():  # (OS · Ola 3)
+            return air_gap_block(query=query, depth=max_depth, time_taken_seconds=0.0, sources_count=0, sources=[], raw_results=[])
         max_duration_sec = 10 if max_depth == "quick" else (35 if max_depth == "standard" else min(300, max(60, duration_mins * 60)))
         num_search_results = 3 if max_depth == "quick" else (6 if max_depth == "standard" else 12)
 
@@ -182,6 +188,11 @@ class AstrauraBrowserAgent:
         """
         if not url.startswith("http://") and not url.startswith("https://"):
             url = f"https://{url}"
+
+        if is_air_gapped():  # (OS · Ola 3) navegación, crawl y acciones interactivas bloqueadas
+            return air_gap_block(url=url, title="", content="", length=0,
+                                 dom={"links": [], "buttons": [], "headings": []}, screenshot_b64=None,
+                                 engine="Air-Gap Soberano (sin red)")
 
         # 1. Fast Semantic Extractor (sub-250ms latency for reading URLs/GitHub/Docs without heavy Chromium startup)
         if not actions and not take_screenshot:

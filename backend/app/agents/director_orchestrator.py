@@ -7,6 +7,13 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 import psutil
 
+# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
+# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
+from pathlib import Path as _SSPath
+from ..core.config import settings as _ss_settings
+WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
+HOME = str(_SSPath.home()).rstrip("/")
+
 class DirectorOrchestratorEngine:
     """
     Agente Orquestador Director Supremo // Astraura Director (Metis-Prime).
@@ -15,7 +22,7 @@ class DirectorOrchestratorEngine:
     Cerebros, Memorias y Recuerdos Clave con memoria ejecutiva propia.
     """
     def __init__(self, workspace_path: Optional[Path] = None):
-        self.workspace_path = workspace_path or Path("/Users/alex/Documents/IA 1.58 bit")
+        self.workspace_path = workspace_path or Path(f"{WORKSPACE}")
         self.vault_dir = self.workspace_path / "data/vault/director"
         self.vault_dir.mkdir(parents=True, exist_ok=True)
         self.memory_file = self.vault_dir / "director_memory_vault.json"
@@ -369,24 +376,63 @@ class DirectorOrchestratorEngine:
 
     # ================= Audit, Verification & Deliverable Attachment =================
 
-    def audit_and_verify_task_output(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
+    # ================= (OS · Ola 3) Cognición real del Director =================
+
+    async def _cognize_audit_verdict(self, task_data: Dict[str, Any], quality_score: int, threshold: int,
+                                     verdict: str, artifact_verified: bool) -> Optional[str]:
+        """(OS · Ola 3) Veredicto breve (2-3 frases) escrito por el motor real. None ⇒ plantilla."""
+        from app.core import cognition
+        if not cognition.real_available():
+            return None
+        logs = [str(l) for l in (task_data.get("logs") or [])][-4:]
+        deliverable = str(task_data.get("deliverable_excerpt") or task_data.get("deliverable") or "")[:700]
+        system = (
+            "Eres Metis Prime, Director del enjambre de Astraura 1.58-bit (StarSeed OS). Auditas entregables "
+            "con rigor técnico, en español, sin inventar cifras. Solo texto, sin JSON ni títulos."
+        )
+        prompt = (
+            f"Tarea: {task_data.get('title', 'Tarea')}\nAgente: {task_data.get('agent_id', 'agente')}\n"
+            f"Objetivo: {str(task_data.get('prompt', ''))[:300]}\n"
+            f"Puntuación heurística: {quality_score}% (umbral {threshold}%) → veredicto {verdict}\n"
+            f"Artefacto verificado en disco: {'sí' if artifact_verified else 'no'}\n"
+            f"Últimos registros: {' | '.join(logs) if logs else 'sin registros'}\n"
+            f"Extracto del entregable: {deliverable if deliverable else 'no disponible'}\n\n"
+            "Redacta el veredicto de auditoría en 2-3 frases: qué se verificó, qué riesgo o mejora ves y la "
+            "recomendación final coherente con el veredicto."
+        )
+        res = await cognition.generate(prompt, system=system, max_tokens=160, temperature=0.3, timeout=60.0)
+        if not res.get("real"):
+            return None
+        text = " ".join(res["text"].split()).strip()
+        return text[:900] if len(text) >= 30 else None
+
+    async def audit_and_verify_task_output_async(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Audita técnicamente la tarea completada por un agente:
-        Verifica el archivo real en disco, comprueba su hash SHA-256,
-        calcula el quality_score determinista y emite un veredicto formal.
+        (OS · Ola 3) Auditoría con veredicto REAL: calcula primero la puntuación heurística
+        (sin efectos secundarios), pide al motor el texto del veredicto y registra la
+        auditoría con la versión síncrona (que conserva la plantilla si no hay modelo).
         """
-        now = time.time()
-        title = task_data.get("title", "Tarea Anónima")
-        agent_id = task_data.get("agent_id", "agente_general")
+        llm_verdict = None
+        try:
+            pre = self._heuristic_audit(task_data)
+            llm_verdict = await self._cognize_audit_verdict(
+                task_data, pre["quality_score"], pre["threshold"], pre["verdict"], pre["artifact_verified"]
+            )
+        except Exception:
+            llm_verdict = None
+        return self.audit_and_verify_task_output(task_data, llm_verdict=llm_verdict)
+
+    def _heuristic_audit(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
+        """(OS · Ola 3) Puntuación determinista de calidad (extraída para reutilizarla sin mutar estado)."""
         logs = task_data.get("logs", [])
         artifact_path_str = task_data.get("artifact_file")
-        
+
         # Calculate Technical Quality Score based on real physical evidence
         base_score = 85
-        logs_joined = " ".join(logs).lower()
+        logs_joined = " ".join(str(l) for l in logs).lower()
         if len(logs) >= 3:
             base_score += 5
-        
+
         # Physical disk artifact audit
         artifact_verified = False
         artifact_bytes = 0
@@ -397,19 +443,55 @@ class DirectorOrchestratorEngine:
                 if artifact_bytes > 0:
                     artifact_verified = True
                     base_score += 8
-        
+
         # Check for actual failure markers
         has_real_failure = any(f in logs_joined for f in ["exception", "traceback", "failed", "falló", "fatal", "crash", "error:"])
         has_clean_execution = any(c in logs_joined for c in ["sin error", "exitos", "completad", "speedup", "nominal", "óptim", "validada en disco"])
-        
+
         if has_real_failure and not has_clean_execution:
             base_score -= 30
         elif has_clean_execution:
             base_score += 4
-            
+
         quality_score = max(50, min(100, base_score))
         threshold = self.config.get("quality_threshold", 80)
         verdict = "APROBADO" if quality_score >= threshold else "REVISIÓN_REQUERIDA"
+        return {
+            "quality_score": quality_score,
+            "threshold": threshold,
+            "verdict": verdict,
+            "artifact_verified": artifact_verified,
+            "artifact_bytes": artifact_bytes,
+            "artifact_file": artifact_path_str,
+        }
+
+    def audit_and_verify_task_output(self, task_data: Dict[str, Any], llm_verdict: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Audita técnicamente la tarea completada por un agente:
+        Verifica el archivo real en disco, comprueba su hash SHA-256,
+        calcula el quality_score determinista y emite un veredicto formal.
+        (OS · Ola 3) `llm_verdict`: texto del veredicto escrito por el motor real
+        (opcional). La puntuación heurística se conserva siempre.
+        """
+        now = time.time()
+        title = task_data.get("title", "Tarea Anónima")
+        agent_id = task_data.get("agent_id", "agente_general")
+
+        # (OS · Ola 3) Puntuación heurística (misma lógica de siempre, ahora en _heuristic_audit).
+        h = self._heuristic_audit(task_data)
+        artifact_path_str = h["artifact_file"]
+        artifact_verified = h["artifact_verified"]
+        artifact_bytes = h["artifact_bytes"]
+        quality_score = h["quality_score"]
+        threshold = h["threshold"]
+        verdict = h["verdict"]
+
+        template_details = f"Auditado por Director Metis. Entregable físico verificado en disco ({artifact_bytes} B). Fidelidad técnica del {quality_score}% (Umbral: {threshold}%)."
+        details = template_details
+        generated_by = "template"
+        if llm_verdict and isinstance(llm_verdict, str) and len(llm_verdict.strip()) >= 30:
+            details = llm_verdict.strip()
+            generated_by = "llm"
 
         audit_entry = {
             "id": f"audit_{int(now)}_{int(now * 1000) % 1000:03d}",
@@ -423,7 +505,10 @@ class DirectorOrchestratorEngine:
             "quality_score": quality_score,
             "quality_threshold": threshold,
             "verdict": verdict,
-            "details": f"Auditado por Director Metis. Entregable físico verificado en disco ({artifact_bytes} B). Fidelidad técnica del {quality_score}% (Umbral: {threshold}%).",
+            "details": details,
+            "heuristic_details": template_details,  # (OS · Ola 3)
+            "generated_by": generated_by,  # (OS · Ola 3) "llm" | "template"
+            "deliverable_generated_by": task_data.get("generated_by"),  # (OS · Ola 3)
             "status": "verified"
         }
         self.audit_log.insert(0, audit_entry)
@@ -466,14 +551,14 @@ class DirectorOrchestratorEngine:
 
         # 2. Map Folder
         folder_map = {
-            "area_engineering": "/Users/alex/Documents/IA 1.58 bit/backend/app",
-            "area_web_intel": "/Users/alex/Documents/IA 1.58 bit/data/research",
-            "area_synaptic_memory": "/Users/alex/Documents/IA 1.58 bit/data/vault/memories",
-            "area_creative_synthesis": "/Users/alex/Documents/IA 1.58 bit/frontend/src/components",
-            "area_sentinel_privacy": "/Users/alex/Documents/IA 1.58 bit/data/telemetry",
-            "area_project_management": "/Users/alex/Documents/IA 1.58 bit/data/vault/projects"
+            "area_engineering": f"{WORKSPACE}/backend/app",
+            "area_web_intel": f"{WORKSPACE}/data/research",
+            "area_synaptic_memory": f"{WORKSPACE}/data/vault/memories",
+            "area_creative_synthesis": f"{WORKSPACE}/frontend/src/components",
+            "area_sentinel_privacy": f"{WORKSPACE}/data/telemetry",
+            "area_project_management": f"{WORKSPACE}/data/vault/projects"
         }
-        target_folder = folder_map.get(area_id, "/Users/alex/Documents/IA 1.58 bit")
+        target_folder = folder_map.get(area_id, f"{WORKSPACE}")
 
         # 3. Associate with Project
         target_proj_id = "proj_astraura_core"
@@ -595,73 +680,73 @@ class DirectorOrchestratorEngine:
             "hephaestus": [
                 ("Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b",
                  "Refactorizar bucles vectoriales NEON de 128 bits para acelerar la multiplicación ternaria sin operaciones en punto flotante.",
-                 "area_engineering", "/Users/alex/Documents/IA 1.58 bit/backend/app"),
+                 "area_engineering", f"{WORKSPACE}/backend/app"),
                 ("Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM",
                  "Implementar instrucciones vld1q_s8 y vaddq_s8 en el microkernel C++ para maximizar el throughput de inferencia.",
-                 "area_engineering", "/Users/alex/Documents/IA 1.58 bit/backend/app"),
+                 "area_engineering", f"{WORKSPACE}/backend/app"),
                 ("Compactación de Huella de Memoria RAM para Modelos de 1.58 Bits",
                  "Verificar empaquetado de 2 bits por peso (bitpacking) reduciendo el uso de memoria a menos de 0.25 bytes por parámetro.",
-                 "area_engineering", "/Users/alex/Documents/IA 1.58 bit/backend/BitNet")
+                 "area_engineering", f"{WORKSPACE}/backend/BitNet")
             ],
             "hermes": [
                 ("Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b",
                  "Indexar papers recientes sobre cuantización extrema y leyes de escala ternarias en el exocórtex de investigación.",
-                 "area_web_intel", "/Users/alex/Documents/IA 1.58 bit/data/research"),
+                 "area_web_intel", f"{WORKSPACE}/data/research"),
                 ("Síntesis Comparativa de Arquitecturas: Transformers vs Ternary BitNet",
                  "Analizar métricas de perplejidad, consumo energético por token y aceleración en silicio Apple M1.",
-                 "area_web_intel", "/Users/alex/Documents/IA 1.58 bit/data/research"),
+                 "area_web_intel", f"{WORKSPACE}/data/research"),
                 ("Mapeo de Referencias Académicas y Citaciones para StarSeed OS",
                  "Extraer abstractos clave y consolidar la bibliografía técnica del sistema soberano.",
-                 "area_web_intel", "/Users/alex/Documents/IA 1.58 bit/data/research")
+                 "area_web_intel", f"{WORKSPACE}/data/research")
             ],
             "mnemosyne": [
                 ("Poda y Reestructuración del Grafo Sináptico de Memoria StarSeed",
                  "Identificar nodos conceptuales huérfanos, calcular densidad semántica y fortalecer conexiones de alta resonancia.",
-                 "area_synaptic_memory", "/Users/alex/Documents/IA 1.58 bit/data/vault/memories"),
+                 "area_synaptic_memory", f"{WORKSPACE}/data/vault/memories"),
                 ("Destilación de Axiomas Soberanos y Recuerdos Clave a Largo Plazo",
                  "Sintetizar principios epistemológicos basados en las directivas del Arquitecto Alex Bordón Garrigós.",
-                 "area_synaptic_memory", "/Users/alex/Documents/IA 1.58 bit/data/vault/memories"),
+                 "area_synaptic_memory", f"{WORKSPACE}/data/vault/memories"),
                 ("Indexación Rápida de Fragmentos de Memoria Episódica en Bóveda",
                  "Optimizar el motor de recuperación por similitud de cosenos para respuestas contextuales instantáneas.",
-                 "area_synaptic_memory", "/Users/alex/Documents/IA 1.58 bit/data/vault/memories")
+                 "area_synaptic_memory", f"{WORKSPACE}/data/vault/memories")
             ],
             "oneiros": [
                 ("Síntesis de Shader Procedural WebGL Reactivo al Sensorium Ambiental",
                  "Crear geometrías visuales ciberdélicas que oscilan con la temperatura, nivel de entropía y carga de CPU.",
-                 "area_creative_synthesis", "/Users/alex/Documents/IA 1.58 bit/frontend/src/components"),
+                 "area_creative_synthesis", f"{WORKSPACE}/frontend/src/components"),
                 ("Generación de Mallas y Texturas Dinámicas para la Bóveda de Creaciones",
                  "Desarrollar componentes interactivos con glassmorphism, paletas HSL cuánticas y shaders WebGL en tiempo real.",
-                 "area_creative_synthesis", "/Users/alex/Documents/IA 1.58 bit/data/vault/creations"),
+                 "area_creative_synthesis", f"{WORKSPACE}/data/vault/creations"),
                 ("Forja de Prototipos de Interfaces Intuitivas de Resonancia Sináptica",
                  "Explorar visualizaciones de grafos neuronales tridimensionales para la navegación cognitiva del usuario.",
-                 "area_creative_synthesis", "/Users/alex/Documents/IA 1.58 bit/frontend/src/components")
+                 "area_creative_synthesis", f"{WORKSPACE}/frontend/src/components")
             ],
             "athena": [
                 ("Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
                  "Monitorear la temperatura del SoC M1 y modular la cuota de CPU de los agentes secundarios para evitar estrangulamiento térmico.",
-                 "area_sentinel_privacy", "/Users/alex/Documents/IA 1.58 bit/data/telemetry"),
+                 "area_sentinel_privacy", f"{WORKSPACE}/data/telemetry"),
                 ("Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
                  "Asegurar que todas las inferencias y escrituras de archivos se mantengan 100% locales sin fugas externas.",
-                 "area_sentinel_privacy", "/Users/alex/Documents/IA 1.58 bit/data/telemetry"),
+                 "area_sentinel_privacy", f"{WORKSPACE}/data/telemetry"),
                 ("Calibración de Sensores de Entorno y Resonancia Acústica",
                  "Sincronizar telemetría física con el módulo Sensorium 360° para enriquecer el contexto cognitivo.",
-                 "area_sentinel_privacy", "/Users/alex/Documents/IA 1.58 bit/data/telemetry")
+                 "area_sentinel_privacy", f"{WORKSPACE}/data/telemetry")
             ],
             "daedalus": [
                 ("Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana",
                  "Revisar el árbol de dependencias de 'proj_astraura_core' y calcular el porcentaje de completitud de hitos.",
-                 "area_project_management", "/Users/alex/Documents/IA 1.58 bit/data/vault/projects"),
+                 "area_project_management", f"{WORKSPACE}/data/vault/projects"),
                 ("Sincronización de Versiones y Diffing de Entregables Multi-Agente",
                  "Validar que el código, shaders y memorias generadas cumplan los estándares de arquitectura modular.",
-                 "area_project_management", "/Users/alex/Documents/IA 1.58 bit/data/vault/projects"),
+                 "area_project_management", f"{WORKSPACE}/data/vault/projects"),
                 ("Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits",
                  "Organizar la hoja de ruta evolutiva de Astraura y asignar micro-tareas a los cerebros especializados.",
-                 "area_project_management", "/Users/alex/Documents/IA 1.58 bit/data/vault/projects")
+                 "area_project_management", f"{WORKSPACE}/data/vault/projects")
             ]
         }
 
         choices = agent_task_blueprints.get(agent_id, agent_task_blueprints["hephaestus"])
-        
+
         # Avoid repeating the immediate last task title if possible
         last_title = last_completed_task.get("title", "") if last_completed_task else ""
         valid_choices = [c for c in choices if c[0] != last_title]
@@ -674,8 +759,81 @@ class DirectorOrchestratorEngine:
             "target_folder_path": chosen[3],
             "agent_id": agent_id,
             "target_project_id": "proj_astraura_core",
-            "allocated_cpu_percent": 10 if agent_id in ["hephaestus", "oneiros"] else 5
+            "allocated_cpu_percent": 10 if agent_id in ["hephaestus", "oneiros"] else 5,
+            "generated_by": "template"  # (OS · Ola 3)
         }
+
+    async def formulate_next_intelligent_task_async(self, agent_id: str, last_completed_task: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        (OS · Ola 3) Pide al motor real UNA siguiente tarea (título + prompt) en JSON a
+        partir de la especialidad del agente, la última tarea completada y la memoria
+        ejecutiva. Si no hay modelo o el JSON no sirve → plantilla (random.choice).
+        """
+        template_spec = self.formulate_next_intelligent_task(agent_id, last_completed_task)
+        try:
+            from app.core import cognition
+            if not cognition.real_available():
+                return template_spec
+            role = ""
+            area_name = ""
+            try:
+                from app.agents.swarm_manager import swarm_manager, SWARM_AREAS
+                ag = swarm_manager.agents.get(agent_id, {})
+                role = ag.get("role", "")
+                area_name = next((a["name"] for a in SWARM_AREAS if a["id"] == template_spec["area_id"]), "")
+            except Exception:
+                pass
+            last_title = (last_completed_task or {}).get("title", "")
+            last_deliverable = str((last_completed_task or {}).get("deliverable_excerpt") or "")[:400]
+            memories = "; ".join(m.get("title", "")[:70] for m in self.executive_memories[:2] if m.get("title"))
+            system = (
+                "Eres Metis Prime, Director del enjambre de Astraura 1.58-bit (StarSeed OS). Planificas tareas de "
+                "desarrollo concretas y verificables, en español. Respondes ÚNICAMENTE con un objeto JSON válido."
+            )
+            prompt = (
+                f"Agente: {agent_id} — {role}\nÁrea: {area_name}\nCarpeta objetivo: {template_spec['target_folder_path']}\n"
+                f"Proyecto: proj_astraura_core (núcleo cognitivo 1.58-bit, StarSeed OS)\n"
+                f"Última tarea completada: {last_title or 'ninguna'}\n"
+                f"Extracto de su entregable: {last_deliverable or 'no disponible'}\n"
+                f"Memoria ejecutiva: {memories or 'sin entradas'}\n"
+                f"Ejemplo del catálogo (NO lo repitas): {template_spec['title']}\n\n"
+                "Formula UNA sola tarea siguiente, distinta de la última, que avance el proyecto. Devuelve SOLO: "
+                "{\"title\": \"título específico (máx. 14 palabras)\", \"prompt\": \"instrucción de 1-3 frases con el resultado esperado\"}"
+            )
+            res = await cognition.generate(prompt, system=system, max_tokens=200, temperature=0.5, timeout=60.0)
+            if not res.get("real"):
+                return template_spec
+            data = cognition.extract_json(res["text"])
+            title = cognition.field(data, "title", max_len=140, min_len=10)
+            task_prompt = cognition.field(data, "prompt", max_len=600, min_len=20)
+            if not title or not task_prompt or title.strip().lower() == str(last_title).strip().lower():
+                return template_spec
+            return {**template_spec, "title": title, "prompt": task_prompt, "generated_by": "llm"}
+        except Exception as e:
+            print(f"⚠️ [Director] Formulación real de tarea falló, se usa plantilla: {e}")
+            return template_spec
+
+    async def auto_renew_completed_task_async(self, completed_task: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """
+        (OS · Ola 3) Variante asíncrona de auto_renew_completed_task usada por el
+        planificador del enjambre: auditoría con veredicto real + siguiente tarea real.
+        """
+        agent_id = completed_task.get("agent_id", "hephaestus")
+        audit_res = await self.audit_and_verify_task_output_async(completed_task)
+        next_task_spec = await self.formulate_next_intelligent_task_async(agent_id, completed_task)
+        now = time.time()
+        self.decision_history.insert(0, {
+            "id": f"dec_renew_{int(now)}_{random.randint(10, 99)}",
+            "timestamp": now,
+            "action": f"Renovación Inteligente de Tarea: {agent_id}",
+            "agent_id": agent_id,
+            "target_project": next_task_spec["target_project_id"],
+            "reasoning": f"Tarea anterior '{completed_task.get('title')}' auditada ({audit_res['audit']['quality_score']}%). Renovando automáticamente con '{next_task_spec['title']}'.",
+            "generated_by": next_task_spec.get("generated_by", "template"),
+            "status": "renewed"
+        })
+        self._save_memory()
+        return next_task_spec
 
     def auto_renew_completed_task(self, completed_task: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """

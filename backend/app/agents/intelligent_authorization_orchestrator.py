@@ -31,6 +31,13 @@ from typing import Dict, List, Any, Optional
 # DREAM_PROCESS_TYPES es constante de módulo (no atributo de instancia)
 from ..core.intuitive_imagination_engine import DREAM_PROCESS_TYPES
 
+# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
+# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
+from pathlib import Path as _SSPath
+from ..core.config import settings as _ss_settings
+WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
+HOME = str(_SSPath.home()).rstrip("/")
+
 # Importación perezosa para evitar ciclos en el arranque de FastAPI
 _intuitive = None
 _notifications = None
@@ -101,7 +108,7 @@ _LOW_PRIORITY_KW = ["cosmetic", "estetica", "decor", "minor", "menor", "opcional
 class IntelligentAuthorizationOrchestrator:
     """Orquestador inteligente de autorizaciones en 2do plano (1.58-bit)."""
 
-    AUTO_MODE_FILE = Path("/Users/alex/Documents/IA 1.58 bit/data/vault/astraura_auth_auto_mode.json")
+    AUTO_MODE_FILE = Path(f"{WORKSPACE}/data/vault/astraura_auth_auto_mode.json")
 
     def __init__(self):
         self.orchestrations_run = 0

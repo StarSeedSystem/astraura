@@ -11,6 +11,13 @@ from datetime import datetime
 from .system_notifications_engine import system_notifications_engine
 from ..memory.starseed_memory_engine import starseed_memory_engine
 
+# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
+# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
+from pathlib import Path as _SSPath
+from .config import settings as _ss_settings
+WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
+HOME = str(_SSPath.home()).rstrip("/")
+
 class StorageRoutingEngine:
     """
     Motor Soberano de Detección y Enrutamiento Automático de Medios de Almacenamiento,
@@ -24,7 +31,7 @@ class StorageRoutingEngine:
       - Modificación y ajuste dinámico de límites de capacidades relativas (Doble Tronco 1.58b: Imaginación % y Multi-Agentes %).
     """
     def __init__(self, storage_dir: Optional[Path] = None):
-        self.workspace_path = Path("/Users/alex/Documents/IA 1.58 bit")
+        self.workspace_path = Path(f"{WORKSPACE}")
         self.storage_dir = storage_dir or (self.workspace_path / "data/storage_routing")
         self.storage_dir.mkdir(parents=True, exist_ok=True)
         self.rules_file = self.storage_dir / "storage_routing_rules.json"

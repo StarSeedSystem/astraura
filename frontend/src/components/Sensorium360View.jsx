@@ -36,7 +36,7 @@ import {
   Edit3,
   SlidersHorizontal
 } from 'lucide-react';
-import { fetchSensoriumLive, updateClientSensors, fetchLiveWeather, updateSensoriumLocation } from '../services/api';
+import { fetchSensoriumLive, updateClientSensors, fetchLiveWeather, updateSensoriumLocation, apiUrl } from '../services/api';
 import { deviceContextDetector } from '../services/deviceContextDetector';
 
 export default function Sensorium360View() {
@@ -113,7 +113,8 @@ export default function Sensorium360View() {
   const checkPing = async () => {
     const start = performance.now();
     try {
-      await fetch('/api/status');
+      // apiUrl respeta el gateway activo (custom / túnel / default) en vez del '/api' relativo
+      await fetch(apiUrl('/api/status'));
       const latency = Math.round(performance.now() - start);
       setNetworkLatency(latency);
     } catch {

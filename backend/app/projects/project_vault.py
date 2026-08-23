@@ -6,6 +6,13 @@ from typing import Dict, Any, List, Optional
 from ..memory.starseed_memory_engine import starseed_memory_engine
 from ..memory.openviking_engine import openviking_memory
 
+# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
+# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
+from pathlib import Path as _SSPath
+from ..core.config import settings as _ss_settings
+WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
+HOME = str(_SSPath.home()).rstrip("/")
+
 class ProjectVaultManager:
     """
     Gestor de Proyectos Multifacéticos y Desarrollos de Software para Astraura (StarSeed OS).
@@ -44,7 +51,7 @@ class ProjectVaultManager:
                 "brain_id": "cerebro_genesis",
                 "created_at": time.time() - 86400,
                 "updated_at": time.time(),
-                "linked_folder": "/Users/alex/Documents/IA 1.58 bit",
+                "linked_folder": f"{WORKSPACE}",
                 "files": [
                     {
                         "filename": "main.py",

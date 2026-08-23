@@ -4,6 +4,13 @@ import re
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
+# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
+# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
+from pathlib import Path as _SSPath
+from ..core.config import settings as _ss_settings
+WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
+HOME = str(_SSPath.home()).rstrip("/")
+
 class Mem0UniversalMemoryEngine:
     """
     Motor de Memoria Universal Mem0 (https://github.com/mem0ai/mem0) para StarSeed OS & Astraura 1.58b.
@@ -15,7 +22,7 @@ class Mem0UniversalMemoryEngine:
       - Trazabilidad y versionado de cambios con historial de mutaciones (memory history).
     """
     def __init__(self, storage_dir: Optional[Path] = None):
-        self.storage_dir = storage_dir or Path("/Users/alex/Documents/IA 1.58 bit/data/mem0")
+        self.storage_dir = storage_dir or Path(f"{WORKSPACE}/data/mem0")
         self.storage_dir.mkdir(parents=True, exist_ok=True)
         self.store_file = self.storage_dir / "mem0_store.json"
         

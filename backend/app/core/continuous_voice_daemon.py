@@ -18,6 +18,13 @@ from .audio_cpp_engine import audio_cpp_engine
 from ..memory.mem0_engine import mem0_engine
 from ..personalities.personality_engine import personality_engine
 
+# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
+# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
+from pathlib import Path as _SSPath
+from .config import settings as _ss_settings
+WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
+HOME = str(_SSPath.home()).rstrip("/")
+
 class ContinuousVoiceDaemon:
     """
     Central Sensory & Autonomous Voice Daemon for StarSeed OS.
@@ -27,7 +34,7 @@ class ContinuousVoiceDaemon:
 
     def __init__(self, data_dir: Optional[str] = None):
         if data_dir is None:
-            self.data_dir = Path("/Users/alex/Documents/IA 1.58 bit/data/voice_daemon")
+            self.data_dir = Path(f"{WORKSPACE}/data/voice_daemon")
         else:
             self.data_dir = Path(data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
@@ -265,7 +272,7 @@ class ContinuousVoiceDaemon:
         context_memories = mem0_engine.search_memories(user_transcript, user_id="alex", limit=3)
         relevant_files = []
         try:
-            ws = Path("/Users/alex/Documents/IA 1.58 bit")
+            ws = Path(f"{WORKSPACE}")
             keyword = user_transcript.split()[0].lower() if user_transcript.split() else "main"
             for f in ws.glob(f"**/*{keyword}*"):
                 if f.is_file() and not f.name.startswith("."):

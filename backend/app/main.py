@@ -6,7 +6,7 @@ from pathlib import Path
 from contextlib import asynccontextmanager
 from typing import Dict, Any, List, Optional
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File, Form, BackgroundTasks, Query, Header, Response
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File, Form, BackgroundTasks, Query, Header, Response, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
@@ -59,9 +59,35 @@ from .core.personality_api_engine import personality_api_engine
 from .core.agent_vault_engine import agent_vault_engine
 from .core.synthesis_reporter_engine import synthesis_reporter_engine
 from .api.voice_studio import router as voice_studio_router
+# Puente oficial con StarSeed OS (sistema primario · Adenda 153 del OS).
+from .api.starseed_bridge import router as starseed_bridge_router, BRIDGE_VERSION as STARSEED_BRIDGE_VERSION  # (OS · Ola 3)
+# Control de acceso (Adenda 153): modos local-only (defecto) · key · open. Ver core/security.py.
+from .core.security import AstrauraAuthMiddleware, security_status, key_is_master, extract_key, mask_key
+
+# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
+# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
+from pathlib import Path as _SSPath
+from .core.config import settings as _ss_settings
+WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
+HOME = str(_SSPath.home()).rstrip("/")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # (Ola 3) Precalienta el motor nativo (ambos perfiles) en un hilo: el modelo
+    # carga durante el arranque y el primer turno/ciclo no paga el arranque en frío.
+    def _warm_bitnet():
+        try:
+            from .engine.bitnet_cpp_manager import bitnet_cpp_manager as _mgr
+            if _mgr.server_binary() is not None:
+                _mgr.ensure_server(0.0, "interactive")
+                _mgr.ensure_server(0.0, "background")
+        except Exception as _e:
+            print(f"[warm] BitNet nativo no precalentado: {_e}")
+    try:
+        import threading as _th
+        _th.Thread(target=_warm_bitnet, daemon=True, name="bitnet-warm").start()
+    except Exception:
+        pass
     print("=" * 65)
     print("🚀 INICIANDO ASTRAURA 1.58-BIT COGNITIVE ENGINE (StarSeed OS)")
     print("⚡ Arquitectura: Apple Silicon M1 (ARM64 NEON) + BitNet b1.58 Ternary")
@@ -85,6 +111,15 @@ async def lifespan(app: FastAPI):
     skills_count = len(starseed_library.get_all_skills())
     print(f"🌌 Biblioteca StarSeed OS: {skills_count} habilidades y paquetes activos por defecto.")
     
+    # (OS · Ola 3) Registrar el bucle principal para cognition.generate_sync() desde hilos
+    # (sync R2, enrutamiento de almacenamiento). Instantáneo: no bloquea el arranque.
+    try:
+        from .core import cognition as _cognition
+        _cognition.register_loop()
+        print(f"🧠 Cognición de fondo (OS · Ola 3): modo real = {_cognition.engine_mode()} · máx. {_cognition.MAX_CONCURRENT} generaciones concurrentes")
+    except Exception as e:
+        print(f"⚠️ No se pudo registrar el bucle de cognición: {e}")
+
     # 5. Start Background Loops: Learner, Intuitive Imagination, Swarm Scheduler & Storage Watcher
     asyncio.create_task(background_learner.start_background_loop())
     asyncio.create_task(intuitive_imagination_engine.start_background_loop())
@@ -138,6 +173,10 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Auth primero en el stack (interior); CORS después (exterior) para que los 401/403
+# sigan siendo legibles desde el navegador de la UI.
+app.add_middleware(AstrauraAuthMiddleware)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -148,6 +187,7 @@ app.add_middleware(
 )
 
 app.include_router(voice_studio_router)
+app.include_router(starseed_bridge_router)
 
 class ConnectionManager:
     def __init__(self):
@@ -199,27 +239,15 @@ async def get_status():
         },
         "skills_active": len([s for s in starseed_library.get_all_skills() if s["enabled"]]),
         "dream_status": dream_engine.get_status(),
-        "swarm_status": swarm_manager.get_swarm_status()
+        "swarm_status": swarm_manager.get_swarm_status(),
+        # (Adenda 153) Estado honesto de seguridad y del puente con StarSeed OS.
+        "security": security_status(),
+        "starseed_bridge": STARSEED_BRIDGE_VERSION  # (OS · Ola 3) versión real del puente
     }
 
-@app.get("/active_tunnel.json")
-async def get_active_tunnel():
-    """Devuelve la URL del túnel activo (se actualiza dinámicamente por el
-    script de túnel sin necesidad de rebuild). El frontend lo consulta para
-    apuntar siempre al backend correcto desde cualquier medio."""
-    import json as _json
-    from pathlib import Path as _Path
-    candidates = [
-        _Path("/Users/alex/Documents/IA 1.58 bit/data/active_tunnel.json"),
-        _Path("/Users/alex/Documents/IA 1.58 bit/frontend/public/active_tunnel.json"),
-    ]
-    for c in candidates:
-        if c.exists():
-            try:
-                return _json.loads(c.read_text())
-            except Exception:
-                pass
-    return {"url": "", "status": "unknown"}
+# (Adenda 153) La ruta /active_tunnel.json única es la DINÁMICA de más abajo
+# (get_active_tunnel_json_dynamic): antes había dos handlers y ganaba el de
+# archivo con ruta /Users/alex fija.
 
 @app.get("/api/profile")
 async def get_hardware_profile():
@@ -353,7 +381,8 @@ class VerifyTaskRequest(BaseModel):
 
 @app.post("/api/director/verify_task")
 async def verify_director_task_endpoint(req: VerifyTaskRequest):
-    return director_orchestrator.audit_and_verify_task_output(req.task)
+    # (OS · Ola 3) Veredicto REAL del Director cuando hay modelo (misma respuesta y puntuación heurística).
+    return await director_orchestrator.audit_and_verify_task_output_async(req.task)
 
 class AddDirectorMemoryRequest(BaseModel):
     title: str
@@ -380,7 +409,8 @@ async def renew_director_tasks_endpoint():
     pool = ["hephaestus", "hermes", "mnemosyne", "oneiros", "athena", "daedalus"]
     renewed = []
     for ag_id in pool[:3]:
-        spec = director_orchestrator.formulate_next_intelligent_task(ag_id)
+        # (OS · Ola 3) Tarea formulada por el motor real (plantilla random.choice si no hay modelo).
+        spec = await director_orchestrator.formulate_next_intelligent_task_async(ag_id)
         swarm_manager.dispatch_task(
             area_id=spec["area_id"],
             title=spec["title"],
@@ -1154,7 +1184,8 @@ async def sync_r2_force():
     try:
         from app.core import sync_engine
         pull = await asyncio.to_thread(sync_engine.pull_all)
-        push = await asyncio.to_thread(sync_engine.push_all)
+        # (Adenda 153) Forzado manual: empuja todo aunque no haya cambiado (respeta el tope de tamaño).
+        push = await asyncio.to_thread(sync_engine.push_all, False, True)
         return {"success": True, "pull": pull, "push": push}
     except Exception as e:
         return {"success": False, "error": str(e)[:200]}
@@ -1468,11 +1499,17 @@ async def list_personality_api_keys():
     return {"success": True, "personalities": personality_api_engine.list_personality_apis()}
 
 @app.get("/api/personalities/{persona_id}/api_status")
-async def get_personality_api_detail_endpoint(persona_id: str):
-    """Returns detailed API status, full key, permissions, active processes, and connections for a personality."""
+async def get_personality_api_detail_endpoint(persona_id: str, request: Request):
+    """Returns detailed API status, permissions, active processes, and connections for a personality.
+    (Adenda 153) La clave completa SOLO se devuelve si la petición trae la clave maestra o
+    esa misma clave; en cualquier otro caso va enmascarada."""
     detail = personality_api_engine.get_personality_api_detail(persona_id)
     if not detail:
         return JSONResponse(status_code=404, content={"success": False, "error": f"Personalidad '{persona_id}' no encontrada."})
+    raw = extract_key(request)
+    full = detail.get("api_key") or ""
+    if not (key_is_master(raw) or (raw and full and raw == full)):
+        detail = {**detail, "api_key": mask_key(full), "api_key_masked": True}
     return {"success": True, "detail": detail}
 
 @app.post("/api/personalities/{persona_id}/generate_key")
@@ -1550,20 +1587,23 @@ async def invoke_personality_via_api(
         return JSONResponse(status_code=401, content={"success": False, "error": auth.get("error", "No autorizado.")})
 
     start_t = time.time()
-    thought_cycle = await orchestrator.execute_thought_cycle(
-        f"@{persona_id} {req.prompt}", 
-        preferences={"selected_personalities": [persona_id], "multi_personality_mode": "single"}
+    # (OS · Ola 3) Respuesta REAL: antes execute_thought_cycle no devolvía texto y la
+    # API contestaba siempre el marcador "Respuesta procesada.". Ahora se consume el
+    # mismo flujo del chat (generate_response_stream) con la personalidad fijada.
+    generated = await _collect_invoke_response(
+        req.prompt,
+        preferences={"selected_personalities": [persona_id], "multi_personality_mode": "single", "client": "invoke_api"}
     )
-    
+
     elapsed_ms = round((time.time() - start_t) * 1000, 1)
-    
+
     personality_api_engine._record_api_call(persona_id, {
         "method": "POST",
         "endpoint": f"/api/v1/personalities/{persona_id}/invoke",
         "client_ip": "External Client",
         "status_code": 200,
         "latency_ms": elapsed_ms,
-        "tokens_used": 150,
+        "tokens_used": generated["tokens_used"],
         "scope_checked": "invoke_agents"
     })
 
@@ -1572,9 +1612,44 @@ async def invoke_personality_via_api(
         "persona_id": persona_id,
         "persona_name": auth.get("persona_name"),
         "latency_ms": elapsed_ms,
-        "response": thought_cycle.get("final_synthesis", "Respuesta procesada."),
-        "branching_plan": thought_cycle.get("branching_plan"),
+        "response": generated["text"] or "Respuesta procesada.",
+        "generated_by": generated["generated_by"],
+        "engine_mode": generated["engine_mode"],
+        "branching_plan": generated["branching_plan"],
         "timestamp": time.time()
+    }
+
+
+async def _collect_invoke_response(prompt: str, preferences: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    (OS · Ola 3) Consume `orchestrator.generate_response_stream` y devuelve el texto
+    completo + el plan de ramificación (barato: es el primer evento del stream).
+    Nunca lanza: ante error devuelve texto vacío y el llamador conserva el marcador.
+    """
+    full = ""
+    branching_plan = None
+    try:
+        async for event in orchestrator.generate_response_stream(prompt, "", preferences=preferences):
+            et = event.get("type")
+            if et == "branching_plan" and branching_plan is None:
+                branching_plan = event.get("plan")
+            elif et == "token":
+                full += event.get("token", "")
+            elif et == "done" and not full:
+                full = event.get("full_text", "") or ""
+    except Exception as e:
+        print(f"⚠️ [invoke] Error generando respuesta real: {e}")
+    text = full.strip()
+    try:
+        engine_mode = bitnet_engine.get_engine_status().get("real_mode", "templates")
+    except Exception:
+        engine_mode = "templates"
+    return {
+        "text": text,
+        "tokens_used": max(1, len(text.split())) if text else 0,
+        "generated_by": "llm" if (text and engine_mode != "templates") else "template",
+        "engine_mode": engine_mode,
+        "branching_plan": branching_plan,
     }
 
 
@@ -1632,11 +1707,16 @@ async def list_agent_api_keys_endpoint():
     return {"success": True, "agents": agent_vault_engine.list_agent_apis()}
 
 @app.get("/api/agents_api/{agent_id}/api_status")
-async def get_agent_api_detail_endpoint(agent_id: str):
-    """Returns detailed API status, full key, permissions, active processes, and connections for an agent."""
+async def get_agent_api_detail_endpoint(agent_id: str, request: Request):
+    """Returns detailed API status, permissions, active processes, and connections for an agent.
+    (Adenda 153) Clave completa solo con clave maestra o con esa misma clave; si no, enmascarada."""
     detail = agent_vault_engine.get_agent_api_detail(agent_id)
     if not detail:
         return JSONResponse(status_code=404, content={"success": False, "error": f"Agente '{agent_id}' no encontrado."})
+    raw = extract_key(request)
+    full = detail.get("api_key") or ""
+    if not (key_is_master(raw) or (raw and full and raw == full)):
+        detail = {**detail, "api_key": mask_key(full), "api_key_masked": True}
     return {"success": True, "detail": detail}
 
 @app.post("/api/agents_api/{agent_id}/generate_key")
@@ -1715,11 +1795,14 @@ async def invoke_agent_via_api(
 
     start_t = time.time()
     agent = agent_vault_engine.get_agent(agent_id) or {}
-    primary_persona = agent.get("used_personalities", [{"id": "aurora"}])[0].get("id", "aurora")
-
-    thought_cycle = await orchestrator.execute_thought_cycle(
-        f"[{agent.get('name', agent_id)}] {req.prompt}",
-        preferences={"selected_personalities": [primary_persona], "multi_personality_mode": "single"}
+    # (OS · Ola 3) Personalidad primaria del agente (used_personalities[0].id) con
+    # respaldo astraura_prime; respuesta REAL vía el mismo flujo del chat.
+    used = agent.get("used_personalities") or []
+    primary_persona = (used[0].get("id") if used and isinstance(used[0], dict) else None) or "astraura_prime"
+    generated = await _collect_invoke_response(
+        req.prompt,
+        preferences={"selected_personalities": [primary_persona], "multi_personality_mode": "single",
+                     "client": "invoke_api", "agent_id": agent_id, "agent_name": agent.get("name", agent_id)}
     )
     elapsed_ms = round((time.time() - start_t) * 1000, 1)
 
@@ -1729,7 +1812,7 @@ async def invoke_agent_via_api(
         "client_ip": "External Client / Script",
         "status_code": 200,
         "latency_ms": elapsed_ms,
-        "tokens_used": 165,
+        "tokens_used": generated["tokens_used"],
         "scope_checked": "invoke_subagents"
     })
 
@@ -1737,9 +1820,12 @@ async def invoke_agent_via_api(
         "success": True,
         "agent_id": agent_id,
         "agent_name": auth.get("agent_name"),
+        "persona_id": primary_persona,
         "latency_ms": elapsed_ms,
-        "response": thought_cycle.get("final_synthesis", "Tarea del agente completada."),
-        "branching_plan": thought_cycle.get("branching_plan"),
+        "response": generated["text"] or "Tarea del agente completada.",
+        "generated_by": generated["generated_by"],
+        "engine_mode": generated["engine_mode"],
+        "branching_plan": generated["branching_plan"],
         "timestamp": time.time()
     }
 
@@ -2281,7 +2367,8 @@ class GenerateSynthesisReportRequest(BaseModel):
 
 @app.post("/api/imagination/synthesis_reports/generate")
 async def generate_synthesis_report_endpoint(req: GenerateSynthesisReportRequest):
-    report = synthesis_reporter_engine.generate_synthesis_report(
+    # (OS · Ola 3) Resumen ejecutivo REAL cuando hay modelo (plantilla si no).
+    report = await synthesis_reporter_engine.generate_synthesis_report_async(
         trigger_type=req.trigger_type or "manual_request",
         context_data=req.context_data or {}
     )
@@ -2306,7 +2393,8 @@ async def get_synthesis_report_memory_graph(report_id: str):
         return {"success": False, "error": "Informe no encontrado"}
     
     from pathlib import Path as PathLib
-    from app.core.memory_graph_engine import memory_graph_engine
+    # (Adenda 153) Módulo real: el grafo vive en app.memory.knowledge_graph
+    from app.memory.knowledge_graph import knowledge_graph as memory_graph_engine
     
     # Get linked memory references from the report
     real_links = report.get("real_links", {})
@@ -2415,7 +2503,8 @@ async def get_synthesis_report_brain_cerebros(report_id: str):
     if not report:
         return {"success": False, "error": "Informe no encontrado"}
     
-    from app.core.personality_engine import personality_engine
+    # (Adenda 153) Módulos reales (antes apuntaban a app.core.* inexistentes → 500)
+    from app.personalities.personality_engine import personality_engine
     from app.memory.starseed_memory_engine import starseed_memory_engine
     
     # Get participating agents and their cerebro mappings
@@ -3158,7 +3247,8 @@ async def get_tunnel_qr_data():
 async def get_cerebros_media_map():
     """Returns which media/storage devices each Cerebro has access to, and which Cerebros are linked to each storage volume."""
     from .core.tunnel_manager import tunnel_manager
-    from app.core.starseed_memory_engine import starseed_memory_engine
+    # (Adenda 153) Módulo real (antes app.core.* inexistente → 500)
+    from app.memory.starseed_memory_engine import starseed_memory_engine
     
     tunnel_status = tunnel_manager.get_status()
     

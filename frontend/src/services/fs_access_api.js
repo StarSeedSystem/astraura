@@ -6,6 +6,9 @@
   ================================================================================
 */
 
+// apiFetch respeta el gateway activo (custom / túnel / default) — necesario para submitFolderToBackend().
+import { apiFetch } from './api';
+
 // ── Solicita acceso a una carpeta via showDirectoryPicker ──
 export async function requestFolderAccess(prompt) {
   if (typeof window !== 'undefined' && window.showDirectoryPicker) {

@@ -10,6 +10,11 @@
  * - Multi-personality dialogue routing with authentic prosody per persona
  */
 
+// apiUrl() resuelve cada endpoint contra el gateway activo (custom en localStorage, túnel o default),
+// para que VoiceStudio/síntesis funcionen también en Vercel con túnel y en la app Electron (file://).
+// (api.js no importa este módulo: sin dependencia circular.)
+import { apiUrl } from './api';
+
 class OmniVoiceEngine {
   constructor() {
     this.synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
@@ -294,7 +299,7 @@ class OmniVoiceEngine {
    */
   async autoEvolveVoice(personaId = 'aurora', context = '', memories = [], mood = 'natural') {
     try {
-      const res = await fetch('/api/voice_studio/auto_evolve', {
+      const res = await fetch(apiUrl('/api/voice_studio/auto_evolve'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ persona_id: personaId, context, memories, mood })
@@ -307,7 +312,7 @@ class OmniVoiceEngine {
 
   async fetchVoiceStudioProfiles() {
     try {
-      const res = await fetch('/api/voice_studio/profiles');
+      const res = await fetch(apiUrl('/api/voice_studio/profiles'));
       if (res.ok) {
         const data = await res.json();
         const profiles = data.profiles || [];
@@ -330,7 +335,7 @@ class OmniVoiceEngine {
 
   async fetchLanguagesCatalogue() {
     try {
-      const res = await fetch('/api/voice_studio/languages');
+      const res = await fetch(apiUrl('/api/voice_studio/languages'));
       if (res.ok) {
         const data = await res.json();
         return data.languages || [];
@@ -343,7 +348,7 @@ class OmniVoiceEngine {
 
   async cloneVoiceFromSample(audioBase64, name, language = 'es', personaId = null) {
     try {
-      const res = await fetch('/api/voice_studio/clone', {
+      const res = await fetch(apiUrl('/api/voice_studio/clone'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ audio_base64: audioBase64, name, language, persona_id: personaId })
@@ -356,7 +361,7 @@ class OmniVoiceEngine {
 
   async designVoiceProfile(params) {
     try {
-      const res = await fetch('/api/voice_studio/design', {
+      const res = await fetch(apiUrl('/api/voice_studio/design'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params)
@@ -369,7 +374,7 @@ class OmniVoiceEngine {
 
   async updateVoiceStudioProfile(voiceId, updates) {
     try {
-      const res = await fetch(`/api/voice_studio/profiles/${voiceId}`, {
+      const res = await fetch(apiUrl(`/api/voice_studio/profiles/${voiceId}`), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates)
@@ -382,7 +387,7 @@ class OmniVoiceEngine {
 
   async deleteVoiceStudioProfile(voiceId) {
     try {
-      const res = await fetch(`/api/voice_studio/profiles/${voiceId}`, {
+      const res = await fetch(apiUrl(`/api/voice_studio/profiles/${voiceId}`), {
         method: 'DELETE'
       });
       return await res.json();
@@ -393,7 +398,7 @@ class OmniVoiceEngine {
 
   async assignVoiceToPersona(voiceId, personaId) {
     try {
-      const res = await fetch('/api/voice_studio/assign', {
+      const res = await fetch(apiUrl('/api/voice_studio/assign'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ voice_id: voiceId, persona_id: personaId })
@@ -411,7 +416,7 @@ class OmniVoiceEngine {
 
   async exportVoiceProfile(voiceId) {
     try {
-      const res = await fetch(`/api/voice_studio/export/${voiceId}`);
+      const res = await fetch(apiUrl(`/api/voice_studio/export/${voiceId}`));
       if (!res.ok) throw new Error('Error al exportar perfil');
       const data = await res.json();
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -429,7 +434,7 @@ class OmniVoiceEngine {
 
   async exportAllVoiceProfiles() {
     try {
-      const res = await fetch('/api/voice_studio/export_all');
+      const res = await fetch(apiUrl('/api/voice_studio/export_all'));
       if (!res.ok) throw new Error('Error al exportar bóveda');
       const data = await res.json();
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -447,7 +452,7 @@ class OmniVoiceEngine {
 
   async importVoiceProfiles(jsonData) {
     try {
-      const res = await fetch('/api/voice_studio/import', {
+      const res = await fetch(apiUrl('/api/voice_studio/import'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(jsonData)
@@ -461,7 +466,7 @@ class OmniVoiceEngine {
   async fetchLearningMatrix(personaId = null) {
     try {
       const url = personaId ? `/api/voice_studio/learning_matrix?persona_id=${encodeURIComponent(personaId)}` : '/api/voice_studio/learning_matrix';
-      const res = await fetch(url);
+      const res = await fetch(apiUrl(url));
       if (res.ok) {
         return await res.json();
       }
@@ -485,7 +490,7 @@ class OmniVoiceEngine {
         });
       }
 
-      const res = await fetch('/api/voice_studio/analyze_mic_158', {
+      const res = await fetch(apiUrl('/api/voice_studio/analyze_mic_158'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ audio_data: b64, target_persona_id: targetPersonaId })
@@ -503,7 +508,7 @@ class OmniVoiceEngine {
   async fetchBranchedMemories(personaId = null) {
     try {
       const url = personaId ? `/api/voice_studio/branched_memories?persona_id=${encodeURIComponent(personaId)}` : '/api/voice_studio/branched_memories';
-      const res = await fetch(url);
+      const res = await fetch(apiUrl(url));
       if (res.ok) {
         return await res.json();
       }
@@ -518,7 +523,7 @@ class OmniVoiceEngine {
    */
   async recordBranchedAcousticMemory(personaId, domain, userSentiment, speechMetrics = {}, dialogueSnippet = '') {
     try {
-      const res = await fetch('/api/voice_studio/branched_memories/record', {
+      const res = await fetch(apiUrl('/api/voice_studio/branched_memories/record'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -537,7 +542,7 @@ class OmniVoiceEngine {
 
   async generateSFX(prompt, category = 'ambient', durationSeconds = 3.0, parameters = {}) {
     try {
-      const res = await fetch('/api/voice_studio/generate_sfx', {
+      const res = await fetch(apiUrl('/api/voice_studio/generate_sfx'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt, category, duration_seconds: durationSeconds, parameters })
@@ -966,7 +971,7 @@ class OmniVoiceEngine {
       this.emit('state_change', 'speaking');
       if (onStart) onStart();
 
-      const response = await fetch('/api/voice/synthesize', {
+      const response = await fetch(apiUrl('/api/voice/synthesize'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1485,7 +1490,7 @@ class OmniVoiceEngine {
       else if (text.includes('...')) userSentiment = 'reflexivo';
 
       // Send non-blocking background learning update to backend
-      fetch('/api/voice_studio/learn_interaction', {
+      fetch(apiUrl('/api/voice_studio/learn_interaction'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1523,6 +1528,24 @@ class OmniVoiceEngine {
     this.echoCooldownUntil = 0;
     this.currentUtterance = null;
     this.emit('state_change', 'idle');
+  }
+
+  /**
+   * Detención total de la locución (usado por VoiceStudio → handleStopPreview y controles de voz):
+   * - Cancela speechSynthesis (cola de cláusulas de speak()/speakMultiPersonalityDialogue()).
+   * - Vacía y desactiva el flujo progresivo en tiempo real (tokens/cláusulas pendientes).
+   * - Detiene cualquier <audio> iniciado por speakWithAudioCpp() o el daemon ambiental.
+   * - Emite state_change 'idle' (lo hace stopSpeaking()).
+   */
+  stop() {
+    // 1. Flujo progresivo: sin esto, _drainProgressiveQueue() seguiría encolando cláusulas
+    //    y isPlayingProgressiveChunk quedaría atascado (el onEnd de speak() no se dispara al cancelar).
+    this.isProgressiveStreamActive = false;
+    this.progressiveQueue = [];
+    this.progressiveTokenAccumulator = '';
+    this.isPlayingProgressiveChunk = false;
+    // 2. Reutiliza la lógica de cancelación existente: <audio> audio.cpp + speechSynthesis.cancel() + 'idle'.
+    this.stopSpeaking();
   }
 
   /**
@@ -1923,7 +1946,7 @@ class OmniVoiceEngine {
           if (onSpeechRecognized) onSpeechRecognized(transcript);
 
           try {
-            const resp = await fetch('/api/voice/daemon/ambient_perceive', {
+            const resp = await fetch(apiUrl('/api/voice/daemon/ambient_perceive'), {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({

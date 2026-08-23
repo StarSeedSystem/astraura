@@ -23,7 +23,20 @@ class AgentVaultEngine:
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.agents_file = self.data_dir / "agents_vault.json"
-        self.apis_file = self.data_dir / "agent_apis.json"
+        # (Adenda 153) Las CLAVES viven FUERA del repo (~/.astraura/keys o ASTRAURA_KEYS_DIR).
+        # Migración única desde las ubicaciones antiguas (data/ y backend/data/, que
+        # acabaron commiteadas en git → rotar con scripts/rotate_keys.py).
+        from .security import keys_dir as _keys_dir
+        self.apis_file = _keys_dir() / "agent_apis.json"
+        if not self.apis_file.exists():
+            for legacy in (self.data_dir / "agent_apis.json", Path("data") / "agent_apis.json", Path("backend/data") / "agent_apis.json"):
+                try:
+                    if legacy.exists():
+                        self.apis_file.write_text(legacy.read_text(encoding="utf-8"), encoding="utf-8")
+                        print(f"🔐 [Seguridad] Claves migradas de {legacy} a {self.apis_file}. ROTA las claves: python3 scripts/rotate_keys.py")
+                        break
+                except Exception:
+                    pass
 
         self.default_agent_scopes = {
             "read_memory": True,

@@ -26,8 +26,59 @@ async function refreshDynamicGateway() {
   }
 }
 
+/**
+ * Enlace profundo `?gateway=<url>` (lo generan el QR del GatewayModal y
+ * `connect_links.vercel_app_linked` del backend). Si el parámetro es una URL http(s)
+ * válida, se guarda como gateway personalizado (origen 'user') y se elimina de la
+ * barra de direcciones conservando el resto de la URL (ruta, otros parámetros y hash).
+ * Devuelve la URL aplicada o null si no había parámetro válido.
+ */
+export function applyGatewayFromUrl() {
+  if (typeof window === 'undefined') return null;
+  try {
+    const params = new URLSearchParams(window.location.search || '');
+    const raw = params.get('gateway');
+    if (!raw || !raw.trim()) return null;
+
+    const candidate = raw.trim();
+    let parsed = null;
+    try {
+      parsed = new URL(candidate);
+    } catch {
+      parsed = null;
+    }
+    if (!parsed || (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') || !parsed.hostname) {
+      console.warn(`[Astraura Bridge] Parámetro ?gateway= ignorado (URL inválida): ${candidate}`);
+      return null;
+    }
+
+    const cleanUrl = candidate.replace(/\/+$/, '');
+    setCustomGateway(cleanUrl, 'user');
+    console.log(`[Astraura Bridge] 🔗 Gateway aplicado desde enlace profundo: ${cleanUrl}`);
+
+    // Limpiar el parámetro de la barra de direcciones sin recargar la página.
+    params.delete('gateway');
+    const rest = params.toString();
+    const newUrl = `${window.location.pathname}${rest ? `?${rest}` : ''}${window.location.hash || ''}`;
+    if (window.history && typeof window.history.replaceState === 'function') {
+      try {
+        window.history.replaceState(window.history.state, '', newUrl);
+      } catch {
+        // Algunos contextos (file://, sandbox) no permiten replaceState: no es crítico.
+      }
+    }
+    return cleanUrl;
+  } catch (e) {
+    console.warn('[Astraura Bridge] No se pudo procesar el enlace profundo ?gateway=:', e?.message || e);
+    return null;
+  }
+}
+
 // Refrescar el gateway al cargar y cada 30s.
 if (typeof window !== 'undefined') {
+  // El enlace profundo se procesa ANTES de cualquier petición para que todo el
+  // frontend (fetch, WebSocket, voz) apunte al gateway indicado desde el primer momento.
+  applyGatewayFromUrl();
   refreshDynamicGateway();
   setInterval(refreshDynamicGateway, 30000);
 }
@@ -36,7 +87,7 @@ export function getGatewayUrl() {
   if (typeof window !== 'undefined') {
     const custom = localStorage.getItem('astraura_backend_gateway');
     if (custom && custom.trim()) return custom.trim().replace(/\/$/, '');
-    
+
     const h = window.location.hostname;
     // localhost/127.0.0.1 → backend local (relativo)
     if (h === 'localhost' || h === '127.0.0.1') {
@@ -50,12 +101,20 @@ export function getGatewayUrl() {
   return '';
 }
 
-export function setCustomGateway(url) {
+/**
+ * Guarda (o borra) el gateway personalizado.
+ * `source` indica quién lo fijó: 'user' (modal / enlace profundo) o 'auto' (auto-detección de túnel).
+ * La auto-detección solo puede sustituir entradas 'auto' (o sin origen, por compatibilidad) — nunca
+ * un gateway fijado manualmente por el usuario.
+ */
+export function setCustomGateway(url, source = 'user') {
   if (typeof localStorage !== 'undefined') {
     if (url && url.trim()) {
       localStorage.setItem('astraura_backend_gateway', url.trim());
+      localStorage.setItem('astraura_backend_gateway_source', source === 'auto' ? 'auto' : 'user');
     } else {
       localStorage.removeItem('astraura_backend_gateway');
+      localStorage.removeItem('astraura_backend_gateway_source');
     }
   }
 }
@@ -63,6 +122,36 @@ export function setCustomGateway(url) {
 export function getApiBase() {
   const gw = getGatewayUrl();
   return gw ? `${gw}/api` : '/api';
+}
+
+/**
+ * Normaliza una ruta de endpoint a su forma relativa al API, sin el prefijo '/api'.
+ *   '/api/status' | 'status' | '/status' → '/status'   ·   URL absoluta → su pathname + query
+ */
+function normalizeApiPath(path = '') {
+  let rel = typeof path === 'string' ? path : String(path || '');
+  if (/^https?:\/\//i.test(rel)) {
+    try {
+      const u = new URL(rel);
+      rel = `${u.pathname}${u.search}`;
+    } catch {
+      rel = '/';
+    }
+  }
+  if (!rel.startsWith('/')) rel = `/${rel}`;
+  return rel.replace(/^\/api(?=\/|$)/, '');
+}
+
+/**
+ * Construye la URL de un endpoint respetando el gateway activo (personalizado en localStorage,
+ * túnel dinámico o default). Acepta rutas con o sin prefijo '/api' para poder sustituir
+ * llamadas `fetch('/api/...')` directas sin cambiar la ruta:
+ *   apiUrl('/api/status') === apiUrl('/status') → `${getApiBase()}/status`
+ * Las URLs absolutas (http/https) se devuelven sin cambios.
+ */
+export function apiUrl(path = '') {
+  if (typeof path === 'string' && /^https?:\/\//i.test(path)) return path;
+  return `${getApiBase()}${normalizeApiPath(path)}`;
 }
 
 export async function testGatewayConnection(urlToTest = null) {
@@ -99,7 +188,9 @@ export async function apiFetch(path, options = {}) {
           window.location.hostname !== 'localhost' && 
           window.location.hostname !== '127.0.0.1') {
         console.warn(`[Astraura Bridge] Gateway ${url} returned ${res.status}, trying localhost fallback...`);
-        const fallbackUrl = `http://127.0.0.1:8000${path}`;
+        // `path` es relativo a la base del API (p. ej. '/status'): el backend local expone
+        // todo bajo '/api', así que se antepone el prefijo (normalizado para evitar '/api/api').
+        const fallbackUrl = `http://127.0.0.1:8000/api${normalizeApiPath(path)}`;
         try {
           const fallbackRes = await fetch(fallbackUrl, { ...options, signal: AbortSignal.timeout(5000) });
           if (fallbackRes.ok) {
@@ -1899,9 +1990,11 @@ export async function fetchAuthOrchestratorStatus() {
   return apiFetch('/notifications/auth_orchestrator_status');
 }
 
+// Nota: FastAPI/pydantic solo parsea el cuerpo como JSON si llega 'Content-Type: application/json'.
 export async function setAuthOrchestratorAuto(enabled) {
   return apiFetch('/notifications/auth_orchestrator_auto', {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ enabled }),
   });
 }
@@ -1909,6 +2002,7 @@ export async function setAuthOrchestratorAuto(enabled) {
 export async function updateAgentConfig(agentId, config) {
   return apiFetch(`/ecosystem/agents/${agentId}/config`, {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ config }),
   });
 }
@@ -1916,6 +2010,7 @@ export async function updateAgentConfig(agentId, config) {
 export async function toggleAgentEnabled(agentId, enabled) {
   return apiFetch(`/ecosystem/agents/${agentId}/toggle`, {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ enabled }),
   });
 }
@@ -2000,10 +2095,18 @@ export async function autoDetectAndSetLiveTunnel() {
             signal: AbortSignal.timeout(5000) 
           });
           if (verifyRes.ok) {
-            const saved = localStorage.getItem('astraura_backend_gateway');
-            if (saved !== tunnelUrl) {
+            const saved = (localStorage.getItem('astraura_backend_gateway') || '').trim().replace(/\/$/, '');
+            const savedSource = localStorage.getItem('astraura_backend_gateway_source');
+            const normalizedTunnel = tunnelUrl.replace(/\/$/, '');
+            if (saved && saved !== normalizedTunnel && savedSource === 'user') {
+              // Gateway fijado manualmente (modal / enlace profundo): la auto-detección NO lo sobrescribe.
+              // Solo puede sustituir entradas 'auto' (o vacías / sin origen, por compatibilidad).
+              console.log(`[Astraura Bridge] Gateway manual conservado (${saved}); túnel detectado no aplicado: ${normalizedTunnel}`);
+              return tunnelUrl;
+            }
+            if (saved !== normalizedTunnel) {
               console.log(`[Astraura Bridge] 🌐 Túnel vivo detectado: ${tunnelUrl}`);
-              setCustomGateway(tunnelUrl);
+              setCustomGateway(tunnelUrl, 'auto');
             }
             return tunnelUrl;
           }

@@ -3,6 +3,13 @@ import json
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
+# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
+# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
+from pathlib import Path as _SSPath
+from .config import settings as _ss_settings
+WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
+HOME = str(_SSPath.home()).rstrip("/")
+
 class SystemNotificationsEngine:
     """
     Centro Unificado de Notificaciones y Árbol de Logs de Procesos en Segundo Plano.
@@ -13,7 +20,7 @@ class SystemNotificationsEngine:
       - Árbol de ramificación de logs con filtrado interactivo y acciones en un clic.
     """
     def __init__(self, storage_dir: Optional[Path] = None):
-        self.storage_dir = storage_dir or Path("/Users/alex/Documents/IA 1.58 bit/data/notifications")
+        self.storage_dir = storage_dir or Path(f"{WORKSPACE}/data/notifications")
         self.storage_dir.mkdir(parents=True, exist_ok=True)
         self.notif_file = self.storage_dir / "notifications_registry.json"
         

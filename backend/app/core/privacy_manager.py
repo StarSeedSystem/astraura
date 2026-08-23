@@ -3,6 +3,13 @@ import json
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
+# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
+# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
+from pathlib import Path as _SSPath
+from .config import settings as _ss_settings
+WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
+HOME = str(_SSPath.home()).rstrip("/")
+
 class PrivacyManager:
     """
     Gestor de Privacidad Soberana, Control de Acceso a Sensores y Gobernanza de Datos (StarSeed OS).
@@ -21,7 +28,7 @@ class PrivacyManager:
       - Modo Air-Gap Soberano Estricto (aislamiento total de red y sensores externos con 1 clic).
     """
     def __init__(self, storage_dir: Optional[Path] = None):
-        self.storage_dir = storage_dir or Path("/Users/alex/Documents/IA 1.58 bit/data/privacy")
+        self.storage_dir = storage_dir or Path(f"{WORKSPACE}/data/privacy")
         self.storage_dir.mkdir(parents=True, exist_ok=True)
         self.config_file = self.storage_dir / "privacy_settings.json"
         self.audit_file = self.storage_dir / "privacy_audit_log.json"
@@ -89,6 +96,11 @@ class PrivacyManager:
         try:
             self.config_file.write_text(json.dumps(self.settings, indent=2, ensure_ascii=False), encoding="utf-8")
             self.audit_file.write_text(json.dumps(self.audit_log[:50], indent=2, ensure_ascii=False), encoding="utf-8")
+            # (OS · Ola 3) Recordar el mtime propio para que is_air_gapped() no relea en vano.
+            try:
+                self._settings_mtime = self.config_file.stat().st_mtime
+            except Exception:
+                pass
         except Exception as e:
             print(f"[PrivacyManager] Error saving state: {e}")
 
@@ -131,6 +143,25 @@ class PrivacyManager:
         })
         self._save()
         return self.settings["strict_air_gap_mode"]
+
+    def is_air_gapped(self) -> bool:
+        """
+        (OS · Ola 3) Verdad única del Air-Gap: lee `strict_air_gap_mode` (la misma
+        clave persistida que conmuta `toggle_air_gap`). Si otro proceso editó el
+        JSON en disco, se recarga por mtime para no quedarse con un valor viejo.
+        Antes el flag solo filtraba la salida del Sensorium; ahora lo consultan el
+        navegador, el agente de herramientas, el clima, la sincronización y el túnel.
+        """
+        try:
+            mtime = self.config_file.stat().st_mtime if self.config_file.exists() else 0.0
+            if mtime and mtime != getattr(self, "_settings_mtime", None):
+                data = json.loads(self.config_file.read_text(encoding="utf-8"))
+                if isinstance(data, dict):
+                    self.settings.update(data)
+                self._settings_mtime = mtime
+        except Exception:
+            pass
+        return bool(self.settings.get("strict_air_gap_mode", False))
 
     def filter_sensorium(self, raw_sensorium: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -237,3 +268,21 @@ class PrivacyManager:
         }
 
 privacy_manager = PrivacyManager()
+
+
+def is_air_gapped() -> bool:
+    """(OS · Ola 3) Atajo a nivel de módulo: `from app.core.privacy_manager import is_air_gapped`."""
+    try:
+        return privacy_manager.is_air_gapped()
+    except Exception:
+        return False
+
+
+AIR_GAP_ERROR = "air-gap activo"  # (OS · Ola 3) Mensaje canónico que devuelven las herramientas de red.
+
+
+def air_gap_block(**extra: Any) -> Dict[str, Any]:
+    """(OS · Ola 3) Respuesta canónica de bloqueo de red: {"success": False, "error": "air-gap activo", ...}."""
+    out: Dict[str, Any] = {"success": False, "error": AIR_GAP_ERROR, "air_gap": True}
+    out.update(extra)
+    return out

@@ -25,34 +25,53 @@ import {
   fetchTunnelStatus,
   autoDetectAndSetLiveTunnel
 } from '../services/api';
+import { drawQRToCanvas } from '../services/qrCode';
 
-/** Minimal QR code generator using a data URL via the canvas API */
+/**
+ * QR generado 100% en local (services/qrCode.js) — sin servicios externos:
+ * la URL del túnel/gateway nunca sale del dispositivo (antes se enviaba a api.qrserver.com).
+ */
 function QRCodeCanvas({ text, size = 160 }) {
   const canvasRef = useRef(null);
+  const [renderError, setRenderError] = useState('');
 
   useEffect(() => {
     if (!text || !canvasRef.current) return;
-    // Use the free QR API to generate a QR image
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}&bgcolor=0b0e17&color=00e5ff&qzone=1&margin=0&format=png`;
-    img.onload = () => {
+    try {
+      // Canvas a 2x para módulos nítidos en pantallas HiDPI; zona de silencio de 4 módulos (norma).
+      drawQRToCanvas(canvasRef.current, text, {
+        dark: '#00e5ff',
+        light: '#0b0e17',
+        quietZone: 4,
+        ecLevel: 'M'
+      });
+      setRenderError('');
+    } catch (e) {
+      console.warn('QR local render notice:', e?.message || e);
       const ctx = canvasRef.current?.getContext('2d');
       if (ctx) {
-        ctx.clearRect(0, 0, size, size);
-        ctx.drawImage(img, 0, 0, size, size);
+        ctx.fillStyle = '#0b0e17';
+        ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       }
-    };
+      setRenderError('QR no disponible (enlace demasiado largo). Copia el enlace directo.');
+    }
   }, [text, size]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={size}
-      height={size}
-      className="rounded-xl border border-cyan-500/30"
-      style={{ imageRendering: 'pixelated', background: '#0b0e17' }}
-    />
+    <div className="relative" style={{ width: size, height: size }}>
+      <canvas
+        ref={canvasRef}
+        width={size * 2}
+        height={size * 2}
+        className="rounded-xl border border-cyan-500/30"
+        style={{ width: size, height: size, imageRendering: 'pixelated', background: '#0b0e17' }}
+      />
+      {renderError && (
+        <div className="absolute inset-0 rounded-xl flex items-center justify-center text-slate-400 text-[10px] text-center p-4 bg-[#0b0e17]/90">
+          {renderError}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -115,7 +134,8 @@ export default function GatewayModal({ isOpen, onClose, onConnected }) {
         const fallback = tunnelData?.url;
         if (fallback) {
           setGatewayInput(fallback);
-          setCustomGateway(fallback);
+          // URL derivada de la auto-detección: origen 'auto' (la detección futura puede actualizarla)
+          setCustomGateway(fallback, 'auto');
           const res = await testGatewayConnection(fallback);
           setStatusResult({ success: true, data: res });
           if (onConnected) onConnected(res);
@@ -339,7 +359,7 @@ export default function GatewayModal({ isOpen, onClose, onConnected }) {
                       Túnel no detectado aún.<br />Verifica que el backend corre.
                     </div>
                   )}
-                  <span className="text-[10px] text-slate-500">Escanear abre Astraura conectado</span>
+                  <span className="text-[10px] text-slate-500">Escanear abre Astraura conectado · QR generado localmente (sin servicios externos)</span>
                 </div>
 
                 <div className="flex-1 space-y-3 min-w-0">

@@ -1,4 +1,5 @@
 import os
+import re  # (OS · Ola 3)
 import time
 import asyncio
 import json
@@ -11,6 +12,14 @@ from ..memory.starseed_memory_engine import starseed_memory_engine
 from ..memory.openviking_engine import openviking_memory
 from .system_notifications_engine import system_notifications_engine
 from .synthesis_reporter_engine import synthesis_reporter_engine
+from . import cognition  # (OS · Ola 3) cognición real con plantilla de respaldo
+
+# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
+# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
+from pathlib import Path as _SSPath
+from .config import settings as _ss_settings
+WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
+HOME = str(_SSPath.home()).rstrip("/")
 
 DREAM_PROCESS_TYPES = [
     {
@@ -118,7 +127,7 @@ class IntuitiveImaginationEngine:
       - Ventanas de información completa, historial y ramas por proceso.
     """
     def __init__(self, storage_dir: Optional[Path] = None):
-        self.workspace_path = Path("/Users/alex/Documents/IA 1.58 bit")
+        self.workspace_path = Path(f"{WORKSPACE}")
         self.storage_dir = storage_dir or (self.workspace_path / "data/imagination")
         self.storage_dir.mkdir(parents=True, exist_ok=True)
         self.state_file = self.storage_dir / "intuitive_imagination_state.json"
@@ -514,6 +523,137 @@ class IntuitiveImaginationEngine:
             "audit_score": round(audit_score, 3)
         }
 
+    # ================= (OS · Ola 3) Cognición real para las ramas y creaciones =================
+
+    PROCESS_AGENT_MAP = {
+        "code_self_reflection_opt": ("hephaestus", "Hephaestus (Ingeniería ARM & Código)"),
+        "lucid_cyberdelic_creativity": ("oneiros", "Oneiros (Síntesis Creativa & 3D)"),
+        "rem_synaptic_consolidation": ("mnemosyne", "Mnemosyne (Memoria & Exocórtex)"),
+        "project_architectural_synthesis": ("architectus", "Architectus-ProjectMaster"),
+        "predictive_future_simulation": ("hermes", "Hermes (Web Intel & Prospectiva)"),
+        "counterfactual_quantum_imagination": ("hermes", "Hermes (Web Intel & Prospectiva)"),
+        "inter_brain_evolutionary_mutation": ("athena", "Athena (Sentinel & Gobernanza)"),
+    }
+
+    def _agent_for_process(self, process_type_id: str) -> Dict[str, str]:
+        """(OS · Ola 3) Agente/persona responsable de un tipo de proceso (mismo mapa que la aplicación sincronizada)."""
+        agent_id, agent_name = self.PROCESS_AGENT_MAP.get(process_type_id, ("athena", "Athena (Sentinel & Gobernanza)"))
+        return {"id": agent_id, "name": agent_name}
+
+    def _recent_memory_doc_names(self, limit: int = 3) -> List[str]:
+        """(OS · Ola 3) Nombres de los documentos de memoria más recientes para anclar al modelo."""
+        names: List[str] = []
+        try:
+            for d in starseed_memory_engine.list_documents()[:limit]:
+                n = " ".join(str(d.get("name") or "").split()).strip()
+                if n:
+                    names.append(n[:80])
+        except Exception:
+            pass
+        return names
+
+    async def _cognize_branch(
+        self,
+        p_id: str,
+        proc_info: Dict[str, Any],
+        template_theme: str,
+        template_hypothesis: str,
+        template_insights: str,
+        context: Dict[str, Any],
+        custom_seed: Optional[str] = None,
+    ) -> Optional[Dict[str, str]]:
+        """
+        (OS · Ola 3) Pide al motor real (Ollama/BitNet) la rama imaginativa en JSON
+        {"theme","hypothesis","insights"}. Devuelve None si no hay modelo real o la
+        respuesta no sirve (el llamador conserva la plantilla). Nunca lanza.
+        """
+        if not cognition.real_available():
+            return None
+        agent = self._agent_for_process(p_id)
+        docs = self._recent_memory_doc_names(3)
+        loc = context.get("location", {}) if isinstance(context, dict) else {}
+        weather = context.get("weather", {}) if isinstance(context, dict) else {}
+        files = list((context or {}).get("recent_files") or [])[:4]
+        system = (
+            f"Eres {agent['name']}, agente de la Imaginación Intuitiva de Astraura 1.58-bit (StarSeed OS). "
+            "Piensas en español, con concreción técnica y sin adornos. Respondes ÚNICAMENTE con un objeto JSON válido."
+        )
+        seed_line = f"Semilla del usuario (obligatoria): {custom_seed}\n" if custom_seed else ""
+        prompt = (
+            f"Tipo de proceso: {proc_info.get('name')} — categoría {proc_info.get('category')}.\n"
+            f"Propósito del proceso: {proc_info.get('description')}\n"
+            f"{seed_line}"
+            f"Tema propuesto por plantilla: {template_theme}\n"
+            f"Agente responsable: {agent['name']}\n"
+            f"Memorias recientes para anclar: {', '.join(docs) if docs else 'ninguna'}\n"
+            f"Archivos recientes del workspace: {', '.join(files) if files else 'ninguno'}\n"
+            f"Entorno: {loc.get('city', '')}, {loc.get('country', '')} · {weather.get('temp_c', '')}°C {weather.get('condition', '')}\n"
+            f"Borrador de plantilla (mejóralo, no lo copies): hipótesis='{template_hypothesis[:200]}'; insights='{template_insights[:200]}'\n\n"
+            "Devuelve SOLO este JSON: {\"theme\": \"título corto y específico (máx. 12 palabras)\", "
+            "\"hypothesis\": \"hipótesis concreta y verificable en 1-2 frases\", "
+            "\"insights\": \"2-3 frases con acciones o hallazgos accionables\"}"
+        )
+        res = await cognition.generate(prompt, system=system, max_tokens=300, temperature=0.65, timeout=75.0)
+        if not res.get("real"):
+            return None
+        data = cognition.extract_json(res["text"])
+        theme = cognition.field(data, "theme", max_len=140, min_len=6)
+        hypothesis = cognition.field(data, "hypothesis", max_len=600, min_len=12)
+        insights = cognition.field(data, "insights", max_len=800, min_len=12)
+        if not (theme or hypothesis or insights):
+            # Texto libre sin JSON utilizable: se usa como hipótesis y se conserva el resto.
+            text = " ".join(res["text"].split()).strip()
+            if len(text) < 20:
+                return None
+            return {"theme": template_theme, "hypothesis": text[:600], "insights": template_insights}
+        if custom_seed and theme and custom_seed.lower()[:24] not in theme.lower():
+            theme = f"Exploración Intuitiva: {theme}"
+        return {
+            "theme": theme or template_theme,
+            "hypothesis": hypothesis or template_hypothesis,
+            "insights": insights or template_insights,
+        }
+
+    async def _cognize_creation(
+        self,
+        p_id: str,
+        proc_info: Dict[str, Any],
+        title: str,
+        c_type: str,
+        theme: str,
+        hypothesis: str,
+    ) -> Optional[str]:
+        """(OS · Ola 3) Contenido real de la creación (código/shader/esquema). None ⇒ plantilla."""
+        if not cognition.real_available():
+            return None
+        agent = self._agent_for_process(p_id)
+        if p_id == "code_self_reflection_opt":
+            ask = "Escribe una función C++ breve (≤ 30 líneas) con intrínsecos ARM NEON para acumulación ternaria {-1,0,+1}, con comentarios en español."
+        elif p_id == "lucid_cyberdelic_creativity":
+            ask = "Escribe un fragment shader GLSL (WebGL 2.0, ≤ 30 líneas) reactivo a uniforms u_time, u_temp y u_entropy, con comentarios en español."
+        else:
+            ask = "Escribe un esquema JSON (≤ 25 líneas) de un agente mutado: nombre, capacidades, cerebro objetivo, núcleos asignados y criterios de auto-corrección."
+        system = (
+            f"Eres {agent['name']} en Astraura 1.58-bit. Entregas SOLO el artefacto pedido, sin explicaciones "
+            "antes ni después, sin vallas de código markdown."
+        )
+        prompt = (
+            f"Creación: {title} (tipo: {c_type}).\nTema: {theme}\nHipótesis: {hypothesis[:300]}\n"
+            f"Proceso: {proc_info.get('name')}\n\n{ask}"
+        )
+        res = await cognition.generate(prompt, system=system, max_tokens=320, temperature=0.4, timeout=75.0)
+        if not res.get("real"):
+            return None
+        text = res["text"].strip()
+        # Quita vallas markdown si el modelo las añadió de todos modos.
+        m = re.search(r"```[a-zA-Z0-9_+-]*\n(.*?)```", text, flags=re.S)
+        if m:
+            text = m.group(1).strip()
+        if len(text) < 20:
+            return None
+        header = f"// (OS · Ola 3) Generado por {agent['name']} · {proc_info.get('name')}\n" if p_id != "inter_brain_evolutionary_mutation" else ""
+        return (header + text)[:4000]
+
     async def trigger_cycle(self, custom_seed: Optional[str] = None, process_type_id: Optional[str] = None) -> Dict[str, Any]:
         """
         Ejecuta un ciclo de imaginación intuitiva aplicando la política de permisos graduales correspondiente.
@@ -616,6 +756,17 @@ class IntuitiveImaginationEngine:
             hypothesis = f"Proyectando la evolución cognitiva de Astraura ante fluctuaciones ambientales ({weather_str})."
             insights = f"Garantiza que el presupuesto de recursos M1 ({self.max_imagination_global_percent}%) mantenga los agentes secundarios en equilibrio."
 
+        # (OS · Ola 3) Cognición real: con modelo (Ollama/BitNet) la rama la escribe el
+        # motor a partir del tipo de proceso, el tema, el agente responsable y 2-3
+        # documentos de memoria recientes; sin modelo se conserva la plantilla.
+        generated_by = "template"
+        llm_branch = await self._cognize_branch(p_id, proc_info, theme, hypothesis, insights, context, custom_seed)
+        if llm_branch:
+            theme = llm_branch.get("theme") or theme
+            hypothesis = llm_branch.get("hypothesis") or hypothesis
+            insights = llm_branch.get("insights") or insights
+            generated_by = "llm"
+
         branch_id = f"branch_{int(now)}"
         
         # Status determination based on approval requirement and auto-sync toggle
@@ -649,6 +800,8 @@ class IntuitiveImaginationEngine:
             "applied_by": applied_by_val,
             "timestamp": now,
             "formatted_time": datetime.fromtimestamp(now).strftime("%d/%m/%Y %H:%M:%S"),
+            "generated_by": generated_by,  # (OS · Ola 3) "llm" | "template"
+            "responsible_agent": self._agent_for_process(p_id),  # (OS · Ola 3)
             "context_snapshot": {
                 "location": loc_str,
                 "weather": weather_str,
@@ -683,6 +836,13 @@ class IntuitiveImaginationEngine:
                 }, indent=2)
                 c_tags = ["MultiAgent", "Evolution", "Astraura-1.58b"]
 
+            # (OS · Ola 3) Contenido real de la creación (código / shader / esquema) cuando hay modelo.
+            c_generated_by = "template"
+            llm_content = await self._cognize_creation(p_id, proc_info, c_title, c_type, theme, hypothesis)
+            if llm_content:
+                c_content = llm_content
+                c_generated_by = "llm"
+
             creation_item = {
                 "id": creation_id,
                 "title": c_title,
@@ -693,6 +853,7 @@ class IntuitiveImaginationEngine:
                 "importance_level": importance,
                 "requires_user_approval": requires_approval,
                 "status": status_value,
+                "generated_by": c_generated_by,  # (OS · Ola 3)
                 "timestamp": now
             }
             self.creations.insert(0, creation_item)
@@ -739,7 +900,8 @@ class IntuitiveImaginationEngine:
                 "requires_user_approval": requires_approval,
                 "branch_id": branch_id,
                 "creation_id": creation_item.get("id") if creation_item else None,
-                "entropy": self.quantum_entropy_level
+                "entropy": self.quantum_entropy_level,
+                "generated_by": generated_by  # (OS · Ola 3)
             })
             pm["history"] = pm["history"][:25]
 
@@ -762,7 +924,8 @@ class IntuitiveImaginationEngine:
             "next_cycle_in_seconds": self.cycle_frequency_minutes * 60
         }
         # Generar Informe Comprensible de Síntesis para el Usuario
-        synthesis_report = synthesis_reporter_engine.generate_synthesis_report(
+        # (OS · Ola 3) Variante asíncrona: resumen ejecutivo real cuando hay modelo.
+        synthesis_report = await synthesis_reporter_engine.generate_synthesis_report_async(
             trigger_type="imaginative_cycle",
             context_data={
                 "process_type": proc_info,
@@ -883,7 +1046,7 @@ class IntuitiveImaginationEngine:
         self._notify_callbacks({"type": "sync_apply_progress", "state": self.sync_execution_state})
 
         # Generar Informe Comprensible de Síntesis para el Usuario
-        synthesis_report = synthesis_reporter_engine.generate_synthesis_report(
+        synthesis_report = await synthesis_reporter_engine.generate_synthesis_report_async(  # (OS · Ola 3)
             trigger_type="sync_proposal_application",
             context_data={"applied_items": applied_items}
         )
@@ -1255,7 +1418,7 @@ class IntuitiveImaginationEngine:
                         "author": "Daedalus-Architect",
                         "summary": "Scaffolding inicial y distribución de registros escalares.",
                         "changes": ["Creación de estructura base", "Lógica de control inicial"],
-                        "file_link": "/Users/alex/Documents/IA 1.58 bit/backend/app/core/intuitive_imagination_engine.py"
+                        "file_link": f"{WORKSPACE}/backend/app/core/intuitive_imagination_engine.py"
                     },
                     {
                         "version": "v1.1",
@@ -1263,7 +1426,7 @@ class IntuitiveImaginationEngine:
                         "author": "Hephaestus Forjador",
                         "summary": "Compilación ARM64 NEON i2_s sin desborde de registros.",
                         "changes": ["Vectorización 128-bit", "Reducción de latencia a sub-milisegundo"],
-                        "file_link": "/Users/alex/Documents/IA 1.58 bit/backend/app/core/bitnet_neon_engine.cpp"
+                        "file_link": f"{WORKSPACE}/backend/app/core/bitnet_neon_engine.cpp"
                     },
                     {
                         "version": "v1.3",
@@ -1271,7 +1434,7 @@ class IntuitiveImaginationEngine:
                         "author": "Astraura Director // Metis Prime",
                         "summary": "Auditoría de veracidad en silicio M1 y calibración de entropía determinista.",
                         "changes": ["Veredicto 100% verificado", "Sincronía con Bóveda de Proyectos"],
-                        "file_link": "/Users/alex/Documents/IA 1.58 bit/backend/vault/projects/projects_vault.json"
+                        "file_link": f"{WORKSPACE}/backend/vault/projects/projects_vault.json"
                     }
                 ]
 
@@ -1280,13 +1443,13 @@ class IntuitiveImaginationEngine:
                     "files": [
                         {
                             "name": "intuitive_imagination_engine.py",
-                            "path": "/Users/alex/Documents/IA 1.58 bit/backend/app/core/intuitive_imagination_engine.py",
+                            "path": f"{WORKSPACE}/backend/app/core/intuitive_imagination_engine.py",
                             "size_formatted": "68 KB",
                             "status": "Activo (Modificable)"
                         },
                         {
                             "name": "projects_vault.json",
-                            "path": "/Users/alex/Documents/IA 1.58 bit/backend/vault/projects/projects_vault.json",
+                            "path": f"{WORKSPACE}/backend/vault/projects/projects_vault.json",
                             "size_formatted": "24 KB",
                             "status": "Bóveda Sincronizada"
                         }
@@ -1294,11 +1457,11 @@ class IntuitiveImaginationEngine:
                     "folders": [
                         {
                             "name": "backend/app/core",
-                            "path": "/Users/alex/Documents/IA 1.58 bit/backend/app/core"
+                            "path": f"{WORKSPACE}/backend/app/core"
                         },
                         {
                             "name": "data/vault/projects",
-                            "path": "/Users/alex/Documents/IA 1.58 bit/backend/vault/projects"
+                            "path": f"{WORKSPACE}/backend/vault/projects"
                         }
                     ],
                     "memories": [
@@ -1375,9 +1538,20 @@ class IntuitiveImaginationEngine:
         now = time.time()
         p_id = target.get("process_type", "rem_synaptic_consolidation")
         proc_info = next((p for p in DREAM_PROCESS_TYPES if p["id"] == p_id), DREAM_PROCESS_TYPES[0])
-        
-        target["hypothesis"] = f"[Regenerado] {target.get('hypothesis', '')} (Calibración determinista M1: 0.96)"
-        target["insights"] = f"Nueva síntesis y axiomas forjados por {proc_info['name']}. Verificación matemática 100% válida."
+
+        # (OS · Ola 3) Regeneración REAL con el motor cuando hay modelo; plantilla si no.
+        regen = await self._cognize_branch(
+            p_id, proc_info, target.get("theme", ""), target.get("hypothesis", ""), target.get("insights", ""),
+            self._harvest_user_contexts(), None
+        )
+        if regen:
+            target["hypothesis"] = regen.get("hypothesis") or target.get("hypothesis", "")
+            target["insights"] = regen.get("insights") or target.get("insights", "")
+            target["generated_by"] = "llm"
+        else:
+            target["hypothesis"] = f"[Regenerado] {target.get('hypothesis', '')} (Calibración determinista M1: 0.96)"
+            target["insights"] = f"Nueva síntesis y axiomas forjados por {proc_info['name']}. Verificación matemática 100% válida."
+            target["generated_by"] = "template"
         target["timestamp"] = now
         target["formatted_time"] = datetime.fromtimestamp(now).strftime("%d/%m/%Y %H:%M:%S")
         target["step_logs"] = [

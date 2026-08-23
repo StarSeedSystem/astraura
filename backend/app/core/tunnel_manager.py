@@ -108,6 +108,16 @@ class SovereignTunnelManager:
 
     def start_tunnel_in_background(self) -> bool:
         """Starts cloudflared tunnel in a dedicated monitoring background thread."""
+        # (OS · Ola 3) Air-Gap REAL: con el aislamiento activo NO se abre ningún túnel
+        # público (ni al arrancar ni desde /api/system/tunnel/start|restart).
+        try:
+            from .privacy_manager import is_air_gapped
+            if is_air_gapped():
+                self.last_error = "air-gap activo: túnel público deshabilitado."
+                print(f"🔒 [TunnelManager] {self.last_error}")
+                return False
+        except Exception:
+            pass
         with self.lock:
             if self.is_running and self.tunnel_process and self.tunnel_process.poll() is None:
                 return True
@@ -121,6 +131,10 @@ class SovereignTunnelManager:
             self.monitor_thread = threading.Thread(target=self._run_tunnel_loop, args=(str(cloudflared_bin),), daemon=True)
             self.monitor_thread.start()
             return True
+
+    def start_tunnel(self) -> bool:
+        """(OS · Ola 3) Alias explícito: respeta el Air-Gap igual que start_tunnel_in_background."""
+        return self.start_tunnel_in_background()
 
     def _run_tunnel_loop(self, cloudflared_bin: str):
         cmd = [

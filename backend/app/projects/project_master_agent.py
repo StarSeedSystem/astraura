@@ -315,7 +315,8 @@ class ProjectMasterAgent:
 
         synthesis_report = None
         if synthesis_reporter_engine:
-            synthesis_report = synthesis_reporter_engine.generate_synthesis_report(
+            # (OS · Ola 3) Resumen ejecutivo real cuando hay modelo (plantilla si no).
+            synthesis_report = await synthesis_reporter_engine.generate_synthesis_report_async(
                 trigger_type="architectus_cycle",
                 context_data={
                     "proposals_generated": new_proposals_generated,

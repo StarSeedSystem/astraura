@@ -14,13 +14,20 @@ import subprocess
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 
+# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
+# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
+from pathlib import Path as _SSPath
+from .config import settings as _ss_settings
+WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
+HOME = str(_SSPath.home()).rstrip("/")
+
 class Needle2Engine:
     """
     Core manager for Needle 2 (45M parameter .cact model) and ESP32-S3 hardware bridge.
     Guarantees 100% schema-valid JSON tool calling through C99 pushdown automata.
     """
 
-    def __init__(self, workspace_path: str = "/Users/alex/Documents/IA 1.58 bit"):
+    def __init__(self, workspace_path: str = f"{WORKSPACE}"):
         self.workspace = Path(workspace_path)
         self.data_dir = self.workspace / "data" / "needle"
         self.data_dir.mkdir(parents=True, exist_ok=True)

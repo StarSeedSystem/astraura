@@ -37,6 +37,25 @@ class AstrauraToolAgent:
         research_depth = prefs.get("deep_research_depth", "standard") # 'quick', 'standard', 'deep'
         research_mins = prefs.get("deep_research_mins", 1)
 
+        # (OS · Ola 3) Air-Gap REAL: con el aislamiento activo se omiten TODAS las
+        # herramientas web (navegación, búsqueda, investigación profunda). El chat
+        # sigue funcionando con memoria, archivos y telemetría locales.
+        air_gapped = False
+        try:
+            from ..core.privacy_manager import is_air_gapped
+            air_gapped = is_air_gapped()
+        except Exception:
+            air_gapped = False
+        if air_gapped and web_enabled:
+            web_enabled = False
+            agent_thoughts.append("🔒 Air-Gap Soberano activo: herramientas web omitidas (sin salida a internet).")
+            tool_executions.append({
+                "tool": "web_tools",
+                "target": "internet",
+                "success": False,
+                "summary": "air-gap activo: navegación, búsqueda e investigación web deshabilitadas."
+            })
+
         # 1. Web Browsing / URL Navigation / Live Internet Search
         urls = re.findall(r"https?://[^\s\)\"\'>]+", prompt)
         if urls and web_enabled:
@@ -70,7 +89,7 @@ class AstrauraToolAgent:
                 "success": deep_res.get("success", False),
                 "summary": f"Sintetizadas {deep_res.get('sources_count', 0)} fuentes en {deep_res.get('time_taken_seconds', 0)}s."
             })
-        elif not web_enabled and urls:
+        elif not web_enabled and urls and not air_gapped:  # (OS · Ola 3) con air-gap ya se avisó arriba
             agent_thoughts.append("🔒 Modo Aislado Local: Uso de datos de internet desactivado por preferencia del usuario.")
 
         # 2. Filesystem Access

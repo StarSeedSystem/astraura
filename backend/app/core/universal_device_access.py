@@ -7,6 +7,13 @@ import json
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
+# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
+# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
+from pathlib import Path as _SSPath
+from .config import settings as _ss_settings
+WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
+HOME = str(_SSPath.home()).rstrip("/")
+
 class UniversalDeviceAccessEngine:
     """
     Motor Universal de Acceso a Dispositivos, Procesadores y Sistemas Operativos.
@@ -18,7 +25,7 @@ class UniversalDeviceAccessEngine:
       - Aceleración WASM SIMD 128-bit / WebGPU.
     """
     def __init__(self):
-        self.workspace_path = Path("/Users/alex/Documents/IA 1.58 bit")
+        self.workspace_path = Path(f"{WORKSPACE}")
         self.storage_dir = self.workspace_path / "data/device_access"
         self.storage_dir.mkdir(parents=True, exist_ok=True)
         self.state_file = self.storage_dir / "device_permissions.json"

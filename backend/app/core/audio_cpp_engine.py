@@ -15,6 +15,13 @@ import wave
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 
+# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
+# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
+from pathlib import Path as _SSPath
+from .config import settings as _ss_settings
+WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
+HOME = str(_SSPath.home()).rstrip("/")
+
 class AudioCppEngine:
     """
     Core audio inference & holographic voice engine.
@@ -24,7 +31,7 @@ class AudioCppEngine:
 
     def __init__(self, storage_dir: Optional[str] = None):
         if storage_dir is None:
-            self.storage_dir = Path("/Users/alex/Documents/IA 1.58 bit/data/voice_matrix")
+            self.storage_dir = Path(f"{WORKSPACE}/data/voice_matrix")
         else:
             self.storage_dir = Path(storage_dir)
         self.storage_dir.mkdir(parents=True, exist_ok=True)
@@ -584,6 +591,30 @@ class AudioCppEngine:
             "profile": profile,
             "total_memories": len(memories[persona_id])
         }
+
+    async def synthesize_speech(self, text: str, voice_params: Optional[Dict[str, Any]] = None, stream: bool = False, persona_id: Optional[str] = None) -> Dict[str, Any]:
+        """(Adenda 153) Contrato que usa /api/voice_studio/preview (antes no existía → 500).
+        Devuelve el WAV procedural como data-URI base64. Honesto: no es TTS neuronal."""
+        import base64
+        profile = dict(voice_params or {})
+        if persona_id and not profile:
+            try:
+                profile = (self._read_profiles() or {}).get(persona_id, {}) or {}
+            except Exception:
+                profile = {}
+        try:
+            pcm = self.synthesize_native_pcm(text, profile)
+            return {
+                "success": True,
+                "persona_id": persona_id or profile.get("persona_id", "custom"),
+                "audio_base64": "data:audio/wav;base64," + base64.b64encode(pcm).decode("ascii"),
+                "sample_rate": 24000,
+                "format": "wav",
+                "engine": "procedural_1.58b",
+                "note": "Síntesis procedural (no neuronal): usa OmniVoice/Web Speech para voz inteligible.",
+            }
+        except Exception as e:
+            return {"success": False, "error": str(e)}
 
     def synthesize_native_pcm(self, text: str, voice_profile: Dict[str, Any]) -> bytes:
         """

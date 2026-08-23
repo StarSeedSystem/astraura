@@ -9,6 +9,13 @@ from typing import Dict, Any, List, Optional
 import psutil
 import numpy as np
 
+# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
+# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
+from pathlib import Path as _SSPath
+from ..core.config import settings as _ss_settings
+WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
+HOME = str(_SSPath.home()).rstrip("/")
+
 SWARM_AREAS = [
     {
         "id": "area_engineering",
@@ -66,7 +73,7 @@ class AdaptiveMultiAreaSwarmEngine:
     y Sistema de Reactivaciones Programadas Autónomas (StarSeed OS // Astraura 1.58b).
     """
     def __init__(self, data_dir: Optional[Path] = None):
-        self.workspace_path = Path("/Users/alex/Documents/IA 1.58 bit")
+        self.workspace_path = Path(f"{WORKSPACE}")
         self.data_dir = data_dir or (self.workspace_path / "data/swarm")
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.state_file = self.data_dir / "swarm_adaptive_state.json"
@@ -472,7 +479,7 @@ class AdaptiveMultiAreaSwarmEngine:
 
     # ================= Multi-Agent Task Dispatcher & Execution =================
 
-    def dispatch_task(self, area_id: str, title: str, prompt: str, agent_id: Optional[str] = None, target_project_id: Optional[str] = None, priority_level: int = 5, origin: str = "user") -> Dict[str, Any]:
+    def dispatch_task(self, area_id: str, title: str, prompt: str, agent_id: Optional[str] = None, target_project_id: Optional[str] = None, priority_level: int = 5, origin: str = "user", target_folder_path: Optional[str] = None) -> Dict[str, Any]:
         """
         Despacha una nueva tarea concurrente con telemetría real del sistema,
         rutas de disco físicas y fases de ejecución concretas.
@@ -483,14 +490,14 @@ class AdaptiveMultiAreaSwarmEngine:
         target_agent = agent_id or area["lead_agent"]
         
         folder_map = {
-            "area_engineering": "/Users/alex/Documents/IA 1.58 bit/backend/app",
-            "area_web_intel": "/Users/alex/Documents/IA 1.58 bit/data/research",
-            "area_synaptic_memory": "/Users/alex/Documents/IA 1.58 bit/data/vault/memories",
-            "area_creative_synthesis": "/Users/alex/Documents/IA 1.58 bit/frontend/src/components",
-            "area_sentinel_privacy": "/Users/alex/Documents/IA 1.58 bit/data/telemetry",
-            "area_project_management": "/Users/alex/Documents/IA 1.58 bit/data/vault/projects"
+            "area_engineering": f"{WORKSPACE}/backend/app",
+            "area_web_intel": f"{WORKSPACE}/data/research",
+            "area_synaptic_memory": f"{WORKSPACE}/data/vault/memories",
+            "area_creative_synthesis": f"{WORKSPACE}/frontend/src/components",
+            "area_sentinel_privacy": f"{WORKSPACE}/data/telemetry",
+            "area_project_management": f"{WORKSPACE}/data/vault/projects"
         }
-        target_folder = folder_map.get(area_id, "/Users/alex/Documents/IA 1.58 bit")
+        target_folder = folder_map.get(area_id, f"{WORKSPACE}")
         
         # Real system metrics
         proc = psutil.Process()
@@ -515,7 +522,9 @@ class AdaptiveMultiAreaSwarmEngine:
             "real_memory_mb": ram_mb,
             "real_cpu_usage": cpu_usage,
             "real_pid": os.getpid(),
-            "target_folder_path": target_folder,
+            # (Adenda 153) El despachador proactivo pasa la carpeta objetivo; antes el
+            # kwarg no existía y cada ciclo de 5 s moría con TypeError.
+            "target_folder_path": target_folder_path or target_folder,
             "target_project_id": target_project_id or "proj_astraura_core",
             "priority_level": priority_level,
             "origin": origin,
@@ -583,6 +592,140 @@ class AdaptiveMultiAreaSwarmEngine:
         self._save_state()
         return new_sched
 
+    # ================= (OS · Ola 3) Entregable real al completar una tarea =================
+
+    def _template_deliverable(self, t: Dict[str, Any]) -> str:
+        """Entregable de plantilla (honesto: describe lo que se inspeccionó, sin inventar resultados)."""
+        area = next((a for a in SWARM_AREAS if a["id"] == t.get("area_id")), SWARM_AREAS[0])
+        folder = t.get("target_folder_path") or f"{WORKSPACE}"
+        scanned = t.get("real_files_scanned_count", 0)
+        return (
+            f"# {t.get('title', 'Tarea')}\n\n"
+            f"Agente: {t.get('agent_name', t.get('agent_id', 'agente'))} · Área: {area['name']}\n"
+            f"Objetivo: {t.get('prompt', '')}\n"
+            f"Carpeta inspeccionada: {folder} ({scanned} archivos)\n\n"
+            "Resultado: ciclo de inspección, inferencia ternaria y forja completado; el artefacto JSON queda "
+            "en data/vault/artifacts con telemetría real (PID, RAM, CPU). Sin modelo real disponible, este "
+            "entregable es una plantilla (generated_by=template): arranca Ollama o compila BitNet para que "
+            "el agente redacte el entregable de verdad."
+        )
+
+    async def _cognize_deliverable(self, t: Dict[str, Any]) -> Optional[str]:
+        """Entregable escrito por el motor real a partir del prompt de la tarea (≈400 tokens). None ⇒ plantilla."""
+        from app.core import cognition
+        if not cognition.real_available():
+            return None
+        area = next((a for a in SWARM_AREAS if a["id"] == t.get("area_id")), SWARM_AREAS[0])
+        agent = self.agents.get(t.get("agent_id", ""), {})
+        persona_ids = [p.get("id") for p in agent.get("used_personalities", []) if p.get("id")]
+        folder = t.get("target_folder_path") or f"{WORKSPACE}"
+        files: List[str] = []
+        try:
+            files = [f.name for f in Path(folder).glob("*.*") if not f.name.startswith(".")][:8]
+        except Exception:
+            files = []
+        system = (
+            f"Eres {agent.get('name', t.get('agent_id', 'un agente'))} del enjambre de Astraura 1.58-bit (StarSeed OS)"
+            f"{' (personalidades: ' + ', '.join(persona_ids) + ')' if persona_ids else ''}. "
+            f"Rol: {agent.get('role', area['description'])}. Redactas entregables técnicos en español, concretos y "
+            "verificables, en markdown breve. No inventes mediciones que no puedas justificar."
+        )
+        prompt = (
+            f"Tarea: {t.get('title', '')}\nInstrucción: {t.get('prompt', '')}\n"
+            f"Área: {area['name']} — {area['description']}\n"
+            f"Carpeta objetivo: {folder}\nArchivos visibles: {', '.join(files) if files else 'ninguno'}\n"
+            f"Registros del ciclo: {' | '.join(str(l) for l in (t.get('logs') or [])[-3:])}\n\n"
+            "Escribe el ENTREGABLE de esta tarea: 1) hallazgos, 2) cambios o propuestas concretas (con fragmentos "
+            "de código o pasos si aplica), 3) cómo verificarlo. Máximo ~250 palabras."
+        )
+        res = await cognition.generate(prompt, system=system, max_tokens=400, temperature=0.45, timeout=90.0)
+        if not res.get("real"):
+            return None
+        text = res["text"].strip()
+        return text if len(text) >= 40 else None
+
+    async def _finalize_completed_task(self, t: Dict[str, Any]) -> None:
+        """
+        (OS · Ola 3) Al llegar al 100 %: produce el entregable (motor real o plantilla), lo
+        guarda en el artefacto JSON (`deliverable` + `generated_by`), lo audita con el
+        Director (veredicto real) y despacha la siguiente tarea formulada por el Director.
+        """
+        import hashlib
+        try:
+            deliverable = self._template_deliverable(t)
+            generated_by = "template"
+            t0 = time.perf_counter()
+            try:
+                real = await self._cognize_deliverable(t)
+            except Exception as e:
+                real = None
+                print(f"⚠️ [Swarm] Entregable real falló para {t.get('id')}: {e}")
+            if real:
+                deliverable = real
+                generated_by = "llm"
+            ms = int((time.perf_counter() - t0) * 1000)
+
+            agent_id = t.get("agent_id", "hephaestus")
+            artifact_dir = Path(f"{WORKSPACE}/data/vault/artifacts")
+            artifact_dir.mkdir(parents=True, exist_ok=True)
+            artifact_file = Path(t.get("artifact_file") or (artifact_dir / f"artifact_{agent_id}_{t['id']}.json"))
+            artifact_data: Dict[str, Any] = {}
+            try:
+                if artifact_file.exists():
+                    artifact_data = json.loads(artifact_file.read_text(encoding="utf-8")) or {}
+            except Exception:
+                artifact_data = {}
+            artifact_data.update({
+                "task_id": t["id"],
+                "agent_id": agent_id,
+                "title": t.get("title"),
+                "prompt": t.get("prompt"),
+                "target_project_id": t.get("target_project_id", "proj_astraura_core"),
+                "target_folder": t.get("target_folder_path"),
+                "completed_at": t.get("completed_at", time.time()),
+                "deliverable": deliverable,
+                "generated_by": generated_by,
+                "deliverable_ms": ms,
+            })
+            raw_json = json.dumps(artifact_data, indent=2, ensure_ascii=False)
+            artifact_file.write_text(raw_json, encoding="utf-8")
+            sha256_hash = hashlib.sha256(raw_json.encode("utf-8")).hexdigest()
+            t["artifact_file"] = str(artifact_file)
+            t["artifact_sha256"] = sha256_hash
+            t["artifact_bytes"] = len(raw_json.encode("utf-8"))
+            t["deliverable_excerpt"] = deliverable[:600]
+            t["generated_by"] = generated_by
+            t["logs"].append(
+                f"📦 Entregable {'REAL (' + str(ms) + ' ms)' if generated_by == 'llm' else 'de plantilla'} guardado en {artifact_file.name} (SHA-256: {sha256_hash[:12]}...)."
+            )
+
+            # Trigger Director Orchestrator Verification, Multi-Dimensional Attachment & Intelligent Renewal
+            try:
+                from app.agents.director_orchestrator import director_orchestrator
+                next_task = await director_orchestrator.auto_renew_completed_task_async(t)
+                t["logs"].append("👑 Auditado por Director Metis. Siguiente ciclo formulado.")
+                if next_task and len([tk for tk in self.active_tasks if tk["status"] == "running"]) < 4:
+                    self.dispatch_task(
+                        area_id=next_task["area_id"],
+                        title=next_task["title"],
+                        prompt=next_task["prompt"],
+                        agent_id=next_task["agent_id"],
+                        target_project_id=next_task["target_project_id"],
+                        target_folder_path=next_task.get("target_folder_path"),
+                        origin=f"director:{next_task.get('generated_by', 'template')}"
+                    )
+            except Exception as e:
+                print(f"⚠️ Error en auditoría y auto-renovación del Director: {e}")
+
+            self._save_state()
+            self._notify_callbacks({
+                "type": "swarm_task_completed",
+                "task": {k: t.get(k) for k in ("id", "title", "agent_id", "agent_name", "area_id", "completed_at",
+                                                "artifact_file", "deliverable_excerpt", "generated_by")}
+            })
+        except Exception as e:
+            print(f"⚠️ Error finalizando la tarea {t.get('id')}: {e}")
+
     # ================= Background Scheduler & Autonomous Reactivator =================
 
     async def start_scheduler_loop(self):
@@ -612,7 +755,7 @@ class AdaptiveMultiAreaSwarmEngine:
                     t["real_cpu_usage"] = psutil.cpu_percent(interval=None)
 
                     # Real filesystem target path
-                    target_path = Path(t.get("target_folder_path", "/Users/alex/Documents/IA 1.58 bit/backend/app"))
+                    target_path = Path(t.get("target_folder_path", f"{WORKSPACE}/backend/app"))
                     target_path.mkdir(parents=True, exist_ok=True)
                     real_files = [f.name for f in target_path.glob("*.*") if not f.name.startswith(".")][:8] if target_path.exists() else []
                     t["real_files_scanned_count"] = len(real_files)
@@ -643,7 +786,7 @@ class AdaptiveMultiAreaSwarmEngine:
                         if len(t["logs"]) < 5:
                             # Real physical artifact persistence on disk
                             agent_id = t.get("agent_id", "hephaestus")
-                            artifact_dir = Path("/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts")
+                            artifact_dir = Path(f"{WORKSPACE}/data/vault/artifacts")
                             artifact_dir.mkdir(parents=True, exist_ok=True)
                             artifact_file = artifact_dir / f"artifact_{agent_id}_{t['id']}.json"
                             artifact_data = {
@@ -679,32 +822,24 @@ class AdaptiveMultiAreaSwarmEngine:
                         t["logs"].append("✅ Tarea completada y validada en disco.")
                         if t["agent_id"] in self.agents:
                             self.agents[t["agent_id"]]["completed_tasks"] += 1
-                        
-                        # Trigger Director Orchestrator Verification, Multi-Dimensional Attachment & Intelligent Renewal
+
+                        # (OS · Ola 3) Entregable REAL + auditoría del Director + renovación, en una
+                        # tarea de fondo para no congelar este tick de 5 s mientras el motor genera.
+                        # La cadencia simulada de progreso se conserva intacta.
                         try:
-                            from app.agents.director_orchestrator import director_orchestrator
-                            next_task = director_orchestrator.auto_renew_completed_task(t)
-                            t["logs"].append(f"👑 Auditado por Director Metis. Siguiente ciclo formulado.")
-                            if next_task and len([tk for tk in self.active_tasks if tk["status"] == "running"]) < 4:
-                                self.dispatch_task(
-                                    area_id=next_task["area_id"],
-                                    title=next_task["title"],
-                                    prompt=next_task["prompt"],
-                                    agent_id=next_task["agent_id"],
-                                    target_project_id=next_task["target_project_id"]
-                                )
+                            asyncio.create_task(self._finalize_completed_task(t))
                         except Exception as e:
-                            print(f"⚠️ Error en auditoría y auto-renovación del Director: {e}")
+                            print(f"⚠️ Error lanzando la finalización de la tarea {t.get('id')}: {e}")
 
                 # 2. Autonomous Proactive Swarm Dispatcher (Maintains continuous intelligent pipeline)
                 if len(running_tasks) < 2:
                     pool = [
-                        ("area_engineering", "hephaestus", "Optimización de Microkernel Vectorial NEON en 1.58b", "Refactorizar bucles SIMD para Apple Silicon M1.", "/Users/alex/Documents/IA 1.58 bit/backend/app"),
-                        ("area_web_intel", "hermes", "Rastreo de Preprints arXiv sobre Modelos Ternarios", "Extracción y análisis de papers sobre cuantización ternaria.", "/Users/alex/Documents/IA 1.58 bit/data/research"),
-                        ("area_creative_synthesis", "oneiros", "Síntesis de Shader Procedural WebGL Reactivo", "Generación de geometría sagrada y shaders de baja entropía.", "/Users/alex/Documents/IA 1.58 bit/frontend/src/components"),
-                        ("area_synaptic_memory", "mnemosyne", "Consolidación de Grafo de Memoria StarSeed", "Extracción de axiomas y compactación de memoria a largo plazo.", "/Users/alex/Documents/IA 1.58 bit/data/vault/memories"),
-                        ("area_sentinel_privacy", "athena", "Auditoría de Sensores Físicos & Privacidad 360°", "Comprobación de aislamiento y telemetría de silicio M1.", "/Users/alex/Documents/IA 1.58 bit/data/telemetry"),
-                        ("area_project_management", "daedalus", "Sincronización de Topología & Versiones de Proyecto", "Evaluación de métricas de salud en Bóveda de Proyectos.", "/Users/alex/Documents/IA 1.58 bit/data/vault/projects")
+                        ("area_engineering", "hephaestus", "Optimización de Microkernel Vectorial NEON en 1.58b", "Refactorizar bucles SIMD para Apple Silicon M1.", f"{WORKSPACE}/backend/app"),
+                        ("area_web_intel", "hermes", "Rastreo de Preprints arXiv sobre Modelos Ternarios", "Extracción y análisis de papers sobre cuantización ternaria.", f"{WORKSPACE}/data/research"),
+                        ("area_creative_synthesis", "oneiros", "Síntesis de Shader Procedural WebGL Reactivo", "Generación de geometría sagrada y shaders de baja entropía.", f"{WORKSPACE}/frontend/src/components"),
+                        ("area_synaptic_memory", "mnemosyne", "Consolidación de Grafo de Memoria StarSeed", "Extracción de axiomas y compactación de memoria a largo plazo.", f"{WORKSPACE}/data/vault/memories"),
+                        ("area_sentinel_privacy", "athena", "Auditoría de Sensores Físicos & Privacidad 360°", "Comprobación de aislamiento y telemetría de silicio M1.", f"{WORKSPACE}/data/telemetry"),
+                        ("area_project_management", "daedalus", "Sincronización de Topología & Versiones de Proyecto", "Evaluación de métricas de salud en Bóveda de Proyectos.", f"{WORKSPACE}/data/vault/projects")
                     ]
                     # Select least recently dispatched area
                     dispatched_areas = [t["area_id"] for t in self.active_tasks]

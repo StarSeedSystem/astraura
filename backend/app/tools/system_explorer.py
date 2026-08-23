@@ -8,6 +8,13 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 import pypdf
 
+# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
+# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
+from pathlib import Path as _SSPath
+from ..core.config import settings as _ss_settings
+WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
+HOME = str(_SSPath.home()).rstrip("/")
+
 class SystemExplorer:
     """
     Computer-wide file system explorer and indexing utility.
@@ -226,7 +233,7 @@ class SystemExplorer:
             p = Path(target_path).expanduser().resolve()
             if not p.exists():
                 # If path does not exist, try finding workspace relative path
-                workspace_p = (Path("/Users/alex/Documents/IA 1.58 bit") / target_path).resolve()
+                workspace_p = (Path(f"{WORKSPACE}") / target_path).resolve()
                 if workspace_p.exists():
                     p = workspace_p
                 else:
@@ -271,7 +278,7 @@ class SystemExplorer:
         try:
             p = Path(target_path).expanduser().resolve()
             if not p.exists():
-                workspace_p = (Path("/Users/alex/Documents/IA 1.58 bit") / target_path).resolve()
+                workspace_p = (Path(f"{WORKSPACE}") / target_path).resolve()
                 if workspace_p.exists():
                     p = workspace_p
                 else:

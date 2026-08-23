@@ -34,7 +34,8 @@ import {
   Palette,
   Headphones,
   PanelLeftClose,
-  PanelLeftOpen
+  PanelLeftOpen,
+  Link2
 } from 'lucide-react';
 
 import ChatInterface from './components/ChatInterface';
@@ -70,7 +71,7 @@ import GatewayModal from './components/GatewayModal';
 import UniversalDeviceModal from './components/UniversalDeviceModal';
 import ThemePickerModal from './components/ThemePickerModal';
 import UniversalFileViewerModal from './components/UniversalFileViewerModal';
-import { ChatWebSocketClient, fetchStatus, fetchSystemNotifications, autoDetectAndSetLiveTunnel, getGatewayUrl } from './services/api';
+import { ChatWebSocketClient, fetchStatus, fetchSystemNotifications, autoDetectAndSetLiveTunnel, getGatewayUrl, apiUrl } from './services/api';
 import { webCognition } from './services/webCognition';
 import { deviceContextDetector } from './services/deviceContextDetector';
 import { omniVoice } from './services/omniVoice';
@@ -444,8 +445,9 @@ export default function App() {
     }
 
     // 2. Try HTTP REST API endpoint /api/chat if local server is reachable
+    //    (apiUrl respeta el gateway activo: custom / túnel / default, también en Electron file://)
     try {
-      const httpRes = await fetch('/api/chat', {
+      const httpRes = await fetch(apiUrl('/api/chat'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: text, system_prompt: settings.systemPrompt, preferences: preferences || {} }),
@@ -773,6 +775,16 @@ export default function App() {
               )}
             </button>
 
+            {/* Puente Soberano / Gateway (túnel HTTPS · LAN · QR multi-dispositivo) */}
+            <button
+              onClick={() => setIsGatewayModalOpen(true)}
+              className="text-xs px-2.5 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 font-mono transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+              title="Puente soberano / Gateway"
+            >
+              <Link2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              <span className="hidden md:inline">Gateway</span>
+            </button>
+
             {/* Notifications */}
             <button
               onClick={() => handleTabChange('notifications')}
@@ -860,6 +872,19 @@ export default function App() {
                 )}
               </button>
             ))}
+
+            {/* Puente Soberano / Gateway (acceso móvil desde "Más") */}
+            <button
+              onClick={() => {
+                setIsGatewayModalOpen(true);
+                setIsMobileMenuOpen(false);
+              }}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-cyan-300 border-t border-white/10 mt-1 pt-2.5"
+              title="Puente soberano / Gateway"
+            >
+              <Link2 className="w-4 h-4 flex-shrink-0 text-cyan-400/80" />
+              <span className="flex-1 text-left">Puente Soberano / Gateway</span>
+            </button>
           </div>
         )}
 

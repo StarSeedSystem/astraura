@@ -1,9 +1,11 @@
 import time
+import json  # (OS · Ola 3) faltaba: execute_dream_burst usaba json.dumps y moría con NameError
 import asyncio
 import random
 from typing import Dict, Any, List, Optional
 from ..memory.starseed_memory_engine import starseed_memory_engine
 from ..memory.openviking_engine import openviking_memory
+from . import cognition  # (OS · Ola 3) cognición real con plantilla de respaldo
 
 DREAM_PROCESS_TYPES = [
     {
@@ -306,6 +308,15 @@ class AstrauraDreamEngine:
             asset_title = f"{project_prefix}Sinapsis // {target_theme[:24]}"
             asset_type = "memory_node"
 
+        # (OS · Ola 3) Cognición real: con modelo (Ollama/BitNet) el contenido del sueño
+        # lo escribe el motor; sin modelo se conserva la plantilla de arriba.
+        generated_by = "template"
+        llm_dream = await self._cognize_dream(selected_ptype, ptype_meta, target_theme, hypo, insights, project_obj)
+        if llm_dream:
+            hypo = llm_dream.get("hypothesis") or hypo
+            insights = llm_dream.get("insights") or insights
+            generated_by = "llm"
+
         new_branch = {
             "id": branch_id,
             "parent_id": parent_branch_id or "branch_root_1",
@@ -320,6 +331,7 @@ class AstrauraDreamEngine:
             "status": "active",
             "entropy_delta": f"-{round(max(0.01, min(0.09, 0.05 + (len(insights) / 5000.0))), 3):.3f}",
             "insights": insights,
+            "generated_by": generated_by,  # (OS · Ola 3) "llm" | "template"
             "created_assets": [
                 {
                     "id": f"asset_{int(time.time())}",
@@ -340,6 +352,7 @@ class AstrauraDreamEngine:
             "type": ptype_meta["name"],
             "timestamp": time.time(),
             "content": f"{hypo}\n\nConclusiones:\n{insights}",
+            "generated_by": generated_by,  # (OS · Ola 3)
             "origin_branch": branch_id,
             "project_id": target_pid,
             "linked_projects": [target_pid] if target_pid else ["proj_astraura_core"],
@@ -412,6 +425,66 @@ class AstrauraDreamEngine:
 
         self.is_dreaming = False
         return result_payload
+
+    async def _cognize_dream(
+        self,
+        ptype_id: str,
+        ptype_meta: Dict[str, Any],
+        theme: str,
+        template_hypo: str,
+        template_insights: str,
+        project_obj: Optional[Dict[str, Any]] = None,
+    ) -> Optional[Dict[str, str]]:
+        """
+        (OS · Ola 3) Pide al motor real el contenido del sueño (hipótesis + conclusiones)
+        en JSON. Devuelve None si no hay modelo real o la respuesta no sirve: el
+        llamador conserva la plantilla. Nunca lanza.
+        """
+        if not cognition.real_available():
+            return None
+        # Anclaje: 2-3 nombres de documentos de memoria recientes.
+        doc_names: List[str] = []
+        try:
+            for d in starseed_memory_engine.list_documents()[:3]:
+                n = str(d.get("name") or "").strip()
+                if n:
+                    doc_names.append(n[:80])
+        except Exception:
+            doc_names = []
+        project_line = f"Proyecto activo: {project_obj.get('name')} — {str(project_obj.get('description', ''))[:160]}\n" if project_obj else ""
+        system = (
+            "Eres Oneiros, el motor onírico de Astraura 1.58-bit (StarSeed OS). Escribes en español, "
+            "con precisión técnica y sin relleno. Respondes ÚNICAMENTE con un objeto JSON válido."
+        )
+        prompt = (
+            f"Proceso onírico: {ptype_meta.get('name')} ({ptype_meta.get('category')}).\n"
+            f"Descripción del proceso: {ptype_meta.get('description')}\n"
+            f"Tema del sueño: {theme}\n"
+            f"{project_line}"
+            f"Memorias recientes para anclar: {', '.join(doc_names) if doc_names else 'ninguna'}\n"
+            f"Borrador de plantilla (mejóralo, no lo copies): hipótesis='{template_hypo[:200]}'; conclusiones='{template_insights[:200]}'\n\n"
+            "Devuelve SOLO este JSON: {\"hypothesis\": \"una hipótesis concreta y verificable en 1-2 frases\", "
+            "\"insights\": \"2-3 frases con conclusiones accionables para el proyecto\"}"
+        )
+        res = await cognition.generate(prompt, system=system, max_tokens=300, temperature=0.6, timeout=75.0)
+        if not res.get("real"):
+            return None
+        data = cognition.extract_json(res["text"])
+        hypo = cognition.field(data, "hypothesis", max_len=600, min_len=12)
+        insights = cognition.field(data, "insights", max_len=800, min_len=12)
+        if not hypo and not insights:
+            # Texto libre sin JSON: primera línea como hipótesis, resto como conclusiones.
+            text = res["text"].strip()
+            parts = [p.strip() for p in text.split("\n") if p.strip()]
+            if not parts:
+                return None
+            hypo = parts[0][:600]
+            insights = " ".join(parts[1:])[:800] or template_insights
+        return {"hypothesis": hypo or template_hypo, "insights": insights or template_insights}
+
+    async def trigger_manual_dream(self, theme: Optional[str] = None, process_type: Optional[str] = None, target_project_id: Optional[str] = None) -> Dict[str, Any]:
+        """(Adenda 153) Alias estable que usaba workflow_engine (`dream_reflect`) sin existir."""
+        return await self.execute_dream_burst(theme=theme, process_type=process_type, target_project_id=target_project_id)
 
     def register_callback(self, cb):
         if cb not in self.callbacks:

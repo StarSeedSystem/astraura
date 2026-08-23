@@ -81,3 +81,11 @@ astraura_r2_credentials.json
 *.swp
 *.swo
 .cursor/
+
+# --- (Adenda 153 · StarSeed OS) Claves de API de personalidades/agentes y ubicación: NUNCA en el repo ---
+data/personality_apis.json
+data/agent_apis.json
+backend/data/personality_apis.json
+backend/data/agent_apis.json
+data/sensorium/sensorium_location.json
+**/master_key.txt

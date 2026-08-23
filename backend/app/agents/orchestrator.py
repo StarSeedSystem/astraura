@@ -65,10 +65,17 @@ class AstrauraOrchestrator:
         selected_ids = set()
 
         # 1. From Preferences
+        # (OS · Ola 3) Una selección EXPLÍCITA del cliente (OS, invoke API, puente)
+        # gana sobre el olfateo de nombres: si el usuario eligió a Hephaestus y
+        # menciona a "Hermes" en el texto, responde solo Hephaestus. Se conserva el
+        # orden de la lista.
         if prefs.get("selected_personalities") and isinstance(prefs["selected_personalities"], list):
+            explicit = []
             for pid in prefs["selected_personalities"]:
-                if pid in persona_map:
-                    selected_ids.add(pid)
+                if pid in persona_map and pid not in explicit:
+                    explicit.append(pid)
+            if explicit:
+                return [persona_map[pid] for pid in explicit]
 
         # 2. From @Mentions in Prompt (e.g. @Aurora @Hephaestus @Atenea)
         mentions = re.findall(r'@([a-zA-Z0-9_áéíóúñ]+)', prompt)
@@ -99,8 +106,38 @@ class AstrauraOrchestrator:
 
         return [persona_map[pid] for pid in selected_ids if pid in persona_map]
 
+    @staticmethod
+    def _persona_temperature(persona: Optional[Dict[str, Any]], default: float = 0.75) -> float:
+        """(OS · Ola 3) Temperatura del preset/custom (clave `temperature`), acotada a [0.1, 1.2]."""
+        try:
+            t = float((persona or {}).get("temperature", default))
+        except (TypeError, ValueError):
+            t = default
+        return max(0.1, min(1.2, t))
+
+    @staticmethod
+    def _inject_mem0_memories(user_prompt: str, context_chunks: List[str], top_k: int = 3) -> List[str]:
+        """(OS · Ola 3) Top-k recuerdos Mem0 relevantes como líneas `[RECUERDO] …` al frente del contexto."""
+        chunks = list(context_chunks or [])
+        if len((user_prompt or "").strip()) < 3:
+            return chunks
+        try:
+            from ..memory.mem0_engine import mem0_engine
+            hits = mem0_engine.search_memories(user_prompt, user_id="alex", limit=top_k)
+        except Exception:
+            hits = []
+        lines: List[str] = []
+        for m in hits or []:
+            text = " ".join(str(m.get("memory", "")).split()).strip()
+            if not text:
+                continue
+            line = f"[RECUERDO] {text[:320]}"
+            if line not in lines:
+                lines.append(line)
+        return lines[:top_k] + chunks
+
     async def execute_thought_cycle(
-        self, 
+        self,
         user_prompt: str,
         preferences: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
@@ -123,7 +160,15 @@ class AstrauraOrchestrator:
         max_chars = prefs.get("max_length_chars")
         style = prefs.get("response_style", "analytical")
         multi_mode = prefs.get("multi_personality_mode", "auto") # "single" | "multi_dialogue" | "coral_synthesis" | "auto"
-        
+
+        # (OS · Ola 3) El gobernador adaptativo del enjambre cede CPU al chat: existía
+        # record_user_activity() pero nadie lo llamaba.
+        try:
+            from .swarm_manager import swarm_manager
+            swarm_manager.record_user_activity()
+        except Exception:
+            pass
+
         # Detect active personalities
         active_personas = self.detect_requested_personalities(user_prompt, prefs)
         is_multi = len(active_personas) > 1
@@ -139,6 +184,11 @@ class AstrauraOrchestrator:
 
         # 2. Execute Fast Quantum Multi-Agent Parallel Swarm Cycle
         cycle = await self.execute_thought_cycle(user_prompt, preferences=prefs)
+
+        # (OS · Ola 3) Recuerdos Mem0 (top-3) inyectados como contexto [RECUERDO] …
+        # delante de los fragmentos documentales (el motor lee hasta 6 fragmentos).
+        context_chunks = self._inject_mem0_memories(user_prompt, cycle.get("context_chunks") or [])
+        cycle["context_chunks"] = context_chunks
 
         # 3. Emit Final Synchronized Agent Thought traces to UI
         yield {
@@ -197,7 +247,8 @@ class AstrauraOrchestrator:
                     system_prompt=persona_sys,
                     context_chunks=cycle["context_chunks"],
                     tool_data=cycle["tool_data"],
-                    max_tokens=600
+                    max_tokens=600,
+                    temperature=self._persona_temperature(persona)  # (OS · Ola 3)
                 ):
                     accumulated_full_text += token
                     yield {
@@ -266,7 +317,8 @@ class AstrauraOrchestrator:
             system_prompt=sys_prompt,
             context_chunks=cycle["context_chunks"],
             tool_data=cycle["tool_data"],
-            max_tokens=max_tokens
+            max_tokens=max_tokens,
+            temperature=self._persona_temperature(primary_persona)  # (OS · Ola 3)
         ):
             full_text += token
             yield {

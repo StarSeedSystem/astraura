@@ -26,6 +26,13 @@ import platform
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
+# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
+# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
+from pathlib import Path as _SSPath
+from ..core.config import settings as _ss_settings
+WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
+HOME = str(_SSPath.home()).rstrip("/")
+
 # Lazy resolution para evitar ciclos en el arranque de FastAPI
 _cerebros = None
 _memory = None
@@ -37,17 +44,17 @@ def _resolve():
     global _cerebros, _memory, _personality, _storage
     if _cerebros is None:
         try:
-            from app.core.cerebros_manager import cerebros_manager as _cerebros
+            from app.cerebros.cerebros_manager import cerebros_manager as _cerebros
         except Exception:
             _cerebros = None
     if _memory is None:
         try:
-            from app.core.starseed_memory_engine import starseed_memory_engine as _memory
+            from app.memory.starseed_memory_engine import starseed_memory_engine as _memory
         except Exception:
             _memory = None
     if _personality is None:
         try:
-            from app.core.personality_engine import personality_engine as _personality
+            from app.personalities.personality_engine import personality_engine as _personality
         except Exception:
             _personality = None
     if _storage is None:
@@ -58,13 +65,13 @@ def _resolve():
 
 
 # Carpeta raíz del ecosistema Astraura
-ROOT = Path("/Users/alex/Documents/IA 1.58 bit")
+ROOT = Path(f"{WORKSPACE}")
 CONFIG_FILE = ROOT / "data" / "vault" / "routing_storage_agent_config.json"
 
 # Dispositivos/medios conocidos a escanear por defecto
 DEFAULT_SCAN_TARGETS = [
     str(ROOT),
-    "/Users/alex/Documents",
+    f"{HOME}/Documents",
     "/Volumes",
     str(Path.home() / "Desktop"),
     str(Path.home() / "Downloads"),

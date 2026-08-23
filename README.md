@@ -177,6 +177,47 @@ idf.py -p /dev/cu.usbmodem* flash monitor
 
 ---
 
+## 🧩 Integración oficial con StarSeed OS (puente `/api/starseed`)
+
+Astraura 1.58-bit es el **sistema primario de inteligencia** de [StarSeed OS](https://starseed-os.vercel.app) (Adenda 153 del OS). El OS lo coloca primero en su cadena de inteligencia y mantiene el resto de fuentes como secundarias. El backend expone un puente estable:
+
+| Ruta | Uso |
+|---|---|
+| `GET /api/starseed/health` | Latido ligero (motor real, BitNet compilado, modelos en disco). |
+| `GET /api/starseed/manifest` | Motor + personalidades + agentes + habilidades + cerebros en una llamada. |
+| `POST /api/starseed/chat` | Chat con `messages[]` estilo OpenAI (`system`/`user`/`assistant`) + `persona_id`; mismo SSE que `/api/chat/stream`. |
+
+`GET /api/status` incluye ahora `engine.real_mode` (`bitnet-native` · `ollama` · `templates`), `security` y `starseed_bridge`: el estado es **honesto** (si no hay Ollama ni GGUF, lo dice).
+
+## 🔐 Seguridad (modos de acceso)
+
+| `ASTRAURA_AUTH_MODE` | Comportamiento |
+|---|---|
+| `local-only` (defecto) | Las rutas peligrosas (ejecución, archivos, OS, túnel, claves, almacenamiento, navegador server-side) solo se aceptan desde **loopback** o con `X-Astraura-Key`. Chat y lecturas abiertas. |
+| `key` | **Todo** `/api/*` exige `X-Astraura-Key` (salvo `/api/status`, `/api/starseed/health`, `/active_tunnel.json`). Recomendado en Cloud Run/túneles públicos. |
+| `open` | Sin auth (solo desarrollo aislado). |
+
+- Clave maestra: `ASTRAURA_API_KEY` o `~/.astraura/master_key.txt` (se genera sola; nunca se imprime).
+- Las claves de personalidades/agentes viven en `~/.astraura/keys/` (`ASTRAURA_KEYS_DIR`), **fuera del repo**. `api_status` devuelve la clave **enmascarada** salvo con la clave maestra.
+- Si tus claves estuvieron en `data/*_apis.json` (commiteadas), rótalas: `cd backend && python3 ../scripts/rotate_keys.py` y luego `bash scripts/purge_secrets_from_repo.sh`.
+
+## ⚙️ Variables de entorno útiles
+
+| Variable | Para qué |
+|---|---|
+| `ASTRAURA_OLLAMA_URL` / `ASTRAURA_OLLAMA_MODEL` | Servidor y modelo de Ollama preferidos (antes: primer modelo de `/api/tags`). |
+| `ASTRAURA_AUTH_MODE` / `ASTRAURA_API_KEY` / `ASTRAURA_KEYS_DIR` | Seguridad (arriba). |
+| `ASTRAURA_SYNC_MAX_MB` (5) | Tope por sección al sincronizar con Supabase/R2 (la sincronización es incremental: solo lo que cambió). |
+| `ASTRAURA_MAX_AUTOGEN_DOCS` (150) | Tope FIFO por categoría de documentos generados por imaginación/enrutamiento/sueños en el memory root. |
+| `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` · `R2_*` | Sincronización (Cloud Run). |
+
+Rutas portables: todo deriva de la raíz del repo (`backend/app/core/config.py`) y de `~` — ya no hay rutas `/Users/alex/...` fijas.
+
+## 🧹 Mantenimiento
+
+- `python3 scripts/compact_memory_docs.py --apply` — compacta el memory root (archiva los documentos sintéticos con copia completa `.json.gz`).
+- `python3 scripts/rotate_keys.py` — rota todas las claves de API.
+
 ## 🗺️ Fases de Desarrollo & Roadmap
 
 - [x] **Fase 1:** Núcleo BitNet b1.58 Ternary SIMD/NEON en C++.
@@ -194,3 +235,27 @@ Desarrollado con 💙 por la comunidad **StarSeed System**.
 *Soberanía Tecnológica, Eficiencia Ternaria y Código Abierto para Todos.*
 
 </div>
+
+## Motor nativo BitNet (Ola 3 · 2026-08-23)
+
+- **Servidor gestionado**: el backend ya no lanza `llama-cli` por petición. `bitnet_cpp_manager`
+  arranca `BitNet/build/bin/llama-server` con el GGUF `i2_s` y le habla por la API OpenAI-compatible
+  (streaming real). DOS perfiles sobre el mismo GGUF (pesos compartidos por mmap):
+  `interactive` (chat/orbe, puerto `ASTRAURA_BITNET_PORT`=8790) y `background`
+  (imaginación/enjambre/director vía `cognition`, puerto +1, con `nice 15` para no robar el turno).
+  Variables: `ASTRAURA_BITNET_PORT` · `ASTRAURA_BITNET_CTX` (4096) · `ASTRAURA_BITNET_PAR` (1).
+- **Parche CRÍTICO ReLU²**: `backend/BitNet/3rdparty/llama.cpp/src/models/bitnet.cpp` debe usar
+  `LLM_FFN_RELU_SQR` (el upstream trae `LLM_FFN_SILU` y el 2B-4T degenera: PPL ~41 → ~5.4 con el
+  parche). Guarda: `bash backend/scripts/check_bitnet_patch.sh` antes de compilar.
+- **Plantilla de chat**: el GGUF oficial trae una plantilla rota; el manager escribe
+  `bitnet-chat-template.jinja` (formato oficial `System:/User:/Assistant:` + `<|eot_id|>`)
+  y lanza el server con `--jinja --chat-template-file …` y
+  `--override-kv tokenizer.ggml.pre=str:llama-bpe`.
+- **Presupuesto de contexto honesto**: 4096 posiciones; el motor recorta system+prompt
+  (~3.2 chars/token) y reserva ≥¼ del contexto para la respuesta.
+- **Prioridad de turno**: `generate_stream(..., priority="background")` (lo usa `cognition`)
+  va al perfil de fondo; el chat interactivo nunca espera detrás de la imaginación.
+- **Verificación real**: `python3 backend/scripts/verify_real_ola3.py` (backend vivo) comprueba
+  motor nativo, chat multi-personalidad por @menciones, `generated_by: llm` en imaginación,
+  eventos+ack del puente, procesos, invoke, síntesis y air-gap.
+- **Utilidades**: `backend/scripts/repack_i2s_gguf.py` (diagnóstico de layouts I2_S antiguos).
