@@ -897,6 +897,21 @@ void ggml_vec_dot_i2_i8_s_Nx1(int n, float * s, size_t bs, const void * vx, size
 
 
 void ggml_vec_dot_i2_i8_s(int n, float * s, size_t bs, const void * vx, size_t bx, const void * vy, size_t by, int nrc) {
+#if defined(__ARM_NEON)
+    // (Adenda 162) En ARM, `_1xN`/`_Nx1` escriben el resultado de la PRIMERA
+    // fila en todas las salidas. Verificado en aislamiento contra un producto
+    // escalar calculado a mano, con n=2560 y 16 filas: `_1x1` 16/16 correctas,
+    // `_1xN` 15/16 incorrectas (todas iguales a la fila 0).
+    //
+    // Como `ggml_gemv_i2_i8_s` llama siempre con nrc=16 y PARALLEL_SIZE=8 en
+    // ARM, el camino real era SIEMPRE el roto: todas las neuronas de cada capa
+    // recibian el mismo valor, los logits salian uniformes y el modelo
+    // devolvia un token constante ante cualquier entrada.
+    //
+    // `_1x1` recorre las filas por su cuenta y esta verificado correcto.
+    ggml_vec_dot_i2_i8_s_1x1(n, s, bs, vx, bx, vy, by, nrc);
+    return;
+#endif
     if (nrc % PARALLEL_SIZE == 0)
     {
 #if defined(ACT_PARALLEL)

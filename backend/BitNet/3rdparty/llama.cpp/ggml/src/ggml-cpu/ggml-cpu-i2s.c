@@ -36,6 +36,22 @@ void ggml_gemv_i2_i8_s(int n, float * GGML_RESTRICT s, size_t bs, const void * G
 }
 
 void ggml_gemm_i2_i8_s(int n, float * GGML_RESTRICT s, size_t bs, const void * GGML_RESTRICT vx, const void * GGML_RESTRICT vy, int nr, int nc) {
+#if defined(__ARM_NEON)
+    // (Adenda 162) En ARM la ruta por bloques de abajo devuelve bien la primera
+    // columna y mal las demas (medido: 96/128 valores incorrectos con n=2560,
+    // nr=4, nc=32). Es la ruta del PROCESADO DEL PROMPT, asi que corrompia el
+    // estado oculto y la cache KV desde el primer token.
+    //
+    // `s[col*bs + row]`: para cada columna de activacion, `vec_dot` escribe las
+    // nc filas contiguas leyendo los pesos con paso n/4. Correcto por
+    // construccion, y reutiliza el kernel NEON ya verificado.
+    for (int col = 0; col < nr; col++) {
+        ggml_vec_dot_i2_i8_s(n, s + (size_t)col * bs, 1,
+                             vx, (size_t)n,
+                             (const int8_t *)vy + (size_t)col * n, 0, nc);
+    }
+    return;
+#endif
     // nr = number of activation columns (B side)
     // nc = number of weight rows (A side)
     // n  = inner dimension (elements per row)
