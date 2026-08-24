@@ -440,11 +440,20 @@ class UpdateConnectionRequest(BaseModel):
 
 @app.post("/api/vault/connection/update")
 async def update_connection(req: UpdateConnectionRequest):
+    # (Adenda 158 · Ola 6) El token se GUARDA de verdad. Antes solo se ponia
+    # `token_set = True` y la credencial se tiraba: la boveda del OS decia
+    # «token guardado» sin que hubiera nada guardado.
     updates = {}
     if req.account: updates["account"] = req.account
     if req.status: updates["status"] = req.status
-    if req.token: updates["token_set"] = True
-    return {"success": connections_vault.update_connection(req.conn_id, updates)}
+    if req.token: updates["token"] = req.token
+    ok = connections_vault.update_connection(req.conn_id, updates)
+    return {
+        "success": ok,
+        "conn_id": req.conn_id,
+        "token_saved": bool(req.token),
+        "vault_path": str(connections_vault.vault_file),
+    }
 
 class UpdateParametersRequest(BaseModel):
     parameters: Dict[str, Any]
@@ -1099,8 +1108,23 @@ async def get_starseed_manifest():
     return starseed_memory.get_manifest()
 
 @app.get("/api/memory/starseed/documents")
-async def list_starseed_documents(branch: Optional[str] = Query(None)):
-    return starseed_memory.list_documents(branch)
+async def list_starseed_documents(
+    branch: Optional[str] = Query(None),
+    limit: Optional[int] = Query(None, ge=1, le=5000),
+    offset: int = Query(0, ge=0),
+):
+    """
+    (Adenda 158 · Ola 6) `limit`/`offset` OPCIONALES y compatibles hacia atras:
+    sin ellos devuelve la lista entera, como siempre. El memory root de esta
+    neurona ya tiene mas de 10 000 documentos, asi que cualquier superficie que
+    solo quiera pintar una lista debe pedir una pagina en vez de arrastrarlos
+    todos por la red. Los mas RECIENTES primero cuando se pagina.
+    """
+    docs = starseed_memory.list_documents(branch)
+    if limit is None and offset == 0:
+        return docs
+    ordered = list(reversed(docs))
+    return ordered[offset: offset + (limit or len(ordered))]
 
 class SaveMemoryDocRequest(BaseModel):
     id: Optional[str] = None
@@ -1350,6 +1374,24 @@ async def fork_creation_version_endpoint(req: ForkCreationVersionRequest):
         diff_summary=req.diff_summary,
         new_content=req.new_content,
         author_agent=req.author_agent
+    )
+
+class RunCreationSampleRequest(BaseModel):
+    creation_id: str
+    custom_code: Optional[str] = None
+
+@app.post("/api/creations/run_sample")
+async def run_creation_sample_endpoint(req: RunCreationSampleRequest):
+    """
+    (Adenda 158 · Ola 6) Ejecuta la muestra de una creacion en el sandbox local.
+    El OS lo llama desde la pestana «Proyectos y Creaciones» para probar el
+    codigo forjado sin salir del sistema. La ejecucion real vive en
+    `creations_manager.execute_sample_simulation`, que ya distingue por lenguaje
+    (python / glsl / shader) y mide el tiempo en silicio local.
+    """
+    return creations_manager.execute_sample_simulation(
+        creation_id=req.creation_id,
+        custom_code=req.custom_code,
     )
 
 @app.post("/api/creations/recycle")
@@ -1985,6 +2027,51 @@ async def run_discovery_scan():
 async def get_installer_script():
     script_content = auto_discovery_engine.generate_installer_script()
     return PlainTextResponse(script_content, media_type="text/x-shellscript")
+
+class IndexPathRequest(BaseModel):
+    path: str
+    brain_id: Optional[str] = None
+    recursive: Optional[bool] = True
+    force: Optional[bool] = True
+
+@app.post("/api/system/index_path")
+async def index_path_endpoint(req: IndexPathRequest):
+    """
+    (Adenda 158 · Ola 6) Indexa CUALQUIER ruta del dispositivo en la memoria 1.58.
+    El «Explorador del Dispositivo» del OS lo usa para que una carpeta que el
+    usuario acaba de abrir pase a ser conocimiento consultable.
+
+    Reutiliza `DocumentIndexer` acotandolo a esa raiz en vez de al workspace
+    entero: mismo troceado, mismos conceptos, mismo manifiesto de hashes.
+    Se niega a indexar rutas que no existan o que no sean un directorio, y
+    devuelve el motivo en vez de fingir un exito.
+    """
+    from pathlib import Path as _Path
+    from app.memory.document_indexer import DocumentIndexer
+
+    raw = (req.path or "").strip()
+    if not raw:
+        return {"success": False, "error": "No se indico ninguna ruta."}
+
+    target = _Path(raw).expanduser()
+    if not target.exists():
+        return {"success": False, "error": f"La ruta no existe: {target}"}
+    if not target.is_dir():
+        target = target.parent
+
+    try:
+        scoped = DocumentIndexer(workspace_path=target)
+        result = scoped.scan_and_index(force=bool(req.force))
+    except Exception as exc:
+        return {"success": False, "error": f"No se pudo indexar {target}: {exc}"}
+
+    payload = result if isinstance(result, dict) else {"result": result}
+    payload.setdefault("success", True)
+    payload["path"] = str(target)
+    payload["brain_id"] = req.brain_id
+    # La clave real que devuelve `scan_and_index` es `indexed_files_count`.
+    payload["indexed"] = payload.get("indexed_files_count", payload.get("indexed", 0))
+    return payload
 
 # ================= StarSeed OS Control & Smart Updates Endpoints =================
 
@@ -2980,6 +3067,27 @@ async def scan_serial_devices():
 @app.get("/api/bitnet/status")
 async def get_bitnet_status():
     return bitnet_cpp_manager.check_status()
+
+class BuildBitnetRequest(BaseModel):
+    force: Optional[bool] = False
+
+@app.post("/api/bitnet/build")
+async def build_bitnet_endpoint(req: Optional[BuildBitnetRequest] = None):
+    """
+    (Adenda 158 · Ola 6) Clona y recompila el motor nativo bitnet.cpp con las
+    banderas SIMD del silicio local. Es una operacion LARGA (minutos): el OS la
+    lanza desde «Telemetria 1.58-Bit» y ensena el log que devuelve.
+
+    Con `force=false` (por defecto) no recompila si ya esta compilado: devuelve
+    exito inmediato con el motivo. La compilacion real vive en
+    `bitnet_cpp_manager.clone_and_build`.
+    """
+    force = bool(req.force) if req is not None else False
+    result = bitnet_cpp_manager.clone_and_build(force=force)
+    payload = result if isinstance(result, dict) else {"result": result}
+    payload.setdefault("success", True)
+    payload["status"] = bitnet_cpp_manager.check_status()
+    return payload
 
 class ChatRequest(BaseModel):
     prompt: str
