@@ -54,6 +54,9 @@ function(ggml_add_cpu_backend_variant_impl tag_name)
         ggml-cpu/ops.h
         ggml-cpu/ops.cpp
         ../../../../src/ggml-bitnet-lut.cpp
+        # (Adenda 161) Los kernels NEON de i2_s viven aqui. Sin esta linea,
+        # `ggml_vec_dot_i2_i8_s` lo resolvia la version x86/escalar de quants.c.
+        ../../../../src/ggml-bitnet-mad.cpp
         )
 
     target_compile_features(${GGML_CPU_NAME} PRIVATE c_std_11 cxx_std_17)

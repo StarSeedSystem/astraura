@@ -1,6 +1,8 @@
 set(GGML_HEADERS_BITNET ../include/ggml-bitnet.h)
+# (Adenda 161) Era `set` dos veces: la segunda PISABA a la primera y
+# `ggml-bitnet-mad.cpp` —los kernels NEON de i2_s— se caia del build.
 set(GGML_SOURCES_BITNET ggml-bitnet-mad.cpp)
-set(GGML_SOURCES_BITNET ggml-bitnet-lut.cpp)
+list(APPEND GGML_SOURCES_BITNET ggml-bitnet-lut.cpp)
 
 include_directories(3rdparty/llama.cpp/ggml/include)
 
