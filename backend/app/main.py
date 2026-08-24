@@ -26,6 +26,7 @@ from .memory.knowledge_graph import knowledge_graph
 from .memory.vector_store import vector_store
 from .memory.document_indexer import document_indexer
 from .memory.background_learner import background_learner
+from .memory.device_sync import device_sync  # (Tarea 2) Sincronización automática del almacenamiento local
 from .cerebros.cerebros_manager import cerebros_manager
 from .cerebros.cerebros_manager import scan_context_folder_metrics
 from .personalities.personality_engine import personality_engine
@@ -1463,6 +1464,77 @@ async def update_mem0_memory(memory_id: str, req: UpdateMem0Request):
 async def delete_mem0_memory(memory_id: str):
     success = mem0_engine.delete_memory(memory_id)
     return {"success": success}
+
+# ================= Sincronización de Almacenamiento Local & Búsqueda Unificada =================
+# (Tareas 2 y 3) El usuario pidió que "todo el almacenamiento local se
+# sincronice con el sistema de IA". `device_sync` (app/memory/device_sync.py)
+# guarda una lista persistente de carpetas vigiladas y puede reindexarlas
+# solo con un demonio de fondo opcional. `/api/memory/search` expone
+# EXACTAMENTE el mismo motor que ahora alimenta al modelo en cada turno
+# (`orchestrator.gather_context_items`, Tarea 1 en agents/orchestrator.py):
+# si esta ruta y lo que recibe el modelo pudieran divergir, la UI mentiría.
+
+class DeviceSyncFolderRequest(BaseModel):
+    path: str
+    enabled: Optional[bool] = True
+
+class DeviceSyncConfigRequest(BaseModel):
+    auto: Optional[bool] = None
+    interval_minutes: Optional[int] = None
+
+class DeviceSyncRunRequest(BaseModel):
+    path: Optional[str] = None
+
+@app.get("/api/memory/device_sync")
+async def get_device_sync_status():
+    status = device_sync.get_status()
+    status["total_documents"] = len(vector_store.documents)
+    status["total_nodes"] = len(knowledge_graph.nodes)
+    return status
+
+@app.post("/api/memory/device_sync/folder")
+async def add_device_sync_folder(req: DeviceSyncFolderRequest):
+    return device_sync.add_folder(req.path, enabled=bool(req.enabled))
+
+@app.delete("/api/memory/device_sync/folder")
+async def remove_device_sync_folder(path: str = Query(...)):
+    return device_sync.remove_folder(path)
+
+@app.post("/api/memory/device_sync/config")
+async def configure_device_sync(req: DeviceSyncConfigRequest):
+    # set_config puede esperar hasta ~2s a que el demonio confirme una
+    # parada antes de devolver el estado (ver device_sync.stop_daemon): va
+    # en un hilo aparte para no congelar el event loop mientras tanto.
+    result = await asyncio.to_thread(device_sync.set_config, req.auto, req.interval_minutes)
+    result["success"] = True
+    return result
+
+@app.post("/api/memory/device_sync/run")
+async def run_device_sync(req: DeviceSyncRunRequest):
+    # Indexar es lento (medido: ~17s por una carpeta con un solo .md) y
+    # SIEMPRE se manda a un hilo aparte para no congelar el resto del
+    # backend (WebSockets, otras peticiones) mientras corre.
+    return await asyncio.to_thread(device_sync.index_now, req.path)
+
+@app.get("/api/memory/search")
+async def search_unified_memory(q: str = Query(..., min_length=1), top_k: int = Query(8, ge=1, le=50)):
+    """
+    (Tarea 3) Llama al MISMO motor que `_gather_context` usa en cada turno
+    de chat — `orchestrator.gather_context_items` (Tarea 1) — con las mismas
+    tres fuentes (recuerdos, documentos del memory root, conceptos del
+    grafo), la misma puntuación de relevancia y el mismo presupuesto de
+    caracteres. No es una búsqueda paralela que pueda desviarse: es la
+    prueba, desde la UI, de lo que el modelo recibiría para esta consulta.
+    """
+    try:
+        items = await asyncio.to_thread(orchestrator.gather_context_items, q, None, top_k)
+    except Exception as e:
+        return {"query": q, "hits": [], "error": str(e)[:200]}
+    hits = [
+        {"source": it["source"], "title": it["title"], "text": it["text"], "score": it["score"]}
+        for it in items
+    ]
+    return {"query": q, "hits": hits}
 
 # ================= Chat File Attachment API =================
 
