@@ -1,4 +1,5 @@
 import os
+import json
 import subprocess
 import shutil
 import threading
@@ -123,6 +124,49 @@ class BitNetCppManager:
         except Exception:
             return False
 
+    # ── (Adenda 160) Sonda de cordura del motor nativo ─────────────────────────
+    # bitnet.cpp NO tiene kernel vectorial i2_s para ARM: solo una rama
+    # `#if defined(__AVX2__)` y, para todo lo demas, un "Scalar fallback". En un
+    # Apple Silicon ese fallback devuelve un token CONSTANTE ante cualquier
+    # entrada ('@@@@@@@@') y va a ~0,15 tok/s (≈7 s por token). Verificado con
+    # un clon limpio de microsoft/BitNet recien compilado y el GGUF oficial.
+    #
+    # Sin esta sonda el sistema cargaria el modelo, se declararia «BitNet nativo
+    # activo» y serviria basura con aire de respuesta. Se prueba una vez por
+    # proceso: si la salida es degenerada, el motor nativo queda MARCADO como
+    # inservible con su motivo y el enrutador se queda en Ollama.
+    _sanity: Optional[Dict[str, Any]] = None
+
+    def native_sanity(self, base: str) -> Dict[str, Any]:
+        """Genera 8 tokens y comprueba que no sean todos el mismo. Cachea el veredicto."""
+        if self._sanity is not None:
+            return self._sanity
+        verdict: Dict[str, Any] = {"ok": False, "reason": "sin comprobar", "sample": ""}
+        try:
+            req = urllib.request.Request(
+                f"{base}/completion",
+                json.dumps({"prompt": "La capital de Francia es", "n_predict": 8, "temperature": 0.1}).encode(),
+                {"Content-Type": "application/json"},
+            )
+            with urllib.request.urlopen(req, timeout=180) as res:
+                data = json.loads(res.read().decode())
+            txt = str(data.get("content") or "")
+            uniq = set(txt.strip())
+            tps = float((data.get("timings") or {}).get("predicted_per_second") or 0.0)
+            if not txt.strip():
+                verdict = {"ok": False, "reason": "el motor nativo no devolvio texto", "sample": txt}
+            elif len(uniq) <= 1:
+                verdict = {"ok": False, "reason": f"salida degenerada (un solo caracter repetido: {txt.strip()[:12]!r}) — bitnet.cpp no tiene kernel i2_s vectorial para ARM", "sample": txt}
+            elif tps and tps < 1.0:
+                verdict = {"ok": False, "reason": f"inservible por lentitud: {tps:.2f} tok/s (fallback escalar sin NEON)", "sample": txt}
+            else:
+                verdict = {"ok": True, "reason": f"correcto ({tps:.1f} tok/s)", "sample": txt}
+        except Exception as exc:
+            verdict = {"ok": False, "reason": f"la sonda fallo: {type(exc).__name__}", "sample": ""}
+        self._sanity = verdict
+        print(f"[BitNetCppManager] sonda del motor nativo: {'OK' if verdict['ok'] else 'NO USABLE'} — {verdict['reason']}")
+        return verdict
+
     def ensure_server(self, wait_seconds: float = 0.0, profile: str = "interactive") -> Optional[str]:
         """Arranca (si hace falta) el llama-server nativo del PERFIL pedido con el GGUF
         i2_s y devuelve su base URL, o None si no hay binario/modelo. `wait_seconds` > 0
@@ -159,6 +203,13 @@ class BitNetCppManager:
                         "--jinja", "--chat-template-file", str(tmpl),
                         # El GGUF oficial no declara pre-tokenizer: fijamos el de Llama-3.
                         "--override-kv", "tokenizer.ggml.pre=str:llama-bpe",
+                        # (Adenda 160) CPU PURA, obligatorio. El backend Metal NO
+                        # implementa el tipo i2_s (ggml-metal-device.cpp: "not
+                        # implemented" → "Asserting on type 36" → SIGABRT): con
+                        # descarga a GPU, llama-server se estrella al primer decode.
+                        # Ademas es lo correcto: el kernel ternario de BitNet es de
+                        # CPU (ARM NEON / AVX2); la GPU no aporta nada aqui.
+                        "-ngl", "0",
                     ]
                     log = open(self._server_log, "ab")
                     preexec = None

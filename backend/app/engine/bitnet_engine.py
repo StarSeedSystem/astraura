@@ -351,6 +351,16 @@ class BitNetUnifiedEngine:
         base = await asyncio.to_thread(bitnet_cpp_manager.ensure_server, 120.0, profile) if _has_model else None
         if not _has_model:
             print("[BitNetUnifiedEngine] BitNet nativo omitido: no hay modelo GGUF instalado.")
+        # (Adenda 160) Aunque el servidor levante, el motor nativo solo se USA si
+        # pasa la sonda de cordura. En ARM, bitnet.cpp no tiene kernel i2_s
+        # vectorial y su fallback escalar devuelve un token constante: cargaba,
+        # se declaraba activo y servia basura. Mas vale no usarlo y decirlo.
+        if base:
+            _sane = await asyncio.to_thread(bitnet_cpp_manager.native_sanity, base)
+            if not _sane.get("ok"):
+                bitnet_failed = f"motor nativo descartado — {_sane.get('reason')}"
+                print(f"[BitNetUnifiedEngine] {bitnet_failed}")
+                base = None
         if base and bitnet_cpp_manager.server_ready(profile):
             meta["source"] = "bitnet-native"  # (OS · Ola 3)
             # Presupuesto de contexto HONESTO: el modelo 2B-4T tiene 4096 posiciones.
