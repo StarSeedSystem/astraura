@@ -99,6 +99,11 @@ class BitNetUnifiedEngine:
             "preferred_model": self.preferred_model or None,
             "bitnet_cpp_installed": cpp_status["is_compiled"],
             "bitnet_server": server,
+            # (Adenda 157) Inventario honesto de aceleradores ternarios y estado de
+            # la cuantización de la memoria (TurboQuant) — lo pinta el OS en Telemetría.
+            # OJO: la clave `quantization` ya existe abajo (etiqueta i2_s), por eso
+            # esto va en `quantization_stack` y no la pisa.
+            "quantization_stack": self._quantization_report(),
             "models_on_disk": cpp_status["models_available"],
             "inference_mode": self.stats["inference_mode"],
             "quantization": self.stats["active_quantization"],
@@ -106,6 +111,25 @@ class BitNetUnifiedEngine:
             "speed_tps": self.stats["average_speed_tps"],
             "memory_efficiency": "8.0x reduction vs FP16 (750 MB for 3B parameters)"
         }
+
+
+    def _quantization_report(self) -> Dict[str, Any]:
+        """Motores de cuantización de PESOS + estado del índice comprimido de MEMORIA."""
+        report: Dict[str, Any] = {}
+        try:
+            report["pesos"] = bitnet_cpp_manager.quantization_backends()
+        except Exception as e:
+            report["pesos"] = {"error": str(e)[:160]}
+        try:
+            from ..memory.vector_store import vector_store  # import perezoso
+            report["memoria"] = vector_store.quantization_status()
+        except Exception:
+            try:
+                from ..memory.vector_store import LocalVectorStore
+                report["memoria"] = LocalVectorStore().quantization_status()
+            except Exception as e:
+                report["memoria"] = {"error": str(e)[:160]}
+        return report
 
     async def generate_stream(
         self, 

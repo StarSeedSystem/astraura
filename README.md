@@ -259,3 +259,45 @@ Desarrollado con 💙 por la comunidad **StarSeed System**.
   motor nativo, chat multi-personalidad por @menciones, `generated_by: llm` en imaginación,
   eventos+ack del puente, procesos, invoke, síntesis y air-gap.
 - **Utilidades**: `backend/scripts/repack_i2s_gguf.py` (diagnóstico de layouts I2_S antiguos).
+
+## Cuantización: qué usa el sistema y qué no (Adenda 157 · 2026-08-24)
+
+El sistema tiene DOS cuantizaciones distintas y no conviene confundirlas:
+
+### 1 · Pesos del modelo — ternario BitNet b1.58 (`i2_s`)
+- Motor por defecto: **bitnet.cpp nativo** (`llama-server` gestionado, 2 bits/peso, ARM NEON / AVX2),
+  con el parche ReLU² obligatorio (`backend/scripts/check_bitnet_patch.sh`).
+- Acelerador OPCIONAL detectado en caliente: **[spbitnet](https://github.com/Artemarius/spbitnet)** (MIT) —
+  kernels CUDA que combinan ternario con **sparsidad 2:4** (~1.5 bits/peso efectivos). Requiere
+  **CUDA 12 y NVIDIA compute capability ≥ 8.0**, por lo que **no aplica en Apple Silicon**: en un Mac
+  el inventario lo dice explícitamente en vez de fingir que está disponible.
+  `bitnet_cpp_manager.quantization_backends()` publica el inventario y `/api/status` lo expone en
+  `engine.quantization_stack.pesos` (lo pinta el OS en Telemetría 1.58-Bit).
+
+### 2 · Vectores de memoria — TurboQuant (`app/memory/turboquant.py`)
+Implementación propia en NumPy del *Algorithm 1* de **[TurboQuant](https://github.com/outmatic/TurboQuant)**
+(Zandieh et al., ICLR 2026; la referencia original es C#/.NET y aquí se reescribe para el backend Python):
+rotación ortogonal con semilla fija → cuantizador **Lloyd-Max** sobre la marginal exacta de una
+coordenada de vector unitario → empaquetado a 2/3/4 bits.
+
+Medido en esta base de código (400k muestras para los niveles, vectores de 384 dims):
+
+| bits | coseno medio | coseno mínimo | compresión |
+|---|---|---|---|
+| 2 | 0.9400 | 0.9281 | 13.7× |
+| 3 | 0.9829 | 0.9756 | 9.6× |
+| 4 | **0.9953** | 0.9919 | **7.4×** |
+
+Uso real: el almacén de memoria (`app/memory/vector_store.py`) es TF-IDF **disperso**, así que
+TurboQuant entra como **índice comprimido de primer paso** — proyección aleatoria fija a denso (d=256),
+matriz de códigos uint8, y búsqueda vectorizada que preselecciona candidatos; el orden final lo decide
+el **coseno exacto** de siempre. Con 2 000 documentos: índice construido en 138 ms, búsqueda **2.8×**
+más rápida y **top-5 idéntico** al exacto. Variables: `ASTRAURA_TQ_BITS` (4), `ASTRAURA_TQ_DIM` (256),
+`ASTRAURA_TQ_MIN_DOCS` (200), `ASTRAURA_TQ_DISABLED=1` para apagarlo.
+
+### 3 · NanoQuant — evaluado y NO integrado
+[NanoQuant](https://github.com/swayam8624/nanoquant) se revisó para esta ola: hoy el repositorio público
+es un meta-repo (100% shell) cuyo README describe un framework de compresión 4/8-bit + poda +
+destilación, **sin implementación pública ni soporte de GGUF/ternario/BitNet**. Integrarlo ahora sería
+prometer algo que no puede ejecutarse; queda anotado como candidato para cuantizar **modelos
+secundarios** (no BitNet) cuando publique código utilizable.

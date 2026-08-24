@@ -1,9 +1,27 @@
 import json
 import math
+import os
 import re
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from ..core.config import settings
+
+# (Adenda 157) Índice comprimido con TurboQuant. El almacén es TF-IDF DISPERSO;
+# TurboQuant trabaja con vectores DENSOS, así que se usa como PRIMER PASO:
+#   sparse TF-IDF --proyección aleatoria fija--> denso d=256 --TurboQuant--> códigos
+# La búsqueda recupera candidatos con los códigos (barato, ~7x menos memoria) y
+# reordena los finalistas con el coseno disperso EXACTO de siempre. Así se gana
+# memoria y velocidad sin perder precisión en el resultado que ve el usuario.
+try:
+    from . import turboquant as _tq
+except Exception:  # pragma: no cover
+    _tq = None  # type: ignore[assignment]
+
+_DENSE_DIM = int(os.environ.get("ASTRAURA_TQ_DIM") or 256)
+_TQ_BITS = int(os.environ.get("ASTRAURA_TQ_BITS") or 4)
+# Con pocos documentos el coseno exacto ya es instantáneo: el índice solo se
+# activa cuando de verdad aporta.
+_TQ_MIN_DOCS = int(os.environ.get("ASTRAURA_TQ_MIN_DOCS") or 200)
 
 class LocalVectorStore:
     """
@@ -15,7 +33,16 @@ class LocalVectorStore:
         self.documents: List[Dict[str, Any]] = []
         self.vocabulary: Dict[str, int] = {}
         self.idf: Dict[str, float] = {}
+        self._tq_index: List[Any] = []
+        self._tq_ids: List[Any] = []
+        self._tq_matrix: Optional[Dict[str, Any]] = None
+        self._tq_stats: Dict[str, Any] = {}
         self.load()
+        if self._tq_enabled():
+            try:
+                self.build_quantized_index()
+            except Exception:
+                self._tq_index = []
 
     def _tokenize(self, text: str) -> List[str]:
         cleaned = re.sub(r"[^\w\s-]", " ", text.lower())
@@ -50,6 +77,61 @@ class LocalVectorStore:
         norm = math.sqrt(norm_sq) or 1.0
         return {k: v / norm for k, v in vec.items()}
 
+    # ── Índice denso comprimido (TurboQuant) ──────────────────────────────
+    def _project(self, sparse: Dict[str, float]) -> List[float]:
+        """Proyección aleatoria estable (hashing con signo) sparse → denso d."""
+        dense = [0.0] * _DENSE_DIM
+        for token, value in sparse.items():
+            h = hash((token, 1580)) & 0xFFFFFFFF
+            idx = h % _DENSE_DIM
+            sign = 1.0 if (h >> 16) & 1 else -1.0
+            dense[idx] += sign * value
+        norm = math.sqrt(sum(x * x for x in dense)) or 1.0
+        return [x / norm for x in dense]
+
+    def _tq_enabled(self) -> bool:
+        if os.environ.get("ASTRAURA_TQ_DISABLED") == "1":
+            return False
+        return bool(_tq and _tq.available() and len(self.documents) >= _TQ_MIN_DOCS)
+
+    def build_quantized_index(self) -> Dict[str, Any]:
+        """(Re)construye el índice comprimido. Devuelve sus métricas reales."""
+        if not (_tq and _tq.available()):
+            self._tq_index = []
+            return {"enabled": False, "reason": "numpy no disponible"}
+        dense = [self._project(d.get("vector", {})) for d in self.documents]
+        # Una sola matriz comprimida (uint8) en vez de N objetos: la búsqueda pasa
+        # a ser un producto matricial en numpy (microsegundos) en vez de N llamadas.
+        self._tq_matrix = _tq.pack_matrix(dense, _TQ_BITS)
+        self._tq_ids = [d.get("id") for d in self.documents]
+        self._tq_index = self._tq_ids  # compatibilidad con quantization_status()
+        stats = _tq.estimate_quality(dense[:256], bits=_TQ_BITS) if dense else {}
+        self._tq_stats = {
+            "enabled": self._tq_enabled(),
+            "bits": _TQ_BITS,
+            "dim": _DENSE_DIM,
+            "documentos": len(self.documents),
+            "minimo_para_activarse": _TQ_MIN_DOCS,
+            **stats,
+        }
+        return self._tq_stats
+
+    def quantization_status(self) -> Dict[str, Any]:
+        """Estado honesto del índice comprimido (para /api/status y el OS)."""
+        base = {
+            "codec": "turboquant-v1",
+            "disponible": bool(_tq and _tq.available()),
+            "activo": self._tq_enabled(),
+            "bits": _TQ_BITS,
+            "dim": _DENSE_DIM,
+            "documentos": len(self.documents),
+            "minimo_para_activarse": _TQ_MIN_DOCS,
+            "indexados": len(getattr(self, "_tq_index", []) or []),
+            "nota": "Comprime el ÍNDICE de memoria (vectores), no los pesos del modelo.",
+        }
+        base.update(getattr(self, "_tq_stats", {}) or {})
+        return base
+
     def _cosine_similarity(self, v1: Dict[str, float], v2: Dict[str, float]) -> float:
         score = 0.0
         # Iterate over smaller dict
@@ -83,18 +165,42 @@ class LocalVectorStore:
             "vector": {}
         }
         self.documents.append(doc)
+        self._index_last_document()
         if auto_rebuild:
             self.rebuild_idf()
             self.save()
         return doc_id
+
+    def _index_last_document(self) -> None:
+        """Marca el índice como sucio al añadir; se reconstruye en bloque (es barato)."""
+        if not (self._tq_enabled() and _tq is not None and self.documents):
+            return
+        try:
+            self.build_quantized_index()
+        except Exception:
+            self._tq_matrix = None
 
     def search(self, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
         if not self.documents:
             return []
         
         q_vec = self._compute_vector(query)
+
+        # PRIMER PASO comprimido: si el índice está activo, quedarse con los
+        # mejores candidatos por coseno aproximado (mucho más barato) y afinar
+        # después con el coseno exacto de siempre.
+        candidates = self.documents
+        if self._tq_enabled() and self._tq_index and _tq is not None:
+            try:
+                rough = _tq.topk_matrix(self._tq_matrix or {}, self._project(q_vec), max(top_k * 5, 25))
+                keep = {self._tq_ids[i] for i, _ in rough if 0 <= i < len(self._tq_ids)}
+                if keep:
+                    candidates = [d for d in self.documents if d.get("id") in keep]
+            except Exception:
+                candidates = self.documents
+
         scored = []
-        for doc in self.documents:
+        for doc in candidates:
             sim = self._cosine_similarity(q_vec, doc.get("vector", {}))
             if sim > 0.01:
                 scored.append({

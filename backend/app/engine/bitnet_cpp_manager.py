@@ -229,6 +229,74 @@ class BitNetCppManager:
                         pass
             self._servers[profile] = {}
 
+
+    # ───────────── Aceleradores alternativos de cuantización (Adenda 157) ─────────────
+
+    def quantization_backends(self) -> Dict[str, Any]:
+        """
+        Inventario HONESTO de motores de inferencia ternaria disponibles en ESTA
+        máquina. No promete nada que no pueda ejecutar: cada entrada dice si está
+        disponible y, si no, POR QUÉ.
+
+        · bitnet.cpp (nativo)  — el que usamos: llama-server con el GGUF i2_s.
+        · spbitnet (CUDA 2:4)  — kernels ternarios + sparsidad 2:4 estructurada
+          para GPUs NVIDIA Ampere+ (github.com/Artemarius/spbitnet, MIT). Requiere
+          CUDA 12 y compute capability ≥ 8.0: en Apple Silicon NO es aplicable.
+        """
+        import platform
+        import shutil as _shutil
+
+        status = self.check_status()
+        machine = platform.machine().lower()
+        system = platform.system()
+
+        native = {
+            "id": "bitnet.cpp",
+            "nombre": "BitNet nativo (llama-server i2_s)",
+            "disponible": bool(status.get("is_compiled") and status.get("models_available")),
+            "activo": self.server_ready("interactive") or self.server_ready("background"),
+            "cuantizacion": "i2_s ternario {-1,0,+1} · 2 bits/peso",
+            "detalle": "Motor por defecto del sistema soberano; CPU (ARM NEON / x86 AVX2).",
+        }
+
+        cuda = _shutil.which("nvcc") or os.path.exists("/usr/local/cuda/bin/nvcc")
+        sp_bin = None
+        for rel in ("spbitnet/build/spbitnet_infer", "../spbitnet/build/spbitnet_infer"):
+            p = (self.repo_dir.parent / rel)
+            if p.exists():
+                sp_bin = str(p)
+                break
+        if sp_bin is None:
+            sp_bin = _shutil.which("spbitnet_infer")
+
+        if machine in ("arm64", "aarch64") and system == "Darwin":
+            sp_reason = "Apple Silicon: spbitnet necesita GPU NVIDIA Ampere+ con CUDA 12; aquí no aplica."
+        elif not cuda:
+            sp_reason = "No se detecta CUDA 12 (nvcc) en esta máquina."
+        elif not sp_bin:
+            sp_reason = "CUDA presente pero falta compilar spbitnet (binario spbitnet_infer)."
+        else:
+            sp_reason = ""
+
+        spbitnet = {
+            "id": "spbitnet",
+            "nombre": "spbitnet (ternario + sparsidad 2:4, CUDA)",
+            "disponible": bool(sp_bin and cuda and not sp_reason),
+            "activo": False,
+            "cuantizacion": "ternario 2 bits + 2:4 estructurada ⇒ ~1.5 bits/peso efectivos",
+            "binario": sp_bin,
+            "detalle": sp_reason or "Listo para usarse como acelerador en esta neurona.",
+            "url": "https://github.com/Artemarius/spbitnet",
+            "requisitos": "CUDA 12 · NVIDIA compute capability ≥ 8.0 · modelo convertido a formato disperso",
+        }
+
+        return {
+            "activo": "bitnet.cpp" if native["activo"] else ("ninguno" if not native["disponible"] else "en frío"),
+            "motores": [native, spbitnet],
+            "maquina": f"{system} {machine}",
+            "nota": "La cuantización de PESOS la hace el motor; la de VECTORES de memoria la hace TurboQuant (ver memoria).",
+        }
+
     def clone_and_build(self, force: bool = False) -> Dict[str, Any]:
         """
         Clones https://github.com/microsoft/BitNet.git and compiles with Apple Silicon SIMD flags.
