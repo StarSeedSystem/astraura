@@ -179,6 +179,11 @@ class BitNetUnifiedEngine:
     ) -> AsyncGenerator[str, None]:
         if meta is None:
             meta = {}
+        # (Adenda 159) Motivo REAL de cada motor que falla, para poder decirselo al
+        # usuario en vez de servirle una plantilla como si fuera una respuesta.
+        ollama_failed = ""
+        bitnet_failed = ""
+
         # 1. Try streaming from local high-performance neural engine (Ollama)
         ollama_models = await self.get_available_ollama_models()
         if ollama_models:
@@ -239,7 +244,11 @@ class BitNetUnifiedEngine:
                 )
 
             try:
-                async with httpx.AsyncClient(timeout=90.0) as client:
+                # (Adenda 159) 90 s se quedaba corto con la maquina cargada: medido
+                # en un M1 con load average 15, el PRIMER token tardaba 68-88 s, asi
+                # que el timeout saltaba y la respuesta real del modelo se perdia.
+                # `keep_alive` mantiene el modelo residente entre turnos.
+                async with httpx.AsyncClient(timeout=httpx.Timeout(300.0, connect=10.0)) as client:
                     async with client.stream(
                         "POST",
                         f"{self.ollama_url}/api/generate",
@@ -248,6 +257,7 @@ class BitNetUnifiedEngine:
                             "prompt": prompt,
                             "system": effective_system_prompt,
                             "stream": True,
+                            "keep_alive": "30m",
                             "options": {
                                 "temperature": max(0.2, min(0.85, temperature)),
                                 "num_predict": max_tokens,
@@ -321,12 +331,26 @@ class BitNetUnifiedEngine:
                                         pass
                             return
             except Exception as e:
-                print(f"[BitNetUnifiedEngine] Ollama streaming notice: {e}")
+                # `str(e)` de un ReadTimeout de httpx es CADENA VACIA: sin el tipo,
+                # el log decia «Ollama streaming notice: » y no habia forma de saber
+                # que habia pasado. El tipo es lo unico que identifica el fallo.
+                ollama_failed = f"{type(e).__name__}: {e}".rstrip(": ")
+                print(f"[BitNetUnifiedEngine] Ollama streaming FALLO ({ollama_failed})")
 
         # 2. BitNet NATIVO (Ola 3): llama-server gestionado (streaming OpenAI-compatible).
         #    Ya no se lanza llama-cli por petición (frío, sin plantilla de chat, sin
         #    paralelismo): el manager mantiene UN servidor con el GGUF i2_s cargado.
-        base = await asyncio.to_thread(bitnet_cpp_manager.ensure_server, 120.0, profile)
+        # (Adenda 159) Antes se esperaban 120 s SIEMPRE, incluso sin ningun modelo
+        # instalado: 120 s de reloj tirados antes de caer a la plantilla. Si no hay
+        # GGUF que cargar, no hay nada que esperar.
+        try:
+            _bn = bitnet_cpp_manager.check_status()
+            _has_model = bool(_bn.get("models_available"))
+        except Exception:
+            _has_model = False
+        base = await asyncio.to_thread(bitnet_cpp_manager.ensure_server, 120.0, profile) if _has_model else None
+        if not _has_model:
+            print("[BitNetUnifiedEngine] BitNet nativo omitido: no hay modelo GGUF instalado.")
         if base and bitnet_cpp_manager.server_ready(profile):
             meta["source"] = "bitnet-native"  # (OS · Ola 3)
             # Presupuesto de contexto HONESTO: el modelo 2B-4T tiene 4096 posiciones.
@@ -376,10 +400,36 @@ class BitNetUnifiedEngine:
                                 yield token
                 return
             except Exception as e:
-                print(f"[BitNetUnifiedEngine] BitNet nativo (llama-server) aviso: {e}")
+                bitnet_failed = f"{type(e).__name__}: {e}".rstrip(": ")
+                print(f"[BitNetUnifiedEngine] BitNet nativo (llama-server) FALLO ({bitnet_failed})")
 
         # 3. Dynamic Natural Language Cognitive Reasoner Fallback
+        #
+        # (Adenda 159) HONESTIDAD. Esta rama NO es inferencia: son plantillas
+        # deterministas. Cuando se llega aqui porque el motor real ha fallado, el
+        # usuario tiene que saberlo — antes recibia una plantilla con aire de
+        # respuesta («He preparado un entorno interactivo para tu consulta…») que
+        # no tenia nada que ver con lo que habia preguntado, y no habia forma de
+        # distinguirla de una respuesta de verdad.
         meta["source"] = "reasoner"  # (OS · Ola 3) plantilla, no inferencia real
+        meta["degraded"] = bool(ollama_failed or bitnet_failed)
+        if ollama_failed:
+            meta["ollama_error"] = ollama_failed
+        if bitnet_failed:
+            meta["bitnet_error"] = bitnet_failed
+        if meta["degraded"]:
+            motivos = " · ".join(x for x in (
+                f"Ollama: {ollama_failed}" if ollama_failed else "",
+                f"BitNet nativo: {bitnet_failed}" if bitnet_failed else "",
+            ) if x)
+            aviso = (
+                "> ⚠️ **Respuesta degradada (plantilla, no inferencia).** El motor de "
+                "lenguaje no pudo responder, asi que esto lo genera el razonador "
+                f"determinista, no el modelo.\n> Motivo — {motivos}\n\n"
+            )
+            for w in aviso.split(" "):
+                yield w + " "
+
         from ..agents.reasoner import reasoner
         full_response = await reasoner.synthesize_response(
             prompt=prompt,

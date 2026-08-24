@@ -4,6 +4,31 @@ import json
 from pathlib import Path
 from typing import Dict, Any, List
 
+
+# ─────────────────────────────────────────────────────────────────────────────
+# (Adenda 159) POR QUE ESTO EXISTE
+# -----------------------------------------------------------------------------
+# Las plantillas deterministas se disparaban con `any(w in p_lower ...)`: una
+# COINCIDENCIA DE SUBCADENA sobre todo el prompt. Cuando un cliente manda la
+# conversacion entera como prompt (el OS lo hacia), bastaba que «quien eres»
+# hubiera aparecido UNA vez —incluso dentro de una respuesta anterior de la
+# propia IA— para que TODOS los mensajes siguientes devolvieran esa misma
+# plantilla. Un bucle que se reforzaba solo: el chat contestaba siempre lo
+# mismo dijeras lo que dijeras. Reproducido y verificado.
+#
+# `dispara_plantilla` exige ademas que el prompt SEA esa pregunta, no que la
+# contenga: un texto largo (transcripcion, documento, codigo pegado) nunca
+# activa una plantilla. Asi el backend queda a salvo aunque el cliente mande
+# de mas.
+MAX_CHARS_PLANTILLA = 200
+
+
+def dispara_plantilla(p_lower: str, frases) -> bool:
+    """True solo si el prompt es una pregunta corta que contiene una de `frases`."""
+    if not p_lower or len(p_lower) > MAX_CHARS_PLANTILLA:
+        return False
+    return any(f in p_lower for f in frases)
+
 class LogicalReasoner:
     """
     Microsoft BitNet b1.58 Cognitive Reasoner for StarSeed OS.
@@ -98,7 +123,7 @@ class LogicalReasoner:
         legal_name = user_info.get("legal_name", "Alex Bordón Garrigós")
 
         # 1. Identity Queries
-        if any(w in p_lower for w in ["cual es mi nombre", "cómo me llamo", "quién soy", "quien soy yo", "quien es el creador", "quien eres tu", "quién eres", "quien eres"]):
+        if dispara_plantilla(p_lower, ["cual es mi nombre", "cómo me llamo", "quién soy", "quien soy yo", "quien es el creador", "quien eres tu", "quién eres", "quien eres"]):
             return (
                 f"### 🧠 Identidad & Ontología Soberana // StarSeed OS\n\n"
                 f"- **Tu Nombre Elegido (Usuario / Creador)**: **{pref_name}**\n"
@@ -110,7 +135,7 @@ class LogicalReasoner:
             )
 
         # 2. System, Voice & Personalities Architecture & Demonstration
-        if any(w in p_lower for w in ["cómo funciona tu sistema", "como funciona tu sistema", "demuéstrame cómo funciona", "demuestrame como funciona", "demuéstrame las personalidades", "demuestrame las personalidades", "sistema de voz", "múltiples personalidades", "multiples personalidades", "cuántas personalidades", "cuantas personalidades", "personalidades con cada uno de sus voces", "personalidades con cada una de sus voces", "personalidades con sus voces", "como opera tu sistema"]):
+        if dispara_plantilla(p_lower, ["cómo funciona tu sistema", "como funciona tu sistema", "demuéstrame cómo funciona", "demuestrame como funciona", "demuéstrame las personalidades", "demuestrame las personalidades", "sistema de voz", "múltiples personalidades", "multiples personalidades", "cuántas personalidades", "cuantas personalidades", "personalidades con cada uno de sus voces", "personalidades con cada una de sus voces", "personalidades con sus voces", "como opera tu sistema"]):
             return (
                 f"### 🌌 Arquitectura Integral de Astraura 1.58-Bit & Enjambre de Personalidades // StarSeed OS\n\n"
                 f"¡Hola {pref_name}! Como **Astraura**, opero como un sistema de inteligencia artificial local, soberano y modular fundamentado en computación ternaria y síntesis acústica en tiempo real.\n\n"
@@ -148,7 +173,7 @@ class LogicalReasoner:
         p_lower = prompt.lower().strip()
 
         # 1. Interactive 3D WebGL / Three.js Scene
-        if any(w in p_lower for w in ["3d", "volumetrico", "volumétrico", "webgl", "threejs", "three", "cubo 3d", "esfera 3d"]):
+        if dispara_plantilla(p_lower, ["3d", "volumetrico", "volumétrico", "webgl", "threejs", "three", "cubo 3d", "esfera 3d"]):
             return (
                 "### 🌌 Escena 3D Volumétrica Interactiva // Three.js & WebGL\n\n"
                 "He construido un entorno 3D completo e interactivo con sombreado holográfico, partículas y rotación en tiempo real. "
@@ -255,7 +280,7 @@ class LogicalReasoner:
             )
 
         # 2. Interactive 2D Game / Physics Particle Engine
-        if any(w in p_lower for w in ["juego", "game", "fisica", "física", "particulas", "partículas", "simulacion", "simulación", "pong", "snake"]):
+        if dispara_plantilla(p_lower, ["juego", "game", "fisica", "física", "particulas", "partículas", "simulacion", "simulación", "pong", "snake"]):
             return (
                 "### 🎮 Simulador de Física Gravitacional & Partículas // Canvas 2D 60FPS\n\n"
                 "He programado un motor de física de partículas interactivo en HTML5 Canvas con colisiones elásticas, fuerzas gravitatorias dinámicas y estelas de luz:\n\n"
@@ -351,7 +376,7 @@ class LogicalReasoner:
             )
 
         # 3. Interactive Modern Web Dashboard / UI App
-        if any(w in p_lower for w in ["dashboard", "interfaz", "ui", "calculadora", "conversor", "app", "herramienta"]):
+        if dispara_plantilla(p_lower, ["dashboard", "interfaz", "ui", "calculadora", "conversor", "app", "herramienta"]):
             return (
                 "### 🎨 Panel de Control & Dashboard Analítico // Tailwind CSS & UI Moderna\n\n"
                 "He diseñado una aplicación web completa con métricas dinámicas, selector de rangos, modo oscuro y tarjetas interactivas:\n\n"
@@ -443,7 +468,7 @@ class LogicalReasoner:
             )
 
         # 4. Interactive 2D Math Plot / Function Visualizer
-        if any(w in p_lower for w in ["grafica", "gráfica", "chart", "2d", "plot", "matematica", "matemática", "funcion", "función", "datos"]):
+        if dispara_plantilla(p_lower, ["grafica", "gráfica", "chart", "2d", "plot", "matematica", "matemática", "funcion", "función", "datos"]):
             return (
                 "### 📊 Gráfica 2D Interactiva de Funciones Matemáticas // Chart.js & Canvas\n\n"
                 "He generado un trazador matemático interactivo en 2D que permite explorar curvas y armónicos en tiempo real:\n\n"
@@ -501,7 +526,7 @@ class LogicalReasoner:
             )
 
         # 5. Interactive WebAudio Synthesizer
-        if any(w in p_lower for w in ["audio", "sonido", "synth", "sintetizador", "onda", "webaudio"]):
+        if dispara_plantilla(p_lower, ["audio", "sonido", "synth", "sintetizador", "onda", "webaudio"]):
             return (
                 "### 🎵 Sintetizador Armónico & Analizador FFT en Vivo // WebAudio API\n\n"
                 "He construido un sintetizador de audio interactivo con osciladores polifónicos y analizador de frecuencias en tiempo real:\n\n"
@@ -574,7 +599,7 @@ class LogicalReasoner:
             )
 
         # 6. Python / Backend Program
-        if any(w in p_lower for w in ["python", "algoritmo", "script", "backend"]):
+        if dispara_plantilla(p_lower, ["python", "algoritmo", "script", "backend"]):
             return (
                 "### 🐍 Programa Python 3 Optimizado // Host M1\n\n"
                 "Aquí tienes un programa completo en Python listo para ejecutarse en el sandbox nativo de tu equipo:\n\n"
@@ -620,7 +645,7 @@ class LogicalReasoner:
         legal_name = user_info.get("legal_name", "Alex Bordón Garrigós")
 
         # 7. Identity Queries
-        if any(w in p_lower for w in ["cual es mi nombre", "cómo me llamo", "quién soy", "quien soy yo", "quien es el creador", "quien eres tu", "quién eres"]):
+        if dispara_plantilla(p_lower, ["cual es mi nombre", "cómo me llamo", "quién soy", "quien soy yo", "quien es el creador", "quien eres tu", "quién eres"]):
             return (
                 f"### 🧠 Identidad & Ontología Soberana // StarSeed OS\n\n"
                 f"- **Tu Nombre Elegido (Usuario / Creador)**: **{pref_name}**\n"
@@ -632,7 +657,7 @@ class LogicalReasoner:
             )
 
         # 8. System, Voice & Personalities Architecture & Demonstration
-        if any(w in p_lower for w in ["cómo funciona tu sistema", "como funciona tu sistema", "demuéstrame cómo funciona", "demuestrame como funciona", "sistema de voz", "múltiples personalidades", "multiples personalidades", "cuántas personalidades", "cuantas personalidades", "personalidades con cada uno de sus voces", "como opera tu sistema"]):
+        if dispara_plantilla(p_lower, ["cómo funciona tu sistema", "como funciona tu sistema", "demuéstrame cómo funciona", "demuestrame como funciona", "sistema de voz", "múltiples personalidades", "multiples personalidades", "cuántas personalidades", "cuantas personalidades", "personalidades con cada uno de sus voces", "como opera tu sistema"]):
             return (
                 f"### 🌌 Arquitectura Integral de Astraura 1.58-Bit & Enjambre de Personalidades // StarSeed OS\n\n"
                 f"¡Hola {pref_name}! Como **Astraura**, opero como un sistema de inteligencia artificial local, soberano y modular fundamentado en computación ternaria y síntesis acústica en tiempo real.\n\n"

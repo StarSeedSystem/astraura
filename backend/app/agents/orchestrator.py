@@ -200,9 +200,12 @@ class AstrauraOrchestrator:
         }
 
         # 3.5 Check if high-precision deterministic reasoning response applies (identity, system architecture & voice demo)
-        from .reasoner import reasoner
+        from .reasoner import reasoner, dispara_plantilla
         p_lower = user_prompt.lower()
-        if any(w in p_lower for w in [
+        # (Adenda 159) Antes bastaba que la frase APARECIERA en cualquier punto del
+        # prompt; con la conversacion entera dentro, el chat quedaba atrapado en la
+        # misma plantilla para siempre. Ahora el prompt tiene que SER la pregunta.
+        if dispara_plantilla(p_lower, [
             "cómo funciona tu sistema", "como funciona tu sistema", "demuéstrame cómo funciona", "demuestrame como funciona",
             "demuéstrame las personalidades", "demuestrame las personalidades", "personalidades con cada uno de sus voces",
             "personalidades con cada una de sus voces", "personalidades con sus voces", "cuántas personalidades", "cuantas personalidades",
