@@ -1,5 +1,6 @@
 import os
 import asyncio
+import math
 import time
 import re
 from typing import AsyncGenerator, Dict, Any, List, Optional
@@ -177,6 +178,51 @@ def _format_context_line(source: str, title: str, text: str) -> str:
     return f"[{source.upper()}] {text}"
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# (Adenda 165) DECAIMIENTO TEMPORAL EXPONENCIAL — base e
+# -----------------------------------------------------------------------------
+# De las cuatro ideas del documento de constantes armonicas, esta es la unica
+# que se puede aplicar a un modelo YA ENTRENADO sin retocar ni un peso: gobernar
+# como se OLVIDA la informacion irrelevante y se preserva la critica.
+#
+# Y no es numerologia: el decaimiento exponencial `e^(-lambda*t)` es la forma
+# matematica CORRECTA de ponderar por recencia — la unica funcion cuya tasa de
+# olvido es proporcional a lo que queda, que es como se comporta la memoria
+# humana (curva de Ebbinghaus). `e` no se elige por bonito: es la base natural
+# de esa familia de funciones.
+#
+# Se parametriza por VIDA MEDIA en dias (`lambda = ln(2)/vida_media`), que es lo
+# que un humano puede razonar: «a los 14 dias, un recuerdo vale la mitad».
+#
+# SUELO deliberado (`_RECENCY_FLOOR`): un recuerdo antiguo pero MUY pertinente
+# no debe desaparecer nunca. Sin suelo, el sistema olvidaria quien eres en
+# cuanto pasaran unas semanas — que es justo lo contrario de lo que se busca.
+_RECENCY_HALF_LIFE_DAYS = float(os.environ.get("ASTRAURA_RECENCY_HALF_LIFE_DAYS", "14") or 14)
+_RECENCY_FLOOR = float(os.environ.get("ASTRAURA_RECENCY_FLOOR", "0.35") or 0.35)
+
+
+def _recency_factor(ts: Any, now: Optional[float] = None) -> float:
+    """
+    Factor multiplicativo en [_RECENCY_FLOOR, 1.0] segun la antiguedad de `ts`.
+    Sin fecha utilizable devuelve 1.0: no penaliza lo que no sabe fechar
+    (inventar una antiguedad seria peor que no aplicar decaimiento).
+    """
+    try:
+        t = float(ts)
+    except (TypeError, ValueError):
+        return 1.0
+    if t <= 0:
+        return 1.0
+    now = time.time() if now is None else now
+    age_days = max(0.0, (now - t) / 86400.0)
+    if age_days <= 0:
+        return 1.0
+    half_life = max(0.5, _RECENCY_HALF_LIFE_DAYS)
+    lam = math.log(2.0) / half_life
+    decayed = math.exp(-lam * age_days)
+    return _RECENCY_FLOOR + (1.0 - _RECENCY_FLOOR) * decayed
+
+
 class AstrauraOrchestrator:
     """
     Astraura Master Cognitive Orchestrator for StarSeed OS (v4.0 Multi-Personality).
@@ -280,6 +326,7 @@ class AstrauraOrchestrator:
         return max(0.1, min(1.2, t))
 
     @staticmethod
+
     def gather_context_items(
         user_prompt: str,
         budget_chars: Optional[int] = None,
@@ -321,11 +368,15 @@ class AstrauraOrchestrator:
                 score = _relevance_score(query_tokens, text)
                 if score <= 0:
                     continue
+                # (Adenda 165) Recencia: un recuerdo de hace una hora sobre lo que
+                # estamos haciendo AHORA pesa mas que uno identico de hace un mes.
+                recency = _recency_factor(m.get("updated_at") or m.get("created_at"))
                 candidates.append({
                     "source": "memory",
                     "title": m.get("category") or "Recuerdo",
                     "text": _clean_truncate(text, _MEMORY_TEXT_CHARS),
-                    "score": score,
+                    "score": round(score * recency, 4),
+                    "recency": round(recency, 3),
                 })
         except Exception as e:
             print(f"[Contexto] Recuerdos Mem0 no disponibles ({e}); sigo con las demás fuentes.")
