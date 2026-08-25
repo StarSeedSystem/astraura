@@ -154,6 +154,22 @@ async def generate(
     _stats["calls"] += 1
     mode = engine_mode()
     _stats["last_mode"] = mode
+    # (Verificación 1.58, bajo carga) La media móvil `measured_tps` mezcla la
+    # VELOCIDAD DE DECODIFICACIÓN con la ESPERA EN COLA del llama-server (un solo
+    # slot compartido con el chat): en vivo medí 0.8 tok/s "fantasma" que inflaba
+    # cada presupuesto hasta el tope de 480 s y multiplicaba la contención (46% de
+    # llamadas agotadas). Si pasan >90 s sin ningún éxito que refresque la media,
+    # se desvanece hacia la referencia sana (~4.3 tok/s medidos en este M1): un
+    # atasco TRANSITORIO deja de condicionar los presupuestos de los minutos
+    # siguientes; en cuanto hay un éxito real, la media vuelve a ser verdad.
+    try:
+        _now_s = time.time()
+        if _now_s - float(_stats.get("last_real_at") or _now_s) > 90.0:
+            _prev_tps = float(_stats.get("measured_tps") or 0.0)
+            if 0 < _prev_tps < 3.5:
+                _stats["measured_tps"] = round(_prev_tps + (4.3 - _prev_tps) * 0.25, 2)
+    except Exception:
+        pass
     if mode == "templates":
         _stats["template"] += 1
         return _templates_result("templates")
@@ -224,11 +240,26 @@ async def generate(
             timeout = min(max(timeout, 45.0 + (float(max_tokens) / _measured) * 1.7), 480.0)
     try:
         sem = _get_semaphore()
-        async with sem:
+        # (Verificación 1.58, bajo carga) La COLA también tiene presupuesto: antes
+        # `wait_for` solo cubría el consumo DESPUÉS de adquirir el semáforo, así
+        # que una ráfaga de peticiones se apilaba SIN LÍMITE esperando turno y
+        # cada una retenía su hueco minutos cuando el motor iba lento. Ahora cada
+        # llamada renuncia a la cola a los 120 s: la más vieja conserva el turno,
+        # las demás devuelven plantilla al instante en vez de apilarse detrás.
+        try:
+            await asyncio.wait_for(sem.acquire(), timeout=120.0)
+        except asyncio.TimeoutError:
+            ms = int((time.perf_counter() - t0) * 1000)
+            _stats["errors"] += 1
+            _stats["last_ms"] = ms
+            return _templates_result(mode, "cola saturada (>120s esperando turno)", ms)
+        try:
             raw = await asyncio.wait_for(
                 _consume(prompt, system, context_chunks, tool_data, max_tokens, temperature, meta),
                 timeout=timeout,
             )
+        finally:
+            sem.release()
     except asyncio.TimeoutError:
         ms = int((time.perf_counter() - t0) * 1000)
         _stats["errors"] += 1
@@ -264,6 +295,10 @@ async def generate(
         _tps = (max(1.0, len(text) / 3.2)) / max(0.001, ms / 1000.0)
         prev = float(_stats.get("measured_tps") or 0.0)
         _stats["measured_tps"] = round(_tps if not prev else (prev * 0.7 + _tps * 0.3), 2)
+        # (Verificación 1.58, bajo carga) Sello temporal del último éxito REAL:
+        # es lo que permite al decaimiento de arriba distinguir "media vieja por
+        # un atasco transitorio" de "media fresca de verdad".
+        _stats["last_real_at"] = time.time()
     except Exception:
         pass
     return {"text": text, "real": True, "mode": meta.get("source") or mode, "ms": ms}

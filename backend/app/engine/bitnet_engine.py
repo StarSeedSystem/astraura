@@ -426,9 +426,40 @@ class BitNetUnifiedEngine:
                     "stream": True,
                 }
                 try:
+                    # read=45: si el slot compartido está ocupado, la petición se
+                    # queda EN COLA sin recibir NI UN BYTE — el read-timeout es
+                    # exactamente el detector de ese caso y cede el turno a Ollama.
                     async with httpx.AsyncClient(timeout=httpx.Timeout(300.0, connect=10.0)) as client:
-                        async with client.stream("POST", f"{base}/v1/chat/completions", json=payload) as res:
+                        async with client.stream(
+                            "POST", f"{base}/v1/chat/completions", json=payload,
+                            timeout=httpx.Timeout(300.0, connect=10.0, read=45.0),
+                        ) as res:
                             res.raise_for_status()
+                            # (Verificación 1.58, bajo carga) GUARDA DE PRIMER TOKEN
+                            # (read=45 arriba): separo el primer trozo con contenido
+                            # para poder ceder limpio SIN haber yield-eado nada — así
+                            # Ollama regenera desde cero sin duplicar texto.
+                            got_first = False
+                            async for line in res.aiter_lines():
+                                if not line or not line.startswith("data:"):
+                                    continue
+                                data = line[5:].strip()
+                                if not data or data == "[DONE]":
+                                    continue
+                                try:
+                                    delta = json.loads(data)["choices"][0].get("delta", {})
+                                except Exception:
+                                    continue
+                                token = delta.get("content")
+                                if token:
+                                    self.stats["tokens_generated"] += 1
+                                    yield token
+                                    got_first = True
+                                    break
+                            if not got_first:
+                                bitnet_failed = "sin primer token en 45 s (slot ocupado)"
+                                print(f"[BitNetUnifiedEngine] BitNet nativo cede el turno: {bitnet_failed}")
+                                return
                             async for line in res.aiter_lines():
                                 if not line or not line.startswith("data:"):
                                     continue
