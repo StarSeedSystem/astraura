@@ -2296,20 +2296,39 @@ def obtener_estado_oficina() -> Dict[str, Any]:
         })
 
     ocupantes: List[Dict[str, Any]] = []
-    if corriendo_pid:
-        desde_real = corriendo_meta.get("cycle_started_at")
-        if not isinstance(desde_real, (int, float)):
-            desde_real = _OFICINA_OCUPACION_DESDE.setdefault(corriendo_pid, ahora)
-        ser_id = _instalados_por_tipo_proceso().get(corriendo_pid)
-        if ser_id:
-            proc_info = next((p for p in DREAM_PROCESS_TYPES if p["id"] == corriendo_pid), {})
-            ocupantes.append({
-                "serId": ser_id, "salaId": _sala_id_de(corriendo_pid), "actividad": "pensando",
-                "procesoId": corriendo_pid, "detalle": proc_info.get("description"),
-                "desde": desde_real,
-            })
-    else:
-        _OFICINA_OCUPACION_DESDE.clear()
+    instalados = _instalados_por_tipo_proceso()
+
+    # (Verificación 1.58 · presencia permanente) PRESENCIA ≠ ACTIVIDAD.
+    # Antes la oficina solo tenia ocupantes DURANTE un ciclo (segundos cada
+    # ~5 min) y el resto del tiempo se veia VACIA aunque los 7 bots de fabrica
+    # estuvieran instalados -- la sala vacia leia como "no existe" cuando lo
+    # unico que faltaba era que diera la hora el ciclo. Ahora cada bot
+    # instalado esta SIEMPRE en su sala: "inactivo" es el estado
+    # quieto-pero-vivo que el contrato ya define (ActividadOcupante) y que el
+    # render ya sabe pintar SIN animacion extra. La ANIMACION sigue mandada
+    # por datosReales exactamente igual que antes: solo el ciclo EN CURSO se
+    # anima ("pensando"); nada se inventa nunca.
+    proc_por_id = {p["id"]: p for p in DREAM_PROCESS_TYPES}
+    for pid, proc in proc_por_id.items():
+        ser_id = instalados.get(pid)
+        if not ser_id:
+            continue
+        activo_ahora = bool(esta_sonando and corriendo_pid == pid)
+        desde_real: Any = None
+        if activo_ahora:
+            desde_real = (corriendo_meta or {}).get("cycle_started_at")
+            if not isinstance(desde_real, (int, float)):
+                desde_real = _OFICINA_OCUPACION_DESDE.setdefault(pid, ahora)
+        else:
+            _OFICINA_OCUPACION_DESDE.pop(pid, None)
+        ocupantes.append({
+            "serId": ser_id,
+            "salaId": _sala_id_de(pid),
+            "actividad": "pensando" if activo_ahora else "inactivo",
+            "procesoId": pid,
+            "detalle": proc.get("description") if activo_ahora else None,
+            "desde": desde_real if isinstance(desde_real, (int, float)) else ahora,
+        })
 
     return {"salas": salas, "ocupantes": ocupantes, "actualizadoEn": ahora, "datosReales": esta_sonando}
 
