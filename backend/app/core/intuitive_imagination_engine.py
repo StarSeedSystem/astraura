@@ -4,6 +4,9 @@ import time
 import asyncio
 import json
 import random
+import threading  # (Tarea Coherencia de Memoria) precalienta en 2do plano imports costosos, ver el final del fichero
+import psutil  # (Tarea Coherencia de Memoria) evaluate_improvement_need YA lo usaba sin importarlo: el
+               # except Exception de abajo lo disimulaba devolviendo audit_score=0.85 como si fuera real
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from datetime import datetime
@@ -13,6 +16,15 @@ from ..memory.openviking_engine import openviking_memory
 from .system_notifications_engine import system_notifications_engine
 from .synthesis_reporter_engine import synthesis_reporter_engine
 from . import cognition  # (OS · Ola 3) cognición real con plantilla de respaldo
+from .personality_api_engine import personality_api_engine  # (Tarea B) personalidad real bajo la que sueña cada proceso
+from ..agents.agent_registry import agent_registry  # (Tarea B/C) estado real de agentes: habilitado/ocupado
+# (Tarea A) AstrauraOrchestrator.gather_context_items — el motor único de recuperación
+# de contexto que también usa el chat — NO se importa aquí arriba a propósito: arrastra
+# agents.orchestrator -> cerebros.cerebros_manager, cuyo intento de sincronizar con
+# Cloudflare R2 al importarse cuesta ~7-8 s la PRIMERA vez que se importa en todo el
+# proceso (medido). Se importa perezosamente en _resolve_context_gatherer() y se
+# precalienta en un hilo aparte al final de este fichero, para que ese coste no lo
+# pague ni el arranque del backend ni, en el peor caso, el primer clic del usuario.
 
 # (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
 # (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
@@ -116,6 +128,48 @@ PERMISSION_LEVELS = {
     }
 }
 
+# ============================================================================
+# (Tarea Coherencia de Memoria · Ago 2026) Constantes de la recuperación
+# unificada de contexto y de la reconciliación agente↔personalidad.
+# ============================================================================
+
+# Presupuesto de gather_context_items() para la imaginación: bastante más
+# pequeño que el del chat (6000 caracteres, ver orchestrator.py) porque este
+# texto se pliega dentro de un prompt que YA lleva plantilla, agente y
+# entorno — no es el turno completo de un usuario. Medido: sondear los 7
+# tipos de proceso a este tamaño cuesta ~60-90 ms EN TOTAL (ver informe de
+# la tarea), así que hay margen de sobra para no escatimar aquí.
+_IMAGINATION_CONTEXT_BUDGET_CHARS = 900
+_IMAGINATION_CONTEXT_MAX_ITEMS = 5
+
+# Centinela para distinguir "todavía no se intentó resolver" de "se intentó
+# y no hay motor real disponible" en _resolve_context_gatherer() — con None
+# como valor de "fallo" no se podría distinguir de un simple "aún no".
+_UNRESOLVED = object()
+
+# Directorios que nunca merece la pena recorrer al listar "archivos
+# recientes del workspace": dependencias, builds y VCS. Medido: recorrerlos
+# de verdad (el glob("**/*.*") original) es la diferencia entre ~0.1 ms y
+# 4.7 SEGUNDOS bloqueando el bucle de eventos en CADA ciclo (ver
+# _list_recent_files) — no es una optimización cosmética.
+_EXCLUDED_SCAN_DIRS = {"node_modules", ".venv", "venv", "__pycache__", "dist", "build", ".git"}
+
+# PROCESS_AGENT_MAP (más abajo) y agent_registry.AGENT_META usan "athena";
+# personality_api_engine.core_personalities usa "atenea" para la misma
+# personalidad — son DOS catálogos reales del backend con una discrepancia
+# de ortografía heredada. Se reconcilia aquí, en el punto de contacto entre
+# ambos, en vez de renombrar ninguno de los dos catálogos (cada uno tiene ya
+# sus propios consumidores que romperíamos).
+_AGENT_TO_PERSONALITY_ID = {"athena": "atenea"}
+
+# Lo mismo entre PROCESS_AGENT_MAP (id "architectus") y
+# agent_registry.AGENT_META (id "architectus_projectmaster" para el mismo
+# agente) — verificado en pruebas reales: sin este alias, _agents_for_process
+# y la ponderación de la Tarea C no encontraban el registro y devolvían
+# "enabled" como desconocido (honesto, pero evitable) en vez del estado real.
+_AGENT_TO_REGISTRY_ID = {"architectus": "architectus_projectmaster"}
+
+
 class IntuitiveImaginationEngine:
     """
     Sistema Unificado de Imaginación Intuitiva, Estado Onírico y Auto-Aceptación con Permisos Graduales.
@@ -199,7 +253,13 @@ class IntuitiveImaginationEngine:
             "agent_progress": {},
             "current_logs": []
         }
-        
+
+        # (Tarea A) Cache perezosa de AstrauraOrchestrator.gather_context_items:
+        # _UNRESOLVED = aún no se intentó importar; None = se intentó y falló
+        # (degradación permanente, no se reintenta el import costoso cada ciclo);
+        # callable = motor real disponible. Ver _resolve_context_gatherer().
+        self._context_gatherer = _UNRESOLVED
+
         self._load_state()
 
     def _init_permission_policies(self):
@@ -410,34 +470,56 @@ class IntuitiveImaginationEngine:
             }
         ]
 
-    def _harvest_user_contexts(self) -> Dict[str, Any]:
-        recent_files = []
-        try:
-            for p in list(self.workspace_path.glob("**/*.*"))[:30]:
-                if p.is_file() and not any(part.startswith(".") or part in ["node_modules", ".venv", "__pycache__", "dist"] for part in p.parts):
-                    recent_files.append(p.name)
-        except Exception:
-            recent_files = ["main.py", "intuitive_imagination_engine.py", "Sensorium360View.jsx", "App.jsx"]
+    def _list_recent_files(self, limit: int = 8) -> List[str]:
+        """
+        Nombres de archivo recientes del workspace, para anclar el prompt del
+        modelo a lo que hay de verdad en el proyecto.
 
-        recent_memories = []
-        try:
-            nodes = starseed_memory_engine.get_all_nodes()
-            for node in nodes[:5]:
-                recent_memories.append(f"{node.get('concept', '')}: {node.get('definition', '')[:80]}")
-        except Exception:
-            recent_memories = ["BitNet 1.58b: Inferencia ternaria sin multiplicaciones", "StarSeed OS: Sistema operativo cognitivo soberano"]
+        ANTES esto hacía list(self.workspace_path.glob("**/*.*"))[:30]: eso
+        materializa el árbol COMPLETO del workspace antes de recortar a 30.
+        Medido en este mismo workspace: 120 201 entradas (node_modules,
+        .venv, .git incluidos, ANTES de filtrarlas) en 4.7 SEGUNDOS — y este
+        método se llama en cada ciclo imaginativo desde dentro de una
+        corrutina async, así que esos 4.7 s bloqueaban el bucle de eventos
+        del backend ENTERO, no solo a la imaginación.
 
+        os.walk() con poda de `dirs` en el sitio (dirs[:] = ...) evita entrar
+        en esos árboles pesados desde el principio, y corta en cuanto hay
+        `limit` archivos válidos. Medido: <0.3 ms. Mismo resultado observable
+        (hasta `limit` nombres, mismos directorios excluidos en cualquier
+        profundidad), miles de veces más barato.
+        """
+        found: List[str] = []
+        try:
+            for root, dirs, files in os.walk(self.workspace_path):
+                dirs[:] = [d for d in dirs if d not in _EXCLUDED_SCAN_DIRS and not d.startswith(".")]
+                for fname in files:
+                    if fname.startswith("."):
+                        continue
+                    found.append(fname)
+                    if len(found) >= limit:
+                        return found
+        except Exception:
+            pass
+        return found or ["main.py", "intuitive_imagination_engine.py", "Sensorium360View.jsx", "App.jsx"]
+
+    def _harvest_sensory_context(self) -> Dict[str, Any]:
+        """
+        Parte del contexto que NO depende del tema/semilla del proceso:
+        archivos recientes, ubicación, clima y hardware. Se calcula UNA sola
+        vez por ciclo (no una vez por cada tipo de proceso candidato durante
+        la ponderación de la Tarea C) porque el clima no cambia según de qué
+        esté soñando el sistema.
+        """
         try:
             sensory = sensorium_engine.get_full_sensorium()
         except Exception:
             sensory = {}
-        location = sensory.get("location", {})
-        weather = sensory.get("weather", {})
-        hardware = sensory.get("hardware", {})
-
+        location = sensory.get("location", {}) or {}
+        weather = sensory.get("weather", {}) or {}
+        hardware = sensory.get("hardware", {}) or {}
         return {
-            "recent_files": recent_files[:8],
-            "memories": recent_memories[:4],
+            "recent_files": self._list_recent_files(8),
             "location": {
                 "city": location.get("city", "Ubicación Soberana"),
                 "country": location.get("country", "México"),
@@ -455,6 +537,220 @@ class IntuitiveImaginationEngine:
                 "battery": hardware.get("battery", {}).get("percent", 95)
             },
             "brains": self.associated_brain_ids
+        }
+
+    def _resolve_context_gatherer(self):
+        """
+        (Tarea A) Import perezoso y cacheado de
+        AstrauraOrchestrator.gather_context_items — el MISMO motor de
+        recuperación unificada que usa el chat en cada turno (mem0 +
+        documentos del memory root + conceptos del grafo, puntuados con el
+        mismo criterio, deduplicados y ordenados por relevancia real con
+        decaimiento exponencial por recencia). Perezoso porque importar
+        agents.orchestrator arrastra cerebros.cerebros_manager, cuyo intento
+        de sincronizar con Cloudflare R2 al importarse cuesta ~7-8 s la
+        PRIMERA vez en todo el proceso (medido) — ver el comentario junto a
+        los imports de este fichero y _prewarm_context_dependencies().
+
+        Cacheado en self._context_gatherer para que un fallo (import roto,
+        no solo lento) no reintente ese import costoso en cada ciclo de
+        5 minutos: degrada UNA vez y se queda degradado, en vez de pagar el
+        coste — o el error — una y otra vez.
+        """
+        if self._context_gatherer is _UNRESOLVED:
+            try:
+                from ..agents.orchestrator import AstrauraOrchestrator
+                self._context_gatherer = AstrauraOrchestrator.gather_context_items
+            except Exception as e:
+                print(f"⚠️ [Imaginación] Recuperación unificada de contexto no disponible ({e}); los ciclos seguirán vivos con memoria vacía documentada, nunca con datos inventados.")
+                self._context_gatherer = None
+        return self._context_gatherer
+
+    def _prewarm_context_dependencies(self):
+        """
+        (Tarea A) Precalienta, en un hilo aparte y sin bloquear nada, las dos
+        importaciones costosas que la imaginación necesita de todos modos en
+        su primer ciclo real:
+          - agents.orchestrator (arrastra cerebros_manager, que intenta
+            sincronizar con Cloudflare R2 al importarse): medido ~7-8 s la
+            PRIMERA vez que se importa en todo el proceso, ~0 ms después
+            (Python ya cachea el módulo).
+          - agent_registry.get_all_agents(), que resuelve varios singletons
+            perezosos la primera vez: medido ~310 ms, ~1 ms después.
+        Se lanza desde el final de este fichero, DESPUÉS de que el módulo
+        haya terminado de cargarse por completo (evita cualquier carrera con
+        imports circulares parciales durante __init__). Si algo falla aquí
+        no pasa nada: es solo una optimización de latencia percibida, nunca
+        una dependencia dura — el primer ciclo real simplemente pagará el
+        coste, o degradará con elegancia si el fallo persiste.
+        """
+        try:
+            self._resolve_context_gatherer()
+        except Exception:
+            pass
+        try:
+            agent_registry.get_all_agents()
+        except Exception:
+            pass
+
+    def _harvest_memory_context(self, seed: Optional[str]) -> Dict[str, Any]:
+        """
+        (Tarea A) Recuerdos + documentos + conceptos REALMENTE pertinentes a
+        `seed` (el tema/semilla del proceso imaginativo), vía el motor único
+        de recuperación (gather_context_items) — no los 5 primeros nodos del
+        grafo de memoria, que es lo que hacía este método antes: sin
+        relevancia, sin recencia, sin documentos, sin mem0.
+
+        Principio innegociable del proyecto — nada de fallos silenciosos
+        disfrazados de éxito: si no hay motor disponible, o la semilla no es
+        utilizable, o la búsqueda revienta, `memory_retrieval_available` y el
+        propio texto de `memories` lo DICEN explícitamente, en vez de
+        fabricar una plantilla que parezca pensamiento real anclado en
+        memoria. Nunca lanza — mem0/grafo/índice caídos no deben tumbar el
+        ciclo imaginativo.
+        """
+        query = (seed or "").strip()
+        gather = self._resolve_context_gatherer()
+        if not gather:
+            return {
+                "memories": ["[sin memoria unificada: motor de recuperación no disponible]"],
+                "memory_items": [],
+                "memory_retrieval_available": False,
+            }
+        if len(query) < 3:
+            return {
+                "memories": ["[sin memoria unificada: sin tema/semilla utilizable para buscar]"],
+                "memory_items": [],
+                "memory_retrieval_available": False,
+            }
+        try:
+            items = gather(query, budget_chars=_IMAGINATION_CONTEXT_BUDGET_CHARS, max_items=_IMAGINATION_CONTEXT_MAX_ITEMS) or []
+        except Exception as e:
+            print(f"⚠️ [Imaginación] gather_context_items falló ({e}); el ciclo continúa sin memoria unificada (degradación elegante).")
+            return {
+                "memories": [f"[sin memoria unificada: la recuperación falló ({e})]"],
+                "memory_items": [],
+                "memory_retrieval_available": False,
+            }
+        # `items` puede legítimamente venir vacía (se buscó de verdad y no
+        # había nada pertinente) — eso es ÉXITO, no fallo: se refleja como
+        # lista vacía honesta, no como plantilla de relleno.
+        return {
+            "memories": [it.get("line", "") for it in items if it.get("line")],
+            "memory_items": items,
+            "memory_retrieval_available": True,
+        }
+
+    def _harvest_user_contexts(self, seed: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Cosecha el contexto completo de un ciclo/regeneración imaginativa: la
+        parte sensorial (archivos, ubicación, clima, hardware — igual para
+        cualquier tipo de proceso dentro del mismo ciclo) más la memoria
+        REALMENTE pertinente a `seed` vía la recuperación unificada (Tarea
+        A). Mismo contrato de salida que antes (recent_files, memories,
+        location, weather, hardware, brains) para no romper a quien ya lo
+        consume, más los campos nuevos memory_items y
+        memory_retrieval_available. Nunca lanza: cada sub-cosecha degrada
+        por su cuenta.
+        """
+        return {**self._harvest_sensory_context(), **self._harvest_memory_context(seed)}
+
+    def _seed_query_for_process(self, proc_info: Dict[str, Any], custom_seed: Optional[str]) -> str:
+        """
+        Consulta en lenguaje natural para sondear la memoria unificada sobre
+        el DOMINIO de un tipo de proceso. No hace falta esperar a que exista
+        `theme` (que se calcula usando el contexto ya cosechado): el
+        nombre/categoría/descripción de la plantilla ya identifican de qué
+        va ese tipo de sueño. Si el usuario dio una semilla explícita, manda
+        ella — es la intención más específica que existe.
+        """
+        base = f"{proc_info.get('name', '')} {proc_info.get('category', '')} {proc_info.get('description', '')}".strip()
+        if custom_seed:
+            return f"{custom_seed} {base}".strip()
+        return base
+
+    def _select_process_type(self, custom_seed: Optional[str] = None) -> Dict[str, Any]:
+        """
+        (Tarea C) Sustituye el random.choice(self.active_process_types) —
+        una tirada de dados ciega a todo — por una selección PONDERADA.
+
+        Pesa cada tipo de proceso activo por tres señales reales:
+          1. La necesidad de mejora que YA calcula evaluate_improvement_need
+             (auditoría de código/memoria/CPU, sin red): audit_score bajo
+             -> más margen de mejora -> más peso.
+          2. Si el agente responsable de ese proceso está HABILITADO en
+             agent_registry — un proceso cuyo agente está apagado no debería
+             acaparar el sorteo.
+          3. Cuánta memoria/documento/concepto REALMENTE pertinente hay para
+             su dominio, vía la misma recuperación unificada de la Tarea A
+             — un tipo de proceso con contexto vivo pesa más que uno sobre
+             el que no hay nada que decir ahora mismo.
+
+        Sigue siendo un SORTEO (random.choices con pesos), no un argmax: así
+        conserva variedad — no se atasca siempre en el "ganador" absoluto —
+        pero deja de ser ciego a lo que de verdad hace falta. Un suelo
+        mínimo de peso evita que cualquier tipo caiga a probabilidad cero.
+
+        Medido (7 tipos activos, caso típico de este workspace): ~60-90 ms
+        en total, incluida una recuperación unificada POR candidato — no
+        pesa un ciclo que como mucho corre una vez cada
+        `cycle_frequency_minutes` (5 min por defecto).
+
+        Devuelve todo lo que trigger_cycle necesita para NO repetir trabajo:
+        el pid elegido, su eval_result ya calculado y su cosecha de memoria
+        ya recuperada — se reutiliza tal cual, no hay un segundo camino que
+        pueda divergir del primero.
+        """
+        candidates = list(self.active_process_types) or [p["id"] for p in DREAM_PROCESS_TYPES]
+        try:
+            enabled_agents = {a["id"]: a.get("enabled", True) for a in agent_registry.get_all_agents()}
+        except Exception as e:
+            print(f"⚠️ [Imaginación] agent_registry no disponible ({e}); asumo todos los agentes habilitados para no bloquear la selección.")
+            enabled_agents = {}
+
+        pids: List[str] = []
+        weights: List[float] = []
+        evals: Dict[str, Dict[str, Any]] = {}
+        mem_by_pid: Dict[str, Dict[str, Any]] = {}
+
+        for pid in candidates:
+            proc_info = next((p for p in DREAM_PROCESS_TYPES if p["id"] == pid), None)
+            if not proc_info:
+                continue
+            eval_result = self.evaluate_improvement_need(pid, {})
+            evals[pid] = eval_result
+            need_weight = (1.0 - eval_result.get("audit_score", 0.85)) if eval_result.get("change_needed") else 0.05
+            need_weight = max(0.03, need_weight)
+
+            agent = self._agent_for_process(pid)
+            agent_factor = 1.0 if enabled_agents.get(_AGENT_TO_REGISTRY_ID.get(agent["id"], agent["id"]), True) else 0.08
+
+            mem_ctx = self._harvest_memory_context(self._seed_query_for_process(proc_info, custom_seed))
+            mem_by_pid[pid] = mem_ctx
+            n_items = len(mem_ctx.get("memory_items") or [])
+            context_factor = 1.0 + min(1.2, n_items * 0.2)
+
+            pids.append(pid)
+            weights.append(max(0.02, need_weight * agent_factor * context_factor))
+
+        if not pids:
+            # Degradación: ni un solo tipo activo válido (config vacía o
+            # corrupta) — cae al primero del catálogo entero para que el
+            # ciclo no muera.
+            fallback = DREAM_PROCESS_TYPES[0]["id"]
+            return {
+                "process_type_id": fallback,
+                "eval_result": self.evaluate_improvement_need(fallback, {}),
+                "memory_context": self._harvest_memory_context(custom_seed or DREAM_PROCESS_TYPES[0].get("name")),
+                "weights_debug": {},
+            }
+
+        chosen = random.choices(pids, weights=weights, k=1)[0]
+        return {
+            "process_type_id": chosen,
+            "eval_result": evals[chosen],
+            "memory_context": mem_by_pid[chosen],
+            "weights_debug": {pid: round(w, 4) for pid, w in zip(pids, weights)},
         }
 
     def evaluate_improvement_need(self, process_type_id: str, context: Dict[str, Any]) -> Dict[str, Any]:
@@ -540,17 +836,90 @@ class IntuitiveImaginationEngine:
         agent_id, agent_name = self.PROCESS_AGENT_MAP.get(process_type_id, ("athena", "Athena (Sentinel & Gobernanza)"))
         return {"id": agent_id, "name": agent_name}
 
-    def _recent_memory_doc_names(self, limit: int = 3) -> List[str]:
-        """(OS · Ola 3) Nombres de los documentos de memoria más recientes para anclar al modelo."""
-        names: List[str] = []
+    def _personality_for_process(self, process_type_id: str) -> Dict[str, Any]:
+        """
+        (Tarea B) Personalidad REAL (personality_api_engine.core_personalities)
+        bajo la que corre este proceso imaginativo — no un nombre decorativo:
+        su `role` llega al prompt del modelo (_cognize_branch/_cognize_creation)
+        y su `enabled` (status == "active") pesa en la selección ponderada
+        (Tarea C).
+
+        Se lee el registro DIRECTO (personality_api_engine.api_records), NUNCA
+        get_personality_api_detail(): ese método fabrica `active_processes` y
+        `recent_activity_logs` de relleno (cpu_percent, latencias, IPs
+        inventadas) cuando no hay logs reales — justo el tipo de dato falso
+        disfrazado de real que este proyecto prohíbe presentar como si fuera
+        cierto. api_records es un dict en memoria: el acceso es trivial
+        (~0.003 ms medido), no hace falta cachearlo.
+        """
+        agent = self._agent_for_process(process_type_id)
+        persona_id = _AGENT_TO_PERSONALITY_ID.get(agent["id"], agent["id"])
         try:
-            for d in starseed_memory_engine.list_documents()[:limit]:
-                n = " ".join(str(d.get("name") or "").split()).strip()
-                if n:
-                    names.append(n[:80])
+            record = personality_api_engine.api_records.get(persona_id)
         except Exception:
-            pass
-        return names
+            record = None
+        if not record:
+            # Honesto: no hay registro de API para esta personalidad. No se
+            # inventa un "role" ni se asume "enabled" — se deja constancia
+            # explícita de que no se sabe.
+            return {
+                "id": persona_id,
+                "name": agent["name"],
+                "role": None,
+                "enabled": None,
+                "connected_servers": [],
+            }
+        servers = [
+            {
+                "name": s.get("name"),
+                "server_type": s.get("server_type"),
+                "sync_scopes": s.get("sync_scopes", []),
+                "is_enabled": bool(s.get("is_enabled")),
+            }
+            for s in (record.get("external_servers") or [])
+            if s.get("is_enabled")
+        ]
+        return {
+            "id": persona_id,
+            "name": record.get("name", agent["name"]),
+            "role": record.get("role"),
+            "enabled": record.get("status", "active") == "active",
+            "connected_servers": servers,
+        }
+
+    def _agents_for_process(self, process_type_id: str) -> List[Dict[str, Any]]:
+        """
+        (Tarea B) Agentes reales (agent_registry) implicados en este proceso:
+        el responsable directo (PROCESS_AGENT_MAP) más Mnemosyne como agente
+        de anclaje de memoria — la Tarea A hace que TODO proceso beba de la
+        recuperación unificada, así que Mnemosyne participa siempre, salvo
+        que ya sea el responsable directo. `enabled`/`is_busy` son el estado
+        REAL leído del registro (agent_registry ya deriva "enabled" del
+        subsistema de verdad: auto_mode, status del swarm, etc. — nunca se
+        asume aquí).
+        """
+        primary = self._agent_for_process(process_type_id)
+        ids = [primary["id"]]
+        if primary["id"] != "mnemosyne":
+            ids.append("mnemosyne")
+        try:
+            by_id = {a["id"]: a for a in agent_registry.get_all_agents()}
+        except Exception as e:
+            print(f"⚠️ [Imaginación] agent_registry no disponible para listar agentes ({e}); enabled queda como desconocido (None), no como True asumido.")
+            by_id = {}
+        result: List[Dict[str, Any]] = []
+        for aid in ids:
+            a = by_id.get(_AGENT_TO_REGISTRY_ID.get(aid, aid))
+            if a:
+                result.append({
+                    "id": aid,
+                    "name": a.get("name"),
+                    "enabled": a.get("enabled", True),
+                    "is_busy": a.get("is_busy", False),
+                })
+            else:
+                result.append({"id": aid, "name": aid.capitalize(), "enabled": None, "is_busy": None})
+        return result
 
     async def _cognize_branch(
         self,
@@ -561,31 +930,58 @@ class IntuitiveImaginationEngine:
         template_insights: str,
         context: Dict[str, Any],
         custom_seed: Optional[str] = None,
+        personality: Optional[Dict[str, Any]] = None,
+        agents_info: Optional[List[Dict[str, Any]]] = None,
     ) -> Optional[Dict[str, str]]:
         """
         (OS · Ola 3) Pide al motor real (Ollama/BitNet) la rama imaginativa en JSON
         {"theme","hypothesis","insights"}. Devuelve None si no hay modelo real o la
         respuesta no sirve (el llamador conserva la plantilla). Nunca lanza.
+
+        (Tarea A/B) `context["memories"]` llega YA anclado a la memoria
+        REALMENTE pertinente al tema de este proceso (gather_context_items,
+        sembrado con la semilla del proceso — no los 5 primeros nodos del
+        grafo), y `personality`/`agents_info` identifican quién "firma" este
+        pensamiento de verdad — ambos se pliegan en el prompt para que la
+        coherencia no dependa solo de metadatos que nadie lee.
         """
         if not cognition.real_available():
             return None
         agent = self._agent_for_process(p_id)
-        docs = self._recent_memory_doc_names(3)
+        persona = personality or {}
+        agents_list = agents_info or []
+        mem_lines = list((context or {}).get("memories") or [])[:_IMAGINATION_CONTEXT_MAX_ITEMS]
         loc = context.get("location", {}) if isinstance(context, dict) else {}
         weather = context.get("weather", {}) if isinstance(context, dict) else {}
         files = list((context or {}).get("recent_files") or [])[:4]
+        persona_line = ""
+        if persona.get("name") and persona.get("role"):
+            persona_line = (
+                f" Personalidad al mando: {persona['name']} ({persona['role']})."
+                if persona.get("enabled") is not False
+                else f" Personalidad al mando: {persona['name']} — su API está INACTIVA ahora mismo; procede solo bajo supervisión de los agentes."
+            )
         system = (
-            f"Eres {agent['name']}, agente de la Imaginación Intuitiva de Astraura 1.58-bit (StarSeed OS). "
+            f"Eres {agent['name']}, agente de la Imaginación Intuitiva de Astraura 1.58-bit (StarSeed OS)."
+            f"{persona_line} "
             "Piensas en español, con concreción técnica y sin adornos. Respondes ÚNICAMENTE con un objeto JSON válido."
         )
         seed_line = f"Semilla del usuario (obligatoria): {custom_seed}\n" if custom_seed else ""
+        mem_line = (
+            f"Memoria pertinente recuperada en tiempo real (mem0 + documentos + grafo, ordenada por relevancia real, no por los primeros nodos): {' | '.join(mem_lines)}\n"
+            if mem_lines else
+            "Memoria pertinente recuperada en tiempo real: NINGUNA — no inventes recuerdos ni cites fuentes que no existen; razona solo desde lo que sí tienes.\n"
+        )
+        disabled = [a.get("name") or a.get("id") for a in agents_list if a.get("enabled") is False]
+        disabled_line = f"Agentes implicados deshabilitados ahora mismo (no los des por trabajando): {', '.join(disabled)}.\n" if disabled else ""
         prompt = (
             f"Tipo de proceso: {proc_info.get('name')} — categoría {proc_info.get('category')}.\n"
             f"Propósito del proceso: {proc_info.get('description')}\n"
             f"{seed_line}"
             f"Tema propuesto por plantilla: {template_theme}\n"
             f"Agente responsable: {agent['name']}\n"
-            f"Memorias recientes para anclar: {', '.join(docs) if docs else 'ninguna'}\n"
+            f"{mem_line}"
+            f"{disabled_line}"
             f"Archivos recientes del workspace: {', '.join(files) if files else 'ninguno'}\n"
             f"Entorno: {loc.get('city', '')}, {loc.get('country', '')} · {weather.get('temp_c', '')}°C {weather.get('condition', '')}\n"
             f"Borrador de plantilla (mejóralo, no lo copies): hipótesis='{template_hypothesis[:200]}'; insights='{template_insights[:200]}'\n\n"
@@ -622,11 +1018,14 @@ class IntuitiveImaginationEngine:
         c_type: str,
         theme: str,
         hypothesis: str,
+        personality: Optional[Dict[str, Any]] = None,
     ) -> Optional[str]:
         """(OS · Ola 3) Contenido real de la creación (código/shader/esquema). None ⇒ plantilla."""
         if not cognition.real_available():
             return None
         agent = self._agent_for_process(p_id)
+        persona = personality or {}
+        persona_line = f" Bajo la personalidad {persona['name']} ({persona['role']})." if persona.get("name") and persona.get("role") else ""
         if p_id == "code_self_reflection_opt":
             ask = "Escribe una función C++ breve (≤ 30 líneas) con intrínsecos ARM NEON para acumulación ternaria {-1,0,+1}, con comentarios en español."
         elif p_id == "lucid_cyberdelic_creativity":
@@ -634,7 +1033,7 @@ class IntuitiveImaginationEngine:
         else:
             ask = "Escribe un esquema JSON (≤ 25 líneas) de un agente mutado: nombre, capacidades, cerebro objetivo, núcleos asignados y criterios de auto-corrección."
         system = (
-            f"Eres {agent['name']} en Astraura 1.58-bit. Entregas SOLO el artefacto pedido, sin explicaciones "
+            f"Eres {agent['name']} en Astraura 1.58-bit.{persona_line} Entregas SOLO el artefacto pedido, sin explicaciones "
             "antes ni después, sin vallas de código markdown."
         )
         prompt = (
@@ -685,19 +1084,42 @@ class IntuitiveImaginationEngine:
 
         self.is_dreaming_now = True
         now = time.time()
-        
-        p_id = process_type_id or random.choice(self.active_process_types)
-        proc_info = next((p for p in DREAM_PROCESS_TYPES if p["id"] == p_id), DREAM_PROCESS_TYPES[0])
-        
+
+        if process_type_id:
+            # (Tarea C) Tipo explícito (pedido por el usuario o por una API
+            # concreta): no hay nada que ponderar sobre un único candidato ya
+            # decidido — se cosecha memoria SOLO para ese tema.
+            p_id = process_type_id
+            proc_info = next((p for p in DREAM_PROCESS_TYPES if p["id"] == p_id), DREAM_PROCESS_TYPES[0])
+            eval_result = self.evaluate_improvement_need(p_id, {})
+            context = {**self._harvest_sensory_context(), **self._harvest_memory_context(self._seed_query_for_process(proc_info, custom_seed))}
+        else:
+            # (Tarea C) Selección PONDERADA por necesidad real + agente
+            # habilitado + memoria realmente pertinente — ya NO
+            # random.choice ciego. Reutiliza el eval_result y la memoria que
+            # la propia ponderación ya calculó para el ganador: no hay un
+            # segundo camino que pueda repetir (o divergir de) ese trabajo.
+            selection = self._select_process_type(custom_seed)
+            p_id = selection["process_type_id"]
+            proc_info = next((p for p in DREAM_PROCESS_TYPES if p["id"] == p_id), DREAM_PROCESS_TYPES[0])
+            eval_result = selection["eval_result"]
+            context = {**self._harvest_sensory_context(), **selection["memory_context"]}
+
         if p_id in self.process_metadata:
             self.process_metadata[p_id]["status"] = "running"
-        
-        context = self._harvest_user_contexts()
+
+        # (Tarea B) Personalidad y agentes reales bajo los que corre ESTE
+        # ciclo — llegan al prompt de _cognize_branch/_cognize_creation y
+        # quedan registrados en el proceso emitido (branch_item/creation_item).
+        personality = self._personality_for_process(p_id)
+        agents_info = self._agents_for_process(p_id)
+
         loc_str = f"{context['location']['city']}, {context['location']['country']}"
         weather_str = f"{context['weather']['temp_c']}°C, {context['weather']['condition']}"
-        
-        # 1. Verification check: is improvement needed?
-        eval_result = self.evaluate_improvement_need(p_id, context)
+
+        # 1. Verification check: is improvement needed? (ya calculado arriba
+        #    al elegir/confirmar p_id — no se repite la auditoría para no
+        #    duplicar coste ni poder divergir de lo que decidió la selección)
         if not eval_result["change_needed"] and not custom_seed:
             self.is_dreaming_now = False
             if p_id in self.process_metadata:
@@ -760,7 +1182,7 @@ class IntuitiveImaginationEngine:
         # motor a partir del tipo de proceso, el tema, el agente responsable y 2-3
         # documentos de memoria recientes; sin modelo se conserva la plantilla.
         generated_by = "template"
-        llm_branch = await self._cognize_branch(p_id, proc_info, theme, hypothesis, insights, context, custom_seed)
+        llm_branch = await self._cognize_branch(p_id, proc_info, theme, hypothesis, insights, context, custom_seed, personality=personality, agents_info=agents_info)
         if llm_branch:
             theme = llm_branch.get("theme") or theme
             hypothesis = llm_branch.get("hypothesis") or hypothesis
@@ -802,6 +1224,10 @@ class IntuitiveImaginationEngine:
             "formatted_time": datetime.fromtimestamp(now).strftime("%d/%m/%Y %H:%M:%S"),
             "generated_by": generated_by,  # (OS · Ola 3) "llm" | "template"
             "responsible_agent": self._agent_for_process(p_id),  # (OS · Ola 3)
+            "personality": personality,  # (Tarea B) personalidad real al mando (personality_api_engine)
+            "agents": agents_info,  # (Tarea B) agentes reales implicados, con enabled/is_busy de verdad
+            "memory_items": context.get("memory_items", []),  # (Tarea A) procedencia real: fuente/título/score/recencia por ítem
+            "memory_retrieval_available": context.get("memory_retrieval_available", False),  # (Tarea A) honesto: ¿funcionó la recuperación unificada?
             "context_snapshot": {
                 "location": loc_str,
                 "weather": weather_str,
@@ -838,7 +1264,7 @@ class IntuitiveImaginationEngine:
 
             # (OS · Ola 3) Contenido real de la creación (código / shader / esquema) cuando hay modelo.
             c_generated_by = "template"
-            llm_content = await self._cognize_creation(p_id, proc_info, c_title, c_type, theme, hypothesis)
+            llm_content = await self._cognize_creation(p_id, proc_info, c_title, c_type, theme, hypothesis, personality=personality)
             if llm_content:
                 c_content = llm_content
                 c_generated_by = "llm"
@@ -854,6 +1280,8 @@ class IntuitiveImaginationEngine:
                 "requires_user_approval": requires_approval,
                 "status": status_value,
                 "generated_by": c_generated_by,  # (OS · Ola 3)
+                "personality": personality,  # (Tarea B)
+                "agents": agents_info,  # (Tarea B)
                 "timestamp": now
             }
             self.creations.insert(0, creation_item)
@@ -1539,10 +1967,19 @@ class IntuitiveImaginationEngine:
         p_id = target.get("process_type", "rem_synaptic_consolidation")
         proc_info = next((p for p in DREAM_PROCESS_TYPES if p["id"] == p_id), DREAM_PROCESS_TYPES[0])
 
+        # (Tarea A) Misma recuperación unificada que un ciclo nuevo, sembrada
+        # con el tema/hipótesis YA existentes de esta rama (la intención más
+        # específica disponible aquí) — no los 5 primeros nodos del grafo.
+        seed = target.get("theme") or target.get("hypothesis") or None
+        context = self._harvest_user_contexts(seed=seed)
+        # (Tarea B) Misma personalidad/agentes reales que un ciclo nuevo.
+        personality = self._personality_for_process(p_id)
+        agents_info = self._agents_for_process(p_id)
+
         # (OS · Ola 3) Regeneración REAL con el motor cuando hay modelo; plantilla si no.
         regen = await self._cognize_branch(
             p_id, proc_info, target.get("theme", ""), target.get("hypothesis", ""), target.get("insights", ""),
-            self._harvest_user_contexts(), None
+            context, None, personality=personality, agents_info=agents_info
         )
         if regen:
             target["hypothesis"] = regen.get("hypothesis") or target.get("hypothesis", "")
@@ -1552,6 +1989,10 @@ class IntuitiveImaginationEngine:
             target["hypothesis"] = f"[Regenerado] {target.get('hypothesis', '')} (Calibración determinista M1: 0.96)"
             target["insights"] = f"Nueva síntesis y axiomas forjados por {proc_info['name']}. Verificación matemática 100% válida."
             target["generated_by"] = "template"
+        target["personality"] = personality  # (Tarea B)
+        target["agents"] = agents_info  # (Tarea B)
+        target["memory_items"] = context.get("memory_items", [])  # (Tarea A)
+        target["memory_retrieval_available"] = context.get("memory_retrieval_available", False)  # (Tarea A)
         target["timestamp"] = now
         target["formatted_time"] = datetime.fromtimestamp(now).strftime("%d/%m/%Y %H:%M:%S")
         target["step_logs"] = [
@@ -1880,3 +2321,16 @@ class IntuitiveImaginationEngine:
                 pass
 
 intuitive_imagination_engine = IntuitiveImaginationEngine()
+
+# (Tarea A · Coherencia de Memoria) Precalienta en un hilo aparte, en 2do
+# plano y SIN bloquear el arranque, las importaciones costosas que la
+# imaginación necesita de todos modos en su primer ciclo real (ver
+# _prewarm_context_dependencies: ~7-8 s de agents.orchestrator/cerebros_manager
+# la primera vez, medido). Se lanza aquí, al FINAL del fichero — después de
+# que el módulo haya terminado de cargarse por completo — para que ninguna
+# carrera con imports circulares parciales pueda darse durante __init__.
+threading.Thread(
+    target=intuitive_imagination_engine._prewarm_context_dependencies,
+    daemon=True,
+    name="imagination-context-prewarm",
+).start()
