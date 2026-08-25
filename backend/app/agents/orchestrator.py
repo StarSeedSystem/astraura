@@ -307,10 +307,7 @@ def _brain_provenance_maps():
             b_id = brain.get("id")
             if b_id:
                 brain_by_id[b_id] = brain
-            server = None
-            linked_source = brain.get("linked_source")
-            if isinstance(linked_source, dict) and linked_source.get("label"):
-                server = {"id": linked_source.get("type") or "remoto", "name": linked_source["label"]}
+            server = _server_for_brain(brain)
             brain_ref = {"id": b_id, "name": brain.get("name") or b_id} if b_id else None
             for persona in (brain.get("linked_personalities") or []):
                 pid = persona.get("id") if isinstance(persona, dict) else None
@@ -321,14 +318,64 @@ def _brain_provenance_maps():
     return prov_by_persona, brain_by_id
 
 
-def _memory_provenance(m: Dict[str, Any], prov_by_persona: Dict[str, Dict[str, Any]]):
-    """Procedencia de un recuerdo mem0: `agent_id` real si no es el comodín
-    "*"; si no, `metadata.persona` (también un dato REAL, escrito por quien
-    generó el recuerdo — no algo que se infiera). Sin ninguno de los dos, o
-    sin ese persona_id enlazado a un cerebro real hoy: (None, None)."""
+def _server_for_brain(brain: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    """Server/almacenamiento de origen de un CEREBRO (no de un ítem): solo se
+    rellena cuando el propio cerebro quedó marcado `linked_source` al llegar
+    por sync desde R2/Supabase/disco externo. Extraído de
+    `_brain_provenance_maps` para poder reutilizarlo también al resolver la
+    procedencia EXPLÍCITA por `brain_id` (ver `_explicit_brain_provenance`) —
+    misma regla, un solo sitio. Nunca "local" por defecto: ver advertencia
+    en la cabecera de la sección Deuda 1 sobre por qué eso sería exactamente
+    el fallo que se persigue."""
+    if not isinstance(brain, dict):
+        return None
+    linked_source = brain.get("linked_source")
+    if isinstance(linked_source, dict) and linked_source.get("label"):
+        return {"id": linked_source.get("type") or "remoto", "name": linked_source["label"]}
+    return None
+
+
+def _explicit_brain_provenance(metadata: Dict[str, Any], brain_by_id: Dict[str, Dict[str, Any]]):
+    """
+    (Adenda sync cerebros) Procedencia EXPLÍCITA de un recuerdo mem0:
+    `mem0_engine.add_memory` graba `metadata.brain_id` en el momento de
+    escribir (ver mem0_engine.py). Cuando ese dato está presente y el
+    cerebro sigue existiendo en el registro EN VIVO, es la fuente de verdad
+    y sustituye por completo la adivinanza por persona_id de
+    `_memory_provenance` — ya no hace falta reconstruir nada.
+
+    Devuelve (brain, server) o (None, None) si el recuerdo es de ANTES de
+    esta adenda (sin `brain_id` en metadata — nunca lo tendrá, y eso es
+    honesto, no un bug) o si el cerebro fue borrado desde que se escribió.
+    """
+    brain_id = (metadata or {}).get("brain_id")
+    if not brain_id:
+        return None, None
+    brain = brain_by_id.get(brain_id)
+    if not brain:
+        return None, None
+    brain_ref = {"id": brain.get("id"), "name": brain.get("name") or brain.get("id")}
+    return brain_ref, _server_for_brain(brain)
+
+
+def _memory_provenance(m: Dict[str, Any], prov_by_persona: Dict[str, Dict[str, Any]], brain_by_id: Dict[str, Dict[str, Any]]):
+    """Procedencia de un recuerdo mem0. Orden de preferencia:
+      1. `metadata.brain_id` EXPLÍCITO, grabado por `mem0_engine.add_memory`
+         en el momento de escribir (Adenda sync cerebros) — dato real, no
+         adivinado, y el único que puede saberlo con certeza absoluta.
+      2. Respaldo para lo ya guardado ANTES de esa adenda (no tiene, y nunca
+         tendrá, `brain_id`): `agent_id` real si no es el comodín "*"; si
+         no, `metadata.persona`. Sin ninguno de los dos, o sin ese
+         persona_id enlazado a un cerebro real hoy: (None, None).
+    """
+    metadata = m.get("metadata") or {}
+    brain, server = _explicit_brain_provenance(metadata, brain_by_id)
+    if brain:
+        return brain, server
+
     persona_id = m.get("agent_id")
     if not persona_id or persona_id == "*":
-        persona_id = (m.get("metadata") or {}).get("persona")
+        persona_id = metadata.get("persona")
     if not persona_id:
         return None, None
     prov = prov_by_persona.get(persona_id)
@@ -515,10 +562,12 @@ class AstrauraOrchestrator:
                 # (Adenda 165) Recencia: un recuerdo de hace una hora sobre lo que
                 # estamos haciendo AHORA pesa mas que uno identico de hace un mes.
                 recency = _recency_factor(m.get("updated_at") or m.get("created_at"))
-                # (Deuda 1) brain/server reales — ver _memory_provenance: None
-                # cuando el recuerdo no trae agent_id/metadata.persona, o esa
-                # personalidad no está enlazada a un cerebro registrado hoy.
-                brain, server = _memory_provenance(m, prov_by_persona)
+                # (Deuda 1 + Adenda sync cerebros) brain/server reales — ver
+                # _memory_provenance: preferentemente `metadata.brain_id`
+                # explícito (grabado al escribir, ver mem0_engine.add_memory);
+                # si no está (recuerdo de antes de esa adenda), respaldo por
+                # agent_id/metadata.persona; None si nada de eso resuelve.
+                brain, server = _memory_provenance(m, prov_by_persona, brain_by_id)
                 candidates.append({
                     "source": "memory",
                     "title": m.get("category") or "Recuerdo",

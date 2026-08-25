@@ -72,7 +72,25 @@ def _headers(creds, extra=None):
 
 
 def push_state(key: str, data: dict) -> bool:
-    """Upsert una sección de estado en Supabase (last-write-wins por fila)."""
+    """Upsert una sección de estado en Supabase (last-write-wins por fila).
+
+    (Adenda sync cerebros) BUG REAL ENCONTRADO Y CORREGIDO: el header que
+    había aquí, "Prefer: upsert,return=representation", NO es una directiva
+    válida de PostgREST -- la sintaxis correcta es
+    "Prefer: resolution=merge-duplicates". Verificado en vivo contra este
+    mismo proyecto Supabase: con "upsert" la PRIMERA escritura a una key
+    insertaba bien (201, fila nueva), pero la SEGUNDA escritura a la MISMA
+    key —el caso normal de cualquier sync que dura más de un guardado—
+    devolvía HTTP 409 ("duplicate key value violates unique constraint
+    astraura_state_pkey", código Postgres 23505): PostgREST, al no reconocer
+    "upsert" como resolución válida, hacía un INSERT plano en vez de un
+    upsert, y chocaba con la fila que ya existía. Con
+    "resolution=merge-duplicates" la segunda escritura devuelve HTTP 200
+    (actualiza) en vez de 409 -- probado en vivo antes y después del cambio.
+    Este bug afectaba a TODO lo que pasa por push_state/push_all, no solo a
+    cerebros: cualquier sección que se sincronizara más de una vez (el caso
+    normal) fallaba en silencio a partir de la segunda vez.
+    """
     creds = _load_creds()
     if not creds:
         return False
@@ -85,7 +103,7 @@ def push_state(key: str, data: dict) -> bool:
     tmp.write(payload)
     tmp.close()
     cmd = [_curl_bin(), "-sS", "-m", "30", "--tlsv1.2", "-X", "POST", url,
-           "-w", "\n%{http_code}"] + _headers(creds, ["-H", "Prefer: upsert,return=representation"])
+           "-w", "\n%{http_code}"] + _headers(creds, ["-H", "Prefer: resolution=merge-duplicates,return=representation"])
     cmd += ["--data-binary", f"@{tmp.name}"]
     try:
         proc = subprocess.run(cmd, capture_output=True, text=True, timeout=40)

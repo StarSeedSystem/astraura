@@ -23,6 +23,17 @@ try:
 except Exception:
     system_notifications_engine = None
 
+# (Adenda sync cerebros) Clave dedicada para el registry de cerebros en la
+# tabla `astraura_state` de Supabase. DELIBERADAMENTE distinta de la que usa
+# el mirror genérico de app/core/sync_engine.py ("cerebros__cerebros_registry.json",
+# vía SECTIONS/_sb_key) — ese mirror hace un volcado ciego de todo el
+# archivo sin fusión ni reconciliación por cerebro; esta clave es la del
+# camino con fusión real de este módulo (ver sync_with_supabase /
+# _merge_remote_registry más abajo). Compartir la clave haría que un push
+# ciego del otro módulo pisara, sin fusionar, lo que este módulo acaba de
+# reconciliar con cuidado.
+SUPABASE_CEREBROS_KEY = "astraura_cerebros_merged_v1"
+
 BIOLOGICAL_BRAIN_REGIONS = [
     {
         "region_id": "prefrontal_cortex",
@@ -1150,11 +1161,13 @@ class CerebrosManager:
 
         if changed:
             self._save_to_disk()
-        # También sincronizar con R2 (almacenamiento compartido soberano)
+        # También sincronizar con el almacenamiento compartido soberano:
+        # R2 primero, Supabase como vía REAL cuando R2 no está disponible o
+        # falla de verdad (ver sync_with_best_available más abajo).
         try:
-            r2res = self.sync_with_r2()
-            if r2res.get("success") and r2res.get("linked_count"):
-                linked.extend(r2res["linked"])
+            syncres = self.sync_with_best_available()
+            if syncres.get("success") and syncres.get("linked_count"):
+                linked.extend(syncres["linked"])
         except Exception:
             pass
         return {"success": True, "linked_count": len(linked), "linked": linked}
@@ -1167,19 +1180,176 @@ class CerebrosManager:
             while True:
                 try:
                     self.auto_link_detected_brains()
-                    self.sync_with_r2()
+                    self.sync_with_best_available()
                 except Exception:
                     pass
                 _t.sleep(120)  # re-escaneo cada 2 min
         t = threading.Thread(target=_loop, daemon=True)
         t.start()
 
+    # ===================== Reconciliación (compartida entre R2 y Supabase) =====================
+    # (Adenda sync cerebros) POR QUÉ una regla explícita de reconciliación:
+    # antes, fusionar un registry remoto solo AÑADÍA cerebros cuyo id no
+    # existiera aún localmente — un cerebro YA conocido en ambos lados jamás
+    # se actualizaba, así que dos dispositivos editando el MISMO cerebro
+    # (p.ej. añadiendo una neurona de memoria en cada uno) nunca convergían:
+    # el segundo push simplemente no tenía efecto en el otro dispositivo.
+    # Eso no perdía datos de forma escandalosa, pero sí los dejaba
+    # divergentes en silencio, que es la otra cara de la misma moneda.
+    #
+    # REGLA DE RECONCILIACIÓN (documentada porque un sync que pierde datos en
+    # silencio es peor que no tener sync):
+    #   1. Cerebro solo remoto -> se adopta (unión, sin pérdida).
+    #   2. Cerebro en ambos lados con contenido IDÉNTICO (hash) -> no-op.
+    #   3. Cerebro en ambos lados con contenido DISTINTO:
+    #      a) Si ambas copias traen "updated_at" y son distintos -> gana la
+    #         copia con "updated_at" MAYOR (last-write-wins POR CEREBRO, no
+    #         por registry completo: los demás cerebros no se tocan).
+    #      b) Si empatan o falta "updated_at" en algún lado (hoy la mayoría
+    #         de los métodos de mutación de esta clase todavía no lo
+    #         actualizan en cada edición — no hay manera fiable de saber cuál
+    #         es más nueva) -> gana la copia LOCAL (la que este dispositivo
+    #         tiene delante en este momento), pero la copia perdedora NUNCA
+    #         se descarta: se archiva dentro del propio cerebro ganador en
+    #         `brain["_sync_conflicts"]` (tope 5, más reciente primero) junto
+    #         con su origen y el momento de detección, y se reporta en el
+    #         resultado. El conflicto queda visible e inspeccionable en vez
+    #         de perderse sin dejar rastro.
+    _SYNC_META_KEYS = ("auto_linked", "linked_source", "_sync_conflicts")
+
+    # (Adenda sync cerebros) Campos DERIVADOS/CACHÉ, no contenido: se
+    # recalculan en cada _normalize_brain_schema() a partir de un escaneo de
+    # disco, y NO deben disparar un conflicto de sync por sí solos.
+    # Verificado en vivo en esta misma máquina: el hallazgo real que motivó
+    # esto es que el MISMO cerebro, sin que nadie tocara nada, dio dos hashes
+    # distintos entre dos ciclos de sync porque "total_context_tokens" saltó
+    # de 359367 a 1850 -- `get_cerebros()` pone `context_folders[*].metrics`
+    # a cero ("Disponible bajo demanda") como efecto secundario de cada
+    # llamada, y ese cero se propaga a `token_parameter_stats` en el
+    # siguiente normalize. Incluir esa caché volátil en el hash disparaba un
+    # "conflicto" en CADA ciclo de sync aunque nada real hubiera cambiado.
+    _VOLATILE_BRAIN_KEYS = ("token_parameter_stats",)
+
+    def _brain_content_hash(self, brain: Dict[str, Any]) -> str:
+        """Hash estable del CONTENIDO de un cerebro, excluyendo:
+          - metadatos propios de la sincronización (_SYNC_META_KEYS): son
+            locales a cómo llegó el cerebro, no a lo que el cerebro ES.
+          - cachés derivadas y volátiles (_VOLATILE_BRAIN_KEYS,
+            context_folders[*].metrics): se recalculan solas y no reflejan
+            una edición real -- incluirlas convertiría cada escaneo de disco
+            en un falso conflicto."""
+        import hashlib
+        clean = {
+            k: v for k, v in brain.items()
+            if k not in self._SYNC_META_KEYS and k not in self._VOLATILE_BRAIN_KEYS
+        }
+        if isinstance(clean.get("context_folders"), list):
+            clean["context_folders"] = [
+                {k: v for k, v in cf.items() if k != "metrics"} if isinstance(cf, dict) else cf
+                for cf in clean["context_folders"]
+            ]
+        try:
+            raw = json.dumps(clean, sort_keys=True, ensure_ascii=False, default=str)
+        except Exception:
+            raw = str(clean)
+        return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+    def _archive_conflict(self, local_brain: Dict[str, Any], remote_brain: Dict[str, Any], winner: str, source_label: str):
+        """Archiva la copia PERDEDORA de un cerebro en conflicto dentro del
+        propio cerebro (ganador o no, `local_brain` sigue siendo el objeto
+        que queda en `self.cerebros`). Es la garantía de 'nunca se pierde en
+        silencio': el dato perdedor sigue ahí, inspeccionable, en vez de
+        desaparecer sin dejar rastro."""
+        loser = remote_brain if winner == "local" else local_brain
+        conflicts = list(local_brain.get("_sync_conflicts") or [])
+        conflicts.insert(0, {
+            "detected_at": time.time(),
+            "source": source_label,
+            "winner": winner,
+            "discarded_snapshot": {k: v for k, v in loser.items() if k not in self._SYNC_META_KEYS},
+        })
+        local_brain["_sync_conflicts"] = conflicts[:5]
+
+    def _merge_remote_registry(self, remote: Dict[str, Any], source_label: str) -> Dict[str, Any]:
+        """Fusiona un registry remoto (de R2 o Supabase) con el local,
+        cerebro por cerebro, aplicando la regla de reconciliación de arriba.
+        Devuelve {"linked", "updated", "conflicts", "changed"}. Nunca lanza:
+        un cerebro remoto malformado se salta, no rompe la fusión de los
+        demás."""
+        linked: List[Dict[str, Any]] = []
+        updated: List[Dict[str, Any]] = []
+        conflicts: List[Dict[str, Any]] = []
+        changed = False
+        by_id = {b.get("id"): b for b in self.cerebros if b.get("id")}
+        for rb in (remote.get("cerebros") or []):
+            try:
+                rid = rb.get("id")
+                if not rid:
+                    continue
+                if rid not in by_id:
+                    brain = dict(rb)
+                    brain["auto_linked"] = True
+                    brain["linked_source"] = {"type": source_label, "label": f"Sincronización ({source_label})"}
+                    self._normalize_brain_schema(brain)
+                    self.cerebros.append(brain)
+                    by_id[rid] = brain
+                    linked.append(brain)
+                    changed = True
+                    continue
+                local_brain = by_id[rid]
+                if self._brain_content_hash(local_brain) == self._brain_content_hash(rb):
+                    continue  # idénticos: nada que reconciliar
+                local_ts = local_brain.get("updated_at")
+                remote_ts = rb.get("updated_at")
+                # OJO con el empate: "remote_ts > local_ts" y "remote_ts <
+                # local_ts" son las DOS únicas ramas con comparación fiable.
+                # Un empate (remote_ts == local_ts) NO es fiable pese a que
+                # ambos existan -- dos ediciones distintas en el mismo
+                # segundo son perfectamente posibles y aquí no hay forma de
+                # saber cuál fue realmente después. Tratarlo como
+                # "remote_ts <= local_ts" (con <=) haría que un empate
+                # cayera en la rama silenciosa de "local gana, nada que
+                # archivar" -- exactamente el descarte sin testigo que esta
+                # regla existe para evitar. Por eso el empate cae en el
+                # `else`, igual que la ausencia de timestamp.
+                if local_ts is not None and remote_ts is not None and remote_ts > local_ts:
+                    # Remoto gana por timestamp real, estrictamente más
+                    # nuevo. La copia local perdedora se archiva ANTES de
+                    # sustituir el objeto en self.cerebros.
+                    self._archive_conflict(local_brain, rb, winner="remote", source_label=source_label)
+                    merged = dict(rb)
+                    merged["_sync_conflicts"] = local_brain.get("_sync_conflicts", [])
+                    self._normalize_brain_schema(merged)
+                    idx = self.cerebros.index(local_brain)
+                    self.cerebros[idx] = merged
+                    by_id[rid] = merged
+                    updated.append(merged)
+                    conflicts.append({"brain_id": rid, "winner": "remote", "reason": "updated_at"})
+                    changed = True
+                elif local_ts is not None and remote_ts is not None and remote_ts < local_ts:
+                    # Local gana por timestamp real, estrictamente más nuevo:
+                    # no hay nada que aplicar (el local se re-sube en el
+                    # próximo push y así converge).
+                    continue
+                else:
+                    # Sin comparación fiable posible: falta "updated_at" en
+                    # algún lado (hoy la mayoría de las mutaciones de esta
+                    # clase todavía no lo actualizan), o empatan. Gana
+                    # LOCAL, pero el remoto se archiva -- no se pierde.
+                    self._archive_conflict(local_brain, rb, winner="local", source_label=source_label)
+                    conflicts.append({"brain_id": rid, "winner": "local", "reason": "sin-timestamp-fiable"})
+                    changed = True
+            except Exception as e:
+                print(f"[Sync cerebros] Cerebro remoto '{rb.get('id')}' saltado ({source_label}): {e}")
+        return {"linked": linked, "updated": updated, "conflicts": conflicts, "changed": changed}
+
     # ===================== Sincronización con R2 (almacenamiento compartido) =====================
     def sync_with_r2(self) -> Dict[str, Any]:
         """Descarga el registry de cerebros desde R2 (almacenamiento compartido
-        soberano) y fusiona los cerebros encontrados con el registry local.
-        Permite que desde CUALQUIER dispositivo con credenciales R2 se vean los
-        mismos cerebros en tiempo real."""
+        soberano) y fusiona los cerebros encontrados con el registry local
+        (ver regla de reconciliación arriba). Permite que desde CUALQUIER
+        dispositivo con credenciales R2 se vean los mismos cerebros en
+        tiempo real."""
         try:
             from app.core import r2_storage
             if not r2_storage.is_available():
@@ -1187,7 +1357,14 @@ class CerebrosManager:
             print("🧪 [R2] Intentando sincronizar cerebros desde Cloudflare R2...")
             remote = r2_storage.download_json("cerebros/cerebros_registry.json")
             if not remote or "cerebros" not in remote:
-                print("🧪 [R2] Sin registry remoto aún (primer uso). Se subirá el local.")
+                # (Adenda sync cerebros) DIAGNÓSTICO HONESTO: antes esto se
+                # imprimía igual tanto si el objeto simplemente no existía
+                # aún (primer uso, HTTP 404) como si el handshake TLS había
+                # muerto sin llegar a haber respuesta HTTP — dos causas
+                # completamente distintas con el mismo mensaje. Ahora se
+                # adjunta el diagnóstico real de r2_storage.diagnose().
+                diag = r2_storage.diagnose()
+                print(f"🧪 [R2] Sin registry remoto aún (o fallo de descarga). {diag}")
                 # Subir el registry local para sembrar R2
                 # `upload_to_r2()` DEVUELVE un booleano y antes se ignoraba: se
                 # imprimía "sembrado correctamente" con solo no lanzar excepción,
@@ -1200,28 +1377,18 @@ class CerebrosManager:
                     if sembrado:
                         print("🧪 [R2] Registry local sembrado en R2 correctamente.")
                     else:
+                        diag2 = r2_storage.diagnose()
                         print("🧪 [R2] NO se pudo sembrar el registry en R2: la subida falló. "
-                              "Los cerebros NO están sincronizados entre dispositivos.")
-                        return {"success": False, "reason": "upload-failed"}
+                              f"Los cerebros NO están sincronizados entre dispositivos. {diag2}")
+                        return {"success": False, "reason": "upload-failed", "diagnosis": diag2}
                 except Exception as e:
                     print(f"🧪 [R2] Error sembrando R2: {type(e).__name__}: {e}")
                     return {"success": False, "reason": f"upload-error:{type(e).__name__}"}
-                return {"success": False, "reason": "no-remote-registry"}
-            linked = []
-            seen_ids = {b.get("id") for b in self.cerebros}
-            for b in remote["cerebros"]:
-                bid = b.get("id")
-                if bid and bid not in seen_ids:
-                    brain = dict(b)
-                    brain["auto_linked"] = True
-                    brain["linked_source"] = {"type": "r2", "label": "Cloudflare R2 (Compartido)"}
-                    self._normalize_brain_schema(brain)
-                    self.cerebros.append(brain)
-                    linked.append(brain)
-                    seen_ids.add(bid)
-            if linked:
+                return {"success": False, "reason": "no-remote-registry", "diagnosis": diag}
+            merge_result = self._merge_remote_registry(remote, source_label="r2")
+            if merge_result["changed"]:
                 self._save_to_disk()
-            return {"success": True, "linked_count": len(linked), "linked": linked}
+            return {"success": True, **merge_result, "linked_count": len(merge_result["linked"])}
         except Exception as e:
             return {"success": False, "error": str(e)[:200]}
 
@@ -1237,16 +1404,103 @@ class CerebrosManager:
         except Exception:
             return False
 
-    def _save_to_disk(self):
-        """Propaga el registry local a R2 (almacenamiento compartido) además
-        de guardarlo en disco."""
+    # ===================== Sincronización con Supabase (vía REAL hoy) =====================
+    # (Adenda sync cerebros) Alex pidió cerebros "sincronizables" de verdad.
+    # R2 en la cuenta actual RECHAZA el handshake TLS -- diagnosticado a
+    # fondo en r2_storage.py: el endpoint *.r2.cloudflarestorage.com de esta
+    # cuenta no tiene R2 aprovisionado, y eso no se arregla desde el código.
+    # Supabase, en cambio, es real hoy: is_available() da True y hay
+    # credenciales que funcionan (verificado en vivo: push HTTP 201, pull
+    # devuelve el contenido exacto de vuelta). Por eso Supabase es la vía que
+    # se usa en la práctica cada vez que R2 no está disponible o falla.
+    def sync_with_supabase(self) -> Dict[str, Any]:
+        """Descarga el registry de cerebros desde Supabase y lo fusiona con
+        el local (misma regla de reconciliación que sync_with_r2, ver arriba
+        de la sección de Reconciliación). Simétrico a sync_with_r2 a
+        propósito: mismo contrato de retorno, misma lógica de fusión —
+        ambos backends deben comportarse igual desde el punto de vista del
+        llamante."""
+        try:
+            from app.core import supabase_sync
+            if not supabase_sync.is_available():
+                return {"success": False, "reason": "no-credentials"}
+            print("🧪 [SB] Intentando sincronizar cerebros desde Supabase...")
+            remote = supabase_sync.pull_state(SUPABASE_CEREBROS_KEY)
+            if not remote or "cerebros" not in remote:
+                print("🧪 [SB] Sin registry remoto aún en Supabase (primer uso). Se subirá el local.")
+                try:
+                    sembrado = self.upload_to_supabase()
+                    if sembrado:
+                        print("🧪 [SB] Registry local sembrado en Supabase correctamente.")
+                        return {"success": True, "linked_count": 0, "linked": [], "updated": [], "conflicts": [], "seeded": True}
+                    print("🧪 [SB] NO se pudo sembrar el registry en Supabase: la subida falló. "
+                          "Los cerebros NO están sincronizados entre dispositivos.")
+                    return {"success": False, "reason": "upload-failed"}
+                except Exception as e:
+                    print(f"🧪 [SB] Error sembrando Supabase: {type(e).__name__}: {e}")
+                    return {"success": False, "reason": f"upload-error:{type(e).__name__}"}
+            merge_result = self._merge_remote_registry(remote, source_label="supabase")
+            if merge_result["changed"]:
+                self._save_to_disk_only()
+                # Re-subir el resultado fusionado para que el otro
+                # dispositivo también vea la reconciliación -- así converge
+                # en las dos direcciones, no solo al bajar.
+                self.upload_to_supabase()
+            return {"success": True, **merge_result, "linked_count": len(merge_result["linked"])}
+        except Exception as e:
+            return {"success": False, "error": str(e)[:200]}
+
+    def upload_to_supabase(self) -> bool:
+        """Sube el registry local de cerebros a Supabase."""
+        try:
+            from app.core import supabase_sync
+            if not supabase_sync.is_available():
+                return False
+            data = {"active_brain_id": self.active_brain_id, "cerebros": self.cerebros}
+            return supabase_sync.push_state(SUPABASE_CEREBROS_KEY, data)
+        except Exception:
+            return False
+
+    def sync_with_best_available(self) -> Dict[str, Any]:
+        """Sincroniza cerebros usando el mejor destino disponible: intenta R2
+        primero y, solo si R2 no está disponible o la operación falla DE
+        VERDAD (no solo "sin credenciales" -- ver r2res.get("success")),
+        recurre a Supabase. Hoy R2 falla siempre en esta cuenta (endpoint no
+        aprovisionado, ver r2_storage.diagnose()), así que en la práctica
+        esta función sincroniza SIEMPRE por Supabase -- pero el código no
+        asume cuál de los dos funciona: el día que Alex habilite R2 en
+        Cloudflare, vuelve a usarse sin tocar una línea."""
+        r2res = self.sync_with_r2()
+        if r2res.get("success"):
+            return r2res
+        sbres = self.sync_with_supabase()
+        if sbres.get("success"):
+            sbres["r2_reason"] = r2res.get("reason") or r2res.get("error")
+            return sbres
+        return {"success": False, "r2": r2res, "supabase": sbres}
+
+    def _save_to_disk_only(self):
+        """Guarda el registry en disco SIN propagar a R2/Supabase. Existe
+        para que sync_with_supabase pueda persistir una fusión ya calculada
+        sin disparar un upload_to_r2() que sabemos que va a fallar (y que ya
+        se intentó, indirectamente, en sync_with_best_available) antes de
+        subir el resultado fusionado a Supabase."""
         try:
             with open(self.cerebros_file, "w", encoding="utf-8") as f:
                 json.dump({"active_brain_id": self.active_brain_id, "cerebros": self.cerebros}, f, indent=2, ensure_ascii=False)
         except Exception:
             pass
+
+    def _save_to_disk(self):
+        """Guarda el registry en disco y lo propaga al almacenamiento
+        compartido: R2 primero; si no está disponible o la subida falla de
+        verdad (hoy falla siempre en esta cuenta por el endpoint no
+        aprovisionado -- ver r2_storage.diagnose()), Supabase es la vía REAL
+        de sincronización que se usa en su lugar."""
+        self._save_to_disk_only()
         try:
-            self.upload_to_r2()
+            if not self.upload_to_r2():
+                self.upload_to_supabase()
         except Exception:
             pass
 

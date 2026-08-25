@@ -5595,25 +5595,45 @@ bool ggml_validate_row_data(enum ggml_type type, const void * data, size_t nbyte
 #define MIN_VAL(a, b) ((a) < (b) ? (a) : (b))
 
 void dequantize_row_i2_s(const uint8_t * x, float * y, int64_t n, const float i2_scale) {
+    // i2_s ternario: 4 valores por byte, agrupados por PASO, no consecutivos.
+    //
+    // EL BUG QUE ESTO ARREGLA (segfault real, no hipotetico): esta funcion
+    // asumia SIEMPRE el empaquetado x86 —128 valores en 32 bytes, paso 32— pero
+    // en ARM QK_I2_S vale 64: son 64 valores en 16 bytes, paso 16. Al avanzar de
+    // 128 en 128 sobre un tensor empaquetado de 64 en 64, `x[(done/4) + gp]`
+    // acababa leyendo MAS ALLA del tensor. El backend BLAS llama aqui para
+    // convertir el tensor ternario a float antes de multiplicar, asi que el
+    // llama-server de fondo moria con SIGSEGV en cuanto le llegaba una peticion:
+    //   dequantize_row_i2_s  <-  ggml_backend_blas_mul_mat
+    // Es la misma familia que los tres fallos del kernel ARM que ya corregimos
+    // (el `set()` de CMake que impedia compilarlo, el `_1xN` que escribia la
+    // fila 0 en todas, y el gemm que erraba 3 de cada 4 columnas): el kernel
+    // vectorial se arreglo, pero esta ruta escalar se quedo con el diseno x86.
+    //
+    // El limite `lim` ademas evita la sobrelectura del bloque final cuando `n`
+    // no es multiplo del bloque: los bytes cuyo `gp` cae fuera solo codifican
+    // valores que ya estarian por encima de `n`.
     static const float map2bit[4] = { -1.0f, 0.0f, 1.0f, 0.0f };
+#if defined(__ARM_NEON)
+    const int64_t grp = 16;   // QK_I2_S = 64 en ARM
+    const int64_t blk = 64;
+#else
+    const int64_t grp = 32;   // QK_I2_S = 128 en x86
+    const int64_t blk = 128;
+#endif
     int64_t done = 0;
     while (done < n) {
-        int64_t cols0 = MIN_VAL(32, n - done - 0*32);
-        int64_t cols1 = MIN_VAL(32, n - done - 1*32);
-        int64_t cols2 = MIN_VAL(32, n - done - 2*32);
-        int64_t cols3 = MIN_VAL(32, n - done - 3*32);
-        for (int gp = 0; gp < 32; gp++) {
-            uint8_t byte = x[(done/4) + gp];
-            uint8_t c0 = (byte >> 6) & 0x03;
-            uint8_t c1 = (byte >> 4) & 0x03;
-            uint8_t c2 = (byte >> 2) & 0x03;
-            uint8_t c3 = (byte >> 0) & 0x03;
-            if (gp < cols0) y[done + 0*32 + gp] = i2_scale * map2bit[c0];
-            if (gp < cols1) y[done + 1*32 + gp] = i2_scale * map2bit[c1];
-            if (gp < cols2) y[done + 2*32 + gp] = i2_scale * map2bit[c2];
-            if (gp < cols3) y[done + 3*32 + gp] = i2_scale * map2bit[c3];
+        const int64_t lim = MIN_VAL(grp, n - done);
+        for (int64_t gp = 0; gp < lim; gp++) {
+            const uint8_t byte = x[(done/4) + gp];
+            for (int64_t g = 0; g < 4; g++) {
+                const int64_t idx = done + g*grp + gp;
+                if (idx < n) {
+                    y[idx] = i2_scale * map2bit[(byte >> (6 - 2*g)) & 0x03];
+                }
+            }
         }
-        done += 128;
+        done += blk;
     }
 }
 

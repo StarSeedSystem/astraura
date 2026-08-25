@@ -1107,6 +1107,14 @@ class IntuitiveImaginationEngine:
 
         if p_id in self.process_metadata:
             self.process_metadata[p_id]["status"] = "running"
+            # (Adenda 168) Instante REAL de inicio de ESTE ciclo -- antes no
+            # se publicaba en ningún sitio que agent_genesis_engine pudiera
+            # leer sin inventarlo, así que oficina.ocupantes[].desde se
+            # aproximaba (anclado a cuándo un GET /oficina lo observaba por
+            # primera vez). Mismo `now` que ya se capturó arriba al poner
+            # is_dreaming_now=True -- es el instante exacto en que ESTE
+            # proceso pasó a 'running', no una lectura posterior.
+            self.process_metadata[p_id]["cycle_started_at"] = now
 
         # (Tarea B) Personalidad y agentes reales bajo los que corre ESTE
         # ciclo — llegan al prompt de _cognize_branch/_cognize_creation y

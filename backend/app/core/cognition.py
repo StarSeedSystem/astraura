@@ -167,23 +167,61 @@ async def generate(
 
     t0 = time.perf_counter()
     meta: Dict[str, Any] = {}
-    # (Ola 3) Gracia de arranque: si el servidor nativo de FONDO aún no está listo
-    # (modelo cargando), el primer ciclo no debe caer a plantilla por un timeout
-    # pensado para el motor caliente. Solo se aplica cuando hay BitNet nativo.
-    try:
-        from ..engine.bitnet_cpp_manager import bitnet_cpp_manager as _mgr
-        if mode == "bitnet-native" and not _mgr.server_ready("background"):
-            timeout = max(timeout, 75.0) + 180.0
-    except Exception:
-        pass
     if mode == "bitnet-native":
-        # Suelo realista para el motor nativo en CPU (cola de 1 slot + prompt largo):
-        # en hardware rápido la llamada simplemente termina antes (esto es un tope).
-        timeout = max(timeout, float(os.environ.get("ASTRAURA_COGNITION_MIN_TIMEOUT") or 150.0))
-    # Adaptación a la velocidad MEDIDA (media móvil de llamadas reales previas).
-    _tps_known = float(_stats.get("measured_tps") or 0.0)
-    if _tps_known and _tps_known < 14.0:
-        timeout = min(max(timeout, 45.0 + (float(max_tokens) / max(_tps_known, 1.0)) * 1.7), 480.0)
+        # (Verificación 1.58) Suelo PROPORCIONAL a `max_tokens`, no una cifra fija
+        # para cualquier petición. Medido de punta a punta en el M1 de Alex con el
+        # GGUF i2_s real: 4.3 tok/s. Antes el suelo era 150 s SIEMPRE — de sobra
+        # para 400 tokens (~93 s de generación), pero un despilfarro para la
+        # llamada de verificación de agent_genesis_engine (16 tokens, ~4 s reales):
+        # esperaba hasta 150 s para poder reportar un fallo real, 30-40x más de lo
+        # que hacía falta. `_tps_floor` es conservador (por debajo de lo medido)
+        # para no recortar una respuesta legítima que vaya lenta por carga de la
+        # máquina; en cuanto hay una media móvil real (`measured_tps`) se usa esa,
+        # con el mismo colchón.
+        _tps_floor = 3.5
+        # (Verificación 1.58) BUG cerrado en bucle, encontrado EN VIVO hoy: un
+        # timeout NUNCA actualiza `measured_tps` (solo lo hace un éxito, más
+        # abajo) — así que si el primer intento en un proceso nuevo agota el
+        # timeout por ir el motor más lento que `_tps_floor`, ese proceso queda
+        # atrapado para SIEMPRE con la misma estimación optimista: cada intento
+        # siguiente vuelve a fallar igual de corto, y `measured_tps` nunca llega
+        # a fijarse porque fijarlo exige justo lo que el timeout le impide
+        # (terminar). MEDIDO hoy: con 3-4 subagentes compitiendo por los mismos
+        # núcleos, el motor nativo bajó a 0.13-0.6 tok/s — muy por debajo del
+        # suelo de 3.5 (sano en condiciones normales, ~4.3 tok/s de referencia).
+        # Backoff: cada timeout consecutivo de bitnet-native sin medición real
+        # DUPLICA el presupuesto del siguiente intento, hasta que uno complete
+        # (fija `measured_tps` de verdad) o el techo de 480s lo pare igual.
+        _timeout_streak = int(_stats.get("bitnet_timeout_streak") or 0)
+        if _timeout_streak > 0:
+            _tps_floor = max(0.2, _tps_floor / (2.0 ** _timeout_streak))
+        _measured = float(_stats.get("measured_tps") or 0.0)
+        _tps = _measured if 0 < _measured < 14.0 else _tps_floor
+        # +20 s fijos (conexión + prefill del prompt) y x1.8 sobre la generación
+        # esperada: colchón para la cola de 1 slot cuando el chat interactivo
+        # también le pide turno al mismo core.
+        proportional = 20.0 + (float(max_tokens) / _tps) * 1.8
+        timeout = max(timeout, proportional, float(os.environ.get("ASTRAURA_COGNITION_MIN_TIMEOUT") or 0.0))
+        # Gracia de arranque en frío: si el servidor de FONDO aún no está listo, la
+        # primera carga del GGUF (mmap ~1.1 GB) se suma al presupuesto — el primer
+        # turno tras un arranque no debe caer a plantilla solo porque el modelo
+        # seguía cargando. Con el motor ya vivo (el caso normal, backend arrancado)
+        # esta gracia no se aplica: no hay nada que esperar.
+        try:
+            from ..engine.bitnet_cpp_manager import bitnet_cpp_manager as _mgr
+            if not _mgr.server_ready("background"):
+                timeout += 180.0
+        except Exception:
+            pass
+        timeout = min(timeout, 480.0)
+    else:
+        # Salvaguarda general (Ollama u otro motor real): si la última generación
+        # medida fue lenta (<14 tok/s) bajo carga compartida de la máquina, se
+        # estira el techo en proporción a `max_tokens` en vez de cortar una
+        # respuesta legítima a medias. Mismos números que ya estaban probados aquí.
+        _measured = float(_stats.get("measured_tps") or 0.0)
+        if 0 < _measured < 14.0:
+            timeout = min(max(timeout, 45.0 + (float(max_tokens) / _measured) * 1.7), 480.0)
     try:
         sem = _get_semaphore()
         async with sem:
@@ -195,6 +233,11 @@ async def generate(
         ms = int((time.perf_counter() - t0) * 1000)
         _stats["errors"] += 1
         _stats["last_ms"] = ms
+        if mode == "bitnet-native":
+            # (Verificación 1.58) alimenta el backoff de arriba: sin esto, un
+            # proceso que falla una vez por timeout falla siempre por el mismo
+            # motivo (ver comentario junto a `_tps_floor`).
+            _stats["bitnet_timeout_streak"] = int(_stats.get("bitnet_timeout_streak") or 0) + 1
         return _templates_result(mode, "timeout", ms)
     except Exception as e:  # pragma: no cover - defensivo
         ms = int((time.perf_counter() - t0) * 1000)
@@ -211,6 +254,10 @@ async def generate(
         _stats["template"] += 1
         return _templates_result(mode, "engine-fallback" if text else "empty", ms)
     _stats["real"] += 1
+    if meta.get("source") == "bitnet-native":
+        # Un intento nativo completo de verdad rompe la racha de timeouts: ya
+        # hay una medición real, así que el backoff deja de hacer falta.
+        _stats["bitnet_timeout_streak"] = 0
     # Velocidad MEDIDA (media móvil, ~3.2 chars/token): alimenta los timeouts
     # adaptativos de las próximas llamadas en hardware lento.
     try:

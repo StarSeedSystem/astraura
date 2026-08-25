@@ -5,6 +5,7 @@ import shutil
 import threading
 import time
 import urllib.request
+import urllib.error
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from ..core.config import settings
@@ -40,12 +41,52 @@ class BitNetCppManager:
         self._servers: Dict[str, Dict[str, Any]] = {}
         self._server_log = Path(os.environ.get("ASTRAURA_BITNET_LOG") or (self.repo_dir.parent / "bitnet-server.log"))
         self.server_port = int(os.environ.get("ASTRAURA_BITNET_PORT") or 8790)
-        self.server_ctx = int(os.environ.get("ASTRAURA_BITNET_CTX") or 4096)
+        # Contexto AJUSTADO A LA RAM DE LA MÁQUINA, no una constante.
+        #
+        # Por qué: este Mac tiene 8 GB y ya corre Ollama residente (~1 GB) más
+        # el backend. Con `-c 4096` el llama-server carga el modelo bien y
+        # responde a `/health`, pero al llegarle la PRIMERA petición reserva el
+        # búfer de cómputo, la memoria se dispara y el sistema lo mata — sin
+        # informe de fallo, sin mensaje de error, sin nada. Desde fuera parecía
+        # que el motor 1.58 "no funcionaba"; en realidad lo estaban matando por
+        # memoria en cuanto intentaba pensar.
+        #
+        # Medido en esta máquina: con `-c 1024` la misma petición devuelve
+        # HTTP 200 y el servidor SOBREVIVE. Con `-c 4096` muere siempre.
+        #
+        # Se sigue pudiendo forzar con ASTRAURA_BITNET_CTX para una máquina con
+        # holgura; el automático solo evita el suicidio silencioso por defecto.
+        self.server_ctx = int(os.environ.get("ASTRAURA_BITNET_CTX") or self._ctx_segun_ram())
         # 1 slot por perfil: cada petición usa el contexto COMPLETO y las demás
         # esperan en cola (con pocos núcleos, el paralelismo solo trocea la KV).
         self.server_parallel = max(1, int(os.environ.get("ASTRAURA_BITNET_PAR") or 1))
         self._server_lock = threading.Lock()  # un solo spawn aunque llamen N corrutinas a la vez
         
+    def _ctx_segun_ram(self) -> int:
+        """
+        Elige el contexto que la máquina puede sostener DE VERDAD.
+
+        No es una heurística de salón: en este Mac de 8 GB, con `-c 4096` el
+        servidor carga el modelo, responde a `/health` y muere en cuanto le
+        llega la primera petición real — el sistema lo mata al reservar el
+        búfer de cómputo. Con `-c 1024` la misma petición devuelve HTTP 200 y
+        el servidor sigue vivo. Medido, no supuesto.
+
+        Escalones deliberadamente conservadores: preferimos un contexto corto
+        que responda a uno largo que muera en silencio. Quien tenga holgura
+        sube el valor con ASTRAURA_BITNET_CTX.
+        """
+        try:
+            import psutil
+            gb = psutil.virtual_memory().total / (1024 ** 3)
+        except Exception:
+            return 2048  # sin poder medir, el término medio prudente
+        if gb <= 8.5:
+            return 1024
+        if gb <= 16.5:
+            return 2048
+        return 4096
+
     def check_status(self) -> Dict[str, Any]:
         """
         Inspects whether bitnet.cpp is cloned, compiled, and what models are available.
@@ -111,18 +152,104 @@ class BitNetCppManager:
                 return p
         return None
 
-    def _port_for(self, profile: str) -> int:
-        return self.server_port if profile == "interactive" else self.server_port + 1
+    def _servidor_compartido(self) -> bool:
+        """
+        ¿Esta máquina puede permitirse DOS llama-server a la vez?
 
-    def _alive(self, profile: str, timeout: float = 1.5) -> bool:
-        st = self._servers.get(profile)
-        if not st or not st.get("base"):
+        La idea de dos perfiles (interactive con prioridad normal, background con
+        `nice` alto) es buena en una máquina holgada: el fondo nunca le roba el
+        turno al usuario. Pero en 8 GB, con Ollama residente y el backend, dos
+        servidores del mismo modelo NO caben: el segundo carga bien, contesta a
+        `/health`, y muere en cuanto reserva el búfer de cómputo de su primera
+        petición real. Sin informe de fallo y sin mensaje: desde fuera parecía
+        que el motor 1.58 «no funcionaba».
+
+        Medido en este Mac: un SOLO servidor con `-c 1024` sirve peticiones
+        reales y sobrevive (HTTP 200, salida coherente); dos servidores mueren.
+        Así que por debajo del umbral compartimos uno. Se pierde el aislamiento
+        de prioridades; se gana que el motor responda, que es lo que importa.
+        """
+        if os.environ.get("ASTRAURA_BITNET_SERVIDORES") == "2":
             return False
         try:
-            with urllib.request.urlopen(f"{st['base']}/health", timeout=timeout) as res:
-                return b"ok" in res.read()
+            import psutil
+            return (psutil.virtual_memory().total / (1024 ** 3)) <= 12.0
         except Exception:
-            return False
+            return True  # sin poder medir, la opción que no se suicida
+
+    def _port_for(self, profile: str) -> int:
+        if self._servidor_compartido():
+            return self.server_port
+        return self.server_port if profile == "interactive" else self.server_port + 1
+
+    # ── (Verificación 1.58) Sonda REAL del puerto, no del proceso ──────────────
+    # `self._servers` solo sabe de los subprocesos que ESTE proceso lanzó. Un
+    # backend nuevo (recarga, script de verificación, otro worker) arranca con
+    # ese diccionario vacío, y ANTES de esta sonda `_alive()`/`server_status()`
+    # declaraban el motor apagado (running=False, ready=False) aunque hubiera un
+    # llama-server real, vivo y respondiendo en el puerto — lanzado por ESTE
+    # proceso en un arranque anterior, o por cualquier otro. El estado tiene que
+    # salir del PUERTO, no de la memoria de un proceso concreto.
+    #
+    # Cache corta (2 s por defecto, `ASTRAURA_BITNET_PROBE_TTL`) para no golpear
+    # /health en cada consulta de estado desde la UI o desde `ensure_server`.
+    _probe_cache: Dict[str, Dict[str, Any]] = {}
+    PROBE_TTL = float(os.environ.get("ASTRAURA_BITNET_PROBE_TTL") or 2.0)
+
+    def probe_port(self, profile: str, timeout: float = 1.5, force: bool = False) -> Dict[str, Any]:
+        """Estado REAL observado en el puerto del perfil (vivo o no, lo hayamos
+        lanzado nosotros o no). `state` ∈:
+          · "apagado"                — nada escucha en el puerto (conexión rechazada
+            o timeout). El único caso que de verdad significa "motor apagado".
+          · "arrancando"             — el proceso responde pero el modelo sigue
+            cargando (llama-server: HTTP 503 "Loading model").
+          · "listo"                  — HTTP 200 con {"status":"ok"}: nuestro
+            llama-server, con el modelo cargado y listo para inferir.
+          · "respondiendo_sin_modelo" — ALGO responde en ese puerto (TCP acepta,
+            hay HTTP de vuelta) pero no es el contrato esperado de llama-server:
+            puede ser un proceso ajeno ocupando el puerto, una versión distinta,
+            o un error real del servidor. No se puede lanzar OTRO servidor encima
+            (el bind fallaría), pero tampoco es honesto llamarlo "listo".
+        """
+        port = self._port_for(profile)
+        base = f"http://127.0.0.1:{port}"
+        now = time.time()
+        if not force:
+            cached = self._probe_cache.get(profile)
+            if cached and (now - float(cached.get("at", 0.0))) < self.PROBE_TTL:
+                return cached["result"]
+        result: Dict[str, Any]
+        try:
+            with urllib.request.urlopen(f"{base}/health", timeout=timeout) as res:
+                body = res.read()
+                try:
+                    data = json.loads(body)
+                except Exception:
+                    data = {}
+                if res.status == 200 and data.get("status") == "ok":
+                    result = {"state": "listo", "base": base, "http": res.status}
+                else:
+                    result = {"state": "respondiendo_sin_modelo", "base": base, "http": res.status, "detalle": data}
+        except urllib.error.HTTPError as e:
+            try:
+                data = json.loads(e.read())
+            except Exception:
+                data = {}
+            msg = str((data.get("error") or {}).get("message") or "").lower()
+            if e.code == 503 and "load" in msg:
+                result = {"state": "arrancando", "base": base, "http": e.code}
+            else:
+                result = {"state": "respondiendo_sin_modelo", "base": base, "http": e.code, "detalle": data}
+        except Exception as exc:
+            # Connection refused / timeout / DNS-lo-que-sea: nada real ahí.
+            result = {"state": "apagado", "base": None, "error": f"{type(exc).__name__}"}
+        self._probe_cache[profile] = {"at": now, "result": result}
+        return result
+
+    def _alive(self, profile: str, timeout: float = 1.5) -> bool:
+        """Vivo = el puerto responde "listo" (ver `probe_port`), sin importar quién
+        lo lanzó ni si `self._servers` tiene registro de él."""
+        return self.probe_port(profile, timeout=timeout).get("state") == "listo"
 
     # ── (Adenda 160) Sonda de cordura del motor nativo ─────────────────────────
     # bitnet.cpp NO tiene kernel vectorial i2_s para ARM: solo una rama
@@ -138,7 +265,25 @@ class BitNetCppManager:
     _sanity: Optional[Dict[str, Any]] = None
 
     def native_sanity(self, base: str) -> Dict[str, Any]:
-        """Genera 8 tokens y comprueba que no sean todos el mismo. Cachea el veredicto."""
+        """Genera 8 tokens y comprueba que no sean degenerados (mismo caracter
+        repetido). Cachea el veredicto — una vez por proceso.
+
+        (Verificación 1.58) El umbral de VELOCIDAD que había aquí (tps < 1.0 ⇒
+        NO USABLE) se retira como criterio de descalificación — MEDIDO en vivo
+        en el Mac de Alex bajo carga real (varios backends/subagentes compitiendo
+        por los mismos 8 núcleos a la vez): el motor nativo, con salida coherente
+        y NO degenerada (la prueba de que el kernel vectorial SÍ funciona), midió
+        0.27–0.37 tok/s — por debajo del propio umbral de 1.0 pensado para
+        detectar el bug real (fallback escalar ARM, que da SIEMPRE el mismo
+        carácter, ~0.15 tok/s). Los dos rangos se solapan bajo carga: la
+        VELOCIDAD no distingue "kernel roto" de "máquina compartida ocupada".
+        La salida DEGENERADA sí lo hace — es la firma real y única del bug de
+        Adenda 160 (token constante ante cualquier entrada) — así que es el
+        ÚNICO criterio de descalificación que queda. Ir lento pero de verdad es
+        justo lo que pidió Alex frente a caer a Ollama en silencio; para eso
+        están los timeouts adaptativos de cognition.py (miden el tps real y
+        ajustan el techo en vez de exigir velocidad para poder usarse siquiera).
+        """
         if self._sanity is not None:
             return self._sanity
         verdict: Dict[str, Any] = {"ok": False, "reason": "sin comprobar", "sample": ""}
@@ -148,21 +293,44 @@ class BitNetCppManager:
                 json.dumps({"prompt": "La capital de Francia es", "n_predict": 8, "temperature": 0.1}).encode(),
                 {"Content-Type": "application/json"},
             )
-            with urllib.request.urlopen(req, timeout=180) as res:
+            # (Verificación 1.58) 180s NO bastó en la práctica: MEDIDO en vivo el
+            # 2026-08-25 con 3 backends/subagentes compitiendo por los mismos 8
+            # núcleos, esta misma sonda de 8 tokens agotó 180s y lanzó TimeoutError
+            # con el servidor realmente vivo (server_ready=True) — no es un motor
+            # roto, es contención real. Subimos el techo y lo hacemos ajustable
+            # por entorno en vez de asumir un numero fijo (MIDE, NO SUPONGAS).
+            _sanity_timeout = float(os.environ.get("ASTRAURA_BITNET_SANITY_TIMEOUT") or 240.0)
+            with urllib.request.urlopen(req, timeout=_sanity_timeout) as res:
                 data = json.loads(res.read().decode())
             txt = str(data.get("content") or "")
             uniq = set(txt.strip())
             tps = float((data.get("timings") or {}).get("predicted_per_second") or 0.0)
             if not txt.strip():
-                verdict = {"ok": False, "reason": "el motor nativo no devolvio texto", "sample": txt}
+                verdict = {"ok": False, "reason": "el motor nativo no devolvio texto", "sample": txt, "tps": tps}
             elif len(uniq) <= 1:
-                verdict = {"ok": False, "reason": f"salida degenerada (un solo caracter repetido: {txt.strip()[:12]!r}) — bitnet.cpp no tiene kernel i2_s vectorial para ARM", "sample": txt}
-            elif tps and tps < 1.0:
-                verdict = {"ok": False, "reason": f"inservible por lentitud: {tps:.2f} tok/s (fallback escalar sin NEON)", "sample": txt}
+                verdict = {"ok": False, "reason": f"salida degenerada (un solo caracter repetido: {txt.strip()[:12]!r}) — bitnet.cpp no tiene kernel i2_s vectorial para ARM", "sample": txt, "tps": tps}
             else:
-                verdict = {"ok": True, "reason": f"correcto ({tps:.1f} tok/s)", "sample": txt}
+                lento = bool(tps and tps < 1.0)
+                motivo = (
+                    f"correcto ({tps:.2f} tok/s)" if not lento
+                    else f"correcto pero LENTO ({tps:.2f} tok/s — máquina bajo carga compartida; la salida no es degenerada, así que no es el bug del kernel escalar)"
+                )
+                verdict = {"ok": True, "reason": motivo, "sample": txt, "tps": tps, "lento": lento}
         except Exception as exc:
-            verdict = {"ok": False, "reason": f"la sonda fallo: {type(exc).__name__}", "sample": ""}
+            # (Verificación 1.58) BUG serio encontrado EN VIVO hoy: un fallo aquí
+            # (TimeoutError, ConnectionError...) es casi siempre TRANSITORIO —
+            # cola/CPU compartida con otros procesos — MEDIDO hoy mismo: la sonda
+            # agotó 240s bajo carga real de varios subagentes a la vez, con el
+            # servidor sano y respondiendo (server_ready=True). No es una
+            # propiedad del binario/modelo. Si esto se cacheara como veredicto
+            # definitivo (como hacía antes), el PROCESO quedaría inhabilitado
+            # para BitNet nativo el resto de su vida aunque la máquina se
+            # despejara 2 minutos después — justo lo contrario de "no mates
+            # respuestas legítimas". Por eso NO se guarda en self._sanity: se
+            # devuelve el fallo para ESTA llamada y la próxima vuelve a sondear.
+            verdict = {"ok": False, "reason": f"la sonda fallo: {type(exc).__name__}", "sample": "", "transitorio": True}
+            print(f"[BitNetCppManager] sonda del motor nativo: NO USABLE (transitorio — cola/CPU compartida, se reintentará) — {verdict['reason']}")
+            return verdict
         self._sanity = verdict
         print(f"[BitNetCppManager] sonda del motor nativo: {'OK' if verdict['ok'] else 'NO USABLE'} — {verdict['reason']}")
         return verdict
@@ -170,7 +338,24 @@ class BitNetCppManager:
     def ensure_server(self, wait_seconds: float = 0.0, profile: str = "interactive") -> Optional[str]:
         """Arranca (si hace falta) el llama-server nativo del PERFIL pedido con el GGUF
         i2_s y devuelve su base URL, o None si no hay binario/modelo. `wait_seconds` > 0
-        espera a que el modelo cargue (health ok); 0 = arranque sin bloquear."""
+        espera a que el modelo cargue (health ok); 0 = arranque sin bloquear.
+
+        (Verificación 1.58) Antes de lanzar NADA, sonda el puerto real
+        (`probe_port(force=True)`: la decisión de lanzar-o-no tiene que ver el
+        instante actual, no una cache de hace 2 s). Si YA hay un llama-server vivo
+        o cargando ahí — lanzado por ESTE proceso en una llamada anterior, por OTRO
+        worker del backend, o a mano por Alex — lo ADOPTA (guarda su base_url; sin
+        `proc` si no es nuestro, para no matarlo nunca desde `stop_server`) en vez
+        de intentar un segundo `bind()` sobre el mismo puerto.
+
+        Sin esto, cada proceso nuevo (recarga del backend, script de verificación,
+        otro worker) que llamaba aquí lanzaba SU PROPIO llama-server sobre el mismo
+        puerto sin saber que ya había uno vivo: el segundo bind() falla
+        (EADDRINUSE), ese proceso muere en segundos, y deja un llama-server fantasma
+        tras otro en la lista de procesos — exactamente lo observado en `ps`: el PID
+        del perfil "background" cambiando cada pocos segundos sin llegar nunca a
+        "listo", uno detrás de otro.
+        """
         if profile not in ("interactive", "background"):
             profile = "interactive"
         with self._server_lock:
@@ -179,17 +364,41 @@ class BitNetCppManager:
             if proc is not None and proc.poll() is not None:
                 st = {}
                 self._servers[profile] = st
-            if st.get("base") and self._alive(profile):
-                return st["base"]
-            binary = self.server_binary()
-            status = self.check_status()
-            models = status.get("models_available") or []
-            if binary is None or not models:
-                return None
-            model_path = models[0]["path"]
+
+            probe = self.probe_port(profile, force=True)
             port = self._port_for(profile)
             base = f"http://127.0.0.1:{port}"
-            if not st.get("proc"):
+
+            if probe["state"] == "listo":
+                # Vivo YA — lo hayamos lanzado nosotros o no. Adoptar y salir.
+                if not st.get("base"):
+                    print(f"[BitNetCppManager] llama-server ({profile}, puerto {port}) ya estaba vivo — adoptado, no se lanza otro.")
+                self._servers[profile] = {**st, "base": base, "port": port, "model": st.get("model") or "(externo, adoptado)"}
+                return base
+
+            if probe["state"] == "respondiendo_sin_modelo":
+                # Hay ALGO en el puerto que no es nuestro llama-server esperado
+                # (otro proceso lo ocupa, o un error real del servidor). Lanzar
+                # encima sería un bind() condenado a fallar: no lo intentamos.
+                print(f"[BitNetCppManager] puerto {port} ({profile}) ocupado por algo que no es nuestro llama-server — no se lanza otro encima (detalle: {probe.get('detalle')}).")
+                return None
+
+            if probe["state"] == "arrancando" and not st.get("proc"):
+                # Cargando — nuestro (llamada previa de ESTE proceso ya en marcha)
+                # o ajeno (otro proceso ganó la carrera de arranque): en ambos
+                # casos ya hay UN bind en curso. No lanzamos un segundo; solo
+                # anotamos su base_url y esperamos más abajo.
+                self._servers[profile] = {**st, "base": base, "port": port}
+                st = self._servers[profile]
+
+            elif probe["state"] == "apagado" and not st.get("proc"):
+                # Nada en el puerto de verdad: aquí sí hace falta lanzar.
+                binary = self.server_binary()
+                status = self.check_status()
+                models = status.get("models_available") or []
+                if binary is None or not models:
+                    return None
+                model_path = models[0]["path"]
                 try:
                     tmpl = self.repo_dir.parent / "bitnet-chat-template.jinja"
                     tmpl.write_text(BITNET_CHAT_TEMPLATE, encoding="utf-8")
@@ -232,6 +441,19 @@ class BitNetCppManager:
                 return self._servers[profile]["base"]
             proc = (self._servers.get(profile) or {}).get("proc")
             if proc is not None and proc.poll() is not None:
+                # Nuestro intento de bind pudo perder una carrera contra OTRO
+                # proceso lanzando el mismo perfil casi a la vez (dos backends
+                # arrancando juntos). Antes de rendirnos, una sonda más sin cache:
+                # si el puerto SÍ tiene algo vivo/cargando, es el ganador de esa
+                # carrera — lo adoptamos en vez de declarar fallo con un servidor
+                # real cargando justo al lado.
+                probe = self.probe_port(profile, force=True)
+                if probe["state"] in ("listo", "arrancando"):
+                    self._servers[profile] = {"base": probe["base"], "port": self._port_for(profile), "model": (self._servers.get(profile) or {}).get("model")}
+                    if probe["state"] == "listo":
+                        return probe["base"]
+                    time.sleep(1.0)
+                    continue
                 self._servers[profile] = {}
                 return None
             time.sleep(1.0)
@@ -239,10 +461,18 @@ class BitNetCppManager:
         return st.get("base") if (wait_seconds == 0 or self._alive(profile)) else None
 
     def server_ready(self, profile: str = "interactive") -> bool:
-        """True solo si el servidor nativo del perfil responde /health (modelo cargado)."""
+        """True solo si el PUERTO del perfil responde /health "listo" — lo haya
+        lanzado este proceso o no (ver `probe_port`)."""
         return self._alive(profile)
 
     def server_status(self) -> Dict[str, Any]:
+        """Estado HONESTO de los DOS perfiles: sonda el puerto real de cada uno
+        (`probe_port`, con su cache corta) en vez de depender de si ESTE proceso
+        los lanzó. Antes iteraba solo `self._servers` — un diccionario vacío en
+        cualquier proceso nuevo (recarga, script de verificación) — así que un
+        motor vivo lanzado por otro proceso se veía como `running: False,
+        ready: False` aunque respondiera. Ahora siempre se comprueban los DOS
+        perfiles, existan o no en memoria local."""
         out: Dict[str, Any] = {
             "port": self.server_port,
             "ctx": self.server_ctx,
@@ -250,14 +480,25 @@ class BitNetCppManager:
             "log": str(self._server_log),
             "profiles": {},
         }
-        for profile, st in self._servers.items():
+        for profile in ("interactive", "background"):
+            probe = self.probe_port(profile)
+            st = self._servers.get(profile) or {}
             proc = st.get("proc")
+            local_running = proc is not None and proc.poll() is None
+            state = probe["state"]
             out["profiles"][profile] = {
-                "running": proc is not None and proc.poll() is None,
-                "ready": self._alive(profile),
-                "base_url": st.get("base"),
-                "port": st.get("port"),
+                "running": state in ("listo", "arrancando", "respondiendo_sin_modelo") or local_running,
+                "ready": state == "listo",
+                "state": state,
+                "base_url": probe.get("base") or st.get("base"),
+                "port": self._port_for(profile),
                 "model": st.get("model"),
+                # Honestidad: ¿lo lanzó ESTE proceso (puede pararlo con
+                # `stop_server`) o solo lo detectó vivo (lanzado por otro
+                # proceso, o a mano)? Las 3 instancias vistas en `ps` (8790,
+                # 8791, y el runner de Ollama en otro puerto) se distinguen
+                # exactamente por este campo.
+                "managed_locally": local_running,
             }
         inter = out["profiles"].get("interactive") or {}
         out["running"] = bool(inter.get("running"))

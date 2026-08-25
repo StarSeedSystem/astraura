@@ -49,35 +49,76 @@ PUBLIC_PATHS = re.compile(
     r"^(/api/status|/api/bitnet/status|/api/starseed/health|/active_tunnel\.json|/api/system/tunnel/status)$"
 )
 
-# Rutas PELIGROSAS → scope requerido. Orden: la primera que casa decide.
-DANGEROUS: list[tuple[re.Pattern[str], str]] = [
-    (re.compile(r"^/api/system/exec"), "exec_terminal"),
-    (re.compile(r"^/api/execute/"), "exec_terminal"),
-    (re.compile(r"^/api/creations/execute_sample"), "exec_terminal"),
-    (re.compile(r"^/api/projects/file/"), "fs_write"),
-    (re.compile(r"^/api/projects/(apply_proposal|link_folder|export|vault/save)"), "fs_write"),
-    (re.compile(r"^/api/creations/(fork_version|recycle)"), "fs_write"),
-    (re.compile(r"^/api/system/os/"), "fs_write"),
-    (re.compile(r"^/api/system/(open_native|index-path|index_path)"), "fs_write"),
-    (re.compile(r"^/api/system/(fs|file|search|item_details)"), "fs_read"),
-    (re.compile(r"^/api/system/storage/"), "fs_read"),
-    (re.compile(r"^/api/system/universal_device_access"), "fs_write"),
-    (re.compile(r"^/api/system/tunnel/(start|stop|restart|qr_data)"), "sync_external"),
-    (re.compile(r"^/api/system/sync/"), "sync_external"),
-    (re.compile(r"^/api/sync/"), "sync_external"),
-    (re.compile(r"^/api/routing_storage/sync"), "sync_external"),
-    (re.compile(r"^/api/storage/"), "fs_write"),
-    (re.compile(r"^/api/cerebros/(scan_folder|link_gdrive|portable/|external/|sync_sources)"), "fs_read"),
-    (re.compile(r"^/api/cerebros/context_metrics"), "fs_read"),
-    (re.compile(r"^/api/vault"), "modify_personality_profile"),
-    (re.compile(r"^/api/personalities/api_keys"), "modify_personality_profile"),
-    (re.compile(r"^/api/personalities/[^/]+/(api_status|generate_key|revoke_key|restore_key|update_permissions|sync_server|trigger_sync)"), "modify_personality_profile"),
-    (re.compile(r"^/api/agents_api/"), "modify_agent_config"),
-    (re.compile(r"^/api/browser/(navigate|action)"), "fs_read"),
-    (re.compile(r"^/api/workflows/(run|save|toggle)"), "exec_terminal"),
-    (re.compile(r"^/api/workflows/[^/]+$"), "exec_terminal"),  # DELETE
-    (re.compile(r"^/api/discovery/scan"), "fs_read"),
-    (re.compile(r"^/api/installer/script"), "fs_read"),
+# Rutas PELIGROSAS → (métodos afectados o None=todos, scope requerido).
+# Orden: la primera que casa (ruta Y método) decide. El campo de métodos
+# existe SOLO para las rutas donde una de escritura comparte la MISMA
+# forma de path que una de lectura (p. ej. PATCH/DELETE /seres/{id} vs
+# GET /seres/{id}) -- así la de lectura sigue abierta sin necesitar una
+# entrada aparte que la vuelva a dejar pasar por detrás.
+DANGEROUS: list[tuple[re.Pattern[str], Optional[frozenset[str]], str]] = [
+    (re.compile(r"^/api/system/exec"), None, "exec_terminal"),
+    (re.compile(r"^/api/execute/"), None, "exec_terminal"),
+    (re.compile(r"^/api/creations/execute_sample"), None, "exec_terminal"),
+    (re.compile(r"^/api/projects/file/"), None, "fs_write"),
+    (re.compile(r"^/api/projects/(apply_proposal|link_folder|export|vault/save)"), None, "fs_write"),
+    (re.compile(r"^/api/creations/(fork_version|recycle)"), None, "fs_write"),
+    (re.compile(r"^/api/system/os/"), None, "fs_write"),
+    (re.compile(r"^/api/system/(open_native|index-path|index_path)"), None, "fs_write"),
+    (re.compile(r"^/api/system/(fs|file|search|item_details)"), None, "fs_read"),
+    (re.compile(r"^/api/system/storage/"), None, "fs_read"),
+    (re.compile(r"^/api/system/universal_device_access"), None, "fs_write"),
+    (re.compile(r"^/api/system/tunnel/(start|stop|restart|qr_data)"), None, "sync_external"),
+    (re.compile(r"^/api/system/sync/"), None, "sync_external"),
+    (re.compile(r"^/api/sync/"), None, "sync_external"),
+    (re.compile(r"^/api/routing_storage/sync"), None, "sync_external"),
+    (re.compile(r"^/api/storage/"), None, "fs_write"),
+    (re.compile(r"^/api/cerebros/(scan_folder|link_gdrive|portable/|external/|sync_sources)"), None, "fs_read"),
+    (re.compile(r"^/api/cerebros/context_metrics"), None, "fs_read"),
+    (re.compile(r"^/api/vault"), None, "modify_personality_profile"),
+    (re.compile(r"^/api/personalities/api_keys"), None, "modify_personality_profile"),
+    (re.compile(r"^/api/personalities/[^/]+/(api_status|generate_key|revoke_key|restore_key|update_permissions|sync_server|trigger_sync)"), None, "modify_personality_profile"),
+    (re.compile(r"^/api/agents_api/"), None, "modify_agent_config"),
+    (re.compile(r"^/api/browser/(navigate|action)"), None, "fs_read"),
+    (re.compile(r"^/api/workflows/(run|save|toggle)"), None, "exec_terminal"),
+    (re.compile(r"^/api/workflows/[^/]+$"), None, "exec_terminal"),  # DELETE
+    (re.compile(r"^/api/discovery/scan"), None, "fs_read"),
+    (re.compile(r"^/api/installer/script"), None, "fs_read"),
+
+    # ─── Adenda 168 (agujero de seguridad): /api/genesis/* NO estaba en
+    # esta lista -- crear/modificar/borrar/engendrar seres, conceder acceso
+    # a internet y a carpetas, instalar bots, aceptar/descartar propuestas
+    # y disparar verificaciones de modelo (cuota REAL de OpenRouter)
+    # quedaban SIN autenticación en local-only: cualquiera en la misma red
+    # que el túnel podía hacerlo. Las LECTURAS se dejan fuera a propósito
+    # (GET /seres, /seres/{id}, /linaje, /vinculos, /comunidades, /espacios,
+    # /modelos, /propuestas, /oficina, /bots_predeterminados, /herramientas):
+    # es lo que la UI del OS necesita poder leer en local sin pedir clave,
+    # y ninguna muta nada.
+    (re.compile(r"^/api/genesis/cerebros/sincronizar"), None, "sync_external"),
+    (re.compile(r"^/api/genesis/seres/[^/]+/cerebros/[^/]+/sincronizar"), None, "sync_external"),
+    # Búsqueda de avatar: sale a la red (Openverse) pero no muta ningún ser
+    # -- mismo cajón que /api/browser/(navigate|action), no modify_agent_config.
+    (re.compile(r"^/api/genesis/seres/[^/]+/avatar/buscar"), None, "fs_read"),
+    (re.compile(r"^/api/genesis/seres$"), frozenset({"POST"}), "modify_agent_config"),
+    (re.compile(r"^/api/genesis/seres/[^/]+$"), frozenset({"PATCH", "DELETE"}), "modify_agent_config"),
+    (re.compile(r"^/api/genesis/seres/[^/]+/(engendrar|adn/recalcular|internet|avatar)$"), None, "modify_agent_config"),
+    (re.compile(r"^/api/genesis/seres/[^/]+/cerebros$"), frozenset({"POST"}), "modify_agent_config"),
+    (re.compile(r"^/api/genesis/seres/[^/]+/cerebros/[^/]+$"), frozenset({"DELETE"}), "modify_agent_config"),
+    (re.compile(r"^/api/genesis/vinculos$"), frozenset({"POST"}), "modify_agent_config"),
+    (re.compile(r"^/api/genesis/vinculos/[^/]+$"), frozenset({"DELETE"}), "modify_agent_config"),
+    (re.compile(r"^/api/genesis/comunidades$"), frozenset({"POST"}), "modify_agent_config"),
+    (re.compile(r"^/api/genesis/espacios$"), frozenset({"POST"}), "modify_agent_config"),
+    (re.compile(r"^/api/genesis/modelos/verificar"), None, "modify_agent_config"),
+    (re.compile(r"^/api/genesis/propuestas/[^/]+/(aceptar|descartar)"), None, "modify_agent_config"),
+    (re.compile(r"^/api/genesis/bots_predeterminados/instalar"), None, "modify_agent_config"),
+    (re.compile(r"^/api/genesis/herramientas/biblioteca_usuario"), None, "modify_agent_config"),
+
+    # ─── Mismo bug, mismo fichero: /api/agents/save y DELETE /api/agents/{id}
+    # creaban/sobrescribían/borraban agentes de la bóveda sin autenticación.
+    # GET /api/agents y GET /api/agents/{id} (misma forma de path que el
+    # DELETE) siguen abiertos: son lectura.
+    (re.compile(r"^/api/agents/save$"), None, "modify_agent_config"),
+    (re.compile(r"^/api/agents/[^/]+$"), frozenset({"DELETE"}), "modify_agent_config"),
 ]
 
 PROXY_HEADERS = ("cf-connecting-ip", "x-forwarded-for", "x-real-ip", "forwarded")
@@ -151,10 +192,21 @@ def is_loopback(request: Request) -> bool:
     return not any(h in request.headers for h in PROXY_HEADERS)
 
 
-def dangerous_scope(path: str) -> Optional[str]:
-    for rx, scope in DANGEROUS:
-        if rx.search(path):
-            return scope
+def dangerous_scope(path: str, method: str) -> Optional[str]:
+    """Scope requerido para `path`+`method`, o None si no es peligrosa.
+    'La primera que casa decide' es ahora 'la primera que casa en RUTA Y
+    MÉTODO': una entrada con métodos restringidos que solo matchea en ruta
+    se SALTA (no bloquea ni decide), para que una entrada más abajo -- o
+    ninguna -- resuelva ese método sin colisionar con la restringida (así
+    puede compartir literalmente el mismo path un GET libre y un
+    DELETE/PATCH/POST protegido, p. ej. /seres/{id})."""
+    metodo = (method or "GET").upper()
+    for rx, metodos, scope in DANGEROUS:
+        if not rx.search(path):
+            continue
+        if metodos is not None and metodo not in metodos:
+            continue
+        return scope
     return None
 
 
@@ -206,7 +258,7 @@ class AstrauraAuthMiddleware(BaseHTTPMiddleware):
         if PUBLIC_PATHS.match(path) or not path.startswith("/api/"):
             return await call_next(request)
 
-        scope = dangerous_scope(path)
+        scope = dangerous_scope(path, request.method)
         raw = extract_key(request)
 
         if mode == "key":

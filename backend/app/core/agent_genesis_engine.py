@@ -1236,6 +1236,10 @@ class _GenesisStore:
         self.comunidades: Dict[str, Dict[str, Any]] = {}
         self.espacios: Dict[str, Dict[str, Any]] = {}
         self.propuestas: Dict[str, Dict[str, Any]] = {}
+        # (Adenda 168) Lo último que el OS depositó de su biblioteca propia
+        # (localStorage 'starseed.library.mine.v1') vía
+        # POST /herramientas/biblioteca_usuario -- {} = nunca depositó nada.
+        self.biblioteca_usuario: Dict[str, Any] = {}
         self._cargar()
 
     def _cargar(self):
@@ -1246,6 +1250,7 @@ class _GenesisStore:
             self.comunidades = datos.get("comunidades", {}) or {}
             self.espacios = datos.get("espacios", {}) or {}
             self.propuestas = datos.get("propuestas", {}) or {}
+            self.biblioteca_usuario = datos.get("biblioteca_usuario", {}) or {}
         except Exception as e:
             print(f"[GenesisEngine] Error leyendo genesis_store.json: {e}")
 
@@ -1255,6 +1260,7 @@ class _GenesisStore:
             payload = {
                 "version": "2.0.0", "updated_at": time.time(),
                 "comunidades": self.comunidades, "espacios": self.espacios, "propuestas": self.propuestas,
+                "biblioteca_usuario": self.biblioteca_usuario,
             }
             self.path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
         except Exception as e:
@@ -1267,6 +1273,7 @@ except Exception as _e:
     print(f"[GenesisEngine] No se pudo inicializar genesis_store.json ({_e}); usando almacen en memoria.")
     _store = _GenesisStore.__new__(_GenesisStore)
     _store.comunidades, _store.espacios, _store.propuestas = {}, {}, {}
+    _store.biblioteca_usuario = {}
     _store.path = Path("data/genesis_store.json")
 
 
@@ -1369,7 +1376,11 @@ def resolver_propuesta(propuesta_id: str, aceptar: bool) -> Dict[str, Any]:
 #    bloque "OLA 2" al final de genesis-types.ts. Reutiliza sin reinventar:
 #    intuitive_imagination_engine.PROCESS_AGENT_MAP/_AGENT_TO_PERSONALITY_ID/
 #    _AGENT_TO_REGISTRY_ID para bots predeterminados y oficina; cerebros_
-#    manager.sync_with_r2() para la sincronización real de cerebros propios;
+#    manager.sync_with_best_available() para la sincronización real de
+#    cerebros propios (Adenda 168: ya NO sync_with_r2() a secas -- R2
+#    rechaza el handshake TLS en esta cuenta, no está aprovisionado; el
+#    "mejor disponible" hoy es siempre Supabase, y el día que Alex habilite
+#    R2 vuelve a usarse solo sin tocar una línea aquí, ver cerebros_manager);
 #    verificar_soberania() (sección 1) para que "internet.dispositivo" no
 #    sea un interruptor decorativo.
 # ═══════════════════════════════════════════════════════════════════════
@@ -1433,7 +1444,41 @@ def conceder_internet(ser_id: str, solicitud: Dict[str, Any]) -> Dict[str, Any]:
 
 _HERRAMIENTAS_OS_CACHE_TTL_S = 60.0
 _herramientas_os_cache: Dict[str, Any] = {"at": 0.0, "items": []}
-_RE_SKILL_ID = re.compile(r'skillId:\s*"([^"]+)"')
+
+# (Adenda 168) Todo paquete instalable literal de packages.ts sigue SIEMPRE
+# este orden en su cabecera -- verificado a mano contra decenas de entradas
+# de TODOS los kinds (app/widget/page/publication/board/research/project/
+# design/animation/function/repo/ai-source): `id: "...", kind: "...",
+# name: "...",` seguido casi siempre de `description: "...",` en la línea
+# siguiente. Sigue siendo una extracción ligera por regex, NO un parser de
+# TypeScript de verdad (ver docstring del módulo) -- ahora cubre TODOS los
+# kinds con paquetes literales, no solo kind="function" (payload.skillId)
+# como antes.
+_RE_PKG_TRIPLE = re.compile(
+    r'id:\s*"([^"]+)"\s*,\s*kind:\s*"([^"]+)"\s*,\s*name:\s*"([^"]+)"\s*,'
+    r'(?:\s*description:\s*"((?:[^"\\]|\\.)*)")?'
+)
+_RE_KIND_TOTAL = re.compile(r'\bkind:\s*"[a-z-]+"')
+_PACKAGE_KINDS_VALIDOS = frozenset({
+    "app", "widget", "page", "publication", "board", "research", "project",
+    "design", "animation", "function", "ai-source", "repo", "agent",
+})
+
+# ai-source programático: buildAiSourcePackages() en packages.ts NO declara
+# sus paquetes como literales -- los construye en runtime cruzando
+# CORE_AI_SOURCE_IDS (packages.ts, ids curados) con FREE_CATALOG
+# (free-catalog.ts, id/label reales). Ambos SÍ son arrays estáticos, así
+# que el mismo cruce se replica aquí con dos regex, uno por fichero.
+_RE_CATALOG_ID = re.compile(r'catalogId:\s*"([^"]+)"')
+_RE_FREE_CATALOG_ENTRY = re.compile(r'id:\s*"([^"]+)"\s*,\s*label:\s*"([^"]+)"')
+_FREE_CATALOG_PATH = _OS_REPO_ROOT / "src" / "ai" / "astraura" / "free-catalog.ts"
+
+# agent builtin: buildAgentPackages() construye igual, desde BUILTIN_AGENTS
+# (builtins.ts) -- un array pequeño y literal (3 agentes de fábrica hoy).
+_BUILTIN_AGENTS_PATH = _OS_REPO_ROOT / "src" / "lib" / "agents" / "builtins.ts"
+_RE_BUILTIN_AGENT = re.compile(
+    r'id:\s*"([^"]+)"\s*,\s*name:\s*"([^"]+)"\s*,\s*description:\s*"((?:[^"\\]|\\.)*)"'
+)
 
 
 def _herramienta_indisponible(hid: str, nombre: str, fuente: str, permiso: Optional[str], motivo: str) -> Dict[str, Any]:
@@ -1441,14 +1486,56 @@ def _herramienta_indisponible(hid: str, nombre: str, fuente: str, permiso: Optio
             "requierePermiso": permiso, "disponible": False, "motivo": motivo}
 
 
+def _ai_source_packages_desde_catalogo(texto_packages_ts: str) -> List["tuple[str, str]"]:
+    """Replica buildAiSourcePackages(): CORE_AI_SOURCE_IDS (literal en
+    packages.ts) × FREE_CATALOG (literal en free-catalog.ts) -- un cruce
+    entre dos arrays estáticos, ninguno evaluado en runtime de TS, así que
+    es leer dos ficheros con regex, no un parser. [] si algo falla (nunca
+    lanza): degradación elegante, el resto del catálogo sigue sirviendo."""
+    catalog_ids = list(dict.fromkeys(_RE_CATALOG_ID.findall(texto_packages_ts)))
+    if not catalog_ids:
+        return []
+    try:
+        texto_fc = _FREE_CATALOG_PATH.read_text(encoding="utf-8")
+    except Exception as e:
+        print(f"[GenesisEngine] No se pudo leer {_FREE_CATALOG_PATH} (fuentes ai-source): {e}")
+        return []
+    etiquetas = dict(_RE_FREE_CATALOG_ENTRY.findall(texto_fc))
+    return [(f"ai-{cid}", etiquetas[cid]) for cid in catalog_ids if cid in etiquetas]
+
+
+def _agent_packages_desde_builtins() -> List["tuple[str, str, Optional[str]]"]:
+    """Replica buildAgentPackages(): BUILTIN_AGENTS (builtins.ts), estático
+    y literal. [] si falla (degradación elegante, igual que arriba)."""
+    try:
+        texto = _BUILTIN_AGENTS_PATH.read_text(encoding="utf-8")
+    except Exception as e:
+        print(f"[GenesisEngine] No se pudo leer {_BUILTIN_AGENTS_PATH} (paquetes 'agent'): {e}")
+        return []
+    return [(m.group(1), m.group(2), m.group(3)) for m in _RE_BUILTIN_AGENT.finditer(texto)]
+
+
 def _herramientas_biblioteca_os() -> List[Dict[str, Any]]:
-    """Paquetes kind="function" (skills reales, payload.skillId) de la
-    Biblioteca en línea del OS (src/lib/library/packages.ts). Lectura de
-    solo texto con una extracción ligera por regex -- este backend es
-    Python, no hay un parser de TypeScript aquí, y escribir uno de verdad
-    para un catálogo que no es mío (src/lib/library/packages.ts, del OS)
-    sería sobre-ingeniería para este encargo. Cacheado 60s: son ~155KB
-    de fichero en cada llamada si no se cachea (ver 'MIDE' del encargo)."""
+    """Catálogo ENTERO (Adenda 168, pedido explícito: "todas las
+    herramientas de la librería en línea del os") de la Biblioteca en línea
+    del OS -- ya no solo kind="function" (62 antes): todo PackageKind con
+    paquetes declarados literal en packages.ts (ver _RE_PKG_TRIPLE), más
+    "ai-source" (CORE_AI_SOURCE_IDS × FREE_CATALOG) y "agent"
+    (BUILTIN_AGENTS), construidos en runtime por packages.ts a partir de
+    otros ficheros pero también estáticos y literales en origen -- así que
+    también extraíbles sin inventar nada.
+
+    Lo que NO se extrae, a propósito: los paquetes "design" que
+    buildThemePackages()/buildDesignElementPackages() generan desde
+    theme-catalog.ts/design-elements.ts. Esos dos ficheros no son un array
+    plano de {id,name,description} -- son generadores de tokens de tema
+    (paleta+material+fondo derivados con funciones de mezcla HSL) sin una
+    forma literal estable que un regex pueda seguir sin arriesgarse a
+    inventar datos. Se dice así, con un candidato "no disponible" EXPLÍCITO
+    más abajo, en vez de omitirlos en silencio o fingir que se leyeron
+    (regla nº1 del encargo). Sigue siendo lectura por regex, no un parser
+    de TypeScript de verdad (sería sobre-ingeniería para este encargo).
+    Cacheado 60s: son ~155KB de fichero en cada llamada si no se cachea."""
     ahora = time.time()
     if _herramientas_os_cache["items"] and (ahora - _herramientas_os_cache["at"]) < _HERRAMIENTAS_OS_CACHE_TTL_S:
         return _herramientas_os_cache["items"]
@@ -1464,23 +1551,66 @@ def _herramientas_biblioteca_os() -> List[Dict[str, Any]]:
         _herramientas_os_cache.update({"at": ahora, "items": items})
         return items
 
-    vistos: List[str] = []
-    for m in _RE_SKILL_ID.finditer(texto):
-        sid = m.group(1)
-        if sid not in vistos:
-            vistos.append(sid)
+    vistos: Dict[str, Dict[str, Any]] = {}
+    for m in _RE_PKG_TRIPLE.finditer(texto):
+        pid, kind, nombre, descripcion = m.group(1), m.group(2), m.group(3), m.group(4)
+        if kind not in _PACKAGE_KINDS_VALIDOS or pid in vistos:
+            continue
+        vistos[pid] = {
+            "id": f"biblioteca-os:{pid}", "nombre": nombre, "fuente": "biblioteca-os",
+            "descripcion": descripcion, "requierePermiso": "bibliotecaOS",
+            "disponible": True, "motivo": None,
+        }
+
+    try:
+        for pid, nombre in _ai_source_packages_desde_catalogo(texto):
+            if pid not in vistos:
+                vistos[pid] = {
+                    "id": f"biblioteca-os:{pid}", "nombre": nombre, "fuente": "biblioteca-os",
+                    "descripcion": None, "requierePermiso": "bibliotecaOS",
+                    "disponible": True, "motivo": None,
+                }
+    except Exception as e:
+        print(f"[GenesisEngine] fuentes ai-source programaticas no extraidas: {e}")
+
+    try:
+        for pid, nombre, descripcion in _agent_packages_desde_builtins():
+            fid = f"agent-pkg-{pid}"
+            if fid not in vistos:
+                vistos[fid] = {
+                    "id": f"biblioteca-os:{fid}", "nombre": nombre, "fuente": "biblioteca-os",
+                    "descripcion": descripcion, "requierePermiso": "bibliotecaOS",
+                    "disponible": True, "motivo": None,
+                }
+    except Exception as e:
+        print(f"[GenesisEngine] paquetes 'agent' builtin no extraidos: {e}")
 
     if not vistos:
         items = [_herramienta_indisponible(
             "biblioteca-os:catalogo", "Catalogo de la Biblioteca del OS", "biblioteca-os",
-            "bibliotecaOS", f"{ruta} se pudo leer pero no se encontro ningun paquete kind=\"function\" (skillId) dentro.",
+            "bibliotecaOS", f"{ruta} se pudo leer pero no se encontro ningun paquete instalable dentro.",
         )]
     else:
-        items = [{
-            "id": f"biblioteca-os:{sid}", "nombre": sid.replace("-", " ").replace("_", " ").strip().title(),
-            "fuente": "biblioteca-os", "descripcion": None, "requierePermiso": "bibliotecaOS",
-            "disponible": True, "motivo": None,
-        } for sid in vistos]
+        items = list(vistos.values())
+        # Honestidad radical: los paquetes 'design' generados desde temas o
+        # elementos sueltos del Mezclador no son extraibles por regex (ver
+        # docstring de esta funcion) -- se dice, no se omite en silencio.
+        items.append(_herramienta_indisponible(
+            "biblioteca-os:design-programatico", "Temas y elementos de diseño del Mezclador", "biblioteca-os",
+            "bibliotecaOS",
+            "Estos paquetes 'design' los genera packages.ts en runtime desde theme-catalog.ts/"
+            "design-elements.ts (tokens de tema derivados con funciones de mezcla HSL, no una lista "
+            "literal {id,name,description}); este backend Python no tiene un parser de TypeScript real "
+            "para seguirlos sin arriesgarse a inventar datos. El resto del catalogo (app/widget/page/"
+            "publication/board/research/project/design literal/animation/function/repo/ai-source/agent) "
+            "si se lee de verdad, arriba.",
+        ))
+
+    total_kind_literal = len(_RE_KIND_TOTAL.findall(texto))
+    if len(vistos) < total_kind_literal * 0.6:
+        print(f"[GenesisEngine] AVISO: solo se extrajeron {len(vistos)} paquetes de packages.ts pero hay "
+              f"~{total_kind_literal} declaraciones 'kind:\"...\"' en el fichero -- puede que el estilo del "
+              f"fichero haya cambiado y _RE_PKG_TRIPLE ya no lo siga bien. Revisar.")
 
     _herramientas_os_cache.update({"at": ahora, "items": items})
     return items
@@ -1488,16 +1618,74 @@ def _herramientas_biblioteca_os() -> List[Dict[str, Any]]:
 
 def _herramientas_biblioteca_usuario() -> List[Dict[str, Any]]:
     """Honestidad radical (el mismo principio que packages.ts declara en su
-    propia cabecera): la biblioteca PROPIA del usuario vive en localStorage
-    del navegador ('starseed.library.mine.v1'), no en ningun fichero que
-    este backend Python pueda leer. Fingir aqui un catalogo seria inventar
-    datos -- se dice la verdad y punto."""
-    return [_herramienta_indisponible(
-        "biblioteca-usuario:catalogo", "Biblioteca propia del usuario", "biblioteca-usuario",
-        "bibliotecaUsuario",
-        "La biblioteca del usuario vive en localStorage del navegador (starseed.library.mine.v1); "
-        "este backend no tiene acceso al almacenamiento del navegador.",
-    )]
+    propia cabecera): la biblioteca PROPIA del usuario vive DE VERDAD en
+    localStorage del navegador ('starseed.library.mine.v1'); este backend
+    Python no puede leerlo directamente (no hay DOM aquí). Lo que SÍ puede
+    hacer (Adenda 168): servir lo último que el OS depositó A PROPÓSITO en
+    POST /herramientas/biblioteca_usuario (ver depositar_biblioteca_usuario
+    más abajo) -- si nunca depositó nada, se dice exactamente eso, nunca se
+    inventa un catálogo."""
+    paquetes = (_store.biblioteca_usuario or {}).get("paquetes") or []
+    if not paquetes:
+        return [_herramienta_indisponible(
+            "biblioteca-usuario:catalogo", "Biblioteca propia del usuario", "biblioteca-usuario",
+            "bibliotecaUsuario",
+            "Aun no se ha depositado ninguna. El OS tiene la biblioteca real en localStorage "
+            "(starseed.library.mine.v1); este backend Python no tiene acceso a eso directamente, pero "
+            "SI puede servirla si el OS la deposita via POST /api/genesis/herramientas/biblioteca_usuario. "
+            "Hasta que lo haga, no hay nada honesto que listar aqui.",
+        )]
+    return [{
+        "id": f"biblioteca-usuario:{p['id']}", "nombre": p.get("nombre") or p["id"],
+        "fuente": "biblioteca-usuario", "descripcion": p.get("descripcion"),
+        "requierePermiso": "bibliotecaUsuario", "disponible": True, "motivo": None,
+    } for p in paquetes]
+
+
+def depositar_biblioteca_usuario(solicitud: Dict[str, Any]) -> Dict[str, Any]:
+    """POST /herramientas/biblioteca_usuario. NUEVO (Adenda 168) -- el OS SI
+    tiene la biblioteca real (localStorage, 'starseed.library.mine.v1');
+    este endpoint le da un sitio donde depositarla para que este backend
+    pueda por fin listarla de verdad en GET /herramientas en vez de
+    marcarla siempre "no disponible". El backend NUNCA lee localStorage
+    (no puede); es el OS quien decide cuándo llamar a este endpoint
+    (arranque, cada cambio de biblioteca, etc. -- decisión del equipo de
+    frontend, no de este fichero).
+
+    FORMA DEL BODY (documentada aquí para que se sume a genesis-types.ts,
+    ver el informe de esta adenda): el array CRUDO de LibraryPackage tal
+    cual vive en localStorage -- cero traducción de campos en el lado del
+    OS, para que depositar sea "JSON.stringify(los que tengas)" y nada más:
+        { "paquetes": [ { "id": str, "kind"?: str, "name": str,
+                           "description"?: str, ...resto ignorado... }, ... ] }
+    Respuesta: { "ok": true, "recibidos": N, "descartados": M }.
+
+    Validación mínima pero real: cada paquete necesita 'id' Y 'name' (o
+    'nombre', por si algún día el OS manda ya la forma en español) no
+    vacíos -- un paquete sin id/nombre no es un paquete, es ruido, y se
+    descarta en vez de guardarse a medias o inventarle un nombre."""
+    solicitud = solicitud or {}
+    crudos = solicitud.get("paquetes")
+    if not isinstance(crudos, list):
+        return {"ok": False, "error": "Falta 'paquetes' (debe ser un array de LibraryPackage)."}
+
+    limpios: List[Dict[str, Any]] = []
+    for p in crudos:
+        if not isinstance(p, dict):
+            continue
+        pid = p.get("id")
+        nombre = p.get("name") or p.get("nombre")
+        if not isinstance(pid, str) or not pid.strip() or not isinstance(nombre, str) or not nombre.strip():
+            continue
+        descripcion = p.get("description") or p.get("descripcion")
+        limpios.append({
+            "id": pid.strip(), "kind": (p.get("kind") or "app"), "nombre": nombre.strip(),
+            "descripcion": descripcion.strip() if isinstance(descripcion, str) and descripcion.strip() else None,
+        })
+
+    _store.biblioteca_usuario = {"paquetes": limpios, "actualizadoEn": time.time()}
+    _store.guardar()
+    return {"ok": True, "recibidos": len(limpios), "descartados": len(crudos) - len(limpios)}
 
 
 def _herramientas_dispositivo() -> List[Dict[str, Any]]:
@@ -1574,27 +1762,57 @@ def listar_herramientas() -> List[Dict[str, Any]]:
 
 # --------------------------------------------------- 9.3 Cerebros propios
 
-def _mapear_resultado_sync_r2(resultado: Any) -> "tuple[str, Optional[str]]":
-    """Traduce el resultado REAL de cerebros_manager.sync_with_r2() a
-    (estadoSync, errorSync) -- nunca 'ok' por defecto. `resultado` puede
-    traer 'reason' (rama de fallo esperada) o 'error' (excepcion capturada
-    dentro de sync_with_r2); se usa tal cual, sin reinterpretarlo, para que
-    el error que aparezca en pantalla sea el error real."""
+def _mapear_resultado_sync_cerebros(resultado: Any) -> "tuple[str, Optional[str]]":
+    """Traduce el resultado REAL de cerebros_manager.sync_with_best_available()
+    a (estadoSync, errorSync) -- nunca 'ok' por defecto (Adenda 168: antes
+    esto leia sync_with_r2(), que hoy SIEMPRE falla en esta cuenta -- ver
+    r2_storage.diagnose(), el endpoint no tiene R2 aprovisionado). Maneja
+    las DOS formas que sync_with_best_available() puede devolver:
+      · éxito plano ({success:True, ...el merge, venga de R2 o Supabase})
+      · fallo anidado ({success:False, r2:{...}, supabase:{...}} -- un
+        intento REAL contra cada destino) -- se nombra el motivo de AMBOS,
+        no solo uno, para que el error en pantalla sea el error completo.
+    También acepta la forma plana antigua (reason/error sueltos) por si
+    algun dia se le pasa el resultado de sync_with_r2()/sync_with_supabase()
+    a secas en vez del de sync_with_best_available()."""
     if not isinstance(resultado, dict):
-        return "fallo", "cerebros_manager.sync_with_r2() no devolvio un resultado utilizable."
+        return "fallo", "cerebros_manager.sync_with_best_available() no devolvio un resultado utilizable."
     if resultado.get("success"):
         return "ok", None
+    r2 = resultado.get("r2") if isinstance(resultado.get("r2"), dict) else None
+    sb = resultado.get("supabase") if isinstance(resultado.get("supabase"), dict) else None
+    if r2 is not None or sb is not None:
+        motivo_r2 = (r2 or {}).get("reason") or (r2 or {}).get("error") or "sin detalle"
+        motivo_sb = (sb or {}).get("reason") or (sb or {}).get("error") or "sin detalle"
+        return "fallo", f"R2: {motivo_r2} · Supabase: {motivo_sb}"
     motivo = resultado.get("reason") or resultado.get("error") or "fallo sin detalle."
     return "fallo", str(motivo)
+
+
+def _sincronizar_cerebros_manager_ahora() -> Dict[str, Any]:
+    """Un unico punto que dispara cerebros_manager.sync_with_best_available()
+    de verdad -- lo comparten sincronizar_cerebros_ahora() (global),
+    sincronizar_cerebro_propio_ahora() (un cerebro) y agregar_cerebro_propio()
+    (al crear con sincronizable=true), para que los tres vean EXACTAMENTE
+    el mismo resultado real ante el mismo estado del backend, nunca tres
+    interpretaciones distintas del mismo intento."""
+    if cerebros_manager is None:
+        return {"success": False, "reason": "cerebros_manager no esta disponible en este backend."}
+    try:
+        return cerebros_manager.sync_with_best_available()
+    except Exception as e:
+        return {"success": False, "error": f"{type(e).__name__}: {e}"}
 
 
 def agregar_cerebro_propio(ser_id: str, solicitud: Dict[str, Any]) -> Dict[str, Any]:
     """POST /seres/{id}/cerebros. Crea un CerebroSer y lo añade a
     `cerebrosPropios`. Si se pide sincronizable=true, se intenta la
-    sincronizacion REAL ahora mismo (unico mecanismo real que existe hoy:
-    cerebros_manager.sync_with_r2, contra Cloudflare R2) y su resultado
-    HONESTO -- no un 'ok' optimista -- es lo que se guarda en estadoSync/
-    errorSync. Si no se pide, queda 'nunca': no se ha intentado, se dice."""
+    sincronizacion REAL ahora mismo (cerebros_manager.sync_with_best_available():
+    R2 primero -- muerto hoy en esta cuenta, endpoint sin aprovisionar --
+    y Supabase si R2 falla, que es lo que sincroniza de verdad hoy) y su
+    resultado HONESTO -- no un 'ok' optimista -- es lo que se guarda en
+    estadoSync/errorSync. Si no se pide, queda 'nunca': no se ha intentado,
+    se dice."""
     agente = agent_vault_engine.get_agent(ser_id)
     if not agente:
         return {"ok": False, "error": f"Ser '{ser_id}' no encontrado."}
@@ -1619,17 +1837,10 @@ def agregar_cerebro_propio(ser_id: str, solicitud: Dict[str, Any]) -> Dict[str, 
     }
 
     if sincronizable:
-        if cerebros_manager is None:
-            cerebro["estadoSync"] = "fallo"
-            cerebro["errorSync"] = "cerebros_manager no esta disponible en este backend."
-        else:
-            try:
-                resultado = cerebros_manager.sync_with_r2()
-            except Exception as e:
-                resultado = {"success": False, "error": f"{type(e).__name__}: {e}"}
-            estado, error = _mapear_resultado_sync_r2(resultado)
-            cerebro["estadoSync"] = estado
-            cerebro["errorSync"] = error
+        resultado = _sincronizar_cerebros_manager_ahora()
+        estado, error = _mapear_resultado_sync_cerebros(resultado)
+        cerebro["estadoSync"] = estado
+        cerebro["errorSync"] = error
         cerebro["ultimaSync"] = time.time()
 
     propios = agente.setdefault("genesis_cerebros_propios", [])
@@ -1637,6 +1848,70 @@ def agregar_cerebro_propio(ser_id: str, solicitud: Dict[str, Any]) -> Dict[str, 
     agente["updated_at"] = time.time()
     agent_vault_engine._save_agents()
     return {"ok": True, "ser": _proyectar_ser(agente)}
+
+
+def quitar_cerebro_propio(ser_id: str, cerebro_id: str) -> Dict[str, Any]:
+    """DELETE /seres/{id}/cerebros/{cerebro_id}. NUEVO (Adenda 168) --
+    contraparte real de agregar_cerebro_propio: antes solo se podía añadir
+    (o sobrescribir la lista ENTERA de `cerebros` vía PATCH /seres/{id},
+    que además toca `linked_cerebros`, un campo DISTINTO de
+    `cerebrosPropios` -- ver _proyectar_ser). No borra el almacén en disco
+    (`rutaAlmacen`): la carpeta puede tener datos reales que Alex quiera
+    conservar; esto solo desvincula el CerebroSer del ser, igual que
+    borrar_vinculo no borra los seres que unía."""
+    agente = agent_vault_engine.get_agent(ser_id)
+    if not agente:
+        return {"ok": False, "error": f"Ser '{ser_id}' no encontrado."}
+    _asegurar_genesis(agente)
+    propios = agente.get("genesis_cerebros_propios") or []
+    restantes = [c for c in propios if c.get("id") != cerebro_id]
+    if len(restantes) == len(propios):
+        return {"ok": False, "error": f"'{cerebro_id}' no es un cerebro propio de '{ser_id}'."}
+    agente["genesis_cerebros_propios"] = restantes
+    agente["updated_at"] = time.time()
+    agent_vault_engine._save_agents()
+    return {"ok": True, "ser": _proyectar_ser(agente)}
+
+
+def sincronizar_cerebro_propio_ahora(ser_id: str, cerebro_id: str) -> Dict[str, Any]:
+    """POST /seres/{id}/cerebros/{cerebro_id}/sincronizar. NUEVO (Adenda 168)
+    -- 'sincronizar ahora' para UN cerebro propio concreto: repite la misma
+    sincronización REAL que agregar_cerebro_propio(sincronizable=true) ya
+    hace al crear, pero on-demand, sin tener que borrar y re-crear el
+    cerebro solo para reintentar. El resultado (estadoSync/errorSync/
+    ultimaSync) es SIEMPRE el REAL de sync_with_best_available() -- si
+    falla, se dice y se dice por qué (regla nº1 del encargo)."""
+    agente = agent_vault_engine.get_agent(ser_id)
+    if not agente:
+        return {"ok": False, "error": f"Ser '{ser_id}' no encontrado."}
+    _asegurar_genesis(agente)
+    propios = agente.get("genesis_cerebros_propios") or []
+    cerebro = next((c for c in propios if c.get("id") == cerebro_id), None)
+    if cerebro is None:
+        return {"ok": False, "error": f"'{cerebro_id}' no es un cerebro propio de '{ser_id}'."}
+
+    resultado = _sincronizar_cerebros_manager_ahora()
+    estado, error = _mapear_resultado_sync_cerebros(resultado)
+    cerebro["sincronizable"] = True
+    cerebro["estadoSync"] = estado
+    cerebro["errorSync"] = error
+    cerebro["ultimaSync"] = time.time()
+    agente["updated_at"] = time.time()
+    agent_vault_engine._save_agents()
+    return {"ok": estado == "ok", "ser": _proyectar_ser(agente), "resultado": resultado}
+
+
+def sincronizar_cerebros_ahora() -> Dict[str, Any]:
+    """POST /cerebros/sincronizar. NUEVO (Adenda 168) -- 'sincronizar
+    ahora' GLOBAL: dispara cerebros_manager.sync_with_best_available()
+    directamente (el registro COMPLETO de cerebros, no uno concreto) y
+    devuelve su resultado REAL sin reinterpretarlo -- ni un 'ok' optimista
+    si falló, ni el detalle escondido si funcionó. Antes NO existía ningún
+    endpoint para esto: la interfaz no podía ofrecer 'sincronizar ahora'
+    sin fingir (encargo, punto 4)."""
+    resultado = _sincronizar_cerebros_manager_ahora()
+    estado, error = _mapear_resultado_sync_cerebros(resultado)
+    return {"ok": bool(resultado.get("success")), "estado": estado, "error": error, "resultado": resultado}
 
 
 # ------------------------------------------------ 9.4 Bots predeterminados
@@ -1734,17 +2009,211 @@ def instalar_bots_predeterminados() -> Dict[str, Any]:
 
 _FUENTE_AVATAR_MODOS = ("procedural", "enlinea", "subido")
 
+# (Adenda 168) Búsqueda REAL de avatares contra Openverse (api.openverse.org)
+# -- puerto EXACTO de las reglas duras de avatar-busqueda-logica.ts /
+# app/api/avatar-search/route.ts del OS (mismo proveedor: es el único
+# evaluado que da licencia Y atribución POR IMAGEN, no una licencia de
+# plataforma para todo el catálogo -- ver la cabecera de esa ruta). Solo
+# licencias de dominio público (cc0/pdm) o CC que permite EXPLÍCITAMENTE
+# uso comercial Y obra derivada (by/by-sa) -- nunca "nc" ni "nd". Elegir una
+# imagen ajena sin saber si se puede usar es un problema legal para Alex,
+# no una funcionalidad (regla dura del encargo, textual).
+_ETIQUETA_LICENCIA_LIBRE: Dict[str, str] = {
+    "cc0": "CC0 (dominio público)", "pdm": "Marca de dominio público",
+    "by": "CC BY", "by-sa": "CC BY-SA",
+}
+_OPENVERSE_TOKEN_URL = "https://api.openverse.org/v1/auth_tokens/token/"
+_OPENVERSE_SEARCH_URL = "https://api.openverse.org/v1/images/"
+_OPENVERSE_TIMEOUT_S = 10.0
+_OPENVERSE_PAGE_SIZE = 20
+_openverse_token_cache: Dict[str, Any] = {"token": None, "expira_en": 0.0}
 
-def buscar_avatares(ser_id: str, solicitud: Dict[str, Any]) -> Dict[str, Any]:
-    """POST /seres/{id}/avatar/buscar. GAP HONESTO (mismo estilo que el
-    resto del fichero, ver docstring del modulo): no hay ningun motor de
-    busqueda de IMAGENES cableado en este backend (browser_tool.search_web
-    busca paginas web, no imagenes con licencia verificable). Devolver
-    candidatos inventados seria precisamente lo que este proyecto prohibe
-    -- candidatos vacio, honesto, en vez de fabricar URLs o licencias."""
-    if not agent_vault_engine.get_agent(ser_id):
-        return {"ok": False, "error": f"Ser '{ser_id}' no encontrado."}
-    return {"ok": True, "candidatos": []}
+_PALABRA_BUSQUEDA_POR_SOLIDO: Dict[str, str] = {
+    "tetraedro": "tetrahedron crystal", "cubo": "cube crystal geometric",
+    "octaedro": "octahedron gem", "dodecaedro": "dodecahedron sacred geometry",
+    "icosaedro": "icosahedron geometric art", "esfera": "sphere orb light",
+}
+
+
+def _texto_o_none(v: Any) -> Optional[str]:
+    return v.strip() if isinstance(v, str) and v.strip() else None
+
+
+def _openverse_credenciales() -> "tuple[Optional[str], Optional[str]]":
+    """MISMAS env vars que usa el OS (OPENVERSE_CLIENT_ID/_SECRET) -- si
+    Alex ya las configuró para el OS, este backend las reutiliza sin pedir
+    nada nuevo. Opcionales a propósito: sin ellas se busca anónimo (cuota
+    más baja de Openverse) para que funcione SIN configurar nada -- pedido
+    explícito del encargo. Diferencia deliberada con el OS: el OS EXIGE
+    credenciales porque su cuota la comparte TODO un despliegue multi-
+    usuario; este backend es de un solo usuario (Alex, en su Mac) -- aquí
+    la cuota anónima de Openverse ES la cuota de Alex, así que caer a
+    anónimo es honesto y seguro, no una degradación silenciosa de nadie."""
+    cid = (os.environ.get("OPENVERSE_CLIENT_ID") or "").strip()
+    csec = (os.environ.get("OPENVERSE_CLIENT_SECRET") or "").strip()
+    return (cid or None, csec or None)
+
+
+async def _openverse_token(cliente: "httpx.AsyncClient", client_id: str, client_secret: str) -> Optional[str]:
+    """Pide (o reutiliza) un token Bearer de Openverse -- None si el
+    proveedor no responde o rechaza, nunca lanza (mismo contrato que
+    obtenerTokenOpenverse() del OS)."""
+    ahora = time.time()
+    if _openverse_token_cache["token"] and _openverse_token_cache["expira_en"] > ahora:
+        return _openverse_token_cache["token"]
+    try:
+        r = await cliente.post(
+            _OPENVERSE_TOKEN_URL,
+            data={"client_id": client_id, "client_secret": client_secret, "grant_type": "client_credentials"},
+        )
+        if r.status_code != 200:
+            return None
+        datos = r.json()
+        token = datos.get("access_token")
+        if not isinstance(token, str) or not token:
+            return None
+        ttl = datos.get("expires_in")
+        ttl = ttl if isinstance(ttl, (int, float)) and ttl > 0 else 43_200
+        _openverse_token_cache["token"] = token
+        _openverse_token_cache["expira_en"] = ahora + max(30.0, ttl - 60.0)
+        return token
+    except Exception:
+        return None
+
+
+def _candidato_desde_openverse(crudo: Dict[str, Any], consulta: str) -> Optional[Dict[str, Any]]:
+    """Puerto EXACTO de `candidatoDesdeOpenverse()`
+    (avatar-busqueda-logica.ts): el ÚNICO sitio por el que pasa cualquier
+    candidato antes de existir como tal. Sin licencia libre reconocida →
+    None, sin excepción."""
+    licencia_cruda = (_texto_o_none(crudo.get("license")) or "").lower() or None
+    if licencia_cruda not in _ETIQUETA_LICENCIA_LIBRE:
+        return None
+    url = _texto_o_none(crudo.get("thumbnail")) or _texto_o_none(crudo.get("url"))
+    if not url:
+        return None
+    version = _texto_o_none(crudo.get("license_version"))
+    etiqueta = _ETIQUETA_LICENCIA_LIBRE[licencia_cruda]
+    licencia_legible = f"{etiqueta} {version}" if version else etiqueta
+
+    creador = _texto_o_none(crudo.get("creator"))
+    titulo = _texto_o_none(crudo.get("title"))
+    fuente_texto = _texto_o_none(crudo.get("source")) or _texto_o_none(crudo.get("provider")) or "openverse"
+    enlace_origen = _texto_o_none(crudo.get("foreign_landing_url"))
+
+    # Preferimos la atribución YA REDACTADA por el proveedor (formato TASL) y
+    # solo la componemos nosotros si no vino -- nunca inventamos un autor
+    # que el proveedor no declaró explícitamente.
+    atribucion_proveedor = _texto_o_none(crudo.get("attribution"))
+    partes = [f'"{titulo}"' if titulo else None, f"de {creador}" if creador else None, f"({fuente_texto})"]
+    atribucion_propia = " ".join(p for p in partes if p)
+    atribucion_base = atribucion_proveedor or atribucion_propia
+    atribucion = f"{atribucion_base} — {enlace_origen}" if enlace_origen else atribucion_base
+
+    return {
+        "modo": "enlinea", "url": url, "consulta": consulta,
+        "proveedor": f"Openverse · {fuente_texto}", "licencia": licencia_legible,
+        "atribucion": atribucion, "elegidoEn": None,
+    }
+
+
+def _filtrar_candidatos_libres(candidatos: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Segunda barrera, deliberadamente redundante con
+    `_candidato_desde_openverse` -- puerto de `filtrarCandidatosLibres()`.
+    Belt & suspenders: si Openverse cambiara de comportamiento, esta sigue
+    en pie."""
+    etiquetas = list(_ETIQUETA_LICENCIA_LIBRE.values())
+    out = []
+    for c in candidatos:
+        if c.get("modo") != "enlinea":
+            out.append(c)
+            continue
+        lic = c.get("licencia")
+        if not lic:
+            continue
+        if any(lic == e or lic.startswith(f"{e} ") for e in etiquetas):
+            out.append(c)
+    return out
+
+
+def _componer_consulta_avatar(agente: Dict[str, Any]) -> str:
+    """Mismo criterio que `componerConsultaAvatar()` del OS, con lo que YA
+    tiene el ser en la bóveda -- se usa SOLO cuando quien llama no mandó
+    'consulta' (la UI real siempre la manda ya compuesta; esto es la red de
+    seguridad del servidor, no una segunda fuente de verdad divergente)."""
+    personalidades = _proyectar_personalidades(agente)
+    personalidad_nombre = personalidades[0]["nombre"] if personalidades else None
+    arquetipo = (agente.get("genesis_arquetipo") or "").strip()
+    solido = (_adn_de(agente) or {}).get("solido")
+    palabra_arquetipo = arquetipo or (_PALABRA_BUSQUEDA_POR_SOLIDO.get(solido, "") if solido else "")
+    terminos = [agente.get("name"), personalidad_nombre, palabra_arquetipo, agente.get("role"), "portrait avatar art"]
+    vistos: set = set()
+    unicos: List[str] = []
+    for t in terminos:
+        limpio = re.sub(r"\s+", " ", str(t or "")).strip()
+        if not limpio or limpio.lower() in vistos:
+            continue
+        vistos.add(limpio.lower())
+        unicos.append(limpio)
+    return " ".join(unicos).strip()[:120]
+
+
+async def buscar_avatares(ser_id: str, solicitud: Dict[str, Any]) -> Dict[str, Any]:
+    """POST /seres/{id}/avatar/buscar. Búsqueda REAL contra Openverse --
+    antes devolvía siempre candidatos=[] (GAP HONESTO documentado, sin
+    motor de imágenes cableado); ahora SÍ hay uno, con las MISMAS reglas
+    duras de licencia que ya usa el OS (ver `_candidato_desde_openverse` /
+    `_filtrar_candidatos_libres`, puertos exactos de
+    avatar-busqueda-logica.ts). Si la red falla o Openverse no responde:
+    error honesto y candidatos=[] -- NUNCA candidatos inventados (regla
+    nº1 del encargo)."""
+    agente = agent_vault_engine.get_agent(ser_id)
+    if not agente:
+        return {"ok": False, "error": f"Ser '{ser_id}' no encontrado.", "candidatos": []}
+
+    solicitud = solicitud or {}
+    consulta = _texto_o_none(solicitud.get("consulta")) or _componer_consulta_avatar(agente)
+    consulta = consulta[:200] if consulta else ""
+    if not consulta:
+        return {"ok": False, "error": "No se pudo componer una consulta de busqueda para este ser.", "candidatos": []}
+
+    client_id, client_secret = _openverse_credenciales()
+    params = {
+        "q": consulta, "page_size": str(_OPENVERSE_PAGE_SIZE),
+        # Solo licencias que permiten uso comercial Y obra derivada -- nunca "nc" ni "nd". Primera barrera.
+        "license_type": "commercial,modification", "mature": "false",
+    }
+    headers = {"Accept": "application/json"}
+    try:
+        async with httpx.AsyncClient(timeout=_OPENVERSE_TIMEOUT_S) as cliente:
+            if client_id and client_secret:
+                token = await _openverse_token(cliente, client_id, client_secret)
+                if token:
+                    headers["Authorization"] = f"Bearer {token}"
+                # Sin token (el proveedor rechazó las credenciales configuradas):
+                # se sigue igual, anónimo -- degradación elegante, no un error
+                # solo porque las credenciales configuradas fallaron.
+            r = await cliente.get(_OPENVERSE_SEARCH_URL, params=params, headers=headers)
+    except Exception as e:
+        return {"ok": False, "error": f"No se pudo alcanzar Openverse: {type(e).__name__}: {e}", "candidatos": []}
+
+    if r.status_code == 429:
+        return {"ok": False, "error": "Openverse esta saturado ahora mismo (429). Prueba de nuevo en un rato.", "candidatos": []}
+    if r.status_code == 401:
+        _openverse_token_cache["token"] = None  # credenciales rechazadas: se piden de nuevo la proxima vez.
+        return {"ok": False, "error": "Openverse rechazo las credenciales configuradas (401).", "candidatos": []}
+    if r.status_code != 200:
+        return {"ok": False, "error": f"Openverse respondio {r.status_code}.", "candidatos": []}
+
+    try:
+        datos = r.json()
+    except Exception:
+        return {"ok": False, "error": "Respuesta de Openverse ilegible (JSON invalido).", "candidatos": []}
+
+    crudos = datos.get("results") if isinstance(datos, dict) else None
+    crudos = crudos if isinstance(crudos, list) else []
+    mapeados = [c for c in (_candidato_desde_openverse(cr, consulta) for cr in crudos if isinstance(cr, dict)) if c is not None]
+    return {"ok": True, "candidatos": _filtrar_candidatos_libres(mapeados)}
 
 
 def fijar_avatar(ser_id: str, solicitud: Dict[str, Any]) -> Dict[str, Any]:
@@ -1769,6 +2238,13 @@ def fijar_avatar(ser_id: str, solicitud: Dict[str, Any]) -> Dict[str, Any]:
 
 # ------------------------------------------------------------- 9.6 Oficina
 
+# (Adenda 168) Red de seguridad, ya NO la fuente principal: ANTES de esta
+# adenda el motor no publicaba ningún instante de inicio de ciclo, así que
+# 'desde' se aproximaba anclándolo a la PRIMERA vez que esta llamada
+# observaba el pid corriendo. Ahora intuitive_imagination_engine SÍ publica
+# el instante real (process_metadata[pid]['cycle_started_at'], ver
+# trigger_cycle) y obtener_estado_oficina() lo prefiere siempre que existe
+# -- esto solo se usa como respaldo si por lo que sea faltara.
 _OFICINA_OCUPACION_DESDE: Dict[str, float] = {}
 
 
@@ -1783,11 +2259,17 @@ def obtener_estado_oficina() -> Dict[str, Any]:
     inmensa mayoria: un ciclo tarda segundos y se repite cada
     cycle_frequency_minutes, 5 min por defecto) la oficina sale quieta,
     ocupantes=[], tal como pide el encargo: nada de animar actividad
-    inventada. 'desde' de un ocupante se ancla la PRIMERA vez que esta
-    misma llamada observa ese pid corriendo (el motor no persiste un
-    instante de inicio de ciclo en ningun sitio publico que este módulo
-    pueda leer sin inventarlo) y se limpia en cuanto deja de estar
-    corriendo, para que la proxima llegada cuente como una llegada nueva."""
+    inventada.
+
+    'desde' de un ocupante (Adenda 168): el instante REAL en que el motor
+    marcó ese ciclo como 'running' -- intuitive_imagination_engine.
+    trigger_cycle() lo publica en process_metadata[pid]['cycle_started_at']
+    en el MISMO instante en que pone status='running' (mismo `now`, no una
+    lectura posterior), así que es el mismo 'ahora' que decidió que el
+    ciclo empezaba, no una aproximación de este módulo. Si por lo que sea
+    faltara (degradación elegante: motor más viejo, estado cargado de
+    antes de esta adenda), se cae al mecanismo anterior (anclar al primer
+    GET /oficina que lo observa corriendo) en vez de romper la respuesta."""
     ahora = time.time()
     if intuitive_imagination_engine is None:
         return {"salas": [], "ocupantes": [], "actualizadoEn": ahora, "datosReales": False}
@@ -1800,12 +2282,14 @@ def obtener_estado_oficina() -> Dict[str, Any]:
 
     salas: List[Dict[str, Any]] = []
     corriendo_pid: Optional[str] = None
+    corriendo_meta: Dict[str, Any] = {}
     for proc in DREAM_PROCESS_TYPES:
         pid = proc["id"]
         meta = proc_meta.get(pid) or {}
         corriendo = esta_sonando and meta.get("status") == "running"
         if corriendo:
             corriendo_pid = pid
+            corriendo_meta = meta
         salas.append({
             "id": _sala_id_de(pid), "nombre": proc.get("name"), "procesoTipoId": pid,
             "actividad": 1.0 if corriendo else 0.0, "color": proc.get("color"),
@@ -1813,14 +2297,16 @@ def obtener_estado_oficina() -> Dict[str, Any]:
 
     ocupantes: List[Dict[str, Any]] = []
     if corriendo_pid:
-        _OFICINA_OCUPACION_DESDE.setdefault(corriendo_pid, ahora)
+        desde_real = corriendo_meta.get("cycle_started_at")
+        if not isinstance(desde_real, (int, float)):
+            desde_real = _OFICINA_OCUPACION_DESDE.setdefault(corriendo_pid, ahora)
         ser_id = _instalados_por_tipo_proceso().get(corriendo_pid)
         if ser_id:
             proc_info = next((p for p in DREAM_PROCESS_TYPES if p["id"] == corriendo_pid), {})
             ocupantes.append({
                 "serId": ser_id, "salaId": _sala_id_de(corriendo_pid), "actividad": "pensando",
                 "procesoId": corriendo_pid, "detalle": proc_info.get("description"),
-                "desde": _OFICINA_OCUPACION_DESDE.get(corriendo_pid, ahora),
+                "desde": desde_real,
             })
     else:
         _OFICINA_OCUPACION_DESDE.clear()
@@ -1829,12 +2315,20 @@ def obtener_estado_oficina() -> Dict[str, Any]:
 
 
 # ═══════════════════════════════════════════════════════════════════════
-# 8. RUTAS — EXACTAMENTE las 20 de la cabecera de genesis-types.ts más las
-#    8 de la cabecera "OLA 2" (28 en total), ni una más ni una menos. 404
-#    nunca se usa para "no encontrado" lógico (ver SOBRE DE RESPUESTA en
-#    el docstring del módulo); la única excepción deliberada es
-#    GET /seres/{id}, que devuelve 400 porque su forma de éxito es un
-#    objeto desnudo sin sitio para "ok".
+# 8. RUTAS — las 20 de la cabecera de genesis-types.ts más las 8 de la
+#    cabecera "OLA 2" (28 en total, contrato congelado). 404 nunca se usa
+#    para "no encontrado" lógico (ver SOBRE DE RESPUESTA en el docstring
+#    del módulo); la única excepción deliberada es GET /seres/{id}, que
+#    devuelve 400 porque su forma de éxito es un objeto desnudo sin sitio
+#    para "ok".
+#
+#    + 4 RUTAS NUEVAS (Adenda 168, FUERA del contrato congelado -- Alex las
+#    pidió directamente; no están todavía en genesis-types.ts, forma
+#    documentada en el informe de la adenda para que se sumen allí):
+#      DELETE /seres/{id}/cerebros/{cerebro_id}             → { ok, ser }
+#      POST   /seres/{id}/cerebros/{cerebro_id}/sincronizar → { ok, ser, resultado }
+#      POST   /cerebros/sincronizar                         → { ok, estado, error, resultado }
+#      POST   /herramientas/biblioteca_usuario               → { ok, recibidos, descartados }
 # ═══════════════════════════════════════════════════════════════════════
 
 class _VerificarModeloBody(BaseModel):
@@ -1968,7 +2462,7 @@ async def ep_conceder_internet(ser_id: str, solicitud: Dict[str, Any] = Body(def
 
 @router.post("/seres/{ser_id}/avatar/buscar")
 async def ep_buscar_avatar(ser_id: str, solicitud: Dict[str, Any] = Body(default_factory=dict)):
-    return buscar_avatares(ser_id, solicitud)
+    return await buscar_avatares(ser_id, solicitud)
 
 
 @router.post("/seres/{ser_id}/avatar")
@@ -1984,3 +2478,25 @@ async def ep_listar_herramientas():
 @router.post("/seres/{ser_id}/cerebros")
 async def ep_agregar_cerebro_propio(ser_id: str, solicitud: Dict[str, Any] = Body(default_factory=dict)):
     return agregar_cerebro_propio(ser_id, solicitud)
+
+
+# ────────────────────────────── Adenda 168 (4 rutas nuevas, ver sección 8)
+
+@router.delete("/seres/{ser_id}/cerebros/{cerebro_id}")
+async def ep_quitar_cerebro_propio(ser_id: str, cerebro_id: str):
+    return quitar_cerebro_propio(ser_id, cerebro_id)
+
+
+@router.post("/seres/{ser_id}/cerebros/{cerebro_id}/sincronizar")
+async def ep_sincronizar_cerebro_propio(ser_id: str, cerebro_id: str, _cuerpo: Dict[str, Any] = Body(default_factory=dict)):
+    return sincronizar_cerebro_propio_ahora(ser_id, cerebro_id)
+
+
+@router.post("/cerebros/sincronizar")
+async def ep_sincronizar_cerebros_ahora(_cuerpo: Dict[str, Any] = Body(default_factory=dict)):
+    return sincronizar_cerebros_ahora()
+
+
+@router.post("/herramientas/biblioteca_usuario")
+async def ep_depositar_biblioteca_usuario(solicitud: Dict[str, Any] = Body(default_factory=dict)):
+    return depositar_biblioteca_usuario(solicitud)

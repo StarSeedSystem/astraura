@@ -134,6 +134,31 @@ class Mem0UniversalMemoryEngine:
                 return False
         return True
 
+    @staticmethod
+    def _current_active_brain_id() -> Optional[str]:
+        """
+        (Adenda sync cerebros) Cerebro ACTIVO ahora mismo, según el registro
+        en vivo de cerebros_manager — para que add_memory() pueda grabar la
+        procedencia real en el momento de escribir, en vez de que otro
+        módulo tenga que adivinarla después por patrones de texto (ver la
+        "Deuda 1" documentada en orchestrator.py: ese respaldo por patrones
+        solo acertaba el 45% de los recuerdos mem0, y estructuralmente NO
+        puede acertar el 100% porque la mayoría de los recuerdos no llevan
+        ninguna pista textual de qué cerebro los generó).
+
+        Import perezoso (mismo patrón que ya usa este codebase en
+        cerebros_manager.py para sus propios imports opcionales) para no
+        acoplar la carga de este módulo a cerebros_manager, y porque
+        add_memory() corre en la ruta de cada turno de chat: un fallo aquí
+        JAMÁS debe impedir guardar el recuerdo, solo dejarlo sin brain_id
+        (igual que se guardaba antes de esta adenda).
+        """
+        try:
+            from ..cerebros.cerebros_manager import cerebros_manager
+            return cerebros_manager.active_brain_id or None
+        except Exception:
+            return None
+
     def add_memory(
         self,
         memory_text: str,
@@ -145,6 +170,15 @@ class Mem0UniversalMemoryEngine:
     ) -> Optional[Dict[str, Any]]:
         """
         Adds a new semantic memory to Mem0 with auto-deduplication and confidence scoring.
+
+        (Adenda sync cerebros) PROCEDENCIA CAPTURADA AL GUARDAR, no
+        reconstruida después: si `metadata` no trae ya un `brain_id`
+        explícito, aquí se graba el cerebro ACTIVO en este instante exacto.
+        Es la cura de raíz de la Deuda 1 de orchestrator.py — el respaldo
+        por patrones de texto se queda para lo que ya estaba guardado antes
+        de esta adenda (nunca podrá tener este dato) y sigue funcionando
+        igual para ello; los recuerdos NUEVOS a partir de ahora ya no
+        necesitan adivinanza.
         """
         text_clean = memory_text.strip()
         if not self.is_valid_memory(text_clean):
@@ -157,6 +191,12 @@ class Mem0UniversalMemoryEngine:
                 self._save()
                 return existing
 
+        meta = dict(metadata or {})
+        if "brain_id" not in meta:
+            active_brain_id = self._current_active_brain_id()
+            if active_brain_id:
+                meta["brain_id"] = active_brain_id
+
         m_id = f"mem0_{int(time.time() * 1000)}"
         new_entry = {
             "id": m_id,
@@ -168,7 +208,7 @@ class Mem0UniversalMemoryEngine:
             "confidence": 0.95,
             "created_at": time.time(),
             "updated_at": time.time(),
-            "metadata": metadata or {}
+            "metadata": meta
         }
         self.memories.insert(0, new_entry)
         self.history.insert(0, {

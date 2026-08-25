@@ -73,9 +73,22 @@ class BitNetUnifiedEngine:
         # (modelo preferido/primero); si no, plantillas.
         ollama_models = self.probe_ollama_models_sync()
         server = bitnet_cpp_manager.server_status()
+        # (Verificación 1.58) `server` ya sondea el PUERTO real (bitnet_cpp_manager.
+        # probe_port): running/ready son honestos aunque este proceso no haya
+        # lanzado el llama-server él mismo. Antes "estado" solo distinguía listo/
+        # cargando/frío con los 2 booleanos del perfil "interactive"; ahora se usa
+        # el `state` granular que ya trae ese perfil (apagado/arrancando/listo/
+        # respondiendo_sin_modelo) sin perder matices.
+        interactive_state = ((server.get("profiles") or {}).get("interactive") or {}).get("state", "apagado")
+        ESTADOS_LABEL = {
+            "listo": "listo",
+            "arrancando": "arrancando (cargando el modelo)",
+            "respondiendo_sin_modelo": "puerto ocupado por otro proceso",
+            "apagado": "en frío (arranca al primer turno)",
+        }
+        estado = ESTADOS_LABEL.get(interactive_state, interactive_state)
         if cpp_status["is_compiled"] and cpp_status["models_available"] and bitnet_cpp_manager.server_binary() is not None:
             real_mode = "bitnet-native"
-            estado = "listo" if server.get("ready") else ("cargando" if server.get("running") else "en frío (arranca al primer turno)")
             model_label = f"BitNet b1.58 nativo · {Path(cpp_status['models_available'][0]['path']).name} · {estado}"
         elif ollama_models:
             real_mode = "ollama"
@@ -85,7 +98,7 @@ class BitNetUnifiedEngine:
                     if m == self.preferred_model or m.split(":")[0] == self.preferred_model.split(":")[0]:
                         chosen = m
                         break
-            model_label = f"{chosen} (Ollama) // BitNet b1.58 pendiente"
+            model_label = f"{chosen} (Ollama) // BitNet b1.58 {estado}"
         else:
             real_mode = "templates"
             model_label = "sin modelo real (plantillas) — arranca Ollama o compila BitNet"
@@ -99,6 +112,9 @@ class BitNetUnifiedEngine:
             "preferred_model": self.preferred_model or None,
             "bitnet_cpp_installed": cpp_status["is_compiled"],
             "bitnet_server": server,
+            # (Verificación 1.58) Estado granular del perfil "interactive" también
+            # en la raíz, para que la UI no tenga que bucear en bitnet_server.profiles.
+            "bitnet_server_state": interactive_state,
             # (Adenda 157) Inventario honesto de aceleradores ternarios y estado de
             # la cuantización de la memoria (TurboQuant) — lo pinta el OS en Telemetría.
             # OJO: la clave `quantization` ya existe abajo (etiqueta i2_s), por eso
@@ -184,234 +200,283 @@ class BitNetUnifiedEngine:
         ollama_failed = ""
         bitnet_failed = ""
 
-        # 1. Try streaming from local high-performance neural engine (Ollama)
-        ollama_models = await self.get_available_ollama_models()
-        if ollama_models:
-            meta["source"] = "ollama"  # (OS · Ola 3)
-            # Modelo preferido por entorno (si está instalado); si no, el primero.
-            model_to_use = ollama_models[0]
-            if self.preferred_model and self.preferred_model in ollama_models:
-                model_to_use = self.preferred_model
-            elif self.preferred_model:
-                for m in ollama_models:
-                    if m.split(":")[0] == self.preferred_model.split(":")[0]:
-                        model_to_use = m
-                        break
-            # Estado honesto: el modelo REAL que responde (antes era un texto fijo).
-            self.active_model_name = f"{model_to_use} (Ollama) // BitNet b1.58 pendiente"
-            
-            # Format clean, context-rich system prompt
-            context_summary = ""
-            if context_chunks and len(context_chunks) > 0:
-                # (OS · Ola 3) 6 fragmentos en vez de 3: el orquestador antepone hasta 3
-                # recuerdos Mem0 ([RECUERDO] …) y no deben desplazar a los documentos.
-                clean_chunks = [c.replace("\n", " ").strip() for c in context_chunks[:6]]
-                context_summary = "\n- " + "\n- ".join(clean_chunks)
-            
-            tool_summary = ""
-            if tool_data:
-                if "file_content" in tool_data and tool_data["file_content"].get("success"):
-                    fc = tool_data["file_content"]
-                    tool_summary += f"\n[DOCUMENTO EN DISCO LEÍDO ({fc['filename']})]:\n{fc['content'][:3000]}\n"
-                if "web_content" in tool_data and tool_data["web_content"].get("success"):
-                    wc = tool_data["web_content"]
-                    tool_summary += f"\n[EXTRACCIÓN WEB EN VIVO ({wc.get('url', '')}) - {wc.get('title', '')}]:\n{wc.get('content', '')[:4000]}\n"
-                if "deep_research" in tool_data and tool_data["deep_research"].get("success"):
-                    dr = tool_data["deep_research"]
-                    tool_summary += f"\n[INVESTIGACIÓN WEB PROFUNDA ({dr.get('sources_count', 0)} fuentes verificadas)]: \n"
-                    for s in dr.get("sources", [])[:6]:
-                        tool_summary += f"- {s['title']} ({s['url']}): {s.get('snippet', '')[:250]}\n"
-                        if s.get("extracted_text"):
-                            tool_summary += f"  Detalle: {s['extracted_text'][:400]}\n"
-                if "system_telemetry" in tool_data:
-                    st = tool_data["system_telemetry"]
-                    tool_summary += f"\n[TELEMETRÍA REAL DEL DISPOSITIVO]: Batería {st['battery']['percent']}%, CPU Apple Silicon M1 (8 núcleos, {st['cpu']['total_percent']}% uso), RAM Libre {st['memory']['available_gb']} GB, Host {st['hostname']}, OS {st['os']}\n"
+        async def _attempt_ollama() -> AsyncGenerator[str, None]:
+            """Intento via Ollama. No yieldea nada si no hay modelos configurados
+            o si la respuesta HTTP no es 200; un fallo real (excepcion) deja
+            `ollama_failed` con el motivo -- misma logica que antes de extraer
+            este bloque, solo reestructurado en una funcion para poder invertir
+            el orden de intento por perfil (ver mas abajo)."""
+            nonlocal ollama_failed
+            # 1. Try streaming from local high-performance neural engine (Ollama)
+            ollama_models = await self.get_available_ollama_models()
+            if ollama_models:
+                meta["source"] = "ollama"  # (OS · Ola 3)
+                # Modelo preferido por entorno (si está instalado); si no, el primero.
+                model_to_use = ollama_models[0]
+                if self.preferred_model and self.preferred_model in ollama_models:
+                    model_to_use = self.preferred_model
+                elif self.preferred_model:
+                    for m in ollama_models:
+                        if m.split(":")[0] == self.preferred_model.split(":")[0]:
+                            model_to_use = m
+                            break
+                # Estado honesto: el modelo REAL que responde (antes era un texto fijo).
+                self.active_model_name = f"{model_to_use} (Ollama) // BitNet b1.58 pendiente"
+                
+                # Format clean, context-rich system prompt
+                context_summary = ""
+                if context_chunks and len(context_chunks) > 0:
+                    # (OS · Ola 3) 6 fragmentos en vez de 3: el orquestador antepone hasta 3
+                    # recuerdos Mem0 ([RECUERDO] …) y no deben desplazar a los documentos.
+                    clean_chunks = [c.replace("\n", " ").strip() for c in context_chunks[:6]]
+                    context_summary = "\n- " + "\n- ".join(clean_chunks)
+                
+                tool_summary = ""
+                if tool_data:
+                    if "file_content" in tool_data and tool_data["file_content"].get("success"):
+                        fc = tool_data["file_content"]
+                        tool_summary += f"\n[DOCUMENTO EN DISCO LEÍDO ({fc['filename']})]:\n{fc['content'][:3000]}\n"
+                    if "web_content" in tool_data and tool_data["web_content"].get("success"):
+                        wc = tool_data["web_content"]
+                        tool_summary += f"\n[EXTRACCIÓN WEB EN VIVO ({wc.get('url', '')}) - {wc.get('title', '')}]:\n{wc.get('content', '')[:4000]}\n"
+                    if "deep_research" in tool_data and tool_data["deep_research"].get("success"):
+                        dr = tool_data["deep_research"]
+                        tool_summary += f"\n[INVESTIGACIÓN WEB PROFUNDA ({dr.get('sources_count', 0)} fuentes verificadas)]: \n"
+                        for s in dr.get("sources", [])[:6]:
+                            tool_summary += f"- {s['title']} ({s['url']}): {s.get('snippet', '')[:250]}\n"
+                            if s.get("extracted_text"):
+                                tool_summary += f"  Detalle: {s['extracted_text'][:400]}\n"
+                    if "system_telemetry" in tool_data:
+                        st = tool_data["system_telemetry"]
+                        tool_summary += f"\n[TELEMETRÍA REAL DEL DISPOSITIVO]: Batería {st['battery']['percent']}%, CPU Apple Silicon M1 (8 núcleos, {st['cpu']['total_percent']}% uso), RAM Libre {st['memory']['available_gb']} GB, Host {st['hostname']}, OS {st['os']}\n"
 
-            if system_prompt and system_prompt.strip():
-                effective_system_prompt = system_prompt.strip()
-                if tool_summary:
-                    effective_system_prompt += f"\n\n[DATOS DE HARDWARE & HERRAMIENTAS]:\n{tool_summary}"
-                if context_summary:
-                    effective_system_prompt += f"\n\n[DOCUMENTOS DE MEMORIA]:\n{context_summary}"
-            else:
-                from ..memory.starseed_memory_engine import starseed_memory
-                identity_context = starseed_memory.get_formatted_identity_context()
-                effective_system_prompt = (
-                    "Eres Astraura, la inteligencia artificial de StarSeed OS.\n\n"
-                    f"{identity_context}\n"
-                    f"{tool_summary}\n"
-                    f"{('[DOCUMENTOS DE MEMORIA]:' + context_summary) if context_summary else ''}"
-                )
+                if system_prompt and system_prompt.strip():
+                    effective_system_prompt = system_prompt.strip()
+                    if tool_summary:
+                        effective_system_prompt += f"\n\n[DATOS DE HARDWARE & HERRAMIENTAS]:\n{tool_summary}"
+                    if context_summary:
+                        effective_system_prompt += f"\n\n[DOCUMENTOS DE MEMORIA]:\n{context_summary}"
+                else:
+                    from ..memory.starseed_memory_engine import starseed_memory
+                    identity_context = starseed_memory.get_formatted_identity_context()
+                    effective_system_prompt = (
+                        "Eres Astraura, la inteligencia artificial de StarSeed OS.\n\n"
+                        f"{identity_context}\n"
+                        f"{tool_summary}\n"
+                        f"{('[DOCUMENTOS DE MEMORIA]:' + context_summary) if context_summary else ''}"
+                    )
 
-            try:
-                # (Adenda 159) 90 s se quedaba corto con la maquina cargada: medido
-                # en un M1 con load average 15, el PRIMER token tardaba 68-88 s, asi
-                # que el timeout saltaba y la respuesta real del modelo se perdia.
-                # `keep_alive` mantiene el modelo residente entre turnos.
-                async with httpx.AsyncClient(timeout=httpx.Timeout(300.0, connect=10.0)) as client:
-                    async with client.stream(
-                        "POST",
-                        f"{self.ollama_url}/api/generate",
-                        json={
-                            "model": model_to_use,
-                            "prompt": prompt,
-                            "system": effective_system_prompt,
-                            "stream": True,
-                            "keep_alive": "30m",
-                            "options": {
-                                "temperature": max(0.2, min(0.85, temperature)),
-                                "num_predict": max_tokens,
-                                "repeat_penalty": 1.25,
-                                "repeat_last_n": 128,
-                                "top_p": 0.9,
-                                "frequency_penalty": 0.4,
-                                "presence_penalty": 0.4,
-                                "stop": [
-                                    "<|im_end|>", "<|endoftext|>", "PERSONALIDAD 10:", "PERSONALIDAD 11:",
-                                    "PERSONALIDAD 12:", "PERSONALIDAD 13:", "PERSONALIDAD 14:", "PERSONALIDAD 15:",
-                                    "Persona H2O", "Persona M3N"
-                                ]
+                try:
+                    # (Adenda 159) 90 s se quedaba corto con la maquina cargada: medido
+                    # en un M1 con load average 15, el PRIMER token tardaba 68-88 s, asi
+                    # que el timeout saltaba y la respuesta real del modelo se perdia.
+                    # `keep_alive` mantiene el modelo residente entre turnos.
+                    async with httpx.AsyncClient(timeout=httpx.Timeout(300.0, connect=10.0)) as client:
+                        async with client.stream(
+                            "POST",
+                            f"{self.ollama_url}/api/generate",
+                            json={
+                                "model": model_to_use,
+                                "prompt": prompt,
+                                "system": effective_system_prompt,
+                                "stream": True,
+                                "keep_alive": "30m",
+                                "options": {
+                                    "temperature": max(0.2, min(0.85, temperature)),
+                                    "num_predict": max_tokens,
+                                    "repeat_penalty": 1.25,
+                                    "repeat_last_n": 128,
+                                    "top_p": 0.9,
+                                    "frequency_penalty": 0.4,
+                                    "presence_penalty": 0.4,
+                                    "stop": [
+                                        "<|im_end|>", "<|endoftext|>", "PERSONALIDAD 10:", "PERSONALIDAD 11:",
+                                        "PERSONALIDAD 12:", "PERSONALIDAD 13:", "PERSONALIDAD 14:", "PERSONALIDAD 15:",
+                                        "Persona H2O", "Persona M3N"
+                                    ]
+                                }
                             }
-                        }
-                    ) as response:
-                        if response.status_code == 200:
-                            recent_lines = []
-                            current_line_buffer = ""
-                            loop_detected = False
+                        ) as response:
+                            if response.status_code == 200:
+                                recent_lines = []
+                                current_line_buffer = ""
+                                loop_detected = False
 
-                            async for line in response.aiter_lines():
-                                if line:
-                                    try:
-                                        chunk_json = json.loads(line)
-                                        token = chunk_json.get("response", "")
-                                        if not token:
-                                            continue
+                                async for line in response.aiter_lines():
+                                    if line:
+                                        try:
+                                            chunk_json = json.loads(line)
+                                            token = chunk_json.get("response", "")
+                                            if not token:
+                                                continue
 
-                                        current_line_buffer += token
-                                        if "\n" in current_line_buffer or len(current_line_buffer) > 120:
-                                            sublines = current_line_buffer.split("\n")
-                                            for sl in sublines[:-1]:
-                                                sl_clean = " ".join(sl.split()).strip().lower()
-                                                if len(sl_clean) > 15:
-                                                    # Check exact line repetition loop
-                                                    if recent_lines.count(sl_clean) >= 2:
-                                                        loop_detected = True
-                                                        break
-                                                    # Check repeating fictitious personality header loop (beyond the 9 real personalities)
-                                                    if "personalidad" in sl_clean and any(f"personalidad {n}" in sl_clean or f"personalidad #{n}" in sl_clean or f"{n}." in sl_clean for n in range(10, 50)):
-                                                        loop_detected = True
-                                                        break
-                                                    recent_lines.append(sl_clean)
-                                                    if len(recent_lines) > 30:
-                                                        recent_lines.pop(0)
-                                            current_line_buffer = sublines[-1]
+                                            current_line_buffer += token
+                                            if "\n" in current_line_buffer or len(current_line_buffer) > 120:
+                                                sublines = current_line_buffer.split("\n")
+                                                for sl in sublines[:-1]:
+                                                    sl_clean = " ".join(sl.split()).strip().lower()
+                                                    if len(sl_clean) > 15:
+                                                        # Check exact line repetition loop
+                                                        if recent_lines.count(sl_clean) >= 2:
+                                                            loop_detected = True
+                                                            break
+                                                        # Check repeating fictitious personality header loop (beyond the 9 real personalities)
+                                                        if "personalidad" in sl_clean and any(f"personalidad {n}" in sl_clean or f"personalidad #{n}" in sl_clean or f"{n}." in sl_clean for n in range(10, 50)):
+                                                            loop_detected = True
+                                                            break
+                                                        recent_lines.append(sl_clean)
+                                                        if len(recent_lines) > 30:
+                                                            recent_lines.pop(0)
+                                                current_line_buffer = sublines[-1]
 
-                                        if loop_detected:
-                                            yield "\n\n### ⚡ [Síntesis Coral 1.58b]:\nTodas las personalidades y el núcleo cognitivo concluyen la deliberación en consenso soberano y resonancia armónica."
-                                            break
+                                            if loop_detected:
+                                                yield "\n\n### ⚡ [Síntesis Coral 1.58b]:\nTodas las personalidades y el núcleo cognitivo concluyen la deliberación en consenso soberano y resonancia armónica."
+                                                break
 
-                                        # Sanitize rogue hallucinated identity tokens and name fusions in real time
-                                        sanitized_token = token
-                                        if "*Como Alex*" in sanitized_token or "*Como Alex" in sanitized_token:
-                                            sanitized_token = sanitized_token.replace("*Como Alex*", "**Astraura**:").replace("*Como Alex", "**Astraura")
-                                        if "Como Alex Bordón:" in sanitized_token or "Como Alex Bordón" in sanitized_token:
-                                            sanitized_token = sanitized_token.replace("Como Alex Bordón:", "**Astraura**:").replace("Como Alex Bordón", "**Astraura**")
-                                        if "Soy Alex Bordón" in sanitized_token:
-                                            sanitized_token = sanitized_token.replace("Soy Alex Bordón", "Soy Astraura")
-                                        if "Auría Kumbhamakara" in sanitized_token or "Aurora Kumbhamakara" in sanitized_token:
-                                            sanitized_token = sanitized_token.replace("Auría Kumbhamakara", "Aurora").replace("Aurora Kumbhamakara", "Aurora")
-                                        if "Astraura Kumbhamakara" in sanitized_token:
-                                            sanitized_token = sanitized_token.replace("Astraura Kumbhamakara", "Astraura")
-                                        if "Vistāradvīdaśa" in sanitized_token or "Vistāradvāsa" in sanitized_token:
-                                            sanitized_token = sanitized_token.replace("Vistāradvīdaśa", "").replace("Vistāradvāsa", "")
+                                            # Sanitize rogue hallucinated identity tokens and name fusions in real time
+                                            sanitized_token = token
+                                            if "*Como Alex*" in sanitized_token or "*Como Alex" in sanitized_token:
+                                                sanitized_token = sanitized_token.replace("*Como Alex*", "**Astraura**:").replace("*Como Alex", "**Astraura")
+                                            if "Como Alex Bordón:" in sanitized_token or "Como Alex Bordón" in sanitized_token:
+                                                sanitized_token = sanitized_token.replace("Como Alex Bordón:", "**Astraura**:").replace("Como Alex Bordón", "**Astraura**")
+                                            if "Soy Alex Bordón" in sanitized_token:
+                                                sanitized_token = sanitized_token.replace("Soy Alex Bordón", "Soy Astraura")
+                                            if "Auría Kumbhamakara" in sanitized_token or "Aurora Kumbhamakara" in sanitized_token:
+                                                sanitized_token = sanitized_token.replace("Auría Kumbhamakara", "Aurora").replace("Aurora Kumbhamakara", "Aurora")
+                                            if "Astraura Kumbhamakara" in sanitized_token:
+                                                sanitized_token = sanitized_token.replace("Astraura Kumbhamakara", "Astraura")
+                                            if "Vistāradvīdaśa" in sanitized_token or "Vistāradvāsa" in sanitized_token:
+                                                sanitized_token = sanitized_token.replace("Vistāradvīdaśa", "").replace("Vistāradvāsa", "")
 
-                                        self.stats["tokens_generated"] += 1
-                                        yield sanitized_token
-                                    except Exception:
-                                        pass
-                            return
-            except Exception as e:
-                # `str(e)` de un ReadTimeout de httpx es CADENA VACIA: sin el tipo,
-                # el log decia «Ollama streaming notice: » y no habia forma de saber
-                # que habia pasado. El tipo es lo unico que identifica el fallo.
-                ollama_failed = f"{type(e).__name__}: {e}".rstrip(": ")
-                print(f"[BitNetUnifiedEngine] Ollama streaming FALLO ({ollama_failed})")
+                                            self.stats["tokens_generated"] += 1
+                                            yield sanitized_token
+                                        except Exception:
+                                            pass
+                                return
+                except Exception as e:
+                    # `str(e)` de un ReadTimeout de httpx es CADENA VACIA: sin el tipo,
+                    # el log decia «Ollama streaming notice: » y no habia forma de saber
+                    # que habia pasado. El tipo es lo unico que identifica el fallo.
+                    ollama_failed = f"{type(e).__name__}: {e}".rstrip(": ")
+                    print(f"[BitNetUnifiedEngine] Ollama streaming FALLO ({ollama_failed})")
 
-        # 2. BitNet NATIVO (Ola 3): llama-server gestionado (streaming OpenAI-compatible).
-        #    Ya no se lanza llama-cli por petición (frío, sin plantilla de chat, sin
-        #    paralelismo): el manager mantiene UN servidor con el GGUF i2_s cargado.
-        # (Adenda 159) Antes se esperaban 120 s SIEMPRE, incluso sin ningun modelo
-        # instalado: 120 s de reloj tirados antes de caer a la plantilla. Si no hay
-        # GGUF que cargar, no hay nada que esperar.
-        try:
-            _bn = bitnet_cpp_manager.check_status()
-            _has_model = bool(_bn.get("models_available"))
-        except Exception:
-            _has_model = False
-        base = await asyncio.to_thread(bitnet_cpp_manager.ensure_server, 120.0, profile) if _has_model else None
-        if not _has_model:
-            print("[BitNetUnifiedEngine] BitNet nativo omitido: no hay modelo GGUF instalado.")
-        # (Adenda 160) Aunque el servidor levante, el motor nativo solo se USA si
-        # pasa la sonda de cordura. En ARM, bitnet.cpp no tiene kernel i2_s
-        # vectorial y su fallback escalar devuelve un token constante: cargaba,
-        # se declaraba activo y servia basura. Mas vale no usarlo y decirlo.
-        if base:
-            _sane = await asyncio.to_thread(bitnet_cpp_manager.native_sanity, base)
-            if not _sane.get("ok"):
-                bitnet_failed = f"motor nativo descartado — {_sane.get('reason')}"
-                print(f"[BitNetUnifiedEngine] {bitnet_failed}")
-                base = None
-        if base and bitnet_cpp_manager.server_ready(profile):
-            meta["source"] = "bitnet-native"  # (OS · Ola 3)
-            # Presupuesto de contexto HONESTO: el modelo 2B-4T tiene 4096 posiciones.
-            # ~3.2 chars/token ⇒ recortamos system+prompt para dejar sitio a la respuesta
-            # (el orquestador puede mandar contextos enormes de memoria).
-            ctx_tokens = int(bitnet_cpp_manager.server_ctx or 4096)
-            gen_budget = max(128, min(int(max_tokens), max(128, ctx_tokens // 4)))
-            char_budget = max(2000, int((ctx_tokens - gen_budget - 64) * 3.2))
-            sys_txt = (system_prompt or "").strip()
-            if len(sys_txt) > char_budget // 3:
-                sys_txt = sys_txt[: char_budget // 3]
-            user_content = prompt
-            if context_chunks:
-                ctx_txt = "\n".join(f"[CONTEXTO] {c}" for c in context_chunks[:6] if c)
-                user_content = f"{ctx_txt}\n\n{prompt}" if ctx_txt else prompt
-            rest = char_budget - len(sys_txt)
-            if len(user_content) > rest:
-                user_content = user_content[-rest:]  # conserva el FINAL (el turno actual)
-            messages = []
-            if sys_txt:
-                messages.append({"role": "system", "content": sys_txt})
-            messages.append({"role": "user", "content": user_content})
-            payload = {
-                "messages": messages,
-                "max_tokens": gen_budget,
-                "temperature": float(temperature),
-                "top_p": 0.9,
-                "stream": True,
-            }
+        async def _attempt_bitnet_native() -> AsyncGenerator[str, None]:
+            """Intento via llama-server nativo (BitNet i2_s) gestionado por
+            bitnet_cpp_manager. No yieldea nada si no hay modelo GGUF, si el
+            servidor no pasa la sonda de cordura, o si no llega a "listo"."""
+            nonlocal bitnet_failed
+            # 2. BitNet NATIVO (Ola 3): llama-server gestionado (streaming OpenAI-compatible).
+            #    Ya no se lanza llama-cli por petición (frío, sin plantilla de chat, sin
+            #    paralelismo): el manager mantiene UN servidor con el GGUF i2_s cargado.
+            # (Adenda 159) Antes se esperaban 120 s SIEMPRE, incluso sin ningun modelo
+            # instalado: 120 s de reloj tirados antes de caer a la plantilla. Si no hay
+            # GGUF que cargar, no hay nada que esperar.
             try:
-                async with httpx.AsyncClient(timeout=httpx.Timeout(300.0, connect=10.0)) as client:
-                    async with client.stream("POST", f"{base}/v1/chat/completions", json=payload) as res:
-                        res.raise_for_status()
-                        async for line in res.aiter_lines():
-                            if not line or not line.startswith("data:"):
-                                continue
-                            data = line[5:].strip()
-                            if not data or data == "[DONE]":
-                                continue
-                            try:
-                                delta = json.loads(data)["choices"][0].get("delta", {})
-                            except Exception:
-                                continue
-                            token = delta.get("content")
-                            if token:
-                                self.stats["tokens_generated"] += 1
-                                yield token
+                _bn = bitnet_cpp_manager.check_status()
+                _has_model = bool(_bn.get("models_available"))
+            except Exception:
+                _has_model = False
+            base = await asyncio.to_thread(bitnet_cpp_manager.ensure_server, 120.0, profile) if _has_model else None
+            if not _has_model:
+                print("[BitNetUnifiedEngine] BitNet nativo omitido: no hay modelo GGUF instalado.")
+            # (Adenda 160) Aunque el servidor levante, el motor nativo solo se USA si
+            # pasa la sonda de cordura. En ARM, bitnet.cpp no tiene kernel i2_s
+            # vectorial y su fallback escalar devuelve un token constante: cargaba,
+            # se declaraba activo y servia basura. Mas vale no usarlo y decirlo.
+            if base:
+                _sane = await asyncio.to_thread(bitnet_cpp_manager.native_sanity, base)
+                if not _sane.get("ok"):
+                    bitnet_failed = f"motor nativo descartado — {_sane.get('reason')}"
+                    print(f"[BitNetUnifiedEngine] {bitnet_failed}")
+                    base = None
+            if not base and _has_model and not bitnet_failed:
+                # (Verificacion 1.58) Habia modelo GGUF pero `ensure_server` no
+                # logro un servidor nativo sano (puerto ocupado por otra cosa,
+                # timeout cargando, o binario ausente): antes esto se colaba en
+                # silencio -- el aviso de degradacion (si Ollama tambien fallaba)
+                # no explicaba por que el motor nativo no respondio.
+                bitnet_failed = "el servidor nativo no llego a estar listo (revisa el log de BitNet)"
+            if base and bitnet_cpp_manager.server_ready(profile):
+                meta["source"] = "bitnet-native"  # (OS · Ola 3)
+                # Presupuesto de contexto HONESTO: el modelo 2B-4T tiene 4096 posiciones.
+                # ~3.2 chars/token ⇒ recortamos system+prompt para dejar sitio a la respuesta
+                # (el orquestador puede mandar contextos enormes de memoria).
+                ctx_tokens = int(bitnet_cpp_manager.server_ctx or 4096)
+                gen_budget = max(128, min(int(max_tokens), max(128, ctx_tokens // 4)))
+                char_budget = max(2000, int((ctx_tokens - gen_budget - 64) * 3.2))
+                sys_txt = (system_prompt or "").strip()
+                if len(sys_txt) > char_budget // 3:
+                    sys_txt = sys_txt[: char_budget // 3]
+                user_content = prompt
+                if context_chunks:
+                    ctx_txt = "\n".join(f"[CONTEXTO] {c}" for c in context_chunks[:6] if c)
+                    user_content = f"{ctx_txt}\n\n{prompt}" if ctx_txt else prompt
+                rest = char_budget - len(sys_txt)
+                if len(user_content) > rest:
+                    user_content = user_content[-rest:]  # conserva el FINAL (el turno actual)
+                messages = []
+                if sys_txt:
+                    messages.append({"role": "system", "content": sys_txt})
+                messages.append({"role": "user", "content": user_content})
+                payload = {
+                    "messages": messages,
+                    "max_tokens": gen_budget,
+                    "temperature": float(temperature),
+                    "top_p": 0.9,
+                    "stream": True,
+                }
+                try:
+                    async with httpx.AsyncClient(timeout=httpx.Timeout(300.0, connect=10.0)) as client:
+                        async with client.stream("POST", f"{base}/v1/chat/completions", json=payload) as res:
+                            res.raise_for_status()
+                            async for line in res.aiter_lines():
+                                if not line or not line.startswith("data:"):
+                                    continue
+                                data = line[5:].strip()
+                                if not data or data == "[DONE]":
+                                    continue
+                                try:
+                                    delta = json.loads(data)["choices"][0].get("delta", {})
+                                except Exception:
+                                    continue
+                                token = delta.get("content")
+                                if token:
+                                    self.stats["tokens_generated"] += 1
+                                    yield token
+                    return
+                except Exception as e:
+                    bitnet_failed = f"{type(e).__name__}: {e}".rstrip(": ")
+                    print(f"[BitNetUnifiedEngine] BitNet nativo (llama-server) FALLO ({bitnet_failed})")
+
+        # (Verificacion 1.58) Orden de intento por PERFIL, no fijo:
+        #   - "background" (cognition.py: imaginacion, suenos, enjambre, Director
+        #     Metis, cronista) prueba BitNet NATIVO primero. Es el pedido explicito
+        #     de Alex -- "que funcione con el sistema 1.58 bit" -- y antes NUNCA se
+        #     cumplia aqui: con Ollama primero y Ollama sano (como en este Mac, con
+        #     qwen2.5:1.5b siempre arriba en :11434), el bloque nativo no se
+        #     alcanzaba JAMAS y cada "ser" hablaba en realidad con Ollama, no con
+        #     BitNet, aunque get_engine_status() dijera "real_mode: bitnet-native".
+        #     cognition.generate() ya presupuesta timeouts largos para este modo
+        #     (ver cognition.py), asi que esperar aqui a que el nativo cargue es
+        #     coherente con lo que el llamador ya asume.
+        #   - "interactive" (chat/orbe, latencia de cara al usuario) CONSERVA el
+        #     orden previo (Ollama primero): no hay mandato de tocar esa ruta, y
+        #     BitNet nativo en CPU (4.3 tok/s medidos) puede tardar bastante mas
+        #     que Ollama caliente en el primer token; forzar una espera de hasta
+        #     120 s ahi seria una regresion de UX que nadie pidio.
+        attempts = (
+            (_attempt_bitnet_native, _attempt_ollama)
+            if profile == "background"
+            else (_attempt_ollama, _attempt_bitnet_native)
+        )
+        for _attempt in attempts:
+            _yielded = False
+            async for _tok in _attempt():
+                _yielded = True
+                yield _tok
+            if _yielded:
                 return
-            except Exception as e:
-                bitnet_failed = f"{type(e).__name__}: {e}".rstrip(": ")
-                print(f"[BitNetUnifiedEngine] BitNet nativo (llama-server) FALLO ({bitnet_failed})")
+
 
         # 3. Dynamic Natural Language Cognitive Reasoner Fallback
         #
