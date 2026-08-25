@@ -508,7 +508,29 @@ class AgentVaultEngine:
     def get_agent(self, agent_id: str) -> Optional[Dict[str, Any]]:
         return self.agents.get(agent_id)
 
-    def save_agent(self, agent_dict: Dict[str, Any]) -> Dict[str, Any]:
+    # Colecciones que gestiona el servidor y que un documento venido del
+    # navegador NUNCA debe pisar. Los vínculos se crean y se borran por sus
+    # propios endpoints (`/api/genesis/vinculos`), que mutan el registro vivo;
+    # si `save_agent` los aceptara del cliente, cualquier pestaña abierta desde
+    # hace un rato resucitaría vínculos ya borrados al guardar cualquier otra
+    # cosa. Reproducido de verdad antes de escribir esto.
+    _CAMPOS_DEL_SERVIDOR = ("interconnections",)
+
+    def save_agent(self, agent_dict: Dict[str, Any], fusionar: bool = True) -> Dict[str, Any]:
+        """
+        Guarda un agente FUSIONANDO sobre lo que ya hay, no reemplazándolo.
+
+        El porqué: antes hacía `self.agents[aid] = agent_dict`, un reemplazo
+        total. `/api/agents/save` manda el documento entero desde el navegador,
+        así que todo lo que hubiera cambiado por otra vía desde que se cargó esa
+        pantalla —vínculos, cuotas, permisos— se perdía sin un solo aviso. Un
+        guardado que dice «hecho» mientras tira el trabajo de otro es justo el
+        fallo disfrazado de éxito que llevamos semanas quitando de este sistema.
+
+        Contrapartida consciente: al fusionar, una clave que el llamante OMITE
+        se conserva en vez de borrarse. Para una bóveda de configuración es de
+        largo el menor de los dos males; borrar de verdad tiene sus endpoints.
+        """
         aid = agent_dict.get("id") or f"custom_agent_{int(time.time())}"
         agent_dict["id"] = aid
         agent_dict["updated_at"] = time.time()
@@ -516,7 +538,16 @@ class AgentVaultEngine:
             agent_dict["created_at"] = time.time()
             agent_dict["is_custom"] = True
 
-        self.agents[aid] = agent_dict
+        previo = self.agents.get(aid)
+        if previo is not None and fusionar and previo is not agent_dict:
+            registro = dict(previo)
+            for clave, valor in agent_dict.items():
+                if clave in self._CAMPOS_DEL_SERVIDOR:
+                    continue  # lo del servidor manda
+                registro[clave] = valor
+            self.agents[aid] = registro
+        else:
+            self.agents[aid] = agent_dict
         self._save_agents()
 
         # Ensure API record exists

@@ -223,6 +223,144 @@ def _recency_factor(ts: Any, now: Optional[float] = None) -> float:
     return _RECENCY_FLOOR + (1.0 - _RECENCY_FLOOR) * decayed
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# (Deuda 1 · Procedencia real por ítem — "cerebro"/"servidor") — POR QUÉ
+# -----------------------------------------------------------------------------
+# Alex pidió ver, junto a cada recuerdo, de qué CEREBRO y de qué SERVIDOR /
+# almacenamiento salió — "las memorias de los cerebros de los almacenamientos
+# sincronizados con la cuenta en tiempo real desde cualquier servidor
+# conectado". Investigado a fondo (mem0_engine, starseed_memory_engine,
+# knowledge_graph, document_indexer, device_sync, cerebros_manager, y sobre
+# todo los DATOS REALES en disco de este Mac — no solo el código): NINGUNA de
+# las tres fuentes guarda un "brain_id"/"servidor_id" explícito por ítem.
+# Medido en disco (153 recuerdos mem0 / 874 documentos / 397 conceptos, todos
+# reales, ninguno de prueba):
+#
+#   - mem0: 117/153 recuerdos traen `agent_id` (≠ "*") o `metadata.persona` —
+#     la personalidad bajo la que se generó el recuerdo. De esos, solo 69
+#     resuelven a un cerebro REALMENTE registrado hoy (ver abajo).
+#   - Documentos del memory root: 263/874 tienen la personalidad incrustada
+#     en su `category` ("Exocórtex Sincronizado / Hermes (Web Intel)"); 150
+#     más ("Almacenamiento Enrutado") incrustan en su `content`, en texto con
+#     formato estable, tanto el cerebro destino ("Enrutado a cerebros:
+#     brain_genesis") como la ruta de almacenamiento de origen ("Conexión
+#     detectada en /Volumes/External_SSD" — la única vez en todo el sistema
+#     que aparece un almacenamiento genuinamente DISTINTO del disco principal).
+#   - Conceptos del grafo: CERO señal — `knowledge_graph.add_node` nunca
+#     recibe agente ni personalidad; estructuralmente no puede saberse hoy.
+#
+# La personalidad (persona_id) se resuelve contra el registro EN VIVO de
+# `cerebros_manager` — NUNCA contra la plantilla estática
+# `DEFAULT_PERSONALITIES_BY_BRAIN` de ese módulo: medido, este Mac solo tiene
+# 3 cerebros REALES de los 5 que la plantilla describe (brain_genesis,
+# brain_hephaestus, brain_hermes — ni brain_athena ni brain_mnemosyne existen
+# hoy), y de las 9 personalidades oficiales solo 4 persona_id están enlazados
+# a un cerebro real (astraura_prime, genesis_sovereign, hephaestus, hermes).
+# Un recuerdo de "aurora" (el persona_id MÁS usado: 44 de 153) o de "oneiros"
+# (4 de 153) no resuelve — se queda en None, honestamente, aunque SÍ se sepa
+# qué personalidad fue.
+#
+# `servidor` es aún más estricto: solo se rellena cuando el propio cerebro
+# quedó marcado `linked_source` (lo único que escribe
+# `cerebros_manager.sync_with_r2()` al traer un cerebro NUEVO desde
+# Cloudflare R2) — medido, los 3 cerebros reales de este Mac NO lo tienen (son
+# de siembra local, no llegaron por sync: de hecho, medido en esta sesión, el
+# propio intento de sync con R2 falla el handshake TLS desde este entorno),
+# así que hoy `servidor` solo se rellena vía el patrón "Almacenamiento
+# Enrutado" de arriba. NUNCA se rellena con "local" por defecto — ver
+# advertencia del encargo: eso sería exactamente el fallo que se persigue
+# (una etiqueta plausible pero no registrada, que además se volvería FALSA en
+# cuanto hubiera sync real desde otro dispositivo).
+#
+# Forma de salida: `brain`/`server` como {"id", "name"} o None — NO como
+# string plano "cerebro"/"servidor". Se verificó el contrato REAL ya presente
+# en el frontend (starseed-os-main/src/components/astraura/imaginacion/
+# process-provenance.ts → `ProcessMemoryItem.brain` / `.server`,
+# `memoryOriginLabel()`) en vez de asumir que el nombre en castellano del
+# encargo era el nombre de campo literal.
+# ─────────────────────────────────────────────────────────────────────────────
+
+_EXOCORTEX_CATEGORY_RE = re.compile(r"^Exoc[oó]rtex (?:Sincronizado|Autorizado)\s*/\s*([^(]+)", re.I)
+_ENRUTADO_CONTENT_RE = re.compile(r"Conexi[oó]n detectada en (.+?)\.\s*Indexados[^.]*\.\s*Enrutado a cerebros:\s*([\w\-]+)")
+
+
+def _brain_provenance_maps():
+    """
+    A partir del registro EN VIVO de `cerebros_manager` (nunca de la
+    plantilla estática), construye:
+      - prov_by_persona: persona_id -> {"brain": {...}|None, "server": {...}|None}
+      - brain_by_id: brain_id -> dict completo del cerebro (para resolver
+        "Enrutado a cerebros: brain_X" a un nombre real)
+
+    Se reconstruye en CADA llamada a propósito: el registro puede cambiar en
+    caliente (nuevos cerebros vinculados, sync R2) y esto corre en la ruta
+    caliente del chat — debe reflejar el estado ACTUAL. Medido: con los 3
+    cerebros reales de este Mac (unas 4 personas enlazadas en total),
+    reconstruir esto es despreciable frente a lo que ya cuesta
+    gather_context_items completo (ver medición en el informe de la tarea).
+    Nunca lanza — un registro caído deja todo en None, no rompe el turno.
+    """
+    prov_by_persona: Dict[str, Dict[str, Any]] = {}
+    brain_by_id: Dict[str, Dict[str, Any]] = {}
+    try:
+        for brain in (cerebros_manager.cerebros or []):
+            b_id = brain.get("id")
+            if b_id:
+                brain_by_id[b_id] = brain
+            server = None
+            linked_source = brain.get("linked_source")
+            if isinstance(linked_source, dict) and linked_source.get("label"):
+                server = {"id": linked_source.get("type") or "remoto", "name": linked_source["label"]}
+            brain_ref = {"id": b_id, "name": brain.get("name") or b_id} if b_id else None
+            for persona in (brain.get("linked_personalities") or []):
+                pid = persona.get("id") if isinstance(persona, dict) else None
+                if pid and pid not in prov_by_persona:
+                    prov_by_persona[pid] = {"brain": brain_ref, "server": server}
+    except Exception as e:
+        print(f"[Procedencia] Registro de cerebros no disponible ({e}); brain/server quedarán en None.")
+    return prov_by_persona, brain_by_id
+
+
+def _memory_provenance(m: Dict[str, Any], prov_by_persona: Dict[str, Dict[str, Any]]):
+    """Procedencia de un recuerdo mem0: `agent_id` real si no es el comodín
+    "*"; si no, `metadata.persona` (también un dato REAL, escrito por quien
+    generó el recuerdo — no algo que se infiera). Sin ninguno de los dos, o
+    sin ese persona_id enlazado a un cerebro real hoy: (None, None)."""
+    persona_id = m.get("agent_id")
+    if not persona_id or persona_id == "*":
+        persona_id = (m.get("metadata") or {}).get("persona")
+    if not persona_id:
+        return None, None
+    prov = prov_by_persona.get(persona_id)
+    return (prov["brain"], prov["server"]) if prov else (None, None)
+
+
+def _document_provenance(d: Dict[str, Any], prov_by_persona: Dict[str, Dict[str, Any]], brain_by_id: Dict[str, Dict[str, Any]]):
+    """Procedencia de un documento del memory root — los DOS patrones reales
+    encontrados en disco (ver cabecera de esta sección):
+      1. `category` = "Exocórtex Sincronizado|Autorizado / <Persona> (...)".
+      2. `category` = "Almacenamiento Enrutado": el `content` trae, en texto
+         libre pero con formato estable, el cerebro destino Y la ruta de
+         almacenamiento de origen.
+    Si ninguno encaja: (None, None) — nunca se adivina el patrón."""
+    category = str(d.get("category") or "")
+    m = _EXOCORTEX_CATEGORY_RE.match(category)
+    if m:
+        persona_id = m.group(1).strip().lower()
+        prov = prov_by_persona.get(persona_id)
+        return (prov["brain"], prov["server"]) if prov else (None, None)
+
+    m2 = _ENRUTADO_CONTENT_RE.search(str(d.get("content") or ""))
+    if m2:
+        origen = (m2.group(1) or "").strip() or None
+        brain = brain_by_id.get(m2.group(2).strip())
+        brain_ref = {"id": brain.get("id"), "name": brain.get("name") or brain.get("id")} if brain else None
+        server_ref = {"id": (os.path.basename(origen.rstrip("/")) or origen), "name": origen} if origen else None
+        return brain_ref, server_ref
+
+    return None, None
+
+
 class AstrauraOrchestrator:
     """
     Astraura Master Cognitive Orchestrator for StarSeed OS (v4.0 Multi-Personality).
@@ -357,6 +495,12 @@ class AstrauraOrchestrator:
         query_tokens = _tokenize(prompt)
         candidates: List[Dict[str, Any]] = []
 
+        # (Deuda 1) Procedencia real por ítem — se construye UNA vez por
+        # llamada contra el registro EN VIVO de cerebros_manager (ver bloque
+        # de comentarios arriba del archivo para el porqué completo). Nunca
+        # lanza: en el peor caso deja brain/server en None para todo.
+        prov_by_persona, brain_by_id = _brain_provenance_maps()
+
         # --- Fuente 1: Recuerdos (Mem0) --------------------------------------
         try:
             from ..memory.mem0_engine import mem0_engine
@@ -371,12 +515,18 @@ class AstrauraOrchestrator:
                 # (Adenda 165) Recencia: un recuerdo de hace una hora sobre lo que
                 # estamos haciendo AHORA pesa mas que uno identico de hace un mes.
                 recency = _recency_factor(m.get("updated_at") or m.get("created_at"))
+                # (Deuda 1) brain/server reales — ver _memory_provenance: None
+                # cuando el recuerdo no trae agent_id/metadata.persona, o esa
+                # personalidad no está enlazada a un cerebro registrado hoy.
+                brain, server = _memory_provenance(m, prov_by_persona)
                 candidates.append({
                     "source": "memory",
                     "title": m.get("category") or "Recuerdo",
                     "text": _clean_truncate(text, _MEMORY_TEXT_CHARS),
                     "score": round(score * recency, 4),
                     "recency": round(recency, 3),
+                    "brain": brain,
+                    "server": server,
                 })
         except Exception as e:
             print(f"[Contexto] Recuerdos Mem0 no disponibles ({e}); sigo con las demás fuentes.")
@@ -387,18 +537,33 @@ class AstrauraOrchestrator:
             docs = starseed_memory.search_documents(prompt, branch=None, top_k=_CANDIDATE_POOL_PER_SOURCE) or []
             for d in docs:
                 name = d.get("name") or "Documento"
-                haystack = f"{name} {d.get('markdown', '')} {' '.join(d.get('tags') or [])}"
+                # (Hallazgo de esta tarea) Los documentos AUTOGENERADOS —
+                # Imaginación, Exocórtex Sincronizado, Almacenamiento Enrutado:
+                # medido en disco, 724 de los 874 documentos reales del memory
+                # root, el 83% — guardan el texto en `content`, NO en
+                # `markdown` (ese campo solo lo rellenan los documentos
+                # sembrados a mano). Leer solo `markdown` dejaba el fragmento
+                # vacío para esos 724 y el documento se descartaba en silencio
+                # aunque `search_documents` sí lo hubiera encontrado. Se usa
+                # el que tenga contenido real, con preferencia por `markdown`
+                # (formato más limpio, con wikilinks) cuando existen ambos.
+                body = d.get("markdown") or d.get("content") or ""
+                haystack = f"{name} {body} {' '.join(d.get('tags') or [])}"
                 score = _relevance_score(query_tokens, haystack)
                 if score <= 0:
                     continue
-                fragment = _best_fragment(d.get("markdown", ""), query_tokens, _DOC_FRAGMENT_CHARS)
+                fragment = _best_fragment(body, query_tokens, _DOC_FRAGMENT_CHARS)
                 if not fragment:
                     continue
+                # (Deuda 1) brain/server reales — ver _document_provenance.
+                brain, server = _document_provenance(d, prov_by_persona, brain_by_id)
                 candidates.append({
                     "source": "document",
                     "title": name,
                     "text": fragment,
                     "score": score,
+                    "brain": brain,
+                    "server": server,
                 })
         except Exception as e:
             print(f"[Contexto] Documentos del memory root no disponibles ({e}); sigo con las demás fuentes.")
@@ -421,6 +586,13 @@ class AstrauraOrchestrator:
                     "title": label,
                     "text": _clean_truncate(text, _CONCEPT_TEXT_CHARS),
                     "score": score,
+                    # (Deuda 1) Los nodos del grafo NUNCA guardan agente ni
+                    # personalidad (knowledge_graph.add_node no recibe ese
+                    # dato) — estructuralmente no hay brain/server que saber,
+                    # así que se declaran explícitamente en None en vez de
+                    # omitirlos, para que la forma del ítem sea uniforme.
+                    "brain": None,
+                    "server": None,
                 })
         except Exception as e:
             print(f"[Contexto] Grafo de conocimiento no disponible ({e}); sigo con las demás fuentes.")

@@ -62,6 +62,8 @@ from .core.synthesis_reporter_engine import synthesis_reporter_engine
 from .api.voice_studio import router as voice_studio_router
 # Puente oficial con StarSeed OS (sistema primario · Adenda 153 del OS).
 from .api.starseed_bridge import router as starseed_bridge_router, BRIDGE_VERSION as STARSEED_BRIDGE_VERSION  # (OS · Ola 3)
+# Génesis de seres: bots/agentes con ADN, soberanía, linaje y comunidades propias.
+from .core.agent_genesis_engine import router as genesis_router
 # Control de acceso (Adenda 153): modos local-only (defecto) · key · open. Ver core/security.py.
 from .core.security import AstrauraAuthMiddleware, security_status, key_is_master, extract_key, mask_key
 
@@ -189,6 +191,7 @@ app.add_middleware(
 
 app.include_router(voice_studio_router)
 app.include_router(starseed_bridge_router)
+app.include_router(genesis_router)
 
 class ConnectionManager:
     def __init__(self):
@@ -1530,8 +1533,18 @@ async def search_unified_memory(q: str = Query(..., min_length=1), top_k: int = 
         items = await asyncio.to_thread(orchestrator.gather_context_items, q, None, top_k)
     except Exception as e:
         return {"query": q, "hits": [], "error": str(e)[:200]}
+    # Se reenvía TODO lo que el motor sabe de cada ítem, no un subconjunto:
+    # `recency` (cuánto pesa por antigüedad) y `brain`/`server` (de qué cerebro
+    # y de qué almacenamiento salió). Recortarlos aquí era otra forma de que la
+    # UI enseñara menos verdad de la que hay. Van con `.get`: cuando la
+    # procedencia no se puede saber, viaja como null — nunca como un valor
+    # plausible inventado.
     hits = [
-        {"source": it["source"], "title": it["title"], "text": it["text"], "score": it["score"]}
+        {
+            "source": it["source"], "title": it["title"], "text": it["text"],
+            "score": it["score"], "recency": it.get("recency"),
+            "brain": it.get("brain"), "server": it.get("server"),
+        }
         for it in items
     ]
     return {"query": q, "hits": hits}

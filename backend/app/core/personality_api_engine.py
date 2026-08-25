@@ -178,77 +178,59 @@ class PersonalityApiEngine:
         return result
 
     def get_personality_api_detail(self, persona_id: str) -> Optional[Dict[str, Any]]:
-        """Returns the complete API profile, permissions, active processes, and connections for a personality."""
+        """Returns the complete API profile, permissions, active processes, and connections for a personality.
+
+        (Deuda 2 · Datos de relleno) ANTES, `active_processes` eran SIEMPRE
+        los 3 mismos procesos inventados (mismo cpu_percent/memory_mb/
+        started_at para CUALQUIER personalidad, en CUALQUIER llamada) — no
+        existe en todo el backend ningún monitor real de hilos/procesos por
+        personalidad, así que no hay nada honesto que poner ahí salvo una
+        lista vacía. `recent_activity_logs` caía al mismo fallback de 2
+        llamadas API falsas ("Local Bridge"/"api.starseed.nexus") cada vez
+        que `self.request_logs` no tenía nada para esa personalidad — y
+        medido en disco (`personality_apis.json` real de este Mac), 9 de las
+        10 personalidades tienen `total_requests == 0`: NUNCA hubo una
+        llamada real, así que ese fallback era casi siempre lo que se veía,
+        no la excepción. `self.request_logs` además es solo en memoria (no
+        lo persiste `_save_data`), así que se vacía en cada reinicio del
+        backend — el fallback se disparaba aún más de lo que sugiere ese
+        9/10.
+
+        CURA: `active_processes` siempre `[]` (no hay de dónde sacarlo de
+        verdad hoy — ver `datos_reales`). `recent_activity_logs` es lo que
+        `self.request_logs` tenga de verdad para esta personalidad — vacío
+        si no hay nada, nunca relleno de muestra. `datos_reales` distingue
+        "no lo sé" (no hay instrumentación de procesos, nunca la hubo) de
+        "sé que no hay actividad" (sí hay instrumentación de logs; vacío
+        significa que de verdad no se registró ninguna llamada)."""
         if persona_id not in self.api_records:
             return None
-        
-        record = self.api_records[persona_id]
-        
-        # Real-time active processes & subagents for this personality
-        active_processes = [
-            {
-                "id": f"proc_{persona_id}_core",
-                "name": f"Núcleo Inferencia 1.58b ({record['name']})",
-                "type": "native_inference_thread",
-                "status": "running",
-                "cpu_percent": 3.4,
-                "memory_mb": 48.2,
-                "threads": 2,
-                "started_at": time.time() - 3600
-            },
-            {
-                "id": f"proc_{persona_id}_sync",
-                "name": f"Daemon Sincronización Servidores ({persona_id})",
-                "type": "background_sync_worker",
-                "status": "idle",
-                "cpu_percent": 0.5,
-                "memory_mb": 14.1,
-                "threads": 1,
-                "started_at": time.time() - 3600
-            },
-            {
-                "id": f"proc_{persona_id}_sensory",
-                "name": f"Monitor Sensorial & Telemetría ({persona_id})",
-                "type": "hardware_telemetry_streamer",
-                "status": "running",
-                "cpu_percent": 1.1,
-                "memory_mb": 18.5,
-                "threads": 1,
-                "started_at": time.time() - 3600
-            }
-        ]
 
-        recent_logs = self.request_logs.get(persona_id, [
-            {
-                "id": "log_init_1",
-                "timestamp": time.time() - 180,
-                "formatted_time": datetime.fromtimestamp(time.time() - 180).strftime("%H:%M:%S"),
-                "method": "POST",
-                "endpoint": f"/api/v1/personalities/{persona_id}/invoke",
-                "client_ip": "127.0.0.1 (Local Bridge)",
-                "status_code": 200,
-                "latency_ms": 14.8,
-                "tokens_used": 142,
-                "scope_checked": "invoke_agents"
-            },
-            {
-                "id": "log_init_2",
-                "timestamp": time.time() - 60,
-                "formatted_time": datetime.fromtimestamp(time.time() - 60).strftime("%H:%M:%S"),
-                "method": "POST",
-                "endpoint": f"/api/v1/personalities/{persona_id}/sync",
-                "client_ip": "api.starseed.nexus",
-                "status_code": 200,
-                "latency_ms": 41.2,
-                "tokens_used": 0,
-                "scope_checked": "sync_external"
-            }
-        ])
+        record = self.api_records[persona_id]
+
+        # No existe ningún monitor real de procesos/hilos por personalidad
+        # en este backend — devolver vacío es lo honesto, no una limitación
+        # de esta función en concreto. Ver docstring.
+        active_processes: List[Dict[str, Any]] = []
+
+        # Real, tal cual — NUNCA se completa con llamadas de muestra cuando
+        # está vacío. Puede legítimamente estar vacío (aún no hubo ninguna
+        # llamada real en esta sesión del backend, o el proceso se reinició)
+        # — eso es la verdad, no un fallo de la función.
+        recent_logs = self.request_logs.get(persona_id, [])
 
         return {
             **record,
             "active_processes": active_processes,
-            "recent_activity_logs": recent_logs
+            "recent_activity_logs": recent_logs,
+            "datos_reales": {
+                # Siempre False: no hay instrumentación real de procesos por
+                # personalidad hoy — "no lo sé", no "no hay actividad".
+                "active_processes": False,
+                # True solo si de verdad hay al menos una llamada registrada
+                # para esta personalidad en self.request_logs.
+                "recent_activity_logs": bool(self.request_logs.get(persona_id)),
+            },
         }
 
     def regenerate_api_key(self, persona_id: str) -> Dict[str, Any]:

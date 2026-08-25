@@ -1189,11 +1189,23 @@ class CerebrosManager:
             if not remote or "cerebros" not in remote:
                 print("🧪 [R2] Sin registry remoto aún (primer uso). Se subirá el local.")
                 # Subir el registry local para sembrar R2
+                # `upload_to_r2()` DEVUELVE un booleano y antes se ignoraba: se
+                # imprimía "sembrado correctamente" con solo no lanzar excepción,
+                # incluso cuando la subida moría en un handshake TLS y volvía
+                # HTTP 0. Otro fallo disfrazado de éxito, y de los caros: hacía
+                # creer que los cerebros estaban sincronizados entre máquinas
+                # cuando no había salido un solo byte.
                 try:
-                    self.upload_to_r2()
-                    print("🧪 [R2] Registry local sembrado en R2 correctamente.")
+                    sembrado = self.upload_to_r2()
+                    if sembrado:
+                        print("🧪 [R2] Registry local sembrado en R2 correctamente.")
+                    else:
+                        print("🧪 [R2] NO se pudo sembrar el registry en R2: la subida falló. "
+                              "Los cerebros NO están sincronizados entre dispositivos.")
+                        return {"success": False, "reason": "upload-failed"}
                 except Exception as e:
-                    print(f"🧪 [R2] Error sembrando R2: {e}")
+                    print(f"🧪 [R2] Error sembrando R2: {type(e).__name__}: {e}")
+                    return {"success": False, "reason": f"upload-error:{type(e).__name__}"}
                 return {"success": False, "reason": "no-remote-registry"}
             linked = []
             seen_ids = {b.get("id") for b in self.cerebros}

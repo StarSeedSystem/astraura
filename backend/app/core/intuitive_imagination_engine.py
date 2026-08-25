@@ -1786,137 +1786,72 @@ class IntuitiveImaginationEngine:
         return {"success": True, "action": "discarded", "item_id": item_id}
 
     def get_process_branches(self, process_id: str) -> Dict[str, Any]:
+        """
+        (Deuda 2 · Datos de relleno) ANTES, esta función fabricaba EN CADA
+        LLAMADA — y lo escribía directamente sobre `self.branches`, con
+        riesgo real de que un `_save_state()` disparado por OTRA llamada lo
+        persistiera — un `verification` con score inventado, tres líneas de
+        `step_logs` de plantilla, un `diff_comparison` con porcentajes de
+        mejora ("74.2%", "62.8%", "135%") que no median nada, y hasta tres
+        `historical_versions` con AUTORES y resúmenes ficticios
+        ("Daedalus-Architect", "Hephaestus Forjador"…). Se confirmó con grep
+        sobre el archivo entero: `diff_comparison`, `historical_versions` y
+        `real_links` NUNCA los escribe ningún otro sitio — no existe en todo
+        el backend un generador real de diff AST, benchmark de latencia/RAM
+        ni historial de versiones por rama. El resultado en disco: medido,
+        30 de las 50 ramas guardadas ya tenían `verification`/`step_logs`
+        fabricados persistidos de una llamada anterior a esta función.
+
+        CURA: se deja de fabricar y de mutar `self.branches` aquí — se
+        construye una COPIA de cada rama para la respuesta. Los tres campos
+        sin generador real se devuelven siempre vacíos (`{}`/`[]`), nunca con
+        relleno, y `datos_reales` dice explícitamente que no hay medición
+        real detrás — para que un consumidor distinga "no hay diff" de "no
+        lo sé". `verification`/`step_logs` SÍ los escriben otras funciones de
+        esta clase (`regenerate_branch`, `fork_branch`, `modify_branch`,
+        `simulate_live_process_step`) que no son parte de este encargo: lo
+        que traiga la rama ahí se devuelve tal cual, sin tocar (ver informe).
+        """
         proc = next((p for p in DREAM_PROCESS_TYPES if p["id"] == process_id), None)
         all_b = [b for b in self.branches if b.get("process_type") == process_id]
-        in_prog = [b for b in all_b if b.get("status") in ["running", "pending_approval", "active"]]
-        completed = [b for b in all_b if b.get("status") == "applied"]
-        
-        # Ensure every branch has rich verification, diff comparison, versions, progress, and real links
+
+        branches_out: List[Dict[str, Any]] = []
         for b in all_b:
-            # Dynamic branch progress
-            if b.get("status") == "applied":
-                b["progress_percent"] = 100
-            elif b.get("verification", {}).get("is_verified"):
-                b["progress_percent"] = 85
+            item = dict(b)  # copia — nunca se muta self.branches aquí
+
+            # Progreso: SOLO el hecho inequívoco (aplicada = 100). Para el
+            # resto se OMITE la clave — branches-modal.tsx ya tiene su propio
+            # valor por defecto (`b.progress_percent ?? 65`) y este backend
+            # no va a inventar una segunda escala de números sobre esa.
+            if item.get("status") == "applied":
+                item["progress_percent"] = 100
             else:
-                b["progress_percent"] = 65
+                item.pop("progress_percent", None)
 
-            if "verification" not in b:
-                is_valid = len(b.get("hypothesis", "")) > 20
-                b["verification"] = {
-                    "is_verified": is_valid,
-                    "score": 0.98 if is_valid else 0.85,
-                    "checked_by": f"Athena-Sentinel-Verificator",
-                    "tested_at": b.get("formatted_time", "18/08/2026 14:00:00")
-                }
-            if "step_logs" not in b or not b["step_logs"]:
-                b["step_logs"] = [
-                    f"[{b.get('formatted_time', '14:00:00')}] Inicialización de rama sináptica...",
-                    f"[{b.get('formatted_time', '14:00:02')}] Cosechando contexto de usuario y sensores térmicos...",
-                    f"[{b.get('formatted_time', '14:00:04')}] Síntesis completada con verificación matemática ternaria 1.58b."
-                ]
+            # Nunca hubo generador real para estos tres — forma válida y
+            # vacía, no relleno plausible ni claves que desaparecen.
+            item["diff_comparison"] = {}
+            item["historical_versions"] = []
+            item["real_links"] = {}
+            item["datos_reales"] = {
+                "diff_comparison": False,
+                "historical_versions": False,
+                "real_links": False,
+            }
+            branches_out.append(item)
 
-            if "diff_comparison" not in b:
-                theme_str = b.get("theme", "Optimización")
-                b["diff_comparison"] = {
-                    "baseline_version": "v1.0-baseline",
-                    "current_version": b.get("current_version", "v1.3-optimized"),
-                    "delta_metrics": {
-                        "latency_reduction_pct": 74.2,
-                        "ram_reduction_pct": 62.8,
-                        "throughput_increase_pct": 135.0,
-                        "verification_score_delta": "+16%",
-                        "ast_optimizations_count": 28,
-                        "energy_saving_pct": 68.0
-                    },
-                    "code_diff": {
-                        "file_path": "backend/app/core/bitnet_neon_engine.cpp",
-                        "summary": f"Vectorización de registros SIMD y sustitución de multiplicaciones FP32 por adiciones discretas [-1, 0, +1] para '{theme_str}'.",
-                        "before_snippet": "// v1.0 Baseline (FP32 MatMul)\nfor (int i = 0; i < N; ++i) {\n    for (int j = 0; j < K; ++j) {\n        acc += weights_fp32[i * K + j] * input_fp32[j];\n    }\n}",
-                        "after_snippet": "// v1.3 Optimizado 1.58b (ARM64 NEON i2_s)\nint8x16_t v_weights = vld1q_s8(ternary_weights + idx);\nint8x16_t v_input = vld1q_s8(quantized_input + idx);\nint16x8_t v_acc = vdotq_s16(v_acc, v_weights, v_input);\n// 0 Multiplicaciones punto flotante • 100% registros NEON"
-                    }
-                }
-
-            now_ts = time.time()
-            if "historical_versions" not in b or not b["historical_versions"]:
-                b["historical_versions"] = [
-                    {
-                        "version": "v1.0",
-                        "timestamp": now_ts - 86400 * 2,
-                        "author": "Daedalus-Architect",
-                        "summary": "Scaffolding inicial y distribución de registros escalares.",
-                        "changes": ["Creación de estructura base", "Lógica de control inicial"],
-                        "file_link": f"{WORKSPACE}/backend/app/core/intuitive_imagination_engine.py"
-                    },
-                    {
-                        "version": "v1.1",
-                        "timestamp": now_ts - 86400,
-                        "author": "Hephaestus Forjador",
-                        "summary": "Compilación ARM64 NEON i2_s sin desborde de registros.",
-                        "changes": ["Vectorización 128-bit", "Reducción de latencia a sub-milisegundo"],
-                        "file_link": f"{WORKSPACE}/backend/app/core/bitnet_neon_engine.cpp"
-                    },
-                    {
-                        "version": "v1.3",
-                        "timestamp": now_ts - 3600,
-                        "author": "Astraura Director // Metis Prime",
-                        "summary": "Auditoría de veracidad en silicio M1 y calibración de entropía determinista.",
-                        "changes": ["Veredicto 100% verificado", "Sincronía con Bóveda de Proyectos"],
-                        "file_link": f"{WORKSPACE}/backend/vault/projects/projects_vault.json"
-                    }
-                ]
-
-            if "real_links" not in b:
-                b["real_links"] = {
-                    "files": [
-                        {
-                            "name": "intuitive_imagination_engine.py",
-                            "path": f"{WORKSPACE}/backend/app/core/intuitive_imagination_engine.py",
-                            "size_formatted": "68 KB",
-                            "status": "Activo (Modificable)"
-                        },
-                        {
-                            "name": "projects_vault.json",
-                            "path": f"{WORKSPACE}/backend/vault/projects/projects_vault.json",
-                            "size_formatted": "24 KB",
-                            "status": "Bóveda Sincronizada"
-                        }
-                    ],
-                    "folders": [
-                        {
-                            "name": "backend/app/core",
-                            "path": f"{WORKSPACE}/backend/app/core"
-                        },
-                        {
-                            "name": "data/vault/projects",
-                            "path": f"{WORKSPACE}/backend/vault/projects"
-                        }
-                    ],
-                    "memories": [
-                        {
-                            "id": "mem_starseed_neon",
-                            "title": f"Axioma de optimización para {b.get('theme', 'Proceso')}",
-                            "type": "epistemic"
-                        }
-                    ],
-                    "projects": [
-                        {
-                            "id": "proj_astraura_core",
-                            "name": "Astraura 1.58b Core OS"
-                        }
-                    ]
-                }
-
-        dynamic_process_progress = min(100, max(30, int((len(completed) / max(1, len(all_b))) * 60) + 40))
+        in_prog = [b for b in branches_out if b.get("status") in ["running", "pending_approval", "active"]]
+        completed = [b for b in branches_out if b.get("status") == "applied"]
+        dynamic_process_progress = min(100, max(30, int((len(completed) / max(1, len(branches_out))) * 60) + 40))
 
         return {
             "success": True,
             "process": proc,
             "progress_percent": dynamic_process_progress,
-            "total_branches": len(all_b),
+            "total_branches": len(branches_out),
             "in_progress_branches": in_prog,
             "completed_branches": completed,
-            "branches": all_b
+            "branches": branches_out
         }
 
     def simulate_live_process_step(self, process_id: str, branch_id: Optional[str] = None) -> Dict[str, Any]:
