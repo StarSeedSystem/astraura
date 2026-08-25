@@ -95,6 +95,67 @@ from .agent_vault_engine import agent_vault_engine
 from .config import settings
 from . import cognition
 
+# ═══════════════════════════════════════════════════════════════════════
+# OLA 2 — imports defensivos de los motores REALES que los 8 endpoints
+# nuevos consultan (bots predeterminados, cerebros propios, internet y
+# herramientas, oficina). Cada uno envuelto en try/except: "degradación
+# elegante" (ver REGLAS del encargo) significa literalmente que un fallo de
+# import de un vecino (p.ej. cerebros_manager, que ya sabemos que puede
+# tropezar con R2) NUNCA debe tumbar la carga de este router -- y como este
+# router se importa desde app/main.py al arrancar, tumbarlo aquí tumbaría
+# el arranque ENTERO del backend, no solo esta sección. Todos estos módulos
+# YA los importa app/main.py sin envoltorio, así que en el proceso real
+# nunca deberían fallar aquí (ya están en sys.modules) -- esto es cinturón
+# y tirantes, no el camino esperado.
+try:
+    from .intuitive_imagination_engine import (
+        intuitive_imagination_engine,
+        DREAM_PROCESS_TYPES,
+        _AGENT_TO_PERSONALITY_ID,
+        _AGENT_TO_REGISTRY_ID,
+    )
+except Exception as _e:
+    print(f"[GenesisEngine] intuitive_imagination_engine no disponible ({_e}); bots predeterminados y oficina quedan en blanco, no inventados.")
+    intuitive_imagination_engine = None
+    DREAM_PROCESS_TYPES = []
+    _AGENT_TO_PERSONALITY_ID = {}
+    _AGENT_TO_REGISTRY_ID = {}
+try:
+    from ..cerebros.cerebros_manager import cerebros_manager
+except Exception as _e:
+    print(f"[GenesisEngine] cerebros_manager no disponible ({_e}); cerebros propios sincronizables se marcan 'fallo', nunca 'ok'.")
+    cerebros_manager = None
+try:
+    from .universal_device_access import universal_device_access
+except Exception:
+    universal_device_access = None
+try:
+    from ..memory.device_sync import device_sync
+except Exception:
+    device_sync = None
+try:
+    from ..tools.terminal_tool import terminal_tool
+except Exception:
+    terminal_tool = None
+try:
+    from ..tools.system_explorer import system_explorer
+except Exception:
+    system_explorer = None
+try:
+    from ..tools.system_senses import system_senses
+except Exception:
+    system_senses = None
+try:
+    from .privacy_manager import is_air_gapped
+except Exception:
+    def is_air_gapped() -> bool:  # type: ignore
+        return False
+
+# (OLA 2) Raíz del repo del OS -- MISMO patrón ya usado en cerebros_manager.py
+# y auto_discovery.py (HOME/Documents/starseed-os-main); no se inventa una
+# ruta nueva. Solo lectura: este módulo nunca escribe nada dentro del OS.
+_OS_REPO_ROOT = Path.home() / "Documents" / "starseed-os-main"
+
 router = APIRouter(prefix="/api/genesis", tags=["genesis"])
 
 
@@ -473,6 +534,11 @@ def _asegurar_genesis(agente: Dict[str, Any]) -> bool:
         ("genesis_habilidades", True), ("genesis_herramientas", True), ("genesis_reglas", True),
         ("genesis_comunidades", True), ("genesis_espacio_hogar_id", False),
         ("genesis_experiencia", False), ("genesis_adn", False), ("genesis_adn_ajustes", False),
+        # (OLA 2) Ausente = nunca se le concedió/asignó -- igual que el resto de
+        # campos genesis_*, NUNCA se pisa lo que ya exista, solo se rellena lo
+        # que falte para que un ser creado antes de esta ola no reviente al leerlo.
+        ("genesis_internet", False), ("genesis_avatar_fuente", False),
+        ("genesis_cerebros_propios", True), ("genesis_proceso_tipo_id", False),
     ):
         if campo not in agente:
             agente[campo] = [] if es_lista else (0 if campo == "genesis_experiencia" else None)
@@ -563,6 +629,14 @@ def _proyectar_ser(agente: Dict[str, Any]) -> Dict[str, Any]:
             "cpuPorcentaje": agente.get("cpu_quota_percent", 10),
             "ramMb": agente.get("ram_limit_mb", 64),
         },
+        # (OLA 2) Los 4 campos nuevos de Ser -- ausentes tal cual si nunca se
+        # concedieron/asignaron (contrato: "Ausente = nunca se le concedió" /
+        # "Ausente = procedural, el de siempre"), NUNCA sustituidos por un
+        # valor inventado.
+        "internet": agente.get("genesis_internet"),
+        "avatarFuente": agente.get("genesis_avatar_fuente"),
+        "cerebrosPropios": agente.get("genesis_cerebros_propios") or [],
+        "procesoTipoId": agente.get("genesis_proceso_tipo_id"),
         "experiencia": agente.get("genesis_experiencia", 0),
         "creadoEn": creado,
         "actualizadoEn": agente.get("updated_at", creado),
@@ -1291,11 +1365,476 @@ def resolver_propuesta(propuesta_id: str, aceptar: bool) -> Dict[str, Any]:
 
 
 # ═══════════════════════════════════════════════════════════════════════
-# 8. RUTAS — EXACTAMENTE las 20 de la cabecera de genesis-types.ts, ni
-#    una más ni una menos. 404 nunca se usa para "no encontrado" lógico
-#    (ver SOBRE DE RESPUESTA en el docstring del módulo); la única
-#    excepción deliberada es GET /seres/{id}, que devuelve 400 porque su
-#    forma de éxito es un objeto desnudo sin sitio para "ok".
+# 9. OLA 2 — Oficina, capacidades y avatares. Los 8 endpoints nuevos del
+#    bloque "OLA 2" al final de genesis-types.ts. Reutiliza sin reinventar:
+#    intuitive_imagination_engine.PROCESS_AGENT_MAP/_AGENT_TO_PERSONALITY_ID/
+#    _AGENT_TO_REGISTRY_ID para bots predeterminados y oficina; cerebros_
+#    manager.sync_with_r2() para la sincronización real de cerebros propios;
+#    verificar_soberania() (sección 1) para que "internet.dispositivo" no
+#    sea un interruptor decorativo.
+# ═══════════════════════════════════════════════════════════════════════
+
+# ---------------------------------------------------------- 9.1 Internet
+
+CAPACIDAD_INTERNET_POR_DEFECTO: Dict[str, Any] = {
+    "activa": False, "bibliotecaOS": False, "bibliotecaUsuario": False,
+    "dispositivo": False, "web": False,
+    "dominiosPermitidos": [], "dominiosBloqueados": [],
+    "ultimoAcceso": None, "ultimoError": None,
+}
+
+
+def conceder_internet(ser_id: str, solicitud: Dict[str, Any]) -> Dict[str, Any]:
+    """POST /seres/{id}/internet. Fusiona lo pedido sobre lo que ya hubiera
+    (permite conceder una fuente sin retirar las demás) y sanea tipos --
+    nunca se guarda tal cual lo que llegue del body.
+
+    Corazón del encargo: 'dispositivo' NO es un interruptor decorativo. Si
+    se pide dispositivo=true se comprueba DE VERDAD, con verificar_soberania
+    (la misma función, no una copia), que el ser tenga algún dominio o
+    exploración que resuelva a una ruta real -- un ser sin ámbito no puede
+    parecer que lee carpetas solo porque el interruptor está en true. Si no
+    hay ámbito real, el interruptor se concede tal como se pidió (es el
+    consentimiento del usuario; puede que la soberanía llegue después) pero
+    `ultimoError` deja constancia honesta de que hoy no tiene ningún efecto.
+    """
+    agente = agent_vault_engine.get_agent(ser_id)
+    if not agente:
+        return {"ok": False, "error": f"Ser '{ser_id}' no encontrado."}
+    _asegurar_genesis(agente)
+    solicitud = solicitud or {}
+    previa = agente.get("genesis_internet") or {}
+    cap = {**CAPACIDAD_INTERNET_POR_DEFECTO, **previa, **solicitud}
+
+    for campo_bool in ("activa", "bibliotecaOS", "bibliotecaUsuario", "dispositivo", "web"):
+        cap[campo_bool] = bool(cap.get(campo_bool))
+    for campo_lista in ("dominiosPermitidos", "dominiosBloqueados"):
+        cap[campo_lista] = [str(x) for x in (cap.get(campo_lista) or []) if isinstance(x, str)]
+
+    cap["ultimoError"] = None
+    if cap["dispositivo"]:
+        soberania = agente.get("genesis_soberania") or SOBERANIA_POR_DEFECTO
+        ambito = list(soberania.get("dominio") or []) + list(soberania.get("exploracion") or [])
+        ambito_real = [r for r in ambito if verificar_soberania(soberania, r)["nivel"] in ("dominio", "exploracion")]
+        if not ambito_real:
+            cap["ultimoError"] = (
+                "dispositivo=true concedido, pero la soberania de este ser no declara "
+                "ningun dominio ni exploracion que resuelva a una ruta real: no leera "
+                "ninguna carpeta hasta que se le asigne ambito (PATCH /seres/{id} con 'soberania')."
+            )
+
+    agente["genesis_internet"] = cap
+    agente["updated_at"] = time.time()
+    agent_vault_engine._save_agents()
+    return {"ok": True, "ser": _proyectar_ser(agente)}
+
+
+# ------------------------------------------------------- 9.2 Herramientas
+
+_HERRAMIENTAS_OS_CACHE_TTL_S = 60.0
+_herramientas_os_cache: Dict[str, Any] = {"at": 0.0, "items": []}
+_RE_SKILL_ID = re.compile(r'skillId:\s*"([^"]+)"')
+
+
+def _herramienta_indisponible(hid: str, nombre: str, fuente: str, permiso: Optional[str], motivo: str) -> Dict[str, Any]:
+    return {"id": hid, "nombre": nombre, "fuente": fuente, "descripcion": None,
+            "requierePermiso": permiso, "disponible": False, "motivo": motivo}
+
+
+def _herramientas_biblioteca_os() -> List[Dict[str, Any]]:
+    """Paquetes kind="function" (skills reales, payload.skillId) de la
+    Biblioteca en línea del OS (src/lib/library/packages.ts). Lectura de
+    solo texto con una extracción ligera por regex -- este backend es
+    Python, no hay un parser de TypeScript aquí, y escribir uno de verdad
+    para un catálogo que no es mío (src/lib/library/packages.ts, del OS)
+    sería sobre-ingeniería para este encargo. Cacheado 60s: son ~155KB
+    de fichero en cada llamada si no se cachea (ver 'MIDE' del encargo)."""
+    ahora = time.time()
+    if _herramientas_os_cache["items"] and (ahora - _herramientas_os_cache["at"]) < _HERRAMIENTAS_OS_CACHE_TTL_S:
+        return _herramientas_os_cache["items"]
+
+    ruta = _OS_REPO_ROOT / "src" / "lib" / "library" / "packages.ts"
+    try:
+        texto = ruta.read_text(encoding="utf-8")
+    except Exception as e:
+        items = [_herramienta_indisponible(
+            "biblioteca-os:catalogo", "Catalogo de la Biblioteca del OS", "biblioteca-os",
+            "bibliotecaOS", f"No se pudo leer {ruta}: {e}",
+        )]
+        _herramientas_os_cache.update({"at": ahora, "items": items})
+        return items
+
+    vistos: List[str] = []
+    for m in _RE_SKILL_ID.finditer(texto):
+        sid = m.group(1)
+        if sid not in vistos:
+            vistos.append(sid)
+
+    if not vistos:
+        items = [_herramienta_indisponible(
+            "biblioteca-os:catalogo", "Catalogo de la Biblioteca del OS", "biblioteca-os",
+            "bibliotecaOS", f"{ruta} se pudo leer pero no se encontro ningun paquete kind=\"function\" (skillId) dentro.",
+        )]
+    else:
+        items = [{
+            "id": f"biblioteca-os:{sid}", "nombre": sid.replace("-", " ").replace("_", " ").strip().title(),
+            "fuente": "biblioteca-os", "descripcion": None, "requierePermiso": "bibliotecaOS",
+            "disponible": True, "motivo": None,
+        } for sid in vistos]
+
+    _herramientas_os_cache.update({"at": ahora, "items": items})
+    return items
+
+
+def _herramientas_biblioteca_usuario() -> List[Dict[str, Any]]:
+    """Honestidad radical (el mismo principio que packages.ts declara en su
+    propia cabecera): la biblioteca PROPIA del usuario vive en localStorage
+    del navegador ('starseed.library.mine.v1'), no en ningun fichero que
+    este backend Python pueda leer. Fingir aqui un catalogo seria inventar
+    datos -- se dice la verdad y punto."""
+    return [_herramienta_indisponible(
+        "biblioteca-usuario:catalogo", "Biblioteca propia del usuario", "biblioteca-usuario",
+        "bibliotecaUsuario",
+        "La biblioteca del usuario vive en localStorage del navegador (starseed.library.mine.v1); "
+        "este backend no tiene acceso al almacenamiento del navegador.",
+    )]
+
+
+def _herramientas_dispositivo() -> List[Dict[str, Any]]:
+    out: List[Dict[str, Any]] = []
+    try:
+        acceso_fs = bool(universal_device_access and universal_device_access.granted_permissions.get("filesystem_full_access"))
+    except Exception:
+        acceso_fs = False
+    out.append({
+        "id": "dispositivo:sistema-archivos", "nombre": "Acceso al sistema de archivos del dispositivo",
+        "fuente": "dispositivo",
+        "descripcion": "Lectura/escritura de carpetas y discos del dispositivo -- por ser, dentro de su ambito de soberania (verificar_soberania).",
+        "requierePermiso": "dispositivo", "disponible": acceso_fs,
+        "motivo": None if acceso_fs else "universal_device_access no tiene concedido 'filesystem_full_access' en este backend.",
+    })
+    try:
+        n_carpetas = len(device_sync.folders) if device_sync is not None else 0
+        sync_disponible = device_sync is not None
+    except Exception:
+        n_carpetas, sync_disponible = 0, False
+    out.append({
+        "id": "dispositivo:sincronizacion-carpetas", "nombre": "Sincronizacion de carpetas vigiladas",
+        "fuente": "dispositivo",
+        "descripcion": f"Reindexa en la memoria 1.58b las carpetas del dispositivo vigiladas ({n_carpetas} configuradas ahora mismo).",
+        "requierePermiso": "dispositivo", "disponible": sync_disponible,
+        "motivo": None if sync_disponible else "device_sync no esta disponible en este backend.",
+    })
+    return out
+
+
+def _herramientas_web() -> List[Dict[str, Any]]:
+    try:
+        bloqueado = is_air_gapped()
+    except Exception:
+        bloqueado = False
+    return [{
+        "id": "web:busqueda", "nombre": "Busqueda web abierta", "fuente": "web",
+        "descripcion": "Busqueda multi-motor (DuckDuckGo/Brave/GitHub/ArXiv/Wikipedia) real, sin clave, via browser_tool.search_web.",
+        "requierePermiso": "web", "disponible": not bloqueado,
+        "motivo": "Modo air-gapped activo: toda salida de red esta bloqueada." if bloqueado else None,
+    }]
+
+
+def _herramientas_nativas() -> List[Dict[str, Any]]:
+    """Herramientas propias del backend: disponibles si el modulo que las
+    implementa cargo sin errores en este proceso (la comprobacion mas
+    honesta posible sin invocar cada una de verdad en cada listado)."""
+    catalogo = (
+        ("nativa:terminal", "Terminal del sistema", terminal_tool, "Ejecuta comandos de shell soberanos."),
+        ("nativa:explorador-sistema", "Explorador del sistema", system_explorer, "Explora procesos, puertos y estructura del sistema operativo."),
+        ("nativa:sentidos-sistema", "Sentidos del sistema", system_senses, "Telemetria y sensores del entorno fisico del dispositivo."),
+    )
+    out = []
+    for hid, nombre, instancia, desc in catalogo:
+        disponible = instancia is not None
+        out.append({
+            "id": hid, "nombre": nombre, "fuente": "nativa", "descripcion": desc,
+            "requierePermiso": None, "disponible": disponible,
+            "motivo": None if disponible else f"El modulo de '{nombre}' no se pudo cargar en este backend.",
+        })
+    return out
+
+
+def listar_herramientas() -> List[Dict[str, Any]]:
+    out: List[Dict[str, Any]] = []
+    for fuente_fn in (_herramientas_biblioteca_os, _herramientas_biblioteca_usuario,
+                      _herramientas_dispositivo, _herramientas_web, _herramientas_nativas):
+        try:
+            out.extend(fuente_fn())
+        except Exception as e:
+            print(f"[GenesisEngine] fuente de herramientas '{fuente_fn.__name__}' fallo: {e}")
+    return out
+
+
+# --------------------------------------------------- 9.3 Cerebros propios
+
+def _mapear_resultado_sync_r2(resultado: Any) -> "tuple[str, Optional[str]]":
+    """Traduce el resultado REAL de cerebros_manager.sync_with_r2() a
+    (estadoSync, errorSync) -- nunca 'ok' por defecto. `resultado` puede
+    traer 'reason' (rama de fallo esperada) o 'error' (excepcion capturada
+    dentro de sync_with_r2); se usa tal cual, sin reinterpretarlo, para que
+    el error que aparezca en pantalla sea el error real."""
+    if not isinstance(resultado, dict):
+        return "fallo", "cerebros_manager.sync_with_r2() no devolvio un resultado utilizable."
+    if resultado.get("success"):
+        return "ok", None
+    motivo = resultado.get("reason") or resultado.get("error") or "fallo sin detalle."
+    return "fallo", str(motivo)
+
+
+def agregar_cerebro_propio(ser_id: str, solicitud: Dict[str, Any]) -> Dict[str, Any]:
+    """POST /seres/{id}/cerebros. Crea un CerebroSer y lo añade a
+    `cerebrosPropios`. Si se pide sincronizable=true, se intenta la
+    sincronizacion REAL ahora mismo (unico mecanismo real que existe hoy:
+    cerebros_manager.sync_with_r2, contra Cloudflare R2) y su resultado
+    HONESTO -- no un 'ok' optimista -- es lo que se guarda en estadoSync/
+    errorSync. Si no se pide, queda 'nunca': no se ha intentado, se dice."""
+    agente = agent_vault_engine.get_agent(ser_id)
+    if not agente:
+        return {"ok": False, "error": f"Ser '{ser_id}' no encontrado."}
+    _asegurar_genesis(agente)
+    solicitud = solicitud or {}
+    nombre = solicitud.get("nombre")
+    if not nombre or not str(nombre).strip():
+        return {"ok": False, "error": "Falta 'nombre' (obligatorio para crear un CerebroSer)."}
+
+    cid = f"cerebro_propio_{secrets.token_hex(6)}"
+    ruta_almacen = solicitud.get("rutaAlmacen") or str(Path(settings.data_path) / "cerebros_propios" / ser_id / cid)
+    try:
+        Path(ruta_almacen).mkdir(parents=True, exist_ok=True)
+    except Exception as e:
+        print(f"[GenesisEngine] No se pudo crear el almacen '{ruta_almacen}' del cerebro propio de '{ser_id}': {e}")
+
+    sincronizable = bool(solicitud.get("sincronizable", False))
+    cerebro: Dict[str, Any] = {
+        "id": cid, "nombre": str(nombre).strip(), "color": solicitud.get("color"),
+        "rutaAlmacen": ruta_almacen, "enrutadoA": solicitud.get("enrutadoA"),
+        "sincronizable": sincronizable, "ultimaSync": None, "estadoSync": "nunca", "errorSync": None,
+    }
+
+    if sincronizable:
+        if cerebros_manager is None:
+            cerebro["estadoSync"] = "fallo"
+            cerebro["errorSync"] = "cerebros_manager no esta disponible en este backend."
+        else:
+            try:
+                resultado = cerebros_manager.sync_with_r2()
+            except Exception as e:
+                resultado = {"success": False, "error": f"{type(e).__name__}: {e}"}
+            estado, error = _mapear_resultado_sync_r2(resultado)
+            cerebro["estadoSync"] = estado
+            cerebro["errorSync"] = error
+        cerebro["ultimaSync"] = time.time()
+
+    propios = agente.setdefault("genesis_cerebros_propios", [])
+    propios.append(cerebro)
+    agente["updated_at"] = time.time()
+    agent_vault_engine._save_agents()
+    return {"ok": True, "ser": _proyectar_ser(agente)}
+
+
+# ------------------------------------------------ 9.4 Bots predeterminados
+
+def _instalados_por_tipo_proceso() -> Dict[str, str]:
+    """pid -> id del primer ser instalado para ese tipo de proceso (si lo hay)."""
+    out: Dict[str, str] = {}
+    for a in agent_vault_engine.list_agents():
+        pid = a.get("genesis_proceso_tipo_id")
+        if pid and pid not in out:
+            out[pid] = a.get("id")
+    return out
+
+
+def _bot_predeterminado_desde_proceso(proc: Dict[str, Any], instalados: Dict[str, str]) -> Dict[str, Any]:
+    """Un BotPredeterminado por tipo de proceso, con el agente/personalidad
+    REALES que intuitive_imagination_engine ya le asigna -- se reutilizan
+    sus propios métodos (_agent_for_process/_agents_for_process/
+    _personality_for_process) y sus alias de reconciliación
+    (_AGENT_TO_PERSONALITY_ID/_AGENT_TO_REGISTRY_ID), no se reinventan."""
+    pid = proc["id"]
+    primario: Dict[str, Any] = {"id": None, "name": None}
+    agentes_info: List[Dict[str, Any]] = []
+    personalidad: Dict[str, Any] = {"id": None}
+    if intuitive_imagination_engine is not None:
+        try:
+            primario = intuitive_imagination_engine._agent_for_process(pid)
+        except Exception as e:
+            print(f"[GenesisEngine] _agent_for_process('{pid}') fallo: {e}")
+        try:
+            agentes_info = intuitive_imagination_engine._agents_for_process(pid)
+        except Exception as e:
+            print(f"[GenesisEngine] _agents_for_process('{pid}') fallo: {e}")
+        try:
+            personalidad = intuitive_imagination_engine._personality_for_process(pid)
+        except Exception as e:
+            print(f"[GenesisEngine] _personality_for_process('{pid}') fallo: {e}")
+
+    agente_real = next((a for a in agentes_info if a.get("id") == primario.get("id")), None)
+    if agente_real is None and agentes_info:
+        agente_real = agentes_info[0]
+    nombre = (agente_real or {}).get("name") or primario.get("name") or proc.get("name")
+    agente_id = _AGENT_TO_REGISTRY_ID.get(primario.get("id"), primario.get("id")) if primario.get("id") else None
+
+    return {
+        "id": pid,
+        "nombre": nombre,
+        "rol": proc.get("category") or "Ser de Imaginacion Intuitiva",
+        "procesoTipoId": pid,
+        "personalidadId": personalidad.get("id"),
+        "agenteId": agente_id,
+        "instalado": pid in instalados,
+        "descripcion": proc.get("description"),
+    }
+
+
+def listar_bots_predeterminados() -> List[Dict[str, Any]]:
+    instalados = _instalados_por_tipo_proceso()
+    return [_bot_predeterminado_desde_proceso(p, instalados) for p in DREAM_PROCESS_TYPES]
+
+
+def instalar_bots_predeterminados() -> Dict[str, Any]:
+    """POST /bots_predeterminados/instalar. Crea como seres los tipos de
+    proceso que aun no tengan uno instalado -- idempotente: un pid con
+    'genesis_proceso_tipo_id' ya asignado a algun ser NUNCA se vuelve a
+    crear, así que instalar dos veces no duplica nada."""
+    instalados = _instalados_por_tipo_proceso()
+    creados: List[str] = []
+    for proc in DREAM_PROCESS_TYPES:
+        pid = proc["id"]
+        if pid in instalados:
+            continue
+        bot = _bot_predeterminado_desde_proceso(proc, instalados)
+        solicitud = {
+            "nombre": bot["nombre"] or proc.get("name") or pid,
+            "rol": bot["rol"],
+            "esencia": proc.get("description"),
+            "color": proc.get("color"),
+        }
+        resultado = crear_ser(solicitud)
+        if not resultado.get("ok"):
+            print(f"[GenesisEngine] No se pudo instalar el bot predeterminado '{pid}': {resultado.get('error')}")
+            continue
+        ser_id = resultado["ser"]["id"]
+        agente = agent_vault_engine.get_agent(ser_id)
+        if agente is not None:
+            agente["genesis_proceso_tipo_id"] = pid
+            agent_vault_engine._save_agents()
+        creados.append(ser_id)
+        instalados[pid] = ser_id
+    return {"ok": True, "creados": creados}
+
+
+# ------------------------------------------------------------ 9.5 Avatares
+
+_FUENTE_AVATAR_MODOS = ("procedural", "enlinea", "subido")
+
+
+def buscar_avatares(ser_id: str, solicitud: Dict[str, Any]) -> Dict[str, Any]:
+    """POST /seres/{id}/avatar/buscar. GAP HONESTO (mismo estilo que el
+    resto del fichero, ver docstring del modulo): no hay ningun motor de
+    busqueda de IMAGENES cableado en este backend (browser_tool.search_web
+    busca paginas web, no imagenes con licencia verificable). Devolver
+    candidatos inventados seria precisamente lo que este proyecto prohibe
+    -- candidatos vacio, honesto, en vez de fabricar URLs o licencias."""
+    if not agent_vault_engine.get_agent(ser_id):
+        return {"ok": False, "error": f"Ser '{ser_id}' no encontrado."}
+    return {"ok": True, "candidatos": []}
+
+
+def fijar_avatar(ser_id: str, solicitud: Dict[str, Any]) -> Dict[str, Any]:
+    agente = agent_vault_engine.get_agent(ser_id)
+    if not agente:
+        return {"ok": False, "error": f"Ser '{ser_id}' no encontrado."}
+    _asegurar_genesis(agente)
+    solicitud = solicitud or {}
+    modo = solicitud.get("modo")
+    if modo not in _FUENTE_AVATAR_MODOS:
+        return {"ok": False, "error": f"'modo' debe ser uno de {list(_FUENTE_AVATAR_MODOS)}."}
+    fuente = {
+        "modo": modo, "url": solicitud.get("url"), "consulta": solicitud.get("consulta"),
+        "proveedor": solicitud.get("proveedor"), "licencia": solicitud.get("licencia"),
+        "atribucion": solicitud.get("atribucion"), "elegidoEn": time.time(),
+    }
+    agente["genesis_avatar_fuente"] = fuente
+    agente["updated_at"] = time.time()
+    agent_vault_engine._save_agents()
+    return {"ok": True, "ser": _proyectar_ser(agente)}
+
+
+# ------------------------------------------------------------- 9.6 Oficina
+
+_OFICINA_OCUPACION_DESDE: Dict[str, float] = {}
+
+
+def _sala_id_de(pid: str) -> str:
+    return f"sala_{pid}"
+
+
+def obtener_estado_oficina() -> Dict[str, Any]:
+    """GET /oficina. `datosReales` es estrictamente
+    intuitive_imagination_engine.is_dreaming_now -- true solo mientras un
+    ciclo REAL esta ejecutandose ahora mismo. El resto del tiempo (la
+    inmensa mayoria: un ciclo tarda segundos y se repite cada
+    cycle_frequency_minutes, 5 min por defecto) la oficina sale quieta,
+    ocupantes=[], tal como pide el encargo: nada de animar actividad
+    inventada. 'desde' de un ocupante se ancla la PRIMERA vez que esta
+    misma llamada observa ese pid corriendo (el motor no persiste un
+    instante de inicio de ciclo en ningun sitio publico que este módulo
+    pueda leer sin inventarlo) y se limpia en cuanto deja de estar
+    corriendo, para que la proxima llegada cuente como una llegada nueva."""
+    ahora = time.time()
+    if intuitive_imagination_engine is None:
+        return {"salas": [], "ocupantes": [], "actualizadoEn": ahora, "datosReales": False}
+
+    try:
+        esta_sonando = bool(intuitive_imagination_engine.is_dreaming_now)
+    except Exception:
+        esta_sonando = False
+    proc_meta = getattr(intuitive_imagination_engine, "process_metadata", {}) or {}
+
+    salas: List[Dict[str, Any]] = []
+    corriendo_pid: Optional[str] = None
+    for proc in DREAM_PROCESS_TYPES:
+        pid = proc["id"]
+        meta = proc_meta.get(pid) or {}
+        corriendo = esta_sonando and meta.get("status") == "running"
+        if corriendo:
+            corriendo_pid = pid
+        salas.append({
+            "id": _sala_id_de(pid), "nombre": proc.get("name"), "procesoTipoId": pid,
+            "actividad": 1.0 if corriendo else 0.0, "color": proc.get("color"),
+        })
+
+    ocupantes: List[Dict[str, Any]] = []
+    if corriendo_pid:
+        _OFICINA_OCUPACION_DESDE.setdefault(corriendo_pid, ahora)
+        ser_id = _instalados_por_tipo_proceso().get(corriendo_pid)
+        if ser_id:
+            proc_info = next((p for p in DREAM_PROCESS_TYPES if p["id"] == corriendo_pid), {})
+            ocupantes.append({
+                "serId": ser_id, "salaId": _sala_id_de(corriendo_pid), "actividad": "pensando",
+                "procesoId": corriendo_pid, "detalle": proc_info.get("description"),
+                "desde": _OFICINA_OCUPACION_DESDE.get(corriendo_pid, ahora),
+            })
+    else:
+        _OFICINA_OCUPACION_DESDE.clear()
+
+    return {"salas": salas, "ocupantes": ocupantes, "actualizadoEn": ahora, "datosReales": esta_sonando}
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# 8. RUTAS — EXACTAMENTE las 20 de la cabecera de genesis-types.ts más las
+#    8 de la cabecera "OLA 2" (28 en total), ni una más ni una menos. 404
+#    nunca se usa para "no encontrado" lógico (ver SOBRE DE RESPUESTA en
+#    el docstring del módulo); la única excepción deliberada es
+#    GET /seres/{id}, que devuelve 400 porque su forma de éxito es un
+#    objeto desnudo sin sitio para "ok".
 # ═══════════════════════════════════════════════════════════════════════
 
 class _VerificarModeloBody(BaseModel):
@@ -1403,3 +1942,45 @@ async def ep_aceptar_propuesta(propuesta_id: str, _cuerpo: Dict[str, Any] = Body
 @router.post("/propuestas/{propuesta_id}/descartar")
 async def ep_descartar_propuesta(propuesta_id: str, _cuerpo: Dict[str, Any] = Body(default_factory=dict)):
     return resolver_propuesta(propuesta_id, aceptar=False)
+
+
+# ─────────────────────────────────────────── OLA 2 (8 rutas, ver sección 9)
+
+@router.get("/oficina")
+async def ep_estado_oficina():
+    return obtener_estado_oficina()
+
+
+@router.get("/bots_predeterminados")
+async def ep_listar_bots_predeterminados():
+    return listar_bots_predeterminados()
+
+
+@router.post("/bots_predeterminados/instalar")
+async def ep_instalar_bots_predeterminados(_cuerpo: Dict[str, Any] = Body(default_factory=dict)):
+    return instalar_bots_predeterminados()
+
+
+@router.post("/seres/{ser_id}/internet")
+async def ep_conceder_internet(ser_id: str, solicitud: Dict[str, Any] = Body(default_factory=dict)):
+    return conceder_internet(ser_id, solicitud)
+
+
+@router.post("/seres/{ser_id}/avatar/buscar")
+async def ep_buscar_avatar(ser_id: str, solicitud: Dict[str, Any] = Body(default_factory=dict)):
+    return buscar_avatares(ser_id, solicitud)
+
+
+@router.post("/seres/{ser_id}/avatar")
+async def ep_fijar_avatar(ser_id: str, solicitud: Dict[str, Any] = Body(default_factory=dict)):
+    return fijar_avatar(ser_id, solicitud)
+
+
+@router.get("/herramientas")
+async def ep_listar_herramientas():
+    return listar_herramientas()
+
+
+@router.post("/seres/{ser_id}/cerebros")
+async def ep_agregar_cerebro_propio(ser_id: str, solicitud: Dict[str, Any] = Body(default_factory=dict)):
+    return agregar_cerebro_propio(ser_id, solicitud)
