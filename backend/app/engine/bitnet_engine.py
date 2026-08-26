@@ -508,6 +508,52 @@ class BitNetUnifiedEngine:
             if _yielded:
                 return
 
+        # 2.5 Fallback OpenRouter :free (inferencia REAL en la nube)
+        #
+        # En Cloud Run no existe Ollama ni BitNet nativo: sin este puente, TODA
+        # pregunta caia al reasoner de plantillas y el chat repetia lo mismo
+        # para siempre. Ahora, si hay OPENROUTER_API_KEY, se delega a un modelo
+        # gratuito real ANTES de llegar a las plantillas. Sin clave, degradacion
+        # honesta como antes. Nunca lanza hacia el caller.
+        try:
+            from ..core.agent_genesis_engine import _openrouter_key, OPENROUTER_CHAT_URL
+            _clave_or = _openrouter_key()
+            if _clave_or:
+                meta["source"] = "openrouter-free"
+                sys_txt = (system_prompt or "").strip()[:2000]
+                _mensajes = ([{"role": "system", "content": sys_txt}] if sys_txt else [])
+                if context_chunks:
+                    _ctx = "\n".join(f"[CONTEXTO] {c}" for c in context_chunks[:4] if c)
+                    prompt = f"{_ctx}\n\n{prompt}" if _ctx else prompt
+                _mensajes.append({"role": "user", "content": prompt})
+                async with httpx.AsyncClient(timeout=httpx.Timeout(90.0, connect=10.0)) as client:
+                    res = await client.post(
+                        OPENROUTER_CHAT_URL,
+                        headers={
+                            "Authorization": f"Bearer {_clave_or}",
+                            "HTTP-Referer": "https://astraura.vercel.app",
+                            "X-Title": "Astraura 1.58-bit",
+                        },
+                        json={
+                            "model": os.environ.get("ASTRAURA_OPENROUTER_MODEL",
+                                                    "meta-llama/llama-3.3-70b-instruct:free"),
+                            "messages": _mensajes,
+                            "max_tokens": 1024,
+                            "temperature": max(0.2, min(0.85, temperature)),
+                        },
+                    )
+                    res.raise_for_status()
+                    texto = ((res.json().get("choices") or [{}])[0].get("message") or {}).get("content") or ""
+                if texto.strip():
+                    self.stats["tokens_generated"] += len(texto.split())
+                    for palabra in texto.split(" "):
+                        yield palabra + " "
+                        await asyncio.sleep(0.008)
+                    return
+                print("[BitNetUnifiedEngine] OpenRouter :free respondió vacío; cayendo a plantillas.")
+        except Exception as e:
+            print(f"[BitNetUnifiedEngine] Fallback OpenRouter falló ({type(e).__name__}: {e}); cayendo a plantillas.")
+
 
         # 3. Dynamic Natural Language Cognitive Reasoner Fallback
         #
