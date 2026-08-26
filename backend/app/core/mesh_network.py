@@ -66,13 +66,24 @@ def _curl_bin() -> str:
 
 
 def _load_creds() -> Optional[dict]:
-    """Carga credenciales Supabase; None => modo LAN-only."""
+    """Carga credenciales Supabase; None => modo LAN-only.
+    (fix nube) En Cloud Run no existe ~/.astraura/, así que también acepta
+    las mismas env vars que supabase_sync inyecta al contenedor."""
     if os.path.exists(CRED_FILE):
         try:
             with open(CRED_FILE, "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception as e:
             logger.warning(f"No se pudieron leer credenciales Supabase: {e}")
+    url = (os.environ.get("SUPABASE_URL") or "").strip()
+    key = (os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or "").strip()
+    if url and key:
+        try:
+            ref = url.split("//")[1].split(".")[0] if "//" in url else ""
+        except Exception:
+            ref = ""
+        return {"supabase_url": url.rstrip("/"), "service_role_key": key,
+                "anon_key": os.environ.get("SUPABASE_ANON_KEY", ""), "project_ref": ref}
     return None
 
 
