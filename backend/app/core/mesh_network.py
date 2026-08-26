@@ -200,6 +200,12 @@ class MeshNetwork:
         if not creds:
             return False
         row = dict(node)
+        # (fix) PostgREST exige ISO-8601 para timestamptz: el epoch float interno
+        # se convierte aquí (y en cualquier campo *_at) antes del upsert.
+        for k in ("last_heartbeat", "created_at", "updated_at"):
+            v = row.get(k)
+            if isinstance(v, (int, float)):
+                row[k] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(v))
         row["updated_at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         payload = json.dumps(row, ensure_ascii=False).encode("utf-8")
         url = f"{creds['supabase_url'].rstrip('/')}/rest/v1/{SUPABASE_TABLE}?on_conflict=node_id"
