@@ -71,7 +71,8 @@ import GatewayModal from './components/GatewayModal';
 import UniversalDeviceModal from './components/UniversalDeviceModal';
 import ThemePickerModal from './components/ThemePickerModal';
 import UniversalFileViewerModal from './components/UniversalFileViewerModal';
-import { ChatWebSocketClient, fetchStatus, fetchSystemNotifications, autoDetectAndSetLiveTunnel, getGatewayUrl, apiUrl } from './services/api';
+import LocalSystemAccessModal from './components/LocalSystemAccessModal';
+import { ChatWebSocketClient, fetchStatus, fetchSystemNotifications, autoDetectAndSetLiveTunnel, preferLocalBackend, getGatewayUrl, apiUrl } from './services/api';
 import { webCognition } from './services/webCognition';
 import { deviceContextDetector } from './services/deviceContextDetector';
 import { omniVoice } from './services/omniVoice';
@@ -109,6 +110,7 @@ export default function App() {
   const [isGatewayModalOpen, setIsGatewayModalOpen] = useState(false);
   const [isUniversalPermsModalOpen, setIsUniversalPermsModalOpen] = useState(false);
   const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
+  const [isLocalAccessModalOpen, setIsLocalAccessModalOpen] = useState(false);
   const [fileViewerState, setFileViewerState] = useState({ isOpen: false, path: null, title: '' });
   const [deviceProfile, setDeviceProfile] = useState(null);
 
@@ -295,6 +297,15 @@ export default function App() {
       window.location.hostname !== '127.0.0.1';
     if (isExternalHost) {
       autoDetectAndSetLiveTunnel().catch(() => {});
+      // (Astraura 1.58b) Si hay un nodo local vivo (funciones completas) y el
+      // usuario aún no otorgó consentimiento de acceso, pedirlo explícitamente.
+      preferLocalBackend()
+        .then((localUp) => {
+          if (localUp && !localStorage.getItem('astraura_local_access_choice')) {
+            setIsLocalAccessModalOpen(true);
+          }
+        })
+        .catch(() => {});
     }
 
     fetchStatus()
@@ -983,6 +994,19 @@ export default function App() {
       <GatewayModal
         isOpen={isGatewayModalOpen}
         onClose={() => setIsGatewayModalOpen(false)}
+      />
+
+      {/* Local System Access Bridge Modal (Astraura 1.58b) */}
+      <LocalSystemAccessModal
+        isOpen={isLocalAccessModalOpen}
+        onClose={() => { setIsLocalAccessModalOpen(false); localStorage.setItem('astraura_local_access_choice', 'denied'); }}
+        onGranted={(activeScopes) => {
+          setIsLocalAccessModalOpen(false);
+          localStorage.setItem('astraura_local_access_choice', 'granted');
+          localStorage.setItem('astraura_local_access_scopes', JSON.stringify(activeScopes));
+          // El nodo local ya quedó preferido por preferLocalBackend(); forzar refresco del gateway.
+          window.location.reload();
+        }}
       />
 
       {/* Universal Device & Hardware Permissions Modal */}

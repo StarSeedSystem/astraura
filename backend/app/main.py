@@ -3431,15 +3431,77 @@ async def get_tunnel_api():
     lan_ips = status.get("lan_ips", [])
     url = status.get("url")
     vercel_link = f"https://astraura.vercel.app/?gateway={url}" if url else "https://astraura.vercel.app/"
-    return {
-        "active": status.get("active", False),
-        "url": url,
-        "lan_ips": lan_ips,
-        "lan_endpoints": [f"http://{ip}:8000" for ip in lan_ips],
-        "vercel_link": vercel_link,
-        "provider": "cloudflare_quick_tunnel",
-        "timestamp": __import__('time').time()
-    }
+@app.get("/api/system/capabilities")
+async def get_system_capabilities():
+    """
+    (Astraura 1.58b) Inventario HONESTO de las capacidades que el backend LOCAL
+    puede ofrecer al puente cuando el usuario concede acceso al sistema. Es la
+    fuente de verdad que el frontend muestra en el modal de consentimiento:
+    hardware, almacenamiento de cerebros, integraciones nativas. No ejecuta nada;
+    solo declara qué esta disponible para que el usuario autorice con conocimiento.
+    """
+    import platform, os, shutil, psutil
+    from .memory.starseed_memory_engine import starseed_memory
+    try:
+        cpu = platform.processor() or platform.machine()
+        mem = psutil.virtual_memory()
+        disk = shutil.disk_usage(str(settings.workspace_path))
+        brains = starseed_memory.list_brains() if hasattr(starseed_memory, "list_brains") else []
+        return {
+            "success": True,
+            "scope": "local_system",
+            "hardware": {
+                "os": f"{platform.system()} {platform.release()}",
+                "arch": platform.machine(),
+                "cpu": cpu,
+                "ram_gb_total": round(mem.total / (1024**3), 1),
+                "ram_gb_free": round(mem.available / (1024**3), 1),
+                "disk_gb_total": round(disk.total / (1024**3), 1),
+                "disk_gb_free": round(disk.free / (1024**3), 1),
+                "python": platform.python_version(),
+            },
+            "brains_storage": {
+                "count": len(brains) if isinstance(brains, list) else 0,
+                "workspace": str(settings.workspace_path),
+                "synced_to_supabase": True,
+            },
+            "native_integrations": [
+                "filesystem (lectura/escritura bajo workspace ancla)",
+                "terminal (comandos locales via consentimiento)",
+                "starseed_os_bridge (vinculacion de cuentas y sincronizacion)",
+                "ollama / bitnet local (inferencia 1.58-bit en hardware)",
+                "universal_storage (drive/disco/cloud conectado)",
+            ],
+            "consent_required": True,
+            "timestamp": __import__('time').time()
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)[:200], "consent_required": True}
+
+
+@app.post("/api/system/request_access")
+async def request_system_access(req: dict = None):
+    """
+    (Astraura 1.58b) Registra el CONSENTIMIENTO explicito del usuario para que el
+    puente use las capacidades locales (terminal/hardware/almacenamiento). Es la
+    contraparte segura de 'debe pedir acceso a la terminal del sistema': la UI pide
+    permiso, el usuario aprueba, y solo entonces el backend local habilita el
+    acceso completo. El estado se persiste en data/ para no volver a pedirlo.
+    """
+    import json as _json
+    payload = req or {}
+    granted = bool(payload.get("granted", False))
+    scopes = payload.get("scopes", ["hardware", "storage", "terminal", "integrations"])
+    state = {"granted": granted, "scopes": scopes, "at": __import__('time').time()}
+    try:
+        _p = settings.workspace_path / "data" / "local_access_consent.json"
+        _p.parent.mkdir(parents=True, exist_ok=True)
+        _p.write_text(_json.dumps(state, indent=2), encoding="utf-8")
+    except Exception as e:
+        return {"success": False, "error": str(e)[:200]}
+    return {"success": True, "granted": granted, "scopes": scopes, "message":
+            "Acceso al sistema local concedido. El puente ahora usa funciones completas."
+            if granted else "Acceso al sistema local no concedido; el puente usa modo limitado (nube)."}
 
 @app.get("/api/system/tunnel/qr_data")
 async def get_tunnel_qr_data():

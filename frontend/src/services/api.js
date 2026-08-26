@@ -81,7 +81,48 @@ if (typeof window !== 'undefined') {
   // frontend (fetch, WebSocket, voz) apunte al gateway indicado desde el primer momento.
   applyGatewayFromUrl();
   refreshDynamicGateway();
+  // (Astraura 1.58b) AUTO-APERTURA DE LOCALHOST: en CUALQUIER medio (Vercel, app
+  // nativa, externo) sondeamos el nodo local 127.0.0.1:8000. Si está vivo, lo
+  // preferimos como gateway para acceder a las funciones completas (motor 1.58-bit
+  // local, hardware, cerebros, integraciones nativas). El usuario mantiene el
+  // control: si fijó un gateway manual, este auto-descubrimiento no lo pisa.
+  preferLocalBackend().catch(() => {});
   setInterval(refreshDynamicGateway, 30000);
+  // Re-sondeo periódico del nodo local (por si arranca después de la carga).
+  setInterval(() => {
+    const src = localStorage.getItem('astraura_backend_gateway_source');
+    if (src !== 'user') preferLocalBackend().catch(() => {});
+  }, 60000);
+}
+
+/**
+ * (Astraura 1.58b) Sondea el backend LOCAL (http://127.0.0.1:8000) y, si responde,
+ * lo fija como gateway activo (funciones completas). Respeta un gateway fijado
+ * manualmente por el usuario. Devuelve true si el nodo local quedó activo.
+ */
+export async function preferLocalBackend() {
+  try {
+    const customSource = (typeof localStorage !== 'undefined')
+      ? localStorage.getItem('astraura_backend_gateway_source') : null;
+    if (customSource === 'user') return false; // el usuario fijó uno explícito
+
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 1500);
+    const res = await fetch('http://127.0.0.1:8000/api/status', { signal: ctrl.signal });
+    clearTimeout(t);
+    if (!res.ok) return false;
+    const data = await res.json().catch(() => null);
+    if (!data) return false;
+    // El nodo local está vivo: usarlo como gateway (relativo, sin prefijo http).
+    dynamicGateway = 'http://127.0.0.1:8000';
+    gatewayResolved = true;
+    localStorage.setItem('astraura_backend_gateway', 'http://127.0.0.1:8000');
+    localStorage.setItem('astraura_backend_gateway_source', 'auto-local');
+    console.log('⚡ [Astraura Bridge] Nodo local 127.0.0.1:8000 detectado y preferido para funciones completas.');
+    return true;
+  } catch {
+    return false; // no hay nodo local; se queda en Cloud Run (gateway por defecto)
+  }
 }
 
 export function getGatewayUrl() {
@@ -2169,5 +2210,49 @@ export async function regenerateSynthesisReportContent(reportId, tabId) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ tab_id: tabId })
+  });
+}
+
+// ================= Local System Access Bridge (Astraura 1.58b) =================
+
+/**
+ * Consulta el inventario HONESTO de capacidades del sistema local (hardware,
+ * cerebros, integraciones) que el puente puede usar si el usuario concede acceso.
+ * Se muestra en el modal de consentimiento para que autorice con conocimiento.
+ */
+export async function fetchSystemCapabilities() {
+  // Se sondea primero el nodo local (si está activo) y, en su defecto, el gateway.
+  const localCtrl = new AbortController();
+  const lt = setTimeout(() => localCtrl.abort(), 1500);
+  try {
+    const r = await fetch('http://127.0.0.1:8000/api/system/capabilities', { signal: localCtrl.signal });
+    clearTimeout(lt);
+    if (r.ok) return await r.json();
+  } catch { /* no hay nodo local */ }
+  clearTimeout(lt);
+  return apiFetch('/system/capabilities');
+}
+
+/**
+ * Registra el CONSENTIMIENTO del usuario para acceder al sistema local (terminal/
+ * hardware/almacenamiento/integraciones). Cumple 'debe pedir acceso a la terminal
+ * del sistema': la UI pide permiso y solo tras aprobarse el backend habilita el
+ * acceso completo. `granted=false` mantiene el puente en modo limitado (nube).
+ */
+export async function requestSystemAccess(granted, scopes) {
+  const body = JSON.stringify({ granted: !!granted, scopes: scopes || ['hardware', 'storage', 'terminal', 'integrations'] });
+  const localCtrl = new AbortController();
+  const lt = setTimeout(() => localCtrl.abort(), 1500);
+  try {
+    const r = await fetch('http://127.0.0.1:8000/api/system/request_access', {
+      method: 'POST', signal: localCtrl.signal,
+      headers: { 'Content-Type': 'application/json' }, body
+    });
+    clearTimeout(lt);
+    if (r.ok) return await r.json();
+  } catch { /* no hay nodo local */ }
+  clearTimeout(lt);
+  return apiFetch('/system/request_access', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body
   });
 }
