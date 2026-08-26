@@ -57,6 +57,7 @@ import SkillsVaultView from './components/SkillsVaultView';
 import WorkflowsView from './components/WorkflowsView';
 import DreamStudioView from './components/DreamStudioView';
 import Sensorium360View from './components/Sensorium360View';
+import MeshNetworkView from './components/MeshNetworkView';
 import IntuitiveImaginationView from './components/IntuitiveImaginationView';
 import CreationsView from './components/CreationsView';
 import ProjectsView from './components/ProjectsView';
@@ -624,6 +625,7 @@ export default function App() {
     { id: 'library', label: 'Biblioteca StarSeed', icon: Layers, color: 'pink', badge: skillsCount },
     { id: 'telemetry', label: 'Telemetría 1.58-Bit', icon: Cpu, color: 'teal' },
     { id: 'terminal', label: 'Terminal & Sandbox', icon: TerminalIcon, color: 'amber' },
+    { id: 'malla', label: 'Red Mesh 1.58b', icon: Network, color: 'purple' },
     { id: 'settings', label: 'Configuración & Preferencias', icon: Sliders, color: 'cyan' }
   ];
 
@@ -939,6 +941,7 @@ export default function App() {
           {activeTab === 'voice_studio' && <VoiceStudioView onBackToChat={() => handleTabChange('chat')} />}
           {(activeTab === 'projects' || activeTab === 'creations') && <ProjectsView />}
           {activeTab === 'sensorium' && <Sensorium360View />}
+          {activeTab === 'malla' && <MeshNetworkView />}
           {(activeTab === 'imagination' || activeTab === 'dream') && <IntuitiveImaginationView />}
           {activeTab === 'storage' && <StorageRoutingView />}
           {activeTab === 'privacy' && <PrivacySecurityControlView />}

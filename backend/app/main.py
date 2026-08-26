@@ -3597,6 +3597,179 @@ async def get_cerebros_media_map():
         "total_cerebros": len(cerebros_raw)
     }
 
+# ---------------------------------------------------------------------------
+# Red Mesh P2P de Astraura 1.58-bit (registro de nodos, sharding, routing
+# federado). Ver backend/app/core/mesh_network.py para qué es real vs
+# placeholder. Todos los endpoints capturan sus excepciones y devuelven
+# estados degradados honestos.
+# ---------------------------------------------------------------------------
+from .core.mesh_network import mesh_network
+
+
+@app.on_event("startup")
+async def mesh_startup():
+    """Arranca el nodo en la malla (idempotente): heartbeat loop + descubrimiento."""
+    try:
+        mesh_network.start()
+    except Exception as e:
+        print(f"🕸️ [MESH] no se pudo arrancar la malla (modo local): {e}")
+
+
+class MeshJoinRequest(BaseModel):
+    url_publica: Optional[str] = None
+
+
+@app.get("/api/mesh/status")
+async def api_mesh_status():
+    """Estado completo serializable de la malla."""
+    return mesh_network.get_status()
+
+
+@app.post("/api/mesh/join")
+async def api_mesh_join(body: Optional[MeshJoinRequest] = None):
+    """Registra este nodo en la malla (y arranca el loop si aún no corre)."""
+    try:
+        me = mesh_network.get_self()
+        if body and body.url_publica:
+            me["url_publica"] = body.url_publica
+        node = mesh_network.register_node(me)
+        mesh_network.start()
+        return {"success": True, "node": node}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+@app.post("/api/mesh/heartbeat")
+async def api_mesh_heartbeat(request: Request):
+    """Recibe heartbeat de otro nodo (body = registro del peer)."""
+    try:
+        info = await request.json()
+    except Exception:
+        info = {}
+    return mesh_network.receive_heartbeat(info)
+
+
+@app.get("/api/mesh/nodes")
+async def api_mesh_nodes():
+    """Lista nodos conocidos con status actualizado."""
+    try:
+        mesh_network.update_statuses()
+        return {"success": True,
+                "nodes": [n for n in mesh_network.nodes.values() if n.get("status") != "dead"],
+                "total": len(mesh_network.nodes)}
+    except Exception as e:
+        return {"success": False, "nodes": [], "error": str(e)}
+
+
+@app.post("/api/mesh/infer")
+async def api_mesh_infer(request: Request):
+    """
+    Routing de inferencia distribuida. Devuelve streaming de tokens; el último
+    chunk puede ser '__MESH_META__{...}' con los nodos participantes si corrió
+    en modo distribuido. Fallback SIEMPRE al motor local bitnet_engine.
+    """
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    prompt = body.get("prompt", "")
+    system_prompt = body.get("system_prompt", "")
+    preferences = body.get("preferences") or {}
+
+    async def gen():
+        try:
+            async for tok in mesh_network.route_inference(prompt, system_prompt, preferences):
+                yield tok
+        except Exception as e:  # doble red de seguridad: nunca 500 por streaming
+            yield f"[mesh] error: {e}"
+
+    return StreamingResponse(gen(), media_type="text/plain")
+
+
+@app.get("/api/mesh/ping")
+async def api_mesh_ping():
+    """Respuesta rápida para descubrimiento LAN."""
+    me = mesh_network.get_self()
+    return {"node_id": me["node_id"], "hostname": me["hostname"],
+            "capabilities": me["capabilities"], "hardware": me["hardware"]}
+
+
+@app.post("/api/mesh/infer_shard")
+async def api_mesh_infer_shard(request: Request):
+    """Ejecuta un shard entrante de un peer (pipeline distribuido)."""
+    try:
+        body = await request.json()
+        out = await mesh_network.infer_shard_stub(
+            body.get("prompt", ""), body.get("capas", [0, 0]), body.get("shard_id", "?"))
+        return out
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
+
+
+@app.get("/api/mesh/federated/status")
+async def api_mesh_federated_status():
+    """Estado del aprendizaje federado (solo deltas ternarios)."""
+    return mesh_network.federated_status()
+
+
+@app.post("/api/mesh/federated/delta")
+async def api_mesh_federated_delta(request: Request):
+    """Recibe un delta ternario comprimido de otro nodo."""
+    try:
+        body = await request.json()
+        return mesh_network.collect_federated_delta(body.get("node_id", "anónimo"), body)
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
+
+
+# ---------------------------------------------------------------------------
+# Router Económico Inteligente (Astraura 1.58b): selección optimizada de
+# modelos por eficiencia económica vs calidad, y subagentes sincronizados en
+# paralelo sobre el catálogo gratuito. Ver backend/app/core/economic_router.py.
+# ---------------------------------------------------------------------------
+from .core.economic_router import economic_router, classify_task, synthesize
+
+
+class RouterRequest(BaseModel):
+    prompt: str = ""
+    preferencia: str = "economica"
+
+
+@app.get("/api/router/status")
+async def api_router_status():
+    """Catálogo + estado del router económico."""
+    try:
+        return {"success": True, **economic_router.get_status()}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+@app.post("/api/router/recommend")
+async def api_router_recommend(req: Optional[RouterRequest] = None):
+    """Recomendación de motor para un prompt (clasificación local sin LLM)."""
+    try:
+        payload = req or RouterRequest()
+        tarea = classify_task(payload.prompt or "")
+        eleccion = economic_router.select_model(tarea, payload.preferencia)
+        return {"success": True, "tarea": tarea, **eleccion}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+@app.post("/api/router/subagents")
+async def api_router_subagents(req: Optional[RouterRequest] = None):
+    """Ejecuta N subagentes sincronizados (modelos gratuitos distintos) en
+    paralelo y sintetiza. Degradación honesta si no hay modelos remotos."""
+    try:
+        payload = req or RouterRequest()
+        if not (payload.prompt or "").strip():
+            return {"success": False, "error": "prompt vacío"}
+        resultado = await economic_router.run_synced_subagents(payload.prompt)
+        return {"success": True, **resultado}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
 frontend_dist = settings.workspace_path / "frontend" / "dist"
 if frontend_dist.exists():
     app.mount("/", StaticFiles(directory=str(frontend_dist), html=True), name="frontend")
