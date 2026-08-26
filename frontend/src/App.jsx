@@ -458,7 +458,7 @@ export default function App() {
 
     // 1. Try WebSocket if open
     if (wsClientRef.current?.ws?.readyState === WebSocket.OPEN) {
-      wsClientRef.current.sendMessage(text, settings.systemPrompt, preferences || {});
+      wsClientRef.current.sendMessage(text, preferences?.systemPrompt || settings.systemPrompt, { ...(preferences || {}), temperature: preferences?.temperature ?? settings.temperature });
       return;
     }
 
@@ -468,7 +468,7 @@ export default function App() {
       const httpRes = await fetch(apiUrl('/api/chat'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: text, system_prompt: settings.systemPrompt, preferences: preferences || {} }),
+        body: JSON.stringify({ prompt: text, system_prompt: preferences?.systemPrompt || settings.systemPrompt, preferences: { ...(preferences || {}), temperature: preferences?.temperature ?? settings.temperature } }),
         signal: AbortSignal.timeout(6000)
       });
       if (httpRes.ok) {

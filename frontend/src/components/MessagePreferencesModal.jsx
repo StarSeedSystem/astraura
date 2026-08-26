@@ -575,6 +575,47 @@ export default function MessagePreferencesModal({
             </div>
           </div>
 
+          {/* SECTION 6.5: CONFIGURACIÓN PREDETERMINADA DEL CHAT (Astraura 1.58b) */}
+          <div className="p-3.5 bg-indigo-950/20 border border-indigo-500/20 rounded-xl space-y-3">
+            <span className="text-[10px] font-mono text-indigo-300 font-bold uppercase tracking-wider block">
+              🧬 Configuración Predeterminada del Chat (editable)
+            </span>
+            <div>
+              <label className="text-[11px] text-slate-300 font-semibold block mb-1">
+                System Prompt base del chat
+              </label>
+              <textarea
+                value={prefs.systemPrompt || ''}
+                onChange={(e) => setPrefs({ ...prefs, systemPrompt: e.target.value })}
+                rows={4}
+                placeholder="Eres Astraura, el núcleo cognitivo soberano de StarSeed OS en arquitectura de 1.58 bits…"
+                className="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-[11px] text-slate-200 font-mono resize-y focus:border-indigo-400 outline-none"
+              />
+              <span className="text-[9px] text-slate-400 block mt-1">
+                Define la personalidad y directivas del asistente para este chat. Se aplica al enviar mensajes.
+              </span>
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-[11px] text-slate-300 font-semibold">
+                  Temperatura del motor: <span className="text-indigo-300 font-mono">{prefs.temperature ?? 0.7}</span>
+                </label>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                value={prefs.temperature ?? 0.7}
+                onChange={(e) => setPrefs({ ...prefs, temperature: parseFloat(e.target.value) })}
+                className="w-full accent-indigo-400"
+              />
+              <span className="text-[9px] text-slate-400 block mt-1">
+                0 = determinista y preciso · 1 = creativo y diverso.
+              </span>
+            </div>
+          </div>
+
           {/* SECTION 7: MÉTRICAS ESTIMADAS EN TIEMPO REAL */}
           <div className="p-3.5 bg-cyan-950/20 border border-cyan-500/20 rounded-xl space-y-2">
             <span className="text-[10px] font-mono text-cyan-300 font-bold uppercase tracking-wider block">

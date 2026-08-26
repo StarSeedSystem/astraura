@@ -1,19 +1,7 @@
-# Astraura backend Docker context — excluir datos masivos y artefactos generados
-# para que el build de Cloud Run no suba gigas de JSON de runtime.
-node_modules
-npm-debug.log
-frontend
-desktop-app
-data
-backend/data
-backend/vault
-backend/__pycache__
-*.pyc
-.git
-.DS_Store
-_starseed_tanda2
-deploy
-starseed_memory_root
-*.log
-dist
-build
+# Contexto mínimo para el build de Cloud Run: SOLO el backend.
+# Excluye todo lo masivo/generado para que el empaquetado no se cuelgue.
+*
+!backend/
+!backend/**
+!Dockerfile
+!requirements.txt

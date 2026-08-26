@@ -137,7 +137,11 @@ export default function ChatInterface({
       volumePriority: 70,
       qualityPriority: 85,
       qualitySteps: 2,
-      autoTuneForTask: true
+      autoTuneForTask: true,
+      // (Astraura 1.58b) Configuración predeterminada del chat editable desde
+      // el modal de opciones: el systemPrompt base y la temperatura del motor.
+      systemPrompt: activePersona?.systemPrompt || "Eres Astraura, el núcleo cognitivo soberano de StarSeed OS en arquitectura de 1.58 bits.",
+      temperature: 0.7
     };
   });
 
