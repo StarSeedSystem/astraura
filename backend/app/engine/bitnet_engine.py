@@ -536,7 +536,7 @@ class BitNetUnifiedEngine:
                         },
                         json={
                             "model": os.environ.get("ASTRAURA_OPENROUTER_MODEL",
-                                                    "meta-llama/llama-3.3-70b-instruct:free"),
+                                                    "nvidia/nemotron-3-super-120b-a12b:free"),
                             "messages": _mensajes,
                             "max_tokens": 1024,
                             "temperature": max(0.2, min(0.85, temperature)),
