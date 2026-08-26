@@ -3417,6 +3417,30 @@ async def get_active_tunnel_json_dynamic():
         "timestamp": __import__('time').time()
     }
 
+@app.get("/api/tunnel")
+async def get_tunnel_api():
+    """
+    (Astraura 1.58b) Endpoint canonico de descubrimiento del gateway para
+    clientes Vercel/movil/nativo. Se expone bajo /api/* para que el rewrite de
+    Vercel (que SI aplica a /api) lo proxee a Cloud Run, evitando el NOT_FOUND
+    que daba /active_tunnel.json (Vercel ignora rewrites de archivos estaticos
+    con framework Vite). Devuelve el mismo contrato que /active_tunnel.json.
+    """
+    from .core.tunnel_manager import tunnel_manager
+    status = tunnel_manager.get_status()
+    lan_ips = status.get("lan_ips", [])
+    url = status.get("url")
+    vercel_link = f"https://astraura.vercel.app/?gateway={url}" if url else "https://astraura.vercel.app/"
+    return {
+        "active": status.get("active", False),
+        "url": url,
+        "lan_ips": lan_ips,
+        "lan_endpoints": [f"http://{ip}:8000" for ip in lan_ips],
+        "vercel_link": vercel_link,
+        "provider": "cloudflare_quick_tunnel",
+        "timestamp": __import__('time').time()
+    }
+
 @app.get("/api/system/tunnel/qr_data")
 async def get_tunnel_qr_data():
     """Returns the tunnel URL + deep link for generating QR codes in the frontend."""

@@ -419,7 +419,12 @@ SOBERANIA_POR_DEFECTO: Dict[str, Any] = {
     "puedeProponerFuera": True, "prefijoRamaVariante": "variante/", "limitesDuros": [],
 }
 ENRUTADO_POR_DEFECTO: Dict[str, Any] = {
-    "escalera": ["openrouter/free", "bitnet-158-local"],
+    # (Astraura 1.58b) El sistema 1.58-bit LOCAL (BitNet b1.58 / Ollama en el
+    # hardware del usuario) es el predeterminado soberano. OpenRouter :free queda
+    # SOLO como fallback economica cuando el motor local no esta disponible
+    # (p.ej. en la nube, donde no hay BitNet nativo). Asi el chat y los agentes
+    # responden con el sistema 1.58-bit local por defecto, no con remoto.
+    "escalera": ["bitnet-158-local", "openrouter/free"],
     "soloGratuitos": True, "ultimoUsado": None, "ultimaFueDegradada": False,
 }
 

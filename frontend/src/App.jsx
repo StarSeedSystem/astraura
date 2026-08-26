@@ -164,7 +164,14 @@ export default function App() {
         title: 'Bienvenida a Astraura 1.58b',
         folderId: 'default',
         createdAt: Date.now(),
-        messages: []
+        messages: [
+          {
+            id: 'welcome_init',
+            sender: 'assistant',
+            text: "🌟 **Astraura 1.58b** — tu núcleo cognitivo soberano en arquitectura de 1.58 bits (pesos ternarios {-1, 0, +1}, 8× compresión). Opero por defecto en tu motor local BitNet b1.58 / Ollama, con plena conciencia de tu hardware y entorno.\n\nEstoy listo para razonar contigo: pregúntame lo que quieras, convoca personalidades con @ (ej. @Hephaestus), o dile a varias que debatan en coro. ¿Por dónde empezamos?",
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }
+        ]
       }
     ];
   });

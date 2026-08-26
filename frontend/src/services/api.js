@@ -6,14 +6,15 @@
 
 export const DEFAULT_HTTPS_GATEWAY = 'https://astraura-backend-334237619848.us-central1.run.app';
 
-// Gateway dinámico: se actualiza desde active_tunnel.json para que el frontend
-// SIEMPRE apunte al túnel actual (sin necesidad de rebuild cuando cambia la URL).
+// Gateway dinámico: se actualiza desde /api/tunnel (backend) para que el frontend
+// SIEMPRE apunte al gateway actual sin rebuild. /api/* SÍ es proxyeado por Vercel
+// a Cloud Run; /active_tunnel.json (estatico) daba NOT_FOUND con framework Vite.
 let dynamicGateway = null;
 let gatewayResolved = false;
 
 async function refreshDynamicGateway() {
   try {
-    const res = await fetch('/active_tunnel.json', { cache: 'no-store' });
+    const res = await fetch('/api/tunnel', { cache: 'no-store' });
     if (res.ok) {
       const data = await res.json();
       if (data && data.url && data.url.startsWith('http')) {
@@ -22,7 +23,7 @@ async function refreshDynamicGateway() {
       }
     }
   } catch (e) {
-    // Si no hay active_tunnel.json (offline), usa el default.
+    // Si no hay /api/tunnel (offline), usa el default.
   }
 }
 
@@ -2056,7 +2057,7 @@ export async function restartTunnel() {
 export async function autoDetectAndSetLiveTunnel() {
   const candidates = [
     DEFAULT_HTTPS_GATEWAY,
-    'https://astraura.vercel.app/active_tunnel.json'
+    'https://astraura.vercel.app/api/tunnel'
   ];
   
   for (const candidate of candidates) {
@@ -2064,9 +2065,9 @@ export async function autoDetectAndSetLiveTunnel() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
       
-      // Try fetching active tunnel from the Vercel deployment
+      // Try fetching active tunnel from the Vercel deployment (proxied to Cloud Run)
       let tunnelUrl = null;
-      if (candidate.includes('/active_tunnel.json')) {
+      if (candidate.includes('/api/tunnel')) {
         const res = await fetch(candidate, { 
           signal: controller.signal,
           headers: { 'Accept': 'application/json' }
