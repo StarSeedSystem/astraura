@@ -133,22 +133,36 @@ async def lifespan(app: FastAPI):
     # Re-entrena el modelo de conocimiento sobre el corpus local (starseed_memory_root)
     # en GPU local (MPS) y publica llm_delta al micelio. Loop periodico autonomo.
     try:
-        async def _llm_fed_loop():
-            from .core import llm_federated_trainer as lft
+        async def _subsystem_fed_loop():
             import asyncio as _a
+            # Worker unificado de Entrenamiento Federado 1.58-bit para TODA la IA.
+            # Rota entre subsistemas (correccion del dueno: micelio cubre voz + llm +
+            # agentes + personalidades + cerebros), priorizando la GPU local (MPS).
+            from .core import llm_federated_trainer as lft
+            from .core import subsystem_federated_trainer as sft
+            order = [
+                ("llm", lambda: lft.train_local(2, "auto", 1500)),
+                ("agent_memory", lambda: sft.train_subsystem("agent_memory", 2, "auto", 1500)),
+                ("persona_embed", lambda: sft.train_subsystem("persona_embed", 2, "auto", 600)),
+            ]
+            idx = 0
+            name, fn = order[idx]
+            await _a.to_thread(fn)
             while True:
-                try:
-                    await _a.to_thread(lft.train_local, 2, "auto", 2000)
-                except Exception as e:
-                    print(f"⚠️ [LLM-FED] loop degradó: {e}")
-                # Re-entrena cada 15 min (respetando CPU/GPU local).
-                for _ in range(900):
+                for name, fn in order:
+                    try:
+                        await _a.to_thread(fn)
+                    except Exception as e:
+                        print(f"⚠️ [SUB-FED] {name} degradó: {e}")
                     await _a.sleep(1)
-        asyncio.create_task(_llm_fed_loop())
-        print("🧠 Worker de Entrenamiento Federado del LLM 1.58-bit (micelio de conocimiento): ACTIVO")
+                # Espera entre ciclos completos (~10 min entre repeticiones de un mismo subsistema).
+                for _ in range(600):
+                    await _a.sleep(1)
+        asyncio.create_task(_subsystem_fed_loop())
+        print("🧠 Worker de Entrenamiento Federado 1.58-bit para TODA la IA (micelio de conocimiento): ACTIVO — LLM + agentes + personalidades")
     except Exception as e:
-        print(f"⚠️ No se pudo iniciar el worker de entrenamiento federado del LLM: {e}")
-    
+        print(f"⚠️ No se pudo iniciar el worker de entrenamiento federado: {e}")
+
     # 5b. Agente de Sincronización de Cerebros (vinculación automática desde
     # cualquier almacenamiento conectado en tiempo real, multi-medio).
     try:

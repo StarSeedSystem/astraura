@@ -262,9 +262,21 @@ en `app/core/llm_federated_trainer.py`:
 
 **Arranque autónomo**: el backend corre `_llm_fed_loop` (worker de fondo) que
 re-entrena cada 15 min y publica. Endpoints:
-- `POST /api/knowledge-mycelium/train-llm` (dispara entrenamiento bajo demanda)
 - `GET /api/knowledge-mycelium/llm-status` (estado de deltas en la colonia)
 
+**Worker unificado de entrenamiento federado para TODA la IA**
+(`subsystem_federated_trainer.py` + `_subsystem_fed_loop` en el startup): rota
+tres subsistemas, priorizando GPU local MPS, publicando al micelio:
+
+- `llm`: corpus `starseed_memory_root/memory_docs.json` (~47k fragmentos) → `llm_delta`.
+- `agent_memory`: corpus `data/agents_vault.json` (7 agentes) → `agent_memory`.
+- `persona_embed`: arquetipos conocidos de Astraura (9) → `persona_embed`.
+
+**Verificado en vivo (2026-08-27)**: worker arranca en startup; micelio
+`total: 9` con `voice:2, llm_delta:2, agent_memory:2, persona_embed:2, brain_state:1`.
+`POST /api/knowledge-mycelium/train-llm` → HTTP 200, `loss_final≈0.62`.
+`agent_memory` y `persona_embed` publicados (HTTP 201). Voz 1.58-bit sigue
+sirviendo WAV (HTTP 200, 43KB).
 **Verificado en vivo (2026-08-27)**: `POST /api/knowledge-mycelium/train-llm`
 → HTTP 200, `loss_final≈0.62`; `llm_delta` aparece en `astraura_voice_mesh`
 (`remote_by_kind` incluye `llm_delta:2`). El LLM participa en el aprendizaje
