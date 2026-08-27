@@ -1,0 +1,73 @@
+# =========================================================================
+# ASTRAURA 1.58-BIT — VIBEVOICE (multi-locutor TTS) → GOOGLE CLOUD RUN GPU
+# Imagen con GPU que sirve SOLO el router /api/vibevoice sobre el backend
+# Astraura. Reutiliza todo el backend y añade el fork de VibeVoice + el modelo.
+#
+# Build remoto (no hace falta Docker local):
+#   gcloud run deploy astraura-vibevoice --source . \
+#     --dockerfile backend/Dockerfile.vibevoice --region us-central1 \
+#     --gpu=1 --gpu-type=nvidia-l4 --no-cpu-throttling \
+#     --min-instances=0 --max-instances=1 --allow-unauthenticated --port 8080 \
+#     --set-env-vars="VIBEVOICE_ENABLED=1,VIBEVOICE_REPO=/opt/vibevoice,VIBEVOICE_MODEL_PATH=/opt/model,VIBEVOICE_DEVICE=cuda,ASTRAURA_AUTH_MODE=key,ASTRAURA_API_KEY=${ASTRAURA_158_KEY}"
+#
+# El modelo 1.5B (~5.5 GB fp16) se descarga en el BUILD a /opt/model (HF Hub).
+# Para 7B (mejor calidad, ~14 GB) cambia VIBEVOICE_MODEL_ID por vibevoice/VibeVoice-7B
+# y usa --gpu-type=nvidia-l4 con más memoria o nvidia-a100.
+# =========================================================================
+FROM python:3.11
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    HF_HUB_ENABLE_HF_TRANSFER=1 \
+    VIBEVOICE_ENABLED=1 \
+    VIBEVOICE_REPO=/opt/vibevoice \
+    VIBEVOICE_MODEL_PATH=/opt/model \
+    VIBEVOICE_DEVICE=cuda \
+    VIBEVOICE_MODEL_ID=vibevoice/VibeVoice-1.5B
+
+WORKDIR /app
+
+# Compiladores y libs de audio/imagen que requieren build
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential gcc g++ \
+    libxml2-dev libxslt-dev libjpeg-dev zlib1g-dev \
+    libsndfile1 ffmpeg \
+    libffi-dev libssl-dev curl ca-certificates git && \
+    rm -rf /var/lib/apt/lists/*
+
+# Dependencias del backend Astraura
+COPY backend/requirements.txt ./backend/requirements.txt
+RUN pip install --upgrade pip && pip install -r backend/requirements.txt
+
+# Dependencias de VibeVoice (fork comunidad)
+RUN pip install --upgrade \
+    torch==2.3.1 torchvision==0.18.1 --index-url https://download.pytorch.org/whl/cu121 || \
+    pip install --upgrade torch torchvision
+RUN pip install --upgrade \
+    transformers==4.45.0 \
+    accelerate \
+    soundfile librosa==0.10.2 \
+    huggingface_hub[cli] \
+    gradio==4.44.0 \
+    numpy==1.26.4
+
+# Clonar el fork de VibeVoice (commit fijado para reproducibilidad)
+RUN git clone --depth 1 https://github.com/vibevoice-community/VibeVoice /opt/vibevoice || \
+    git clone https://github.com/vibevoice-community/VibeVoice /opt/vibevoice
+
+# Descargar el modelo 1.5B en el BUILD (a /opt/model). Si la red del build
+# falla, el arranque lo reintenta en runtime (lazy) al primer /synthesize.
+RUN python -m huggingface_hub download "${VIBEVOICE_MODEL_ID}" --local-dir /opt/model --local-dir-use-symlinks False || \
+    echo "WARN: descarga de modelo en build falló; se reintentará en runtime."
+
+# Backend completo
+COPY backend/ ./backend/
+
+# En Cloud Run NO hay loopback de confianza: exige clave en las rutas sensibles.
+ENV ASTRAURA_AUTH_MODE=key
+ENV PORT=8080
+EXPOSE 8080
+
+# Arranca el backend; el router VibeVoice se monta solo si VIBEVOICE_ENABLED=1.
+CMD ["python", "backend/run_backend.py"]

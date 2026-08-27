@@ -548,6 +548,13 @@ class BitNetCppManager:
                         # Ademas es lo correcto: el kernel ternario de BitNet es de
                         # CPU (ARM NEON / AVX2); la GPU no aporta nada aqui.
                         "-ngl", "0",
+                        # (Adenda 169 · OOM en ctx largo) El KV-cache en f16 reserva
+                        # RAM anonima que escala con el contexto y produce OOM-kill
+                        # en 8 GB durante inferencias largas. Cuantizar KV a q8_0
+                        # (~la mitad de RAM que f16) da gran margen sin perder
+                        # coherencia: BitNet-b1.58-2B-4T es robusto a q8_0 en KV.
+                        "-ctk", "q8_0",
+                        "-ctv", "q8_0",
                     ]
                     log = open(self._server_log, "ab")
                     preexec = None

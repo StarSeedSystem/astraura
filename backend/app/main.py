@@ -193,6 +193,17 @@ app.include_router(voice_studio_router)
 app.include_router(starseed_bridge_router)
 app.include_router(genesis_router)
 
+# VibeVoice (Microsoft, fork comunidad): TTS multi-locutor. OPCIONAL — solo se
+# monta si VIBEVOICE_ENABLED=1 y el paquete está disponible. En CPU/8 GB sin GPU
+# no se carga (no rompe el backend). El OS cae a OmniVoice si no hay endpoint.
+if os.environ.get("VIBEVOICE_ENABLED", "0") == "1":
+    try:
+        from app.api.vibevoice import router as vibevoice_router
+        app.include_router(vibevoice_router)
+        print("[main] VibeVoice router montado (VIBEVOICE_ENABLED=1).")
+    except Exception as e:  # pragma: no cover - depende del entorno GPU
+        print(f"[main] VibeVoice NO montado: {e}")
+
 class ConnectionManager:
     def __init__(self):
         self.active_connections: List[WebSocket] = []
