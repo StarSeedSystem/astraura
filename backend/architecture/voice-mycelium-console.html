@@ -47,7 +47,7 @@
     <span class="pill"><span id="d-mesh" class="dot off"></span>Malla: <b id="v-mesh">?</b></span>
     <span class="pill"><span id="d-run" class="dot off"></span>Micelio: <b id="v-run">?</b></span>
     <span class="pill">Node: <b id="v-node">?</b></span>
-    <span class="pill">Packs locales: <b id="v-packs">0</b></span>
+    <span class="pill">Packs 1.58-bit: <b id="v-packs">0</b></span>
     <span class="pill">TTS: <b id="v-tts">?</b></span>
     <span class="pill">ASR: <b id="v-asr">?</b></span>
     <button onclick="refresh()">↻ Refrescar</button>
@@ -70,12 +70,15 @@
 <script>
 const $ = (id) => document.getElementById(id);
 const agents = [
-  {id:"trainer",  name:"🧪 Trainer 1.58-bit", role:"Entrena/optimiza voice packs (QAT + weight indexing)"},
-  {id:"mesh",     name:"🕸️ Malla P2P",        role:"Descubre y comparte voice packs con otros nodos"},
-  {id:"tts",      name:"🔊 Puente TTS",        role:"Sintetiza habla en CPU (piper / voice pack)"},
-  {id:"asr",      name:"👂 Oído ASR",          role:"Transcribe audio a texto (faster-whisper)"},
-  {id:"orchest",  name:"🧠 Orquestador",       role:"Memorias multi-plazo + agentes transformadores"},
-  {id:"harmony",  name:"🎵 Homeostasis",       role:"Modula carga y prosodia de forma simbiótica"},
+  {id:"trainer",    name:"🧪 Trainer 1.58-bit",    role:"Entrena/optimiza voice packs (QAT + weight indexing)"},
+  {id:"trainer_gpu",name:"🚀 Trainer GPU (nube)",   role:"Neurona Cloud Run: materializa voice pack 1.58-bit real"},
+  {id:"mesh",       name:"🕸️ Malla P2P",            role:"Descubre y comparte voice packs con otros nodos"},
+  {id:"tts",        name:"🔊 Puente TTS",            role:"Sintetiza habla en CPU (piper / voice pack)"},
+  {id:"asr",        name:"👂 Oído ASR",              role:"Transcribe audio a texto (faster-whisper)"},
+  {id:"datasets",   name:"📚 Datasets",              role:"Common Voice, M-AILABS, LA-Spanish, CSS10, Emilia…"},
+  {id:"orchest",    name:"🧠 Orquestador",           role:"Memorias multi-plazo + agentes transformadores"},
+  {id:"harmony",    name:"🎵 Homeostasis",           role:"Modula carga y prosodia de forma simbiótica"},
+  {id:"evolution",  name:"🌌 Evolución Colectiva",   role:"Conciencia simbiótica: packs se integran en toda la malla"},
 ];
 const logs = {};
 function boot(){
@@ -101,6 +104,8 @@ function pushLog(id, msg){
 }
 async function refresh(){
   try{
+    // Estado vivo del supervisor (segundo plano) si está disponible.
+    let sup=null; try{ sup=await fetch("/api/voice/supervisor-state").then(r=>r.json()); }catch{}
     const [m,v] = await Promise.all([
       fetch("/api/voice-mycelium/status").then(r=>r.json()),
       fetch("/api/voice/status").then(r=>r.json())
@@ -110,16 +115,27 @@ async function refresh(){
     $("v-run").textContent = m.running ? "vivo" : "parado";
     $("d-run").className = "dot " + (m.running?"ok":"off");
     $("v-node").textContent = (m.node_id||"?").slice(0,14);
-    $("v-packs").textContent = m.local_packs ?? 0;
+    const packs = (sup&&sup.voice_packs_158) ? sup.voice_packs_158.length : (m.local_packs||0);
+    $("v-packs").textContent = packs;
     $("v-tts").textContent = v.tts_piper ? "piper ✓" : (v.tts_procedural?"procedural ✓":"—");
     $("v-asr").textContent = v.asr_whisper ? "whisper ✓" : "—";
-    // actividad simulada-real de cada agente según estado
-    pushLog("trainer", m.running? "bucle de auto-mejora activo (120s)":"en espera");
-    pushLog("mesh", m.supabase_mesh? "publicando NT en astraura_voice_mesh":"modo local (sin malla)");
-    pushLog("tts", v.tts_piper? "piper listo (es_ES sharvard)":(v.tts_procedural?"procedural":"sin motor"));
-    pushLog("asr", v.asr_whisper? "escucha disponible":"ASR no instalado");
-    pushLog("orchest", "memorias: corto/medio/largo ⟨proyecto·anandas⟩");
-    pushLog("harmony", "homeostasis: latencia CPU, MOS objetivo 3.1+");
+    // Aplica estado de agentes desde el supervisor si existe.
+    const A = (sup&&sup.agents) || {};
+    agents.forEach(a=>{
+      const st=$("st-"+a.id); const ac=$("ac-"+a.id);
+      if(A[a.id]){ if(st) st.textContent=A[a.id].estado; if(ac) ac.textContent=A[a.id].actividad; }
+    });
+    if(sup){
+      pushLog("trainer", m.running? "bucle auto-mejora 120s":"en espera");
+      pushLog("trainer_gpu", (sup.voice_packs_158&&sup.voice_packs_158.length)? "pack 1.58-bit producido":"entrenando en nube…");
+      pushLog("mesh", m.supabase_mesh? "NT en astraura_voice_mesh":"modo local");
+      pushLog("tts", v.tts_piper? "piper es_ES listo":(v.tts_procedural?"procedural":"sin motor"));
+      pushLog("asr", v.asr_whisper? "escucha disponible":"ASR no instalado");
+      pushLog("datasets", (sup.datasets_prepared||[]).join(", ")||"ninguno preparado");
+      pushLog("orchest", "memorias corto/medio/largo ⟨proyecto·anandas⟩");
+      pushLog("harmony", "homeostasis: latencia CPU, MOS objetivo 3.1+");
+      pushLog("evolution", `simbiótica: ${(sup.voice_packs_158||[]).length} pack(s) en malla`);
+    }
     document.querySelectorAll(".agent").forEach(e=>e.classList.add("alive"));
   }catch(e){
     $("v-mesh").textContent="error"; pushLog("mesh","fetch falló: "+e.message);

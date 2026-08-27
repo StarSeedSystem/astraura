@@ -3747,6 +3747,19 @@ async def api_voice_train(request: Request):
         return {"error": str(e)}
 
 
+# Estado vivo del supervisor del micelio (consume la consola visual).
+@app.get("/api/voice/supervisor-state")
+async def api_voice_supervisor_state():
+    from pathlib import Path
+    f = Path(__file__).resolve().parent.parent / "data" / "voice_mycelium" / "supervisor_state.json"
+    try:
+        if f.exists():
+            return Response(content=f.read_text(encoding="utf-8"), media_type="application/json")
+    except Exception:
+        pass
+    return {"agents": {}, "voice_packs_158": [], "datasets_prepared": []}
+
+
 class MeshJoinRequest(BaseModel):
     url_publica: Optional[str] = None
 
