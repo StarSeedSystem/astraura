@@ -3727,6 +3727,26 @@ async def api_voice_mycelium_console():
         return Response(content=f"<pre>error: {e}</pre>", media_type="text/html")
 
 
+# Preparación de dataset para entrenar un voice pack 1.58-bit (enganche B).
+# Recibe una carpeta local de muestras y normaliza a 24 kHz mono. El entrenamiento
+# QAT real se delega a un nodo GPU de la malla cuando hay torch; aquí dejamos el
+# dataset listo. Ver app/core/trainer_bittts.py.
+@app.post("/api/voice/train")
+async def api_voice_train(request: Request):
+    try:
+        from .core.trainer_bittts import prepare_dataset
+        body = await request.json()
+        src = body.get("src") or ""
+        lang = body.get("lang") or "es"
+        speaker = body.get("speaker") or "Speaker-0"
+        if not src:
+            return {"error": "falta 'src' (carpeta local de muestras .wav/.flac)"}
+        summary = prepare_dataset(src, lang=lang, speaker=speaker)
+        return {"ok": True, "summary": summary}
+    except Exception as e:
+        return {"error": str(e)}
+
+
 class MeshJoinRequest(BaseModel):
     url_publica: Optional[str] = None
 

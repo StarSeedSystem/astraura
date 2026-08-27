@@ -143,3 +143,41 @@ multiagéntico orquestado:
 - EnCodec (Meta), SpeechTokenizer, U-Codec (5 Hz, 2025).
 - Malla del OS: `src/ai/astraura/mesh/{federation,server-relay,synaptic,privacy,codec}.ts`.
 - `bitnet_cpp_manager.py` (backend, LLM 1.58-bit local).
+
+## 10. Datasets de voz para entrenar voice packs 1.58-bit (investigación multiagente 2026-08-26)
+
+Subagente de investigación web encontró 15 datasets abiertos. Prioridad para
+StarSeed: español + multilingüe + licencia libre + multi-speaker. Script de
+descarga: `app/core/download_voice_datasets.py`.
+
+| Dataset | Idioma(s) | Licencia | Multi-spk / Estilos | Uso |
+|---|---|---|---|---|
+| Mozilla Common Voice 14 | 112 (es,fr,de,pt,zh,ja…) | CC0 | Sí / neutro+convers | train+ref |
+| M-AILABS | en,es,fr,de,it,uk,ru,pl | Public Domain | Sí (F/M) / narración | train |
+| CSS10 | 10 (es,de,fr,ja,zh…) | CC0 | No (1/spk) / neutro | clonación |
+| Google LA-Spanish (OpenSLR 61/71/72/73/74/75) | es-AR,CL,CO,PE,PR,VE | CC BY-SA 4.0 | Sí (F/M) | train |
+| Multilingual LibriSpeech (MLS) | 8 (es,fr,de,it,pt,nl,pl,en) | CC BY 4.0 | Sí / narración | train |
+| Emilia / Emilia-Large | en,zh,de,fr,ja,ko | CC BY-NC (+YODAS CC BY) | Sí / in-the-wild | train grande |
+| LJSpeech | en | Public Domain | No / neutro | benchmark |
+| VCTK | en | CC BY 4.0 | Sí (110 spk) | multi-spk |
+| LibriTTS | en | CC BY 4.0 | Sí / narración | train |
+| EmoV-DB | en | MIT-like | 4 spk / emocional | referencia |
+| RAVDESS | en | CC BY-NC-SA | 24 act / 8 emociones | referencia |
+| EMOVOME | es | CC BY 4.0 | 100 spk / emocional ES | referencia ES |
+| Expresso | en | CC BY-NC | 4 spk × 26 estilos | referencia estilo |
+| Piper voices | ~30 idiomas | CC0 | preentrenados VITS | finetune/clonar |
+| Coqui XTTS-v2 | 17 idiomas | CPML (no-comercial) | zero-shot cloning | referencia |
+
+**Recomendados para arrancar (B):**
+1. Common Voice 14 (es) — CC0, masivo, base gratuita.
+2. M-AILABS es_ES — 108h PD, F/M, voice pack ES.
+3. Google LA-Spanish — dialectos ES multi-spk (CC BY-SA).
+4. Multilingual LibriSpeech (es/fr/de/pt) — CC BY 4.0.
+5. CSS10 es — CC0 single-spk, clonación de personalidad limpia.
+6. Piper voices es_ES — VITS CC0 listos para finetune/clonar.
+7. EMOVOME — emoción en ES (CC BY 4.0).
+8. Emilia (YODAS CC BY) — escala masiva multilingüe.
+
+Nota: Emilia/RAVDESS/Expresso son NC (no comercial) → solo experimentación
+local; el micelio filtra su difusión si hay fines comerciales.
+
