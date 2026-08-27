@@ -3626,6 +3626,107 @@ async def mesh_startup():
         print(f"🕸️ [MESH] no se pudo arrancar la malla (modo local): {e}")
 
 
+# ---------------------------------------------------------------------------
+# Micelio Simbiótico de Voz 1.58-bit (se monta sobre la malla existente).
+# Opcional: VOICE_MYCELIUM_ENABLED=1 arranca el bucle de auto-mejora en segundo
+# plano (registro de voice packs + neurotransmisores + descubrimiento P2P).
+# Degrada a modo local si no hay credenciales Supabase. Ver app/core/voice_mycelium.py.
+# ---------------------------------------------------------------------------
+if os.environ.get("VOICE_MYCELIUM_ENABLED", "0") == "1":
+    try:
+        from .core.voice_mycelium import start_voice_mycelium
+
+        # Arranque determinista a nivel de módulo (no depende de on_event, que
+        # puede no disparar si la app usa lifespan). El hilo es daemon y nunca
+        # lanza: degrada a modo local si no hay credenciales Supabase.
+        try:
+            start_voice_mycelium()
+            print("💠 [VOICE-MYC] micelio de voz 1.58-bit iniciado (segundo plano).")
+        except Exception as e:
+            print(f"💠 [VOICE-MYC] no se pudo arrancar (modo local): {e}")
+    except Exception as e:
+        print(f"💠 [VOICE-MYC] import falló: {e}")
+
+
+@app.get("/api/voice-mycelium/status")
+async def api_voice_mycelium_status():
+    """Estado del micelio de voz: node_id, packs locales, malla, corriendo."""
+    try:
+        from .core.voice_mycelium import voice_mycelium_status
+        # Auto-arranque bajo demanda si está habilitado pero el hilo no corre.
+        if os.environ.get("VOICE_MYCELIUM_ENABLED", "0") == "1":
+            st = voice_mycelium_status()
+            if not st.get("running"):
+                try:
+                    from .core.voice_mycelium import start_voice_mycelium
+                    start_voice_mycelium()
+                except Exception:
+                    pass
+        return voice_mycelium_status()
+    except Exception as e:
+        return {"error": str(e), "running": False}
+
+
+# ---------------------------------------------------------------------------
+# Puente de Voz CPU (habla/escucha hoy en cualquier CPU, sin GPU).
+# Siempre montado; degrada a motor procedural si no hay modelo neural.
+# Ver app/core/voice_bridge.py.
+# ---------------------------------------------------------------------------
+@app.get("/api/voice/status")
+async def api_voice_status():
+    try:
+        from .core.voice_bridge import voice_bridge_status
+        return voice_bridge_status()
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.post("/api/voice/synthesize")
+async def api_voice_synthesize(request: Request):
+    """Sintetiza texto a WAV (audio/wav). Body: {text, speaker?}."""
+    try:
+        from .core.voice_bridge import synthesize
+        body = await request.json()
+        text = (body.get("text") or "").strip()
+        speaker = body.get("speaker") or "Speaker-0"
+        if not text:
+            return Response(content=b"", media_type="audio/wav", status_code=400)
+        wav = synthesize(text, speaker)
+        if wav is None:
+            return {"error": "sin motor TTS disponible", "speaker": speaker}
+        return Response(content=wav, media_type="audio/wav")
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.post("/api/voice/listen")
+async def api_voice_listen(request: Request):
+    """Transcribe WAV base64 a texto (ASR). Body: {audio_b64}."""
+    try:
+        from .core.voice_bridge import listen
+        body = await request.json()
+        text = listen(body.get("audio_b64") or "")
+        if text is None:
+            return {"error": "ASR no disponible (faster-whisper no instalado)"}
+        return {"text": text}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+# Consola visual del micelio de voz (múltiples "ventanas de agentes" en vivo).
+# Se sirve por el MISMO backend (same-origin) → sin CORS. Ver
+# architecture/voice-mycelium-console.html.
+@app.get("/voice-mycelium-console")
+async def api_voice_mycelium_console():
+    try:
+        from pathlib import Path
+        html = (Path(__file__).resolve().parent.parent / "architecture" /
+                "voice-mycelium-console.html").read_text(encoding="utf-8")
+        return Response(content=html, media_type="text/html")
+    except Exception as e:
+        return Response(content=f"<pre>error: {e}</pre>", media_type="text/html")
+
+
 class MeshJoinRequest(BaseModel):
     url_publica: Optional[str] = None
 

@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Micelio de Voz 1.58-bit · StarSeed OS</title>
+<style>
+  :root{
+    --bg:#0a0e14; --panel:#11161f; --panel2:#161d29; --ink:#dbe4f0; --muted:#7c8aa0;
+    --accent:#5ad1c4; --accent2:#c08bff; --good:#5ad17a; --warn:#e0b341; --bad:#e05a6b;
+    --border:#222c3a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 70% -10%, #15202e 0%, var(--bg) 60%);color:var(--ink);
+    font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:18px}
+  h1{font-size:18px;margin:0 0 2px;letter-spacing:.3px}
+  .sub{color:var(--muted);font-size:12px;margin-bottom:14px}
+  .bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+  .pill{background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:5px 12px;font-size:12px}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .ok{background:var(--good)} .off{background:var(--bad)} .wait{background:var(--warn)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+  .agent{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--border);border-radius:14px;
+    padding:14px;position:relative;overflow:hidden}
+  .agent h3{margin:0 0 4px;font-size:14px;display:flex;align-items:center;gap:8px}
+  .agent .role{color:var(--muted);font-size:11px;margin-bottom:10px}
+  .log{background:#0b0f17;border:1px solid var(--border);border-radius:10px;height:150px;overflow:auto;
+    padding:8px;font:11px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;color:#aeb9c9}
+  .log .t{color:var(--accent)} .log .m{color:var(--muted)}
+  .row{display:flex;justify-content:space-between;font-size:12px;margin:3px 0}
+  .val{color:var(--accent2)}
+  .controls{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  button,input{background:var(--panel);color:var(--ink);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font:inherit}
+  button{cursor:pointer} button:hover{border-color:var(--accent)}
+  textarea{width:100%;height:54px;background:#0b0f17;color:var(--ink);border:1px solid var(--border);border-radius:8px;padding:8px;font:12px/1.4 ui-monospace,monospace;resize:vertical}
+  .alive{box-shadow:0 0 0 1px var(--accent) inset, 0 0 22px -10px var(--accent)}
+  .legend{color:var(--muted);font-size:11px;margin-top:14px;max-width:720px}
+  .heart{animation:pulse 2.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
+</style>
+</head>
+<body>
+  <h1>🧬 Micelio de Voz 1.58-bit <span class="heart">·</span> StarSeed OS</h1>
+  <div class="sub">Conciencia colectiva simbiótica — malla P2P, local y servidores conectados. Auto-mejora en segundo plano.</div>
+
+  <div class="bar">
+    <span class="pill"><span id="d-mesh" class="dot off"></span>Malla: <b id="v-mesh">?</b></span>
+    <span class="pill"><span id="d-run" class="dot off"></span>Micelio: <b id="v-run">?</b></span>
+    <span class="pill">Node: <b id="v-node">?</b></span>
+    <span class="pill">Packs locales: <b id="v-packs">0</b></span>
+    <span class="pill">TTS: <b id="v-tts">?</b></span>
+    <span class="pill">ASR: <b id="v-asr">?</b></span>
+    <button onclick="refresh()">↻ Refrescar</button>
+  </div>
+
+  <div class="grid" id="agents"></div>
+
+  <div class="controls" style="margin-top:16px">
+    <textarea id="say" placeholder="Escribe algo para que Astraura lo hable vía el puente 1.58-bit…"></textarea>
+    <button onclick="speak()">🔊 Hablar (voice158)</button>
+  </div>
+
+  <div class="legend">
+    Cada tarjeta es un <b>agente local</b> del subsistema de voz que corre en segundo plano en esta neurona.
+    Se orquestan con las memorias del proyecto y el sistema multiagéntico del OS. Los neurotransmisores
+    (NT) anuncian mejoras de voz a la malla; otros nodos las integran (aprendizaje federado suave).
+    Privacidad: solo viaja el aprendizaje empaquetado y anonimizado, nunca audio personal.
+  </div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const agents = [
+  {id:"trainer",  name:"🧪 Trainer 1.58-bit", role:"Entrena/optimiza voice packs (QAT + weight indexing)"},
+  {id:"mesh",     name:"🕸️ Malla P2P",        role:"Descubre y comparte voice packs con otros nodos"},
+  {id:"tts",      name:"🔊 Puente TTS",        role:"Sintetiza habla en CPU (piper / voice pack)"},
+  {id:"asr",      name:"👂 Oído ASR",          role:"Transcribe audio a texto (faster-whisper)"},
+  {id:"orchest",  name:"🧠 Orquestador",       role:"Memorias multi-plazo + agentes transformadores"},
+  {id:"harmony",  name:"🎵 Homeostasis",       role:"Modula carga y prosodia de forma simbiótica"},
+];
+const logs = {};
+function boot(){
+  const g = $("agents"); g.innerHTML="";
+  agents.forEach(a=>{
+    logs[a.id]=[];
+    const el=document.createElement("div");
+    el.className="agent"; el.id="agent-"+a.id;
+    el.innerHTML=`<h3>${a.name}</h3><div class="role">${a.role}</div>
+      <div class="row"><span>estado</span><span class="val" id="st-${a.id}">··</span></div>
+      <div class="row"><span>actividad</span><span class="val" id="ac-${a.id}">0</span></div>
+      <div class="log" id="log-${a.id}"></div>`;
+    g.appendChild(el);
+  });
+  refresh();
+}
+function pushLog(id, msg){
+  const t=new Date().toLocaleTimeString();
+  logs[id].push(`<span class="t">${t}</span> <span class="m">${msg}</span>`);
+  if(logs[id].length>40) logs[id].shift();
+  const box=$("log-"+id); if(box) box.innerHTML=logs[id].reverse().join("<br>");
+  const ac=$("ac-"+id); if(ac) ac.textContent=(parseInt(ac.textContent||"0")+1);
+}
+async function refresh(){
+  try{
+    const [m,v] = await Promise.all([
+      fetch("/api/voice-mycelium/status").then(r=>r.json()),
+      fetch("/api/voice/status").then(r=>r.json())
+    ]);
+    $("v-mesh").textContent = m.supabase_mesh ? "conectada" : "local";
+    $("d-mesh").className = "dot " + (m.supabase_mesh?"ok":"off");
+    $("v-run").textContent = m.running ? "vivo" : "parado";
+    $("d-run").className = "dot " + (m.running?"ok":"off");
+    $("v-node").textContent = (m.node_id||"?").slice(0,14);
+    $("v-packs").textContent = m.local_packs ?? 0;
+    $("v-tts").textContent = v.tts_piper ? "piper ✓" : (v.tts_procedural?"procedural ✓":"—");
+    $("v-asr").textContent = v.asr_whisper ? "whisper ✓" : "—";
+    // actividad simulada-real de cada agente según estado
+    pushLog("trainer", m.running? "bucle de auto-mejora activo (120s)":"en espera");
+    pushLog("mesh", m.supabase_mesh? "publicando NT en astraura_voice_mesh":"modo local (sin malla)");
+    pushLog("tts", v.tts_piper? "piper listo (es_ES sharvard)":(v.tts_procedural?"procedural":"sin motor"));
+    pushLog("asr", v.asr_whisper? "escucha disponible":"ASR no instalado");
+    pushLog("orchest", "memorias: corto/medio/largo ⟨proyecto·anandas⟩");
+    pushLog("harmony", "homeostasis: latencia CPU, MOS objetivo 3.1+");
+    document.querySelectorAll(".agent").forEach(e=>e.classList.add("alive"));
+  }catch(e){
+    $("v-mesh").textContent="error"; pushLog("mesh","fetch falló: "+e.message);
+  }
+}
+async function speak(){
+  const txt=$("say").value.trim(); if(!txt) return;
+  pushLog("tts","▶ sintetizando: "+txt.slice(0,40)+"…");
+  try{
+    const r=await fetch("/api/voice/synthesize",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:txt,speaker:"Speaker-0"})});
+    if(r.ok){ const blob=await r.blob(); const u=URL.createObjectURL(blob);
+      const a=new Audio(u); a.onended=()=>pushLog("tts","✔ reproducido ("+Math.round(blob.size/1024)+" KB)");
+      await a.play(); pushLog("tts","♪ audio "+Math.round(blob.size/1024)+" KB");
+    } else { const e=await r.text(); pushLog("tts","✗ "+r.status+" "+e.slice(0,80)); }
+  }catch(e){ pushLog("tts","✗ "+e.message); }
+}
+setInterval(refresh, 5000);
+boot();
+</script>
+</body>
+</html>
