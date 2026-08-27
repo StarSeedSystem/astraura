@@ -66,6 +66,51 @@ class BitNetCppManager:
         # ASTRAURA_BITNET_PAR.
         self.server_parallel = max(1, int(os.environ.get("ASTRAURA_BITNET_PAR") or self._parallel_segun_hardware()))
         self._server_lock = threading.Lock()  # un solo spawn aunque llamen N corrutinas a la vez
+
+        # (Adenda 169 · SUPERVISOR KEEP-ALIVE) En 8 GB el llama-server BitNet nativo
+        # muere tras servir 1-2 inferencias (bug "cleaning up before exit" de
+        # bitnet.cpp en ARM). Para que el motor nativo esté casi siempre listo
+        # (y el chat no caiga a Ollama por timing de recarga), un hilo daemon
+        # vigila los servers gestionados y los RELANZA INMEDIATAMENTE al morir.
+        self._supervisor_stop = threading.Event()
+        self._supervisor_thread = threading.Thread(
+            target=self._supervisor_loop, name="bitnet-keepalive", daemon=True
+        )
+        self._supervisor_thread.start()
+
+    def _supervisor_loop(self) -> None:
+        """Relanza servers nativos muertos cada pocos segundos (keep-alive)."""
+        while not self._supervisor_stop.is_set():
+            try:
+                if not self._servidor_compartido():
+                    perfiles = ("interactive", "background")
+                else:
+                    perfiles = ("interactive",)  # shared: un solo server
+                for perfil in perfiles:
+                    st = self._servers.get(perfil, {})
+                    proc = st.get("proc")
+                    # ¿El proc existe y está vivo?
+                    vivo = proc is not None and proc.poll() is None
+                    if vivo:
+                        # Sondee rápido: si el server responde 200, OK; si no, relanza.
+                        try:
+                            with urllib.request.urlopen(
+                                f"http://127.0.0.1:{self._port_for(perfil)}/health", timeout=2
+                            ) as r:
+                                if r.status == 200:
+                                    continue  # sano, no tocar
+                        except Exception:
+                            pass  # no responde -> relanzar abajo
+                    # Muerto o colgado -> relanzar (sin bloquear el chat: _launching protege)
+                    if not st.get("_launching"):
+                        try:
+                            self.ensure_server(30.0, perfil)
+                        except Exception:
+                            pass
+            except Exception:
+                pass
+            # Espera corta entre ciclos (no saturar la CPU)
+            self._supervisor_stop.wait(5.0)
         
     def _ctx_segun_ram(self) -> int:
         """
