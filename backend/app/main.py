@@ -128,6 +128,26 @@ async def lifespan(app: FastAPI):
     asyncio.create_task(intuitive_imagination_engine.start_background_loop())
     asyncio.create_task(swarm_manager.start_scheduler_loop())
     asyncio.create_task(storage_routing_engine.start_watcher_loop())
+
+    # 5a. Entrenamiento federado LOCAL del LLM 1.58-bit (micelio de conocimiento).
+    # Re-entrena el modelo de conocimiento sobre el corpus local (starseed_memory_root)
+    # en GPU local (MPS) y publica llm_delta al micelio. Loop periodico autonomo.
+    try:
+        async def _llm_fed_loop():
+            from .core import llm_federated_trainer as lft
+            import asyncio as _a
+            while True:
+                try:
+                    await _a.to_thread(lft.train_local, 2, "auto", 2000)
+                except Exception as e:
+                    print(f"⚠️ [LLM-FED] loop degradó: {e}")
+                # Re-entrena cada 15 min (respetando CPU/GPU local).
+                for _ in range(900):
+                    await _a.sleep(1)
+        asyncio.create_task(_llm_fed_loop())
+        print("🧠 Worker de Entrenamiento Federado del LLM 1.58-bit (micelio de conocimiento): ACTIVO")
+    except Exception as e:
+        print(f"⚠️ No se pudo iniciar el worker de entrenamiento federado del LLM: {e}")
     
     # 5b. Agente de Sincronización de Cerebros (vinculación automática desde
     # cualquier almacenamiento conectado en tiempo real, multi-medio).
@@ -3712,6 +3732,44 @@ async def api_knowledge_mycelium_push(request: Request):
         return {"ok": True, "pack": pack}
     except Exception as e:
         return {"ok": False, "error": str(e)}
+
+
+@app.post("/api/knowledge-mycelium/train-llm")
+async def api_knowledge_mycelium_train_llm(request: Request):
+    """Dispara el entrenamiento federado LOCAL del LLM 1.58-bit (micelio de conocimiento).
+
+    Entrena el modelo de conocimiento sobre el corpus local (starseed_memory_root)
+    en GPU local (MPS) y publica llm_delta al micelio. Body opcional:
+    {epochs?, max_items?, device?}. Best-effort.
+    """
+    try:
+        from .core import llm_federated_trainer as lft
+        import asyncio
+        body = await request.json()
+        epochs = int(body.get("epochs", 2) or 2)
+        max_items = int(body.get("max_items", 2000) or 2000)
+        device = body.get("device") or "auto"
+        res = await asyncio.to_thread(lft.train_local, epochs, device, max_items)
+        return {"ok": True, "result": res}
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
+
+
+@app.get("/api/knowledge-mycelium/llm-status")
+async def api_knowledge_mycelium_llm_status():
+    """Estado del entrenamiento federado del LLM (deltas en la colonia)."""
+    try:
+        # mesh_network es la instancia global ya importada en main.py.
+        fed = mesh_network.federated_status()
+        from .core import knowledge_mycelium as km
+        llm_packs = km.pull_knowledge_packs(kind="llm_delta")
+        return {
+            "federated": fed,
+            "llm_delta_packs_in_malla": len(llm_packs),
+            "llm_delta_ids": [p.get("id") for p in llm_packs[-5:]],
+        }
+    except Exception as e:
+        return {"error": str(e)}
 
 
 # ---------------------------------------------------------------------------

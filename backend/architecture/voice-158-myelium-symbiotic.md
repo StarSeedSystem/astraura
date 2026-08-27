@@ -246,9 +246,27 @@ CREATE POLICY astraura_voice_mesh_anon_read ON public.astraura_voice_mesh
     FOR SELECT TO anon, authenticated USING (true);
 ```
 
-### 11.3 Difusión P2P (sin Supabase)
-Mientras la tabla no exista, las neuronas se descubren vía
-`POST /api/knowledge-mycelium/push` (cada neurona empuja su estado de micelio a
-las demás por HTTP). El `mesh_network` ya gestiona nodos y heartbeats; el
-micelio de conocimiento reusa ese canal para la señalización ligera.
+### 11.4 Entrenamiento federado autónomo del LLM (micelio de conocimiento)
+El LLM de Astraura **entrena y comparte conocimiento** de forma simbiótica
+(corrección del dueño: el micelio cubre TODA la IA, no solo voz). Implementado
+en `app/core/llm_federated_trainer.py`:
+
+- Carga el corpus local de conocimiento (`data/starseed_memory_root/memory_docs.json`,
+  ~47k fragmentos) y entrena un modelo ligero (EmbeddingBag + MLP) en **GPU local
+  MPS** (prioridad local, sin cuotas externas).
+- Cuantiza los pesos a ternario 1.58-bit (weight indexing, igual que voice158).
+- Publica `llm_delta` al micelio vía `register_llm_delta()` (POST directo a
+  `astraura_voice_mesh`).
+- Integra deltas remotos de la colonia vía `mesh_network.apply_federated_updates`
+  (votación por mayoría de pesos ternarios).
+
+**Arranque autónomo**: el backend corre `_llm_fed_loop` (worker de fondo) que
+re-entrena cada 15 min y publica. Endpoints:
+- `POST /api/knowledge-mycelium/train-llm` (dispara entrenamiento bajo demanda)
+- `GET /api/knowledge-mycelium/llm-status` (estado de deltas en la colonia)
+
+**Verificado en vivo (2026-08-27)**: `POST /api/knowledge-mycelium/train-llm`
+→ HTTP 200, `loss_final≈0.62`; `llm_delta` aparece en `astraura_voice_mesh`
+(`remote_by_kind` incluye `llm_delta:2`). El LLM participa en el aprendizaje
+colectivo de la colonia StarSeed.
 
