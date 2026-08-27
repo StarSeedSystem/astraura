@@ -199,3 +199,62 @@ descarga: `app/core/download_voice_datasets.py`.
 Nota: Emilia/RAVDESS/Expresso son NC (no comercial) → solo experimentación
 local; el micelio filtra su difusión si hay fines comerciales.
 
+## 11. Estado de despliegue del micelio (2026-08-27)
+
+### 11.1 Lo verificado en vivo ✅
+- **Voice pack 1.58-bit REAL**: entrenado en GPU local (Apple M1, Metal/MPS),
+  inferencia produce WAV 24 kHz mono válido (RMS activo). `voice_bridge`
+  prioriza el pack 1.58-bit antes que piper; `/api/voice/synthesize` sirve el
+  WAV cuantizado (HTTP 200, ~1.65 s).
+- **Micelio de CONOCIMIENTO 1.58-bit GENERAL** (`app/core/knowledge_mycelium.py`):
+  cubre voz + LLM + agentes + personalidades + cerebros, diferenciados por
+  `kind`. El LLM participa vía `register_llm_delta()` cableado en
+  `mesh_network.collect_federated_delta` (cada delta federado ternario del LLM
+  se anuncia al micelio). Endpoints: `GET /api/knowledge-mycelium/status`,
+  `POST /api/knowledge-mycelium/push` (difusión P2P entre neuronas).
+- **Offline-first / soberano**: los packs se registran y anuncian localmente
+  sin depender de servicios externos (diseño de privacidad del OS).
+
+### 11.2 Bloqueo conocido: tabla `astraura_voice_mesh` en Supabase
+La tabla del Neural Tissue **NO existe aún** en el proyecto Supabase del OS
+(verificado: `GET /rest/v1/astraura_voice_mesh` → 404 PGRST205). Por eso los
+`push_state` devolvían HTTP 200 pero eran no-op (la tabla no existía). El
+descubrimiento cruzado EN LA NUBE requiere crear la tabla.
+
+**Cómo crearla** (una vez, con service_role o en el dashboard):
+- Script listo: `data/voice_mycelium/create_mesh_table.py` (intenta vía
+  `/rest/v1/sql`; si el proyecto lo tiene deshabilitado, imprime el SQL para
+  pegar en el SQL Editor de Supabase).
+- O pegar este SQL en Supabase → SQL Editor → Run:
+
+```sql
+CREATE TABLE IF NOT EXISTS public.astraura_voice_mesh (
+    id          text PRIMARY KEY,
+    kind        text NOT NULL DEFAULT 'nt',
+    node_id     text,
+    speaker     text,
+    version     int,
+    mos         real,
+    mb          real,
+    hash        text,
+    b64         text,
+    meta        jsonb,
+    updated_at  timestamptz DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS astraura_voice_mesh_kind_idx ON public.astraura_voice_mesh (kind);
+ALTER TABLE public.astraura_voice_mesh ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS astraura_voice_mesh_anon_read ON public.astraura_voice_mesh;
+CREATE POLICY astraura_voice_mesh_anon_read ON public.astraura_voice_mesh
+    FOR SELECT TO anon, authenticated USING (true);
+```
+
+Una vez creada, el micelio se descubre automáticamente entre nodos en la nube
+(`_pull_rows` lee todas las filas con service_role; `pull_knowledge_packs`
+filtra por `kind`).
+
+### 11.3 Difusión P2P (sin Supabase)
+Mientras la tabla no exista, las neuronas se descubren vía
+`POST /api/knowledge-mycelium/push` (cada neurona empuja su estado de micelio a
+las demás por HTTP). El `mesh_network` ya gestiona nodos y heartbeats; el
+micelio de conocimiento reusa ese canal para la señalización ligera.
+

@@ -3690,6 +3690,30 @@ async def api_knowledge_mycelium_status():
         return {"error": str(e), "running": False}
 
 
+@app.post("/api/knowledge-mycelium/push")
+async def api_knowledge_mycelium_push(request: Request):
+    """Recibe un knowledge pack de un peer (difusión P2P entre neuronas).
+
+    Permite el descubrimiento simbiótico del micelio SIN depender de Supabase:
+    cada neurona puede empujar su estado de micelio a las demás vía este endpoint.
+    Body: {kind, speaker, version, mb, meta}. Best-effort (degrada silenciosamente).
+    """
+    try:
+        from .core.knowledge_mycelium import register_knowledge_pack
+        body = await request.json()
+        kind = body.get("kind")
+        speaker = body.get("speaker") or body.get("id") or "peer"
+        version = int(body.get("version", 1) or 1)
+        mb = float(body.get("mb", 0.0) or 0.0)
+        meta = body.get("meta") or {}
+        if not kind:
+            return {"ok": False, "error": "falta 'kind'"}
+        pack = register_knowledge_pack(kind, speaker, version, mb=mb, meta=meta)
+        return {"ok": True, "pack": pack}
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
+
+
 # ---------------------------------------------------------------------------
 # Puente de Voz CPU (habla/escucha hoy en cualquier CPU, sin GPU).
 # Siempre montado; degrada a motor procedural si no hay modelo neural.

@@ -71,13 +71,40 @@ def _emit_knowledge_nt(kind: str, kid: str, version: int, mb: float, meta: Dict[
         logger.debug(f"💠 [KNOW-MYC] NT no emitido (degradación): {e}")
 
 
+def _pull_rows(limit: int = 200) -> List[Dict[str, Any]]:
+    """Lee TODAS las filas del Neural Tissue (tabla astraura_voice_mesh) con service_role.
+
+    El micelio almacena cada neurotransmisor como una fila (upsert por id), no
+    como key-value. Por tanto el descubrimiento cruzado debe listar filas, no
+    usar pull_state(key) (que es key-value y no aplica aqui).
+    """
+    try:
+        from app.core import supabase_sync as s
+        creds = s._load_creds()
+        if not creds:
+            return []
+        import requests
+        rest = creds["supabase_url"].rstrip("/") + "/rest/v1"
+        key = creds["service_role_key"]
+        headers = {"apikey": key, "Authorization": f"Bearer {key}",
+                   "Accept": "application/json"}
+        r = requests.get(f"{rest}/{SUPABASE_TABLE}?select=*&order=updated_at.desc&limit={limit}",
+                         headers=headers, timeout=30)
+        if r.ok:
+            return r.json() or []
+        return []
+    except Exception as e:  # pragma: no cover
+        logger.debug(f"💠 [KNOW-MYC] pull_rows degradó: {e}")
+        return []
+
+
 def knowledge_mycelium_status() -> Dict[str, Any]:
     """Estado del micelio de conocimiento 1.58-bit (todos los subsistemas)."""
     by_kind: Dict[str, int] = {}
     for p in list_local_packs():
         k = p.get("kind", "voice")
         by_kind[k] = by_kind.get(k, 0) + 1
-    remote = discover_remote_packs()
+    remote = _pull_rows()
     remote_by_kind: Dict[str, int] = {}
     for r in remote:
         k = r.get("kind", "voice")
@@ -168,13 +195,11 @@ def stop_knowledge_mycelium() -> None:
 def pull_knowledge_packs(kind: Optional[str] = None, limit: int = 50) -> List[Dict[str, Any]]:
     """Descarga knowledge packs del micelio (opcionalmente filtrado por subsistema).
 
-    Reutiliza el canal de descubrimiento del micelio de voz (que ya funciona),
-    pero sin restringir a kind='nt' — así cubre TODA la IA.
+    Lee todas las filas del Neural Tissue (no key-value) y filtra por KIND,
+    cubriendo TODA la IA (voice + llm_delta + agent_memory + persona_embed + brain_state).
     """
     try:
-        rows = discover_remote_packs()
-        if not isinstance(rows, list):
-            rows = []
+        rows = _pull_rows(limit=limit * 4)
     except Exception:
         rows = []
     out = []

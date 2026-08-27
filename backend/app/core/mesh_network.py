@@ -570,6 +570,19 @@ class MeshNetwork:
                 "total_pesos_delta": entry["num_weights"],
             }
             self._supabase_upsert_federado(resumen)
+            # Conecta el LLM al micelio de CONOCIMIENTO 1.58-bit (corrección del
+            # dueno: el micelio cubre TODA la IA, no solo voz). Publica el delta
+            # ternario del LLM como knowledge pack 'llm_delta' en el Neural Tissue.
+            # Es best-effort: si la tabla no existe aun, degrada silenciosamente.
+            try:
+                from .knowledge_mycelium import register_llm_delta
+                register_llm_delta(
+                    epoch=len(self.federated_deltas),
+                    mb=round(entry["num_weights"] * 2 / 8 / 1024 / 1024, 6),  # ~2 bits/peso
+                    layers=len(entry.get("weights", {})),
+                )
+            except Exception:
+                pass
             return {"ok": True, "deltas_almacenados": len(self.federated_deltas)}
         except Exception as e:
             return {"ok": False, "error": str(e)}
