@@ -19,6 +19,24 @@ la integran en su siguiente re-entreno local. El *mismo* sustrato 1.58-bit
 (pesos ternarios `{-1,0,1}`) que corre el LLM en CPU corre también el TTS,
 permitiendo **la mayor cantidad de sub-agentes posibles** en hardware modesto.
 
+> **⚠️ CORRECCIÓN DE ALCANCE (2026-08-27):** el micelio NO es solo de voz.
+> El dueño aclaró: *"el micelio y el entrenamiento del conocimiento debe ser para
+> todos los sistemas, incluyendo aparte de la voz el sistema LLM de toda la IA de
+> Astraura 1.58-bit en todas sus funciones"*. Por tanto el micelio es de
+> **CONOCIMIENTO 1.58-bit SIMBIÓTICO para TODA la IA**, no un órgano aislado.
+>
+> Implementado en `app/core/knowledge_mycelium.py`: un micelio general que publica
+> y descubre knowledge packs de CUALQUIER subsistema, diferenciados por `kind`:
+> `voice` (TTS cuantizado), `llm_delta` (delta de peso ternario del LLM —
+> aprendizaje federado), `agent_memory` (memoria de trabajo comprimida de un
+> agente), `persona_embed` (embedding de personalidad/arquetipo) y `brain_state`
+> (estado de conocimiento de un cerebro). Todos usan el MISMO Neural Tissue
+> (`astraura_voice_mesh` en Supabase + NT local) que el micelio de voz, y el MISMO
+> sustrato ternario `{-1,0,1}` (weight indexing). El LLM participa vía
+> `register_llm_delta()` tras cada entrenamiento federado; los agentes y
+> personalidades vía `register_agent_memory()` / `register_persona_embed()`.
+> Endpoint en vivo: `GET /api/knowledge-mycelium/status`.
+
 ## 1. El sustrato 1.58-bit como "suelo común" multiagente
 
 - BitNet b1.58 (arXiv:2402.17764) usa matmul ternario `I2_S`: `-1→00, 0→01,

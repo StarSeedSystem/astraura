@@ -85,16 +85,25 @@ def voice_bridge_status() -> Dict[str, Any]:
 # TTS: sintetizar texto -> WAV
 # ---------------------------------------------------------------------------
 def synthesize(text: str, speaker: str = DEFAULT_SPEAKER) -> Optional[bytes]:
-    """Produce WAV para `text`. Prioriza voice pack 1.58-bit del micelio,
-    luego piper, luego motor procedural del OS. Devuelve None si nada disponible.
+    """Produce WAV para `text`. Prioridad:
+      1) Voice pack 1.58-bit del micelio (modelo cuantizado REAL, inferencia local).
+      2) piper-tts (neural ligero en CPU).
+      3) Motor procedural del OS (formantes).
+      Devuelve None si nada disponible. NUNCA lanza.
     """
     text = (text or "").strip()
     if not text:
         return None
 
-    # 1) Voice pack 1.58-bit entrenado (ruta futura del trainer). Si existe el
-    #    binario empaquetado, se usaría aquí. Hoy es metadata; degradamos a piper.
-    # (enganche: cuando trainer_bittts produzca el binario, cargarlo aquí)
+    # 1) Voice pack 1.58-bit entrenado: Astraura habla con el MISMO sustrato
+    #    ternario que BitNet (voz cuantizada real, sin GPU, multi-personalidad).
+    try:
+        from .voice158_infer import synthesize_pack
+        wav = synthesize_pack(speaker, text)
+        if wav:
+            return wav
+    except Exception as e:
+        logger.info(f"💠 [VOICE-BRIDGE] pack 1.58-bit no disponible ({e}); sigue a piper.")
 
     # 2) piper-tts (neural ligero en CPU).
     if _piper_available():

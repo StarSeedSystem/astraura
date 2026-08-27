@@ -180,6 +180,47 @@ def demo_weight_indexing() -> Dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
+# 3) Arquitectura VITS-tiny 1.58-bit (fuente única: trainer + inferencia)
+# ---------------------------------------------------------------------------
+# Un modelo de voz REAL necesita EXPANSIÓN TEMPORAL (upsampling) para producir
+# waveform a 24 kHz. Esta arquitectura: mel (80, T) -> backbone Conv1d -> head
+# Conv1d(64,1) -> upsampler ConvTranspose1d (×120) -> waveform (1, N*120).
+# Con T=200 -> 24000 samples = 1s a 24 kHz. La MISMA clase se importa en
+# voice158_infer.py para que el state_dict cuadre 1:1 al inferir.
+
+
+def build_tiny_vits(torch, nn, mel_dim: int = 80, dim: int = 64, layers: int = 4,
+                    upsample_stride: int = 120) -> nn.Module:
+    """VITS-tiny con upsampler temporal para 1.58-bit (BitNet: mel->wave 1s).
+
+    IMPORTANTE: voice158_infer.py importa esta función para garantizar que la
+    arquitectura de inferenceidica sea idéntica a la entrenada (state_dict 1:1).
+    """
+    class TinyVITS(nn.Module):
+        def __init__(self, mel_dim=80, dim=64, layers=4, upsample_stride=120):
+            super().__init__()
+            self.stem = nn.Conv1d(mel_dim, dim, 7, padding=3)
+            self.blocks = nn.ModuleList([nn.Conv1d(dim, dim, 3, padding=1) for _ in range(layers)])
+            self.head = nn.Conv1d(dim, 1, 7, padding=3)  # -> [B,1,T]
+            k = upsample_stride
+            self.upsampler = nn.ConvTranspose1d(1, 1, kernel_size=k + 1, stride=k, padding=0)
+            self.act = nn.Tanh()
+
+        def forward(self, x):
+            x = self.act(self.stem(x))
+            for b in self.blocks:
+                x = self.act(b(x)) + x
+            x = self.head(x)                 # [B,1,T_feat]
+            x = self.upsampler(x)           # [B,1,T_feat*stride]
+            return self.act(x)
+
+    return TinyVITS(mel_dim, dim, layers, upsample_stride)
+
+
+TARGET_SAMPLES = TARGET_SR  # 1 segundo a 24 kHz
+
+
+# ---------------------------------------------------------------------------
 # 3) Entrenamiento QAT real (requiere torch) — enganche para nodo GPU/malla
 # ---------------------------------------------------------------------------
 def train_vits_158(lang: str, speaker: str, epochs: int = 1) -> Optional[Dict[str, Any]]:

@@ -3667,6 +3667,29 @@ async def api_voice_mycelium_status():
         return {"error": str(e), "running": False}
 
 
+@app.get("/api/knowledge-mycelium/status")
+async def api_knowledge_mycelium_status():
+    """Estado del micelio de CONOCIMIENTO 1.58-bit (TODA la IA Astraura).
+
+    Cubre voz + LLM + agentes + personalidades + cerebros. Cada subsistema
+    publica knowledge packs 1.58-bit en el mismo Neural Tissue (tabla
+    astraura_voice_mesh), diferenciados por `kind`. Ver app/core/knowledge_mycelium.py.
+    """
+    try:
+        from .core.knowledge_mycelium import (
+            knowledge_mycelium_status,
+            start_knowledge_mycelium,
+        )
+        if os.environ.get("VOICE_MYCELIUM_ENABLED", "0") == "1":
+            try:
+                start_knowledge_mycelium()
+            except Exception:
+                pass
+        return knowledge_mycelium_status()
+    except Exception as e:
+        return {"error": str(e), "running": False}
+
+
 # ---------------------------------------------------------------------------
 # Puente de Voz CPU (habla/escucha hoy en cualquier CPU, sin GPU).
 # Siempre montado; degrada a motor procedural si no hay modelo neural.
