@@ -178,6 +178,7 @@ def emit_neurotransmitter(pack: Dict[str, Any]) -> None:
         return  # modo LAN-only: no hay malla remota
     try:
         payload = {
+            "id": f"{pack.get('speaker')}@v{pack.get('version')}",
             "kind": "nt",
             "node_id": node_id(),
             "speaker": pack.get("speaker"),

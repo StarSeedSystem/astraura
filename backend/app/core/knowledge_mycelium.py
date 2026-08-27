@@ -49,15 +49,21 @@ _state = {"running": False}
 def _emit_knowledge_nt(kind: str, kid: str, version: int, mb: float, meta: Dict[str, Any]) -> None:
     """Publica un neurotransmisor de conocimiento (ligero) al NT del micelio.
 
-    Reutiliza `astraura_voice_mesh` pero con `kind` = subsistema, para que el
-    descubrimiento P2P cubra TODA la IA, no solo voz.
+    Reutiliza la tabla `astraura_voice_mesh` (creada en Supabase el 2026-08-27)
+    con POST directo (NO push_state, que es key-value y va a astraura_state).
+    Cada pack es una fila con PK `id = "{kind}:{kid}@v{version}"`.
     """
-    sb = _supabase()
-    if not sb:
-        return  # modo LAN-only
     try:
+        from app.core import supabase_sync as s
+        creds = s._load_creds()
+        if not creds:
+            return  # modo LAN-only
+        import requests
+        rest = creds["supabase_url"].rstrip("/") + "/rest/v1"
+        key = creds["service_role_key"]
         payload = {
-            "kind": kind,  # pisa el 'nt' por defecto para distinguir subsistemas
+            "id": f"{kind}:{kid}@v{version}",
+            "kind": kind,
             "node_id": node_id(),
             "speaker": kid,
             "version": version,
@@ -65,8 +71,15 @@ def _emit_knowledge_nt(kind: str, kid: str, version: int, mb: float, meta: Dict[
             "meta": meta,
             "updated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         }
-        sb.push_state(SUPABASE_TABLE, payload)
-        logger.info(f"💠 [KNOW-MYC] NT '{kind}:{kid}'@v{version} emitido")
+        headers = {"apikey": key, "Authorization": f"Bearer {key}",
+                   "Content-Type": "application/json",
+                   "Prefer": "resolution=merge-duplicates,return=representation"}
+        r = requests.post(f"{rest}/astraura_voice_mesh", headers=headers,
+                          json=payload, timeout=30)
+        if r.ok:
+            logger.info(f"💠 [KNOW-MYC] NT '{kind}:{kid}'@v{version} publicado (HTTP {r.status_code})")
+        else:
+            logger.debug(f"💠 [KNOW-MYC] NT no publicado: HTTP {r.status_code} {r.text[:120]}")
     except Exception as e:  # pragma: no cover
         logger.debug(f"💠 [KNOW-MYC] NT no emitido (degradación): {e}")
 
