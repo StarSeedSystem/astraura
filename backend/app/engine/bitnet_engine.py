@@ -467,7 +467,7 @@ class BitNetUnifiedEngine:
                 # ~3.2 chars/token ⇒ recortamos system+prompt para dejar sitio a la respuesta
                 # (el orquestador puede mandar contextos enormes de memoria).
                 ctx_tokens = int(bitnet_cpp_manager.server_ctx or 4096)
-                gen_budget = max(128, min(int(max_tokens), max(128, ctx_tokens // 4)))
+                gen_budget = max(64, min(int(max_tokens), max(64, ctx_tokens // 8)))  # (Adenda 169) buffer menor: supervivencia en 8GB
                 char_budget = max(2000, int((ctx_tokens - gen_budget - 64) * 3.2))
                 # (Verificación 1.58 · VELOCIDAD NATIVA) El modelo i2_s en CPU (M1 8GB)
                 # tarda ~90 s en el PRIMER token cuando el prefill es largo (system de
@@ -488,8 +488,8 @@ class BitNetUnifiedEngine:
                 # system corto + SOLO el prompt del usuario (sin context_chunks pesados,
                 # que se reservan para Ollama). Así el nativo SIEMPRE cabe y no muere.
                 _MAX_PREFILL_CHARS = 1500  # ~480 tokens, margen para respuesta en ctx 512
-                sys_txt = (system_prompt or "").strip()[:200]
-                user_content = (prompt or "").strip()[:1200]
+                sys_txt = (system_prompt or "").strip()[:128]  # (Adenda 169) prefill mínimo para 8GB
+                user_content = (prompt or "").strip()[:640]
                 _prefill = f"{sys_txt}\n\n{user_content}"
                 if len(_prefill) > _MAX_PREFILL_CHARS:
                     # Recorte proporcional: prioriza el prompt del usuario.
