@@ -845,7 +845,8 @@ class AstrauraOrchestrator:
                     context_chunks=cycle["context_chunks"],
                     tool_data=cycle["tool_data"],
                     max_tokens=600,
-                    temperature=self._persona_temperature(persona)  # (OS · Ola 3)
+                    temperature=self._persona_temperature(persona),  # (OS · Ola 3)
+                    priority="background",  # (Verificación 1.58) la deliberación coral es fondo
                 ):
                     accumulated_full_text += token
                     yield {
@@ -915,12 +916,18 @@ class AstrauraOrchestrator:
             context_chunks=cycle["context_chunks"],
             tool_data=cycle["tool_data"],
             max_tokens=max_tokens,
-            temperature=self._persona_temperature(primary_persona)  # (OS · Ola 3)
+            temperature=self._persona_temperature(primary_persona),  # (OS · Ola 3)
+            priority="interactive",  # (Verificación 1.58) el chat del usuario va primero
         ):
             full_text += token
             yield {
                 "type": "token",
-                "token": token
+                "token": token,
+                # (Verificación 1.58) Honestidad: el motor 1.58-bit reporta su
+                # fuente real en `meta["source"]` (bitnet-native / ollama /
+                # openrouter-free). Lo propagamos para que la UI pueda mostrar
+                # "Motor: BitNet 1.58-bit" en vez de fingir que no se sabe.
+                "source": bitnet_engine._last_source
             }
 
         # Enqueue interaction for continuous background learning & Mem0 Universal Memory

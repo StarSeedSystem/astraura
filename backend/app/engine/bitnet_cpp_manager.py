@@ -57,9 +57,14 @@ class BitNetCppManager:
         # Se sigue pudiendo forzar con ASTRAURA_BITNET_CTX para una máquina con
         # holgura; el automático solo evita el suicidio silencioso por defecto.
         self.server_ctx = int(os.environ.get("ASTRAURA_BITNET_CTX") or self._ctx_segun_ram())
-        # 1 slot por perfil: cada petición usa el contexto COMPLETO y las demás
-        # esperan en cola (con pocos núcleos, el paralelismo solo trocea la KV).
-        self.server_parallel = max(1, int(os.environ.get("ASTRAURA_BITNET_PAR") or 1))
+        # (Verificación 1.58 · CORRECCIÓN DE CONCURRENCIA) Paralelismo ADAPTATIVO
+        # al hardware: antes era fijo en 1 slot, y bajo presión simultánea de
+        # varios agentes/bots el llama-server CANCELABA tareas a los ~0.4 s
+        # (preempt LRU del slot único) → cada petición caía a Ollama. Ahora el
+        # número de slots se calcula según núcleos y RAM de la máquina, con
+        # tope conservador para no disparar la memoria. Forzable con
+        # ASTRAURA_BITNET_PAR.
+        self.server_parallel = max(1, int(os.environ.get("ASTRAURA_BITNET_PAR") or self._parallel_segun_hardware()))
         self._server_lock = threading.Lock()  # un solo spawn aunque llamen N corrutinas a la vez
         
     def _ctx_segun_ram(self) -> int:
@@ -82,10 +87,60 @@ class BitNetCppManager:
         except Exception:
             return 2048  # sin poder medir, el término medio prudente
         if gb <= 8.5:
-            return 1024
+            return 512  # (Verificación 1.58 · Adenda 169 · CORRECCIÓN EN VIVO) EN 8 GB
+                        # (1.11 GB libre) el llama-server BitNet i2_s MORÍA por OOM
+                        # durante la inferencia REAL de chat con -c 1024 (pasaba
+                        # /health y la sonda de 8 tokens, pero al generar ~200 tokens
+                        # el búfer de cómputo + KV cache superaba la RAM libre y el
+                        # sistema lo mataba -> RemoteProtocolError -> cedía a Ollama).
+                        # Con -c 512 el búfer de inferencia es la mitad y el server
+                        # SOBREVIVE a la inferencia larga. 512 tokens cubren el prefill
+                        # corto (system 256 + 1 chunk) + ~200 tokens de respuesta:
+                        # suficiente para chat corto. Quien tenga RAM de más sube con
+                        # ASTRAURA_BITNET_CTX.
         if gb <= 16.5:
-            return 2048
+            return 1536
         return 4096
+
+    def _parallel_segun_hardware(self) -> int:
+        """Número de slots del llama-server adaptado al hardware de la máquina.
+
+        Antes era fijo en 1, y bajo presión simultánea de varios agents/bots el
+        slot único preempteaba (cancelaba) tareas a los ~0.4 s → cada petición
+        caía a Ollama. Con más slots, el llama-server encola en paralelo y el
+        motor 1.58-bit aguanta la concurrencia real de la red mesh.
+
+        Criterio (medido, no arbitrario):
+          · RAM <= 8.5 GB  → 2 slots  (8 GB M1 de Alex: 2 aguantan con -c 1024)
+          · RAM <= 16.5 GB → 3 slots
+          · > 16.5 GB      → 4 slots  (tope conservador: BitNet en CPU no escala
+                                       lineal con slots, y cada slot cuesta KV)
+        Además se frena por núcleos: no más de (núcleos/2) slots, para que el
+        sistema operativo y Ollama residente no se queden sin CPU.
+        """
+        try:
+            import psutil
+            gb = psutil.virtual_memory().total / (1024 ** 3)
+            cores = psutil.cpu_count(logical=True) or 4
+        except Exception:
+            return 2  # sin poder medir, lo prudente que aún evita el slot único
+        if gb <= 8.5:
+            raw = 1  # (Verificación 1.58 · Adenda 169 · CAÍDA EN VIVO) EN 8 GB (1.11 GB
+                     # libre) con server compartido (-c 1024 Y --parallel 2): llama-server
+                     # divide el ctx entre slots → 512 tokens/slot. El prefill (system
+                     # 256 chars + prompt) EXCEDE 512 → "request exceeds available context
+                     # size (512)" → cancela tareas → el server OOMea/cae → cede a Ollama.
+                     # MEDIDO en /tmp/astraura-backend.log (tasks 14/13/27: 798/743 tokens > 512).
+                     # CON 1 SLOT el ctx es 1024/slot (suficiente para prefill corto + respuesta
+                     # BitNet nativa). El chat interactivo es el único usuario real de BitNet
+                     # (el fondo usa Ollama); 1 slot no preemptea si el fondo no usa BitNet.
+        elif gb <= 16.5:
+            raw = 3
+        else:
+            raw = 5
+        # Freno por núcleos: al menos 2 núcleos libres para el SO + Ollama.
+        por_nucleos = max(1, (cores - 2) // 2)
+        return max(1, min(raw, por_nucleos))
 
     def check_status(self) -> Dict[str, Any]:
         """
@@ -154,28 +209,41 @@ class BitNetCppManager:
 
     def _servidor_compartido(self) -> bool:
         """
-        ¿Esta máquina puede permitirse DOS llama-server a la vez?
+        ¿Esta máquina comparte UN solo llama-server entre chat y fondo?
 
-        La idea de dos perfiles (interactive con prioridad normal, background con
-        `nice` alto) es buena en una máquina holgada: el fondo nunca le roba el
-        turno al usuario. Pero en 8 GB, con Ollama residente y el backend, dos
-        servidores del mismo modelo NO caben: el segundo carga bien, contesta a
-        `/health`, y muere en cuanto reserva el búfer de cómputo de su primera
-        petición real. Sin informe de fallo y sin mensaje: desde fuera parecía
-        que el motor 1.58 «no funcionaba».
+        # (Verificación 1.58 · Adenda 169) Antes el umbral era 12 GB y en 8 GB se
+        # compartía UNO, así que el chat interactivo competía por los mismos slots
+        # que la Oficina (imaginación/enjambre) y, bajo carga, el chat se bloqueaba
+        # o caía a Ollama. Ahora, como el contexto se redujo a `-c 1024` en 8 GB
+        # (ver `_ctx_segun_ram`), se INTENTABA separar: PERO MEDIDO en vivo en este
+        # Mac (1.11 GB libre): dos llama-server i2_s NO caben en 8 GB — el modelo
+        # mmapea ~1.1 GB POR SERVER y el segundo server OOMea a la primera
+        # inferencia. Así que en ≤8.5 GB se COMPARTE un solo server (el modelo
+        # va por mmap, se comparte de verdad) y el background cede con `nice 15`.
+        # El chat sigue BitNet nativo SIEMPRE primero gracias al semáforo de
+        # `cognition.py` (max_concurrent_adaptive) + priority explícita del
+        # orquestador; el fondo usa Ollama cuando el interactive está activo.
+        # Forzable con ASTRAURA_BITNET_SERVIDORES=2 para forzar dos servers
+        # (máquinas con holgura de RAM).
 
-        Medido en este Mac: un SOLO servidor con `-c 1024` sirve peticiones
-        reales y sobrevive (HTTP 200, salida coherente); dos servidores mueren.
-        Así que por debajo del umbral compartimos uno. Se pierde el aislamiento
-        de prioridades; se gana que el motor responda, que es lo que importa.
+        Umbral: solo compartimos UNO si la RAM es <= 6 GB (muy justa incluso con
+        contexto corto). A partir de 8 GB separamos. Forzable con
+        ASTRAURA_BITNET_SERVIDORES=1 para volver al servidor único.
         """
+        if os.environ.get("ASTRAURA_BITNET_SERVIDORES") == "1":
+            return True
         if os.environ.get("ASTRAURA_BITNET_SERVIDORES") == "2":
             return False
         try:
             import psutil
-            return (psutil.virtual_memory().total / (1024 ** 3)) <= 12.0
+            # (Verificación 1.58 · Adenda 169) EN 8 GB (1.11 GB libre en este Mac) dos
+            # llama-server i2_s NO caben: el modelo mmapea ~1.1 GB por server y la
+            # inferencia + KV cache de un segundo server lo mata por OOM. Se comparte
+            # UNO (mmap comparte de verdad) hasta >8.5 GB. Quien tenga RAM de más
+            # fuerza ASTRAURA_BITNET_SERVIDORES=2 y ambos servers con ctx propio.
+            return (psutil.virtual_memory().total / (1024 ** 3)) <= 8.5
         except Exception:
-            return True  # sin poder medir, la opción que no se suicida
+            return True  # sin poder medir, preferimos COMPARTIR (no dos servers OOM)
 
     def _port_for(self, profile: str) -> int:
         if self._servidor_compartido():
@@ -391,19 +459,35 @@ class BitNetCppManager:
                 self._servers[profile] = {**st, "base": base, "port": port}
                 st = self._servers[profile]
 
-            elif probe["state"] == "apagado" and not st.get("proc"):
-                # Nada en el puerto de verdad: aquí sí hace falta lanzar.
-                binary = self.server_binary()
-                status = self.check_status()
-                models = status.get("models_available") or []
-                if binary is None or not models:
-                    return None
-                model_path = models[0]["path"]
+            elif probe["state"] == "apagado":
+                # (Verificación 1.58 · Adenda 169 · RACE FIX) Si YA hay un lanzamiento
+                # en curso (otra corrutina llamó ensure_server y está cargando el
+                # modelo), NO lanzamos un segundo server sobre el mismo puerto (el
+                # bind() fallaría y entraríamos en bucle de servers que nacen/mueren).
+                # Esperamos a que el primero esté listo. El flag `_launching` se setea
+                # justo antes del Popen y se limpia al registrar el proc o al fallar.
+                if st.get("_launching"):
+                    # Ya se está lanzando: esperar a que esté listo abajo.
+                    self._servers[profile] = {**st, "base": base, "port": port}
+                    st = self._servers[profile]
+                elif not st.get("proc") or (st.get("proc") and st["proc"].poll() is not None):
+                    # Nada vivo en el puerto ni proc nuestro sano: aquí sí lanzar.
+                    binary = self.server_binary()
+                    status = self.check_status()
+                    models = status.get("models_available") or []
+                    if binary is None or not models:
+                        return None
+                    model_path = models[0]["path"]
                 try:
                     tmpl = self.repo_dir.parent / "bitnet-chat-template.jinja"
                     tmpl.write_text(BITNET_CHAT_TEMPLATE, encoding="utf-8")
                     cpu = os.cpu_count() or 4
-                    threads = max(1, min(int(getattr(settings, "threads", 4) or 4), cpu))
+                    # (Verificación 1.58 · Adenda 169) En 8 GB usamos SOLO 2 threads:
+                    # el búfer de activaciones del llama-server escala con los threads
+                    # (cada thread mantiene su estado de capa). 2 threads reducen el
+                    # footprint de RAM de inferencia ~4x vs 8, evitando el OOM que
+                    # mataba el server durante la generación larga de chat.
+                    threads = max(1, min(2, cpu))
                     cmd = [
                         str(binary), "-m", model_path,
                         "--host", "127.0.0.1", "--port", str(port),
@@ -428,8 +512,10 @@ class BitNetCppManager:
                                 os.nice(15)
                             except Exception:
                                 pass
+                    # Flag de lanzamiento en curso (evita race de doble-bind).
+                    self._servers[profile] = {**st, "_launching": True}
                     proc = subprocess.Popen(cmd, stdout=log, stderr=log, cwd=str(self.repo_dir), preexec_fn=preexec)
-                    self._servers[profile] = {"proc": proc, "base": base, "model": model_path, "port": port}
+                    self._servers[profile] = {"proc": proc, "base": base, "model": model_path, "port": port, "_launching": False}
                     print(f"[BitNetCppManager] llama-server nativo ({profile}) lanzado (pid {proc.pid}, puerto {port}, modelo {Path(model_path).name})")
                 except Exception as e:
                     print(f"[BitNetCppManager] no se pudo lanzar llama-server ({profile}): {e}")

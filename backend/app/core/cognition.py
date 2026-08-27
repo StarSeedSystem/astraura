@@ -35,9 +35,50 @@ import time
 from typing import Any, Dict, List, Optional, Tuple
 
 # (OS · Ola 3) Máximo de generaciones de fondo simultáneas por bucle de eventos.
+# (Verificación 1.58 · CORRECCIÓN) Ya NO es fijo: se recalcula RAM-aware en
+# `_max_concurrent_adaptive()` para que el número de agents/bots concurrentes se
+# ajuste al hardware del entorno automáticamente (pedido de Alex: «el número de
+# agentes y su uso debe ser relativo a las capacidades de hardware...
+# automática e inteligentemente»). El valor de aquí es el respaldo si no se
+# puede medir la RAM.
 MAX_CONCURRENT = 2
 DEFAULT_TIMEOUT = 90.0
 STATUS_TTL_SECONDS = 5.0
+
+# (Verificación 1.58) Preferencia de motor por USUARIO, respetando su elección
+# con fallback inteligente. Modos:
+#   · "auto"          → BitNet 1.58-bit primero; si no está disponible, el mejor
+#                        de los demás (Ollama / OpenRouter :free). Adaptativo.
+#   · "bitnet-158"    → FUERZA BitNet nativo (otros modelos como fallback de
+#                        último recurso si el nativo está totalmente caído).
+#   · "multimodel"    → BitNet primero, pero respeta los demás modelos del
+#                        catálogo del usuario como alternativa explícita.
+# Forzable globalmente con ASTRAURA_COGNITION_PREFERENCE.
+_COGNITION_PREFERENCE = (os.environ.get("ASTRAURA_COGNITION_PREFERENCE") or "auto").strip().lower()
+# Orden de intento por defecto cuando el usuario elige "auto"/"bitnet-158".
+_ENGINE_ORDER_BITNET_FIRST = ("bitnet-native", "ollama", "openrouter-free")
+_ENGINE_ORDER_MULTIMODEL = ("bitnet-native", "ollama", "openrouter-free")
+
+
+def max_concurrent_adaptive() -> int:
+    """Concurrencia de fondo ajustada a la RAM de la máquina (1-6)."""
+    try:
+        import psutil
+        gb = psutil.virtual_memory().total / (1024 ** 3)
+    except Exception:
+        return MAX_CONCURRENT
+    if gb <= 8.5:
+        return 2
+    if gb <= 16.5:
+        return 3
+    if gb <= 32.5:
+        return 4
+    return 6
+
+
+def cognition_preference() -> str:
+    """Preferencia de motor efectiva (auto | bitnet-158 | multimodel)."""
+    return _COGNITION_PREFERENCE if _COGNITION_PREFERENCE in ("auto", "bitnet-158", "multimodel") else "auto"
 
 _semaphores: Dict[int, Tuple[asyncio.AbstractEventLoop, asyncio.Semaphore]] = {}
 _semaphores_lock = threading.Lock()
@@ -93,7 +134,7 @@ def _get_semaphore() -> asyncio.Semaphore:
             # Poda de bucles ya cerrados (scripts, hilos efímeros con asyncio.run).
             for k in [k for k, (l, _s) in _semaphores.items() if l.is_closed()]:
                 _semaphores.pop(k, None)
-            entry = (loop, asyncio.Semaphore(MAX_CONCURRENT))
+            entry = (loop, asyncio.Semaphore(max_concurrent_adaptive()))
             _semaphores[key] = entry
     return entry[1]
 
@@ -421,4 +462,5 @@ def field(data: Optional[Dict[str, Any]], key: str, max_len: int = 600, min_len:
 
 def stats() -> Dict[str, Any]:
     """Contadores honestos para /api/starseed/processes."""
-    return {**_stats, "mode": engine_mode(), "max_concurrent": MAX_CONCURRENT}
+    return {**_stats, "mode": engine_mode(), "max_concurrent": max_concurrent_adaptive(),
+            "preference": cognition_preference()}

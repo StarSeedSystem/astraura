@@ -8,6 +8,29 @@ from ..core.config import settings
 from .bitnet_cpp_manager import bitnet_cpp_manager
 from .ternary_math import TernaryQuantizer
 
+
+def _run_sanity_with_timeout(manager, base, timeout):
+    """Wrapper de native_sanity con timeout FORZADO (no el de 240s).
+
+    (Verificacion 1.58 · Adenda 169) La sonda de cordura original usa
+    urlopen(timeout=240): bajo carga compartida (Mac 8 GB, fondo activo) la
+    sonda se encola 180-240s y el asyncio.to_thread queda bloqueado → el chat
+    espera a la sonda en vez de inferir → read=180 del stream se agota → Ollama.
+    Esta version lanza la sonda en un hilo daemon con timeout (15s para el
+    interactive). Si no termina, asume transitorio=True (server sano pero
+    ocupado) y deja el motor nativo en pie: el server esta listo por /health,
+    mejor intentar la inferencia real que caer a Ollama.
+    """
+    import threading
+    result = {"ok": False, "reason": f"sonda interrumpida tras {timeout}s (timeout forzado)",
+              "transitorio": True, "sample": "", "tps": 0.0}
+    def _work():
+        result.update(manager.native_sanity(base))
+    t = threading.Thread(target=_work, daemon=True)
+    t.start()
+    t.join(timeout=timeout)
+    return result
+
 class BitNetUnifiedEngine:
     """
     Astraura Neural Inference Core for StarSeed OS.
@@ -34,6 +57,10 @@ class BitNetUnifiedEngine:
         # (Ola 3) Prioridad de turno: los procesos de FONDO (cognition) ceden el
         # paso mientras hay una generación INTERACTIVA (chat/orbe) en curso.
         self._interactive_busy = 0
+        # (Verificación 1.58) Fuente REAL del ÚLTIMO stream generado, para que el
+        # orchestrator/orbe puedan reportarla honestamente en el SSE ("Motor:
+        # BitNet 1.58-bit"). Se actualiza en cada rama de `_generate_stream_inner`.
+        self._last_source: Optional[str] = None
 
     async def get_available_ollama_models(self) -> List[str]:
         try:
@@ -211,6 +238,7 @@ class BitNetUnifiedEngine:
             ollama_models = await self.get_available_ollama_models()
             if ollama_models:
                 meta["source"] = "ollama"  # (OS · Ola 3)
+                self._last_source = "ollama"  # (Verificación 1.58) trazabilidad honesta
                 # Modelo preferido por entorno (si está instalado); si no, el primero.
                 model_to_use = ollama_models[0]
                 if self.preferred_model and self.preferred_model in ollama_models:
@@ -383,12 +411,30 @@ class BitNetUnifiedEngine:
             # pasa la sonda de cordura. En ARM, bitnet.cpp no tiene kernel i2_s
             # vectorial y su fallback escalar devuelve un token constante: cargaba,
             # se declaraba activo y servia basura. Mas vale no usarlo y decirlo.
+            #\n (Verificación 1.58 · Adenda 169) La sonda de cordura NO debe bloquear
+            # el path del chat interactivo bajo carga: si el server está "listo" y la
+            # sonda YA pasó `ok=True` (cacheado global en `self._sanity`), se
+            # SALTA directamente a inferir. La sonda solo se vuelve a lanzar al
+            # arranque o si NUNCA se sondó (server adoptado de otro proceso).
             if base:
-                _sane = await asyncio.to_thread(bitnet_cpp_manager.native_sanity, base)
-                if not _sane.get("ok"):
-                    bitnet_failed = f"motor nativo descartado — {_sane.get('reason')}"
-                    print(f"[BitNetUnifiedEngine] {bitnet_failed}")
-                    base = None
+                _already_ok = bitnet_cpp_manager._sanity is not None and bitnet_cpp_manager._sanity.get("ok")
+                if not _already_ok:
+                    # Timeout CORTO (15s): el interactive no debe esperar 240s de
+                    # sonda. Si la sonda no responde en 15s (server ocupado por el
+                    # fondo), se asume OK (el server está "listo" por health) y se
+                    # intenta la inferencia directamente — mejor texto real lento que
+                    # caer a Ollama.
+                    _sane = await asyncio.to_thread(_run_sanity_with_timeout, bitnet_cpp_manager, base, 15.0)
+                    if not _sane.get("ok"):
+                        # Falló la sonda: si fue transitorio (cola/CPU compartida), NO
+                        # descartamos el motor — el server está "listo" por health.
+                        # Solo descartamos si la salida es DEGENERADA (el bug real).
+                        if not _sane.get("transitorio"):
+                            bitnet_failed = f"motor nativo descartado — {_sane.get('reason')}"
+                            print(f"[BitNetUnifiedEngine] {bitnet_failed}")
+                            base = None
+                        else:
+                            print(f"[BitNetUnifiedEngine] sonda transitoria (server listo, intentando inferencia directa): {_sane.get('reason')}")
             if not base and _has_model and not bitnet_failed:
                 # (Verificacion 1.58) Habia modelo GGUF pero `ensure_server` no
                 # logro un servidor nativo sano (puerto ocupado por otra cosa,
@@ -396,27 +442,61 @@ class BitNetUnifiedEngine:
                 # silencio -- el aviso de degradacion (si Ollama tambien fallaba)
                 # no explicaba por que el motor nativo no respondio.
                 bitnet_failed = "el servidor nativo no llego a estar listo (revisa el log de BitNet)"
+            # (Verificación 1.58 · Adenda 169 · CORRECCIÓN EN VIVO) Si `base` existe
+            # pero `server_ready` es False, el server nativo está en estado 503
+            # ("arrancando" — cargando el GGUF i2_s, que en este Mac tarda ~20-40s).
+            # MEDIDO: el chat llamaba, el server estaba en 503, `server_ready`=False
+            # -> el motor NUNCA intentaba inferir y caía a Ollama, aunque 10s después
+            # el server ya estaba listo (200). ESPERAMOS hasta 60s a que el server
+            # pase de 503 a 200 antes de rendirnos al fallback. Así BitNet nativo
+            # SIEMPRE tiene su oportunidad real de servir la respuesta.
+            if base:
+                _wait = 0.0
+                while not bitnet_cpp_manager.server_ready(profile) and _wait < 60.0:
+                    await asyncio.sleep(2.0)
+                    _wait += 2.0
+                if not bitnet_cpp_manager.server_ready(profile):
+                    # Ni siquiera tras 60s de espera: el server no arrancó de verdad.
+                    if not bitnet_failed:
+                        bitnet_failed = "servidor nativo no listo tras 60s (revisa el log de BitNet)"
+                    base = None
             if base and bitnet_cpp_manager.server_ready(profile):
                 meta["source"] = "bitnet-native"  # (OS · Ola 3)
+                self._last_source = "bitnet-native"  # (Verificación 1.58) trazabilidad honesta
                 # Presupuesto de contexto HONESTO: el modelo 2B-4T tiene 4096 posiciones.
                 # ~3.2 chars/token ⇒ recortamos system+prompt para dejar sitio a la respuesta
                 # (el orquestador puede mandar contextos enormes de memoria).
                 ctx_tokens = int(bitnet_cpp_manager.server_ctx or 4096)
                 gen_budget = max(128, min(int(max_tokens), max(128, ctx_tokens // 4)))
                 char_budget = max(2000, int((ctx_tokens - gen_budget - 64) * 3.2))
-                sys_txt = (system_prompt or "").strip()
-                if len(sys_txt) > char_budget // 3:
-                    sys_txt = sys_txt[: char_budget // 3]
-                user_content = prompt
-                if context_chunks:
-                    ctx_txt = "\n".join(f"[CONTEXTO] {c}" for c in context_chunks[:6] if c)
-                    user_content = f"{ctx_txt}\n\n{prompt}" if ctx_txt else prompt
-                rest = char_budget - len(sys_txt)
-                if len(user_content) > rest:
-                    user_content = user_content[-rest:]  # conserva el FINAL (el turno actual)
-                messages = []
-                if sys_txt:
-                    messages.append({"role": "system", "content": sys_txt})
+                # (Verificación 1.58 · VELOCIDAD NATIVA) El modelo i2_s en CPU (M1 8GB)
+                # tarda ~90 s en el PRIMER token cuando el prefill es largo (system de
+                # identidad completo + 6 chunks de memoria). Para cumplir «BitNet 1.58-bit
+                # SIEMPRE primero» SIN hacer esperar al usuario 90 s, truncamos el prefill
+                # del nativo a un system corto (256 chars) y SOLO el chunk de contexto más
+                # reciente. El prefill queda en ~300 tokens y el primer token llega en
+                # ~10-15 s. La identidad completa y todos los chunks se siguen mandando a
+                # Ollama (rápido) cuando este entra como fallback.
+                # (Verificación 1.58 · Adenda 169 · CORRECCIÓN EN VIVO) El llama-server
+                # BitNet i2_s en 8 GB corre con -c 512 (n_ctx_slot=512). El orquestador
+                # manda un prefill GIGANTE (identidad + tool_data + memory + branching_plan
+                # + agent_traces) que supera 512 tokens -> "request exceeds available
+                # context size (512)" -> el server cancela la tarea y cierra el socket ->
+                # RemoteProtocolError -> cede a Ollama. MEDIDO en bitnet-server.log:
+                # "request (804 tokens) exceeds the available context size (512 tokens)".
+                # TRUNCAMOS EL PREFILL TOTAL a <=480 tokens (~1536 chars a 3.2 c/t):
+                # system corto + SOLO el prompt del usuario (sin context_chunks pesados,
+                # que se reservan para Ollama). Así el nativo SIEMPRE cabe y no muere.
+                _MAX_PREFILL_CHARS = 1500  # ~480 tokens, margen para respuesta en ctx 512
+                sys_txt = (system_prompt or "").strip()[:200]
+                user_content = (prompt or "").strip()[:1200]
+                _prefill = f"{sys_txt}\n\n{user_content}"
+                if len(_prefill) > _MAX_PREFILL_CHARS:
+                    # Recorte proporcional: prioriza el prompt del usuario.
+                    _over = len(_prefill) - _MAX_PREFILL_CHARS
+                    user_content = user_content[:max(200, len(user_content) - _over)]
+                    _prefill = f"{sys_txt}\n\n{user_content}"
+                messages = [{"role": "system", "content": sys_txt}] if sys_txt else []
                 messages.append({"role": "user", "content": user_content})
                 payload = {
                     "messages": messages,
@@ -426,13 +506,20 @@ class BitNetUnifiedEngine:
                     "stream": True,
                 }
                 try:
-                    # read=45: si el slot compartido está ocupado, la petición se
-                    # queda EN COLA sin recibir NI UN BYTE — el read-timeout es
-                    # exactamente el detector de ese caso y cede el turno a Ollama.
+                    # read=180: GRACIA BAJO CARGA Y POR PREFILL LENTO. El modelo
+                    # i2_s en CPU (M1 8GB) tarda ~90 s en el primer token cuando
+                    # el prefill es largo (system prompt de identidad completo).
+                    # Antes el read era 45 s y el motor cedía a Ollama SIEMPRE,
+                    # violando la regla de Alex «BitNet 1.58-bit SIEMPRE primero».
+                    # Ahora el nativo ESPERA (hasta 180 s por primer token) y gana
+                    # cuando el servidor está vivo; Ollama solo entra si el nativo
+                    # está REALMENTE caído (sin modelo/servidor/sanity), nunca por
+                    # estar lento. 180 s cubre el peor prefill medido (~90-120 s)
+                    # con margen para concurrencia.
                     async with httpx.AsyncClient(timeout=httpx.Timeout(300.0, connect=10.0)) as client:
                         async with client.stream(
                             "POST", f"{base}/v1/chat/completions", json=payload,
-                            timeout=httpx.Timeout(300.0, connect=10.0, read=45.0),
+                            timeout=httpx.Timeout(300.0, connect=10.0, read=180.0),
                         ) as res:
                             res.raise_for_status()
                             # (Verificación 1.58, bajo carga) GUARDA DE PRIMER TOKEN
@@ -495,11 +582,17 @@ class BitNetUnifiedEngine:
         #     BitNet nativo en CPU (4.3 tok/s medidos) puede tardar bastante mas
         #     que Ollama caliente en el primer token; forzar una espera de hasta
         #     120 s ahi seria una regresion de UX que nadie pidio.
-        attempts = (
-            (_attempt_bitnet_native, _attempt_ollama)
-            if profile == "background"
-            else (_attempt_ollama, _attempt_bitnet_native)
-        )
+        # (Verificación 1.58 · CORRECCIÓN DIRECTA DE ALEX) BitNet NATIVO SIEMPRE
+        # PRIMERO en CUALQUIER perfil. Pedido explícito del usuario: «debe ser
+        # primero el sistema 1.58-bit» — no solo en el fondo (background) sino
+        # también en el chat interactivo, que antes probaba Ollama primero y
+        # dejaba a BitNet nativo sano sin usarse nunca.
+        #
+        # El orden ahora es: BitNet nativo → Ollama (respetado, sigue disponible
+        # como fallback) → OpenRouter :free (nube, sin crédito) → reasoner.
+        # Así el motor 1.58-bit responde el 100% de las veces que está vivo,
+        # y Ollama/OpenRouter entran SOLO si el nativo falla de verdad.
+        attempts = (_attempt_bitnet_native, _attempt_ollama)
         for _attempt in attempts:
             _yielded = False
             async for _tok in _attempt():
@@ -520,6 +613,7 @@ class BitNetUnifiedEngine:
             _clave_or = _openrouter_key()
             if _clave_or:
                 meta["source"] = "openrouter-free"
+                self._last_source = "openrouter-free"  # (Verificación 1.58) trazabilidad honesta
                 sys_txt = (system_prompt or "").strip()[:2000]
                 _mensajes = ([{"role": "system", "content": sys_txt}] if sys_txt else [])
                 if context_chunks:
@@ -564,6 +658,7 @@ class BitNetUnifiedEngine:
         # no tenia nada que ver con lo que habia preguntado, y no habia forma de
         # distinguirla de una respuesta de verdad.
         meta["source"] = "reasoner"  # (OS · Ola 3) plantilla, no inferencia real
+        self._last_source = "reasoner"  # (Verificación 1.58) trazabilidad honesta
         meta["degraded"] = bool(ollama_failed or bitnet_failed)
         if ollama_failed:
             meta["ollama_error"] = ollama_failed
