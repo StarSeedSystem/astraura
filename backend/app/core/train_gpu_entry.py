@@ -27,8 +27,12 @@ import json
 import os
 import time
 import logging
+import sys
 from pathlib import Path
 from typing import Dict, Any, Optional
+
+# Asegura que el paquete 'app' sea importable cuando se corre como script.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 logger = logging.getLogger("astraura.voice_trainer_gpu")
 
