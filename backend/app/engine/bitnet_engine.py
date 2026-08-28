@@ -487,9 +487,16 @@ class BitNetUnifiedEngine:
                 # TRUNCAMOS EL PREFILL TOTAL a <=480 tokens (~1536 chars a 3.2 c/t):
                 # system corto + SOLO el prompt del usuario (sin context_chunks pesados,
                 # que se reservan para Ollama). Así el nativo SIEMPRE cabe y no muere.
-                _MAX_PREFILL_CHARS = 1500  # ~480 tokens, margen para respuesta en ctx 512
-                sys_txt = (system_prompt or "").strip()[:128]  # (Adenda 169) prefill mínimo para 8GB
-                user_content = (prompt or "").strip()[:640]
+                # (Corrección Adenda 172 · 2026-08-28) El prefill anterior (sys 128 / user 640)
+                # destruía la personalidad de Astraura (128 chars de system no caben la
+                # identidad StarSeed) y dejaba 732 chars de presupuesto sin usar. El slot
+                # real es n_ctx_slot=512 (~1500 chars). Con gen_budget=128 dejamos ~1000
+                # chars de prefill (≈312 tokens) + 128 gen = 440 < 512 → cabe SIEMPRE.
+                # Rebalanceo: más contexto de sistema (384) para preservar la persona, y
+                # hasta 1024 de usuario (el recorte proporcional lo ajusta a 1000).
+                _MAX_PREFILL_CHARS = 1000  # ~312 tokens, margen seguro en ctx 512
+                sys_txt = (system_prompt or "").strip()[:384]  # (Adenda 172) preserva identidad Astraura
+                user_content = (prompt or "").strip()[:1024]
                 _prefill = f"{sys_txt}\n\n{user_content}"
                 if len(_prefill) > _MAX_PREFILL_CHARS:
                     # Recorte proporcional: prioriza el prompt del usuario.
