@@ -5,3 +5,14 @@
 !backend/**
 !Dockerfile
 !requirements.txt
+
+# (Adenda 176) Re-exclusiones DESPUÉS de !backend/** (la última regla gana):
+# el build arm64 del Mac (Exec format error en Cloud Run x86), los GGUF (2,2 GB
+# que hicieron la subida de 1 h) y el estado runtime NO deben viajar a la nube.
+backend/BitNet
+backend/.venv
+backend/data
+backend/vault
+backend/upstream-pr-bitnet-arm
+backend/**/*.log
+**/*.gguf
