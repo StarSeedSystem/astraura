@@ -53,8 +53,34 @@ STATUS_TTL_SECONDS = 5.0
 #                        último recurso si el nativo está totalmente caído).
 #   · "multimodel"    → BitNet primero, pero respeta los demás modelos del
 #                        catálogo del usuario como alternativa explícita.
-# Forzable globalmente con ASTRAURA_COGNITION_PREFERENCE.
-_COGNITION_PREFERENCE = (os.environ.get("ASTRAURA_COGNITION_PREFERENCE") or "auto").strip().lower()
+# Forzable globalmente con ASTRAURA_COGNITION_PREFERENCE; sin la variable, se
+# persiste en data/cognition_preference.json (editable en caliente desde el OS).
+_VALID_PREFERENCES = ("auto", "bitnet-158", "multimodel")
+_COGNITION_PREFERENCE_ENV = (os.environ.get("ASTRAURA_COGNITION_PREFERENCE") or "").strip().lower()
+
+
+def _preference_file() -> str:
+    try:
+        from .config import DATA_DIR
+        return str(DATA_DIR / "cognition_preference.json")
+    except Exception:
+        return os.path.join(os.path.expanduser("~"), ".astraura", "cognition_preference.json")
+
+
+def _load_stored_preference() -> Optional[str]:
+    try:
+        with open(_preference_file(), "r", encoding="utf-8") as fh:
+            val = str((json.load(fh) or {}).get("preference") or "").strip().lower()
+        return val if val in _VALID_PREFERENCES else None
+    except Exception:
+        return None
+
+
+_COGNITION_PREFERENCE = (
+    _COGNITION_PREFERENCE_ENV
+    if _COGNITION_PREFERENCE_ENV in _VALID_PREFERENCES
+    else (_load_stored_preference() or "auto")
+)
 # Orden de intento por defecto cuando el usuario elige "auto"/"bitnet-158".
 _ENGINE_ORDER_BITNET_FIRST = ("bitnet-native", "ollama", "openrouter-free")
 _ENGINE_ORDER_MULTIMODEL = ("bitnet-native", "ollama", "openrouter-free")
@@ -78,7 +104,45 @@ def max_concurrent_adaptive() -> int:
 
 def cognition_preference() -> str:
     """Preferencia de motor efectiva (auto | bitnet-158 | multimodel)."""
-    return _COGNITION_PREFERENCE if _COGNITION_PREFERENCE in ("auto", "bitnet-158", "multimodel") else "auto"
+    return _COGNITION_PREFERENCE if _COGNITION_PREFERENCE in _VALID_PREFERENCES else "auto"
+
+
+def cognition_preference_detail() -> Dict[str, Any]:
+    """Preferencia + procedencia honesta (env | stored | default) para la UI."""
+    stored = _load_stored_preference()
+    env_locked = _COGNITION_PREFERENCE_ENV in _VALID_PREFERENCES
+    return {
+        "preference": cognition_preference(),
+        "source": "env" if env_locked else ("stored" if stored else "default"),
+        "env_override": env_locked,
+        "options": list(_VALID_PREFERENCES),
+    }
+
+
+def set_cognition_preference(value: str) -> Dict[str, Any]:
+    """Fija la preferencia en caliente y la persiste (escritura atómica).
+
+    Con ASTRAURA_COGNITION_PREFERENCE presente NO finge el cambio: devuelve
+    applied=False con el motivo real (la variable de entorno manda)."""
+    global _COGNITION_PREFERENCE
+    val = (value or "").strip().lower()
+    if val not in _VALID_PREFERENCES:
+        raise ValueError(f"preference inválida: {value!r} (opciones: {', '.join(_VALID_PREFERENCES)})")
+    if _COGNITION_PREFERENCE_ENV in _VALID_PREFERENCES:
+        detail = cognition_preference_detail()
+        detail["applied"] = False
+        detail["reason"] = "ASTRAURA_COGNITION_PREFERENCE fuerza el valor; quita la variable para configurarlo en caliente"
+        return detail
+    path = _preference_file()
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as fh:
+        json.dump({"preference": val, "updated_at": time.strftime("%Y-%m-%dT%H:%M:%S")}, fh, ensure_ascii=False, indent=1)
+    os.replace(tmp, path)
+    _COGNITION_PREFERENCE = val
+    detail = cognition_preference_detail()
+    detail["applied"] = True
+    return detail
 
 _semaphores: Dict[int, Tuple[asyncio.AbstractEventLoop, asyncio.Semaphore]] = {}
 _semaphores_lock = threading.Lock()

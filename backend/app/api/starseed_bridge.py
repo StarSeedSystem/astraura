@@ -41,7 +41,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
@@ -776,3 +776,26 @@ async def starseed_trigger_imagination(req: Optional[ImaginationTriggerRequest] 
         "bridge": BRIDGE_VERSION,
         "server_ts": time.time(),
     }
+
+
+# ─── (Adenda 175) Preferencia de motor de cognición (auto · bitnet-158 · multimodel) ───
+class CognitionPreferenceRequest(BaseModel):
+    preference: str
+
+
+@router.get("/cognition/preference")
+async def get_cognition_preference_endpoint():
+    """Preferencia efectiva del motor + procedencia (env | stored | default)."""
+    from ..core.cognition import cognition_preference_detail
+    return {"success": True, "bridge": BRIDGE_VERSION, **cognition_preference_detail()}
+
+
+@router.post("/cognition/preference")
+async def set_cognition_preference_endpoint(req: CognitionPreferenceRequest):
+    """Cambia la preferencia en caliente (persistida). Honesto con el override por entorno."""
+    from ..core.cognition import set_cognition_preference
+    try:
+        detail = set_cognition_preference(req.preference)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    return {"success": True, "bridge": BRIDGE_VERSION, **detail}
