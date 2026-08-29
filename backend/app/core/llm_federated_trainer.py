@@ -110,25 +110,28 @@ def label_of(doc: dict, l2i: dict) -> int:
 # ---------------------------------------------------------------------------
 # Modelo de conocimiento 1.58-bit (MLP ternario)
 # ---------------------------------------------------------------------------
-class KnowledgeMLP(nn.Module):
-    """MLP pequeno de conocimiento. Los pesos se cuantizan a ternario tras entrenar."""
+if _TORCH:
+    class KnowledgeMLP(nn.Module):
+        """MLP pequeno de conocimiento. Los pesos se cuantizan a ternario tras entrenar."""
 
-    def __init__(self, n_vocab: int, n_hidden: int, n_labels: int):
-        super().__init__()
-        self.emb = nn.EmbeddingBag(n_vocab, n_hidden, mode="mean")
-        self.fc = nn.Linear(n_hidden, n_labels)
-        self.n_vocab = n_vocab
-        self.n_hidden = n_hidden
-        self.n_labels = n_labels
+        def __init__(self, n_vocab: int, n_hidden: int, n_labels: int):
+            super().__init__()
+            self.emb = nn.EmbeddingBag(n_vocab, n_hidden, mode="mean")
+            self.fc = nn.Linear(n_hidden, n_labels)
+            self.n_vocab = n_vocab
+            self.n_hidden = n_hidden
+            self.n_labels = n_labels
 
-    def forward(self, idx: torch.Tensor) -> torch.Tensor:
-        if idx.numel() == 0:
-            idx = torch.zeros(1, dtype=torch.long)
-        # idx es 1D (un bag = un fragmento). EmbeddingBag requiere offsets.
-        # Un solo bag que cubre todo el fragmento -> offsets=[0].
-        offsets = torch.zeros(1, dtype=torch.long, device=idx.device)
-        x = self.emb(idx, offsets)
-        return self.fc(x)
+        def forward(self, idx: torch.Tensor) -> torch.Tensor:
+            if idx.numel() == 0:
+                idx = torch.zeros(1, dtype=torch.long)
+            # idx es 1D (un bag = un fragmento). EmbeddingBag requiere offsets.
+            # Un solo bag que cubre todo el fragmento -> offsets=[0].
+            offsets = torch.zeros(1, dtype=torch.long, device=idx.device)
+            x = self.emb(idx, offsets)
+            return self.fc(x)
+else:
+    KnowledgeMLP = None  # torch no disponible en este entorno (CPU-only BitNet)
 
 
 def quantize_state_dict_158(sd: dict) -> dict:

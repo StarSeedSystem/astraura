@@ -492,10 +492,12 @@ class BitNetUnifiedEngine:
                 # identidad StarSeed) y dejaba 732 chars de presupuesto sin usar. El slot
                 # real es n_ctx_slot=512 (~1500 chars). Con gen_budget=128 dejamos ~1000
                 # chars de prefill (≈312 tokens) + 128 gen = 440 < 512 → cabe SIEMPRE.
-                # Rebalanceo: más contexto de sistema (384) para preservar la persona, y
-                # hasta 1024 de usuario (el recorte proporcional lo ajusta a 1000).
-                _MAX_PREFILL_CHARS = 1000  # ~312 tokens, margen seguro en ctx 512
-                sys_txt = (system_prompt or "").strip()[:384]  # (Adenda 172) preserva identidad Astraura
+                # (Adenda 173 · 2026-08-28) Pre-fill preserva la identidad completa
+                # de Astraura y permite prompts largos. Con contexto de 2048 (forzado
+                # via ASTRAURA_BITNET_CTX en 8 GB) y KV cache q8_0 (~2 MB), hay margen
+                # suficiente: 1420 chars de prefill + hasta 256 de generación < 2048.
+                _MAX_PREFILL_CHARS = 1420
+                sys_txt = (system_prompt or "").strip()[:640]
                 user_content = (prompt or "").strip()[:1024]
                 _prefill = f"{sys_txt}\n\n{user_content}"
                 if len(_prefill) > _MAX_PREFILL_CHARS:
@@ -530,9 +532,13 @@ class BitNetUnifiedEngine:
                         ) as res:
                             res.raise_for_status()
                             # (Verificación 1.58, bajo carga) GUARDA DE PRIMER TOKEN
-                            # (read=45 arriba): separo el primer trozo con contenido
-                            # para poder ceder limpio SIN haber yield-eado nada — así
-                            # Ollama regenera desde cero sin duplicar texto.
+                            # (read=45 arriba): necesitamos yield-ear el primer token
+                            # con contenido para poder ceder limpio SIN haber emitido
+                            # nada si falla — así Ollama regenera desde cero sin
+                            # duplicar texto. Se usa UN SOLO bucle con bandera
+                            # `got_first` (dos `async for` sobre el mismo iterator de
+                            # httpx provocaba que el segundo terminara vacío y solo se
+                            # emitiera el primer token → respuestas de 1 palabra).
                             got_first = False
                             async for line in res.aiter_lines():
                                 if not line or not line.startswith("data:"):
@@ -549,25 +555,10 @@ class BitNetUnifiedEngine:
                                     self.stats["tokens_generated"] += 1
                                     yield token
                                     got_first = True
-                                    break
                             if not got_first:
                                 bitnet_failed = "sin primer token en 45 s (slot ocupado)"
                                 print(f"[BitNetUnifiedEngine] BitNet nativo cede el turno: {bitnet_failed}")
                                 return
-                            async for line in res.aiter_lines():
-                                if not line or not line.startswith("data:"):
-                                    continue
-                                data = line[5:].strip()
-                                if not data or data == "[DONE]":
-                                    continue
-                                try:
-                                    delta = json.loads(data)["choices"][0].get("delta", {})
-                                except Exception:
-                                    continue
-                                token = delta.get("content")
-                                if token:
-                                    self.stats["tokens_generated"] += 1
-                                    yield token
                     return
                 except Exception as e:
                     bitnet_failed = f"{type(e).__name__}: {e}".rstrip(": ")

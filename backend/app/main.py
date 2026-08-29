@@ -20,6 +20,7 @@ from .core.dream_engine import dream_engine
 from .core.vault import connections_vault
 from .engine.bitnet_engine import bitnet_engine
 from .engine.bitnet_cpp_manager import bitnet_cpp_manager
+from .engine.bonsai_manager import bonsai_manager
 from .memory.starseed_memory_engine import starseed_memory
 from .memory.openviking_engine import openviking_memory
 from .memory.knowledge_graph import knowledge_graph
@@ -276,6 +277,7 @@ async def get_status():
         "status": "online",
         "app_name": settings.app_name,
         "engine": bitnet_engine.get_engine_status(),
+        "bonsai": bonsai_manager.get_status(),
         "environment": environment_sensor.get_live_metrics(),
         "telemetry": system_senses.get_full_telemetry(),
         "profiler": profiler.get_profile(),

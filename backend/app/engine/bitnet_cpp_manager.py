@@ -10,18 +10,15 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 from ..core.config import settings
 
-# Plantilla de chat OFICIAL de BitNet-b1.58-2B-4T (tokenizer_config.json):
-# «{Role}: {content}<|eot_id|>» por mensaje y «Assistant: » como prompt de
-# generación. La que trae el GGUF es un placeholder roto («BITNETAssistant»),
-# así que el servidor gestionado la sobreescribe con esta.
-BITNET_CHAT_TEMPLATE = (
-    "{%- for message in messages %}{%- if loop.first %}{{ bos_token }}{%- endif %}"
-    "{%- if message['role'] == 'system' %}{{ 'System: ' + message['content'] + '<|eot_id|>' }}"
-    "{%- elif message['role'] == 'user' %}{{ 'User: ' + message['content'] + '<|eot_id|>' }}"
-    "{%- elif message['role'] == 'assistant' %}{{ 'Assistant: ' + message['content'] + '<|eot_id|>' }}"
-    "{%- endif %}{%- endfor %}"
-    "{%- if add_generation_prompt %}{{ 'Assistant: ' }}{%- endif %}"
-)
+# (Adenda 173 · 2026-08-28) HISTÓRICO: antes se sobreescribía la plantilla de chat
+# con BITNET_CHAT_TEMPLATE (formato no estándar «System:/User:/Assistant:»). Eso,
+# sumado a que el GGUF tensor-only (n_kv=0) NO trae tokenizer embebido, producía
+# salida basura ("嗯", bucles de repetición) porque el vocab se tokenizaba mal.
+# AHORA: hay tokenizer.json + tokenizer_config.json (de microsoft/BitNet-b1.58-2B-4T)
+# al lado del GGUF y se fija --override-kv tokenizer.ggml.pre=str:llama-bpe. El
+# servidor usa la plantilla y el pre-tokenizer que declara el propio tokenizer_config
+# (Llama-3). La constante se elimina: el server gestiona la plantilla solo.
+# (Verificado en vivo: /v1/chat/completions devuelve texto coherente en ES/EN.)
 
 class BitNetCppManager:
     """
@@ -92,13 +89,22 @@ class BitNetCppManager:
                     # ¿El proc existe y está vivo?
                     vivo = proc is not None and proc.poll() is None
                     if vivo:
-                        # Sondee rápido: si el server responde 200, OK; si no, relanza.
+                        # Sondee rápido: si el server responde 200, OK. Si responde
+                        # 503 ("Loading model") el server ESTÁ vivo pero cargando el
+                        # GGUF (tarda 30-60 s en M1 8 GB) -> NO relanzar, se está
+                        # inicializando. Solo relanzar si el puerto NO responde NADA
+                        # (connection refused / timeout = proceso muerto de verdad).
                         try:
                             with urllib.request.urlopen(
                                 f"http://127.0.0.1:{self._port_for(perfil)}/health", timeout=2
                             ) as r:
-                                if r.status == 200:
-                                    continue  # sano, no tocar
+                                # 200 = sano; 503 = cargando (dejarlo vivo).
+                                if r.status in (200, 503):
+                                    continue  # vivo (sano o cargando), no tocar
+                        except urllib.error.HTTPError:
+                            # Cualquier otro código HTTP: el server está raro pero
+                            # vivo; no relanzar para evitar el bucle de doble-bind.
+                            continue
                         except Exception:
                             pass  # no responde -> relanzar abajo
                     # Muerto o colgado -> relanzar (sin bloquear el chat: _launching protege)
@@ -524,8 +530,6 @@ class BitNetCppManager:
                         return None
                     model_path = models[0]["path"]
                 try:
-                    tmpl = self.repo_dir.parent / "bitnet-chat-template.jinja"
-                    tmpl.write_text(BITNET_CHAT_TEMPLATE, encoding="utf-8")
                     cpu = os.cpu_count() or 4
                     # (Verificación 1.58 · Adenda 169) En 8 GB usamos SOLO 2 threads:
                     # el búfer de activaciones del llama-server escala con los threads
@@ -538,8 +542,27 @@ class BitNetCppManager:
                         "--host", "127.0.0.1", "--port", str(port),
                         "-t", str(threads), "-c", str(self.server_ctx),
                         "--parallel", str(self.server_parallel),
-                        "--jinja", "--chat-template-file", str(tmpl),
-                        # El GGUF oficial no declara pre-tokenizer: fijamos el de Llama-3.
+                        # (Adenda 173 · 2026-08-28 · CORRECCIÓN FINAL) El GGUF tensor-only
+                        # NO trae plantilla de chat embebida; el tokenizer_config.json que
+                        # acompaña al GGUF declara pre_tokenizer=null / model type=None, así
+                        # que --jinja SOLO usaba un placeholder roto y el modelo REGURGITABA
+                        # datos de entrenamiento ("Question: In the context of a presidential
+                        # election...").  VERIFICADO EN VIVO: pasar explícitamente la
+                        # plantilla Llama-3 Instruct oficial (llama3_chat_template.jinja, al
+                        # lado del repo) devuelve "¡Hola! Estoy aquí para ayudarte. ¿En qué
+                        # puedo ayudarte?" — coherente y siguiendo el system prompt. Por eso
+                        # se FUERZA --chat-template-file con la plantilla Llama-3 correcta.
+                        "--jinja", "--chat-template-file",
+                        str(self.repo_dir.parent / "llama3_chat_template.jinja"),
+                        # (Adenda 173 · 2026-08-28) El GGUF tensor-only NO declara
+                        # pre-tokenizer (log del server: "missing pre-tokenizer type,
+                        # using: 'default' -> GENERATION QUALITY WILL BE DEGRADED").
+                        # BitNet-b1.58-2B-4T es arquitectura Llama-3, así que fijamos
+                        # explícitamente el pre-tokenizer llama-bpe (igual que el build
+                        # oficial de bitnet.cpp). Sin esto el vocab se tokeniza mal y el
+                        # modelo emite basura ("嗯", bucles). El tokenizer.json al lado del
+                        # GGUF aporta el vocabulario correcto; este override aporta el
+                        # pre-tokenizer que el GGUF no trae.
                         "--override-kv", "tokenizer.ggml.pre=str:llama-bpe",
                         # (Adenda 160) CPU PURA, obligatorio. El backend Metal NO
                         # implementa el tipo i2_s (ggml-metal-device.cpp: "not
