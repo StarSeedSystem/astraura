@@ -1,0 +1,279 @@
+diff --git a/ggml/src/CMakeLists.txt b/ggml/src/CMakeLists.txt
+index 94d0f0fa8..22391c151 100644
+--- a/ggml/src/CMakeLists.txt
++++ b/ggml/src/CMakeLists.txt
+@@ -206,6 +206,7 @@ add_library(ggml-base
+             ggml-threading.h
+             ggml-quants.c
+             ggml-quants.h
++            ggml-i2s.c
+             gguf.cpp)
+ 
+ set_target_properties(ggml-base PROPERTIES
+diff --git a/ggml/src/ggml-cpu/CMakeLists.txt b/ggml/src/ggml-cpu/CMakeLists.txt
+index fd5ba9989..5fc3b6830 100644
+--- a/ggml/src/ggml-cpu/CMakeLists.txt
++++ b/ggml/src/ggml-cpu/CMakeLists.txt
+@@ -54,6 +54,9 @@ function(ggml_add_cpu_backend_variant_impl tag_name)
+         ggml-cpu/ops.h
+         ggml-cpu/ops.cpp
+         ../../../../src/ggml-bitnet-lut.cpp
++        # (Adenda 161) Los kernels NEON de i2_s viven aqui. Sin esta linea,
++        # `ggml_vec_dot_i2_i8_s` lo resolvia la version x86/escalar de quants.c.
++        ../../../../src/ggml-bitnet-mad.cpp
+         )
+ 
+     target_compile_features(${GGML_CPU_NAME} PRIVATE c_std_11 cxx_std_17)
+diff --git a/ggml/src/ggml-cpu/ggml-cpu-i2s.c b/ggml/src/ggml-cpu/ggml-cpu-i2s.c
+index d2ea0d729..ef0b956c6 100644
+--- a/ggml/src/ggml-cpu/ggml-cpu-i2s.c
++++ b/ggml/src/ggml-cpu/ggml-cpu-i2s.c
+@@ -36,6 +36,22 @@ void ggml_gemv_i2_i8_s(int n, float * GGML_RESTRICT s, size_t bs, const void * G
+ }
+ 
+ void ggml_gemm_i2_i8_s(int n, float * GGML_RESTRICT s, size_t bs, const void * GGML_RESTRICT vx, const void * GGML_RESTRICT vy, int nr, int nc) {
++#if defined(__ARM_NEON)
++    // (Adenda 162) En ARM la ruta por bloques de abajo devuelve bien la primera
++    // columna y mal las demas (medido: 96/128 valores incorrectos con n=2560,
++    // nr=4, nc=32). Es la ruta del PROCESADO DEL PROMPT, asi que corrompia el
++    // estado oculto y la cache KV desde el primer token.
++    //
++    // `s[col*bs + row]`: para cada columna de activacion, `vec_dot` escribe las
++    // nc filas contiguas leyendo los pesos con paso n/4. Correcto por
++    // construccion, y reutiliza el kernel NEON ya verificado.
++    for (int col = 0; col < nr; col++) {
++        ggml_vec_dot_i2_i8_s(n, s + (size_t)col * bs, 1,
++                             vx, (size_t)n,
++                             (const int8_t *)vy + (size_t)col * n, 0, nc);
++    }
++    return;
++#endif
+     // nr = number of activation columns (B side)
+     // nc = number of weight rows (A side)
+     // n  = inner dimension (elements per row)
+diff --git a/ggml/src/ggml-cpu/ggml-cpu.c b/ggml/src/ggml-cpu/ggml-cpu.c
+index ec88ef29a..e590506a6 100644
+--- a/ggml/src/ggml-cpu/ggml-cpu.c
++++ b/ggml/src/ggml-cpu/ggml-cpu.c
+@@ -1503,6 +1503,9 @@ UseGgmlGemm2:;
+         if (src0_start >= src0_end) return;
+ 
+         const float * scale      = (const float *)((const uint8_t *)src0->data + (ne00 * ne01 / 4));
++        { static int dbg=0; if (getenv("ASTRAURA_I2S_DEBUG") && dbg<3) { dbg++;
++            fprintf(stderr, "[I2S-DEBUG] ruta=GGML-CPU  ne00=%lld ne01=%lld ne11=%lld ws=%.6g\n",
++                    (long long)ne00,(long long)ne01,(long long)ne11,(double)*scale); } }
+         const float * act_scales = (const float *)((const char *)src1_wdata + (ne11 * ne10));
+         const int32_t * act_sums = (const int32_t *)((const char *)act_scales + ne11 * sizeof(float));
+         const int64_t n_rows = src0_end - src0_start;
+@@ -1543,6 +1546,10 @@ UseGgmlGemm2:;
+                 float * dst_row = (float *)((char *)dst->data + iter * nb1) + src0_start;
+                 const float post_scale = ws / act_scales[iter];
+                 const int32_t asum = act_sums[iter];
++                { static int d2=0; if (getenv("ASTRAURA_I2S_DEBUG") && d2<3) { d2++;
++                    fprintf(stderr, "[I2S-GEMV] n_rows=%lld asum=%d act_scale=%.6g post=%.6g | tmp[0..5]= %.1f %.1f %.1f %.1f %.1f %.1f\n",
++                        (long long)n_rows, asum, (double)act_scales[iter], (double)post_scale,
++                        tmp[0],tmp[1],tmp[2],tmp[3],tmp[4],tmp[5]); } }
+                 for (int64_t row = 0; row < n_rows; row++) {
+                     dst_row[row] = (tmp[row] - asum) * post_scale;
+                 }
+diff --git a/ggml/src/ggml-cpu/quants.c b/ggml/src/ggml-cpu/quants.c
+index 603f51c54..0fd56bd25 100644
+--- a/ggml/src/ggml-cpu/quants.c
++++ b/ggml/src/ggml-cpu/quants.c
+@@ -1332,178 +1332,13 @@ void quantize_row_i8_s_4x1(const float * x, void * y, int64_t n, float* act_scal
+     quantize_row_i8_s(x, y, n, act_scales, act_sums);
+ }
+ 
+-void dequantize_row_i2_s(const uint8_t * x, float * y, int64_t n, const float i2_scale) {
+-    static const float map2bit[4] = { -1.0f, 0.0f, 1.0f, 0.0f };
+-    int64_t done = 0;
+-    while (done < n) {
+-        int64_t cols0 = MIN(32, n - done - 0*32);
+-        int64_t cols1 = MIN(32, n - done - 1*32);
+-        int64_t cols2 = MIN(32, n - done - 2*32);
+-        int64_t cols3 = MIN(32, n - done - 3*32);
+-        for (int gp = 0; gp < 32; gp++) {
+-            uint8_t byte = x[(done/4) + gp];
+-            uint8_t c0 = (byte >> 6) & 0x03;
+-            uint8_t c1 = (byte >> 4) & 0x03;
+-            uint8_t c2 = (byte >> 2) & 0x03;
+-            uint8_t c3 = (byte >> 0) & 0x03;
+-            if (gp < cols0) y[done + 0*32 + gp] = i2_scale * map2bit[c0];
+-            if (gp < cols1) y[done + 1*32 + gp] = i2_scale * map2bit[c1];
+-            if (gp < cols2) y[done + 2*32 + gp] = i2_scale * map2bit[c2];
+-            if (gp < cols3) y[done + 3*32 + gp] = i2_scale * map2bit[c3];
+-        }
+-        done += 128;
+-    }
+-}
+-
+-size_t quantize_i2_s(const float * src, void * dst, int64_t nrow, int64_t n_per_row, const float * quant_weights) {
+-    (void)quant_weights;
+-    int64_t n = nrow * n_per_row;
+-
+-    double max = 0.0;
+-    for (int64_t i = 0; i < n; i++) {
+-        double v = fabs((double)src[i]);
+-        if (v > max) { max = v; break; }  // first nonzero abs as scale (BitNet convention)
+-    }
++// (Adenda 160) `dequantize_row_i2_s` se movio a ggml/src/ggml-i2s.c (ggml-base).
+ 
+-    uint8_t * q = (uint8_t *)dst;
+-    memset(q, 0, n / 4);
++// (Adenda 160) `quantize_i2_s` se movio a ggml/src/ggml-i2s.c (ggml-base).
+ 
+-    for (int64_t i = 0; i < n; i++) {
+-        uint8_t val;
+-        if (fabs((double)src[i]) < 1e-6) {
+-            val = 1; // maps to 0
+-        } else {
+-            val = ((double)src[i] * max > 0) ? 2 : 0; // maps to +1 or -1
+-        }
+-        int byte_idx = i / 4;
+-        int bit_pos = 6 - 2 * (i % 4);
+-        q[byte_idx] |= (val << bit_pos);
+-    }
+ 
+-    float * scale_ptr = (float *)(q + n / 4);
+-    scale_ptr[0] = (float)max;
++// (Adenda 161) `ggml_vec_dot_i2_i8_s_1x1` lo provee src/ggml-bitnet-mad.cpp (kernels NEON).
+ 
+-    return nrow * n_per_row / 4 + 32;
+-}
+ 
++// (Adenda 161) `ggml_vec_dot_i2_i8_s` lo provee src/ggml-bitnet-mad.cpp (kernels NEON).
+ 
+-static void ggml_vec_dot_i2_i8_s_1x1(int n, float * s, size_t bs, const void * vx, size_t bx, const void * vy, size_t by, int nrc) {
+-#if defined(__AVX2__)
+-    const uint8_t *    x = (uint8_t *)vx;
+-    const int8_t  *    y = (int8_t *)vy;
+-
+-    const int nb = n / QK_I2_S;
+-    const int group32_num = nb / 32;
+-    const int la_num = nb % 32;
+-    const int groupla_num = nb % 32 != 0 ? 1 : 0;
+-    
+-    __m256i mask = _mm256_set1_epi8(0x03);
+-    __m256i one16 = _mm256_set1_epi16(1);
+-
+-    // 处理多行，nrc表示要处理的行数
+-    for (int row = 0; row < nrc; row++) {
+-        __m256i accu = _mm256_setzero_si256();
+-        
+-        // 计算当前行的x指针偏移
+-        const uint8_t * x_row = x + row * bx / 4;
+-        
+-        for (int i = 0; i < group32_num; i++) {
+-            const uint8_t *px = x_row + i * 1024;     // 32 * 32
+-            const int8_t  *py = y + i * 4096;         // 32 * 128
+-            __m256i accu32 = _mm256_setzero_si256();
+-            
+-            for (int j = 0; j < 32; j++) {
+-                // 128 index
+-                __m256i xq8_3 = _mm256_loadu_si256((const __m256i*)(px));
+-                __m256i xq8_2 = _mm256_srli_epi16(xq8_3, 2);
+-                __m256i xq8_1 = _mm256_srli_epi16(xq8_3, 4);
+-                __m256i xq8_0 = _mm256_srli_epi16(xq8_3, 6);
+-
+-                // each 32 index
+-                xq8_3 = _mm256_and_si256(xq8_3, mask);
+-                xq8_2 = _mm256_and_si256(xq8_2, mask);
+-                xq8_1 = _mm256_and_si256(xq8_1, mask);
+-                xq8_0 = _mm256_and_si256(xq8_0, mask);
+-
+-                // each 32 index
+-                __m256i yq8_0 = _mm256_loadu_si256((const __m256i*)(py));
+-                __m256i yq8_1 = _mm256_loadu_si256((const __m256i*)(py + 32));
+-                __m256i yq8_2 = _mm256_loadu_si256((const __m256i*)(py + 64));
+-                __m256i yq8_3 = _mm256_loadu_si256((const __m256i*)(py + 96));
+-
+-                xq8_0 = _mm256_maddubs_epi16(xq8_0, yq8_0);
+-                xq8_1 = _mm256_maddubs_epi16(xq8_1, yq8_1);
+-                xq8_2 = _mm256_maddubs_epi16(xq8_2, yq8_2);
+-                xq8_3 = _mm256_maddubs_epi16(xq8_3, yq8_3);
+-
+-                accu32 = _mm256_add_epi16(accu32, _mm256_add_epi16(xq8_0, xq8_1));
+-                accu32 = _mm256_add_epi16(accu32, _mm256_add_epi16(xq8_2, xq8_3));
+-
+-                px += 32;
+-                py += 128;
+-            }
+-            accu = _mm256_add_epi32(_mm256_madd_epi16(accu32, one16), accu);
+-        }
+-
+-        for (int i = 0; i < groupla_num; i++) {
+-            __m256i accula = _mm256_setzero_si256();
+-            const uint8_t *px = x_row + group32_num * 1024; // 32 * 32
+-            const int8_t  *py = y + group32_num * 4096;     // 32 * 128
+-            
+-            for (int j = 0; j < la_num; j++) {
+-                // 128 index
+-                __m256i xq8_3 = _mm256_loadu_si256((const __m256i*)(px));
+-                __m256i xq8_2 = _mm256_srli_epi16(xq8_3, 2);
+-                __m256i xq8_1 = _mm256_srli_epi16(xq8_3, 4);
+-                __m256i xq8_0 = _mm256_srli_epi16(xq8_3, 6);
+-
+-                // each 32 index
+-                xq8_3 = _mm256_and_si256(xq8_3, mask);
+-                xq8_2 = _mm256_and_si256(xq8_2, mask);
+-                xq8_1 = _mm256_and_si256(xq8_1, mask);
+-                xq8_0 = _mm256_and_si256(xq8_0, mask);
+-
+-                // each 32 index
+-                __m256i yq8_0 = _mm256_loadu_si256((const __m256i*)(py));
+-                __m256i yq8_1 = _mm256_loadu_si256((const __m256i*)(py + 32));
+-                __m256i yq8_2 = _mm256_loadu_si256((const __m256i*)(py + 64));
+-                __m256i yq8_3 = _mm256_loadu_si256((const __m256i*)(py + 96));
+-
+-                xq8_0 = _mm256_maddubs_epi16(xq8_0, yq8_0);
+-                xq8_1 = _mm256_maddubs_epi16(xq8_1, yq8_1);
+-                xq8_2 = _mm256_maddubs_epi16(xq8_2, yq8_2);
+-                xq8_3 = _mm256_maddubs_epi16(xq8_3, yq8_3);
+-
+-                accula = _mm256_add_epi16(accula, _mm256_add_epi16(xq8_0, xq8_1));
+-                accula = _mm256_add_epi16(accula, _mm256_add_epi16(xq8_2, xq8_3));
+-
+-                px += 32;
+-                py += 128;
+-            }
+-            accu = _mm256_add_epi32(accu, _mm256_madd_epi16(accula, one16));
+-        }
+-        
+-        int sumi = hsum_i32_8(accu);
+-        s[row] = (float)sumi;
+-    }
+-#else
+-    // Scalar fallback
+-    const uint8_t * x = (const uint8_t *)vx;
+-    const int8_t * y  = (const int8_t *)vy;
+-    static const int map2bit[4] = { -1, 0, 1, 0 };
+-    for (int row = 0; row < nrc; row++) {
+-        int32_t sum = 0;
+-        for (int i = 0; i < n; i++) {
+-            int byte_idx = i / 4;
+-            int bit_pos = 6 - 2 * (i % 4);
+-            int w = map2bit[(x[row * (n/4) + byte_idx] >> bit_pos) & 0x03];
+-            sum += w * y[i];
+-        }
+-        s[row] = (float)sum;
+-    }
+-#endif
+-}
+-
+-void ggml_vec_dot_i2_i8_s(int n, float * s, size_t bs, const void * vx, size_t bx, const void * vy, size_t by, int nrc) {
+-    ggml_vec_dot_i2_i8_s_1x1(n, s, bs, vx, bx, vy, by, nrc);
+-}
+diff --git a/ggml/src/ggml-cpu/repack.cpp b/ggml/src/ggml-cpu/repack.cpp
+index d0f549a79..541f608de 100644
+--- a/ggml/src/ggml-cpu/repack.cpp
++++ b/ggml/src/ggml-cpu/repack.cpp
+@@ -4906,6 +4906,9 @@ class tensor_traits_i2s : public ggml::cpu::tensor_traits {
+ 
+         // Phase 2: Static-split GEMM — each thread gets a contiguous range of A rows
+         const float   ws = *(const float *)((const uint8_t *)src0->data + (ne00 * ne01 / 4));
++        { static int dbg=0; if (getenv("ASTRAURA_I2S_DEBUG") && dbg<3) { dbg++;
++            fprintf(stderr, "[I2S-DEBUG] ruta=REPACK  ne00=%lld ne01=%lld ne11=%lld ws=%.6g ith=%d nth=%d\n",
++                    (long long)ne00,(long long)ne01,(long long)ne11,(double)ws,ith,nth); } }
+         const int64_t a_row_bytes = ne00 / 4;
+ 
+         const int64_t ALIGN = 4;
