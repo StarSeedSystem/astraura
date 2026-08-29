@@ -89,3 +89,6 @@ backend/data/personality_apis.json
 backend/data/agent_apis.json
 data/sensorium/sensorium_location.json
 **/master_key.txt
+
+# (Adenda 175) Artefactos runtime del enjambre: NUNCA al repo
+data/vault/artifacts/
