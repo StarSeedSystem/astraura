@@ -341,8 +341,11 @@ class AdaptiveMultiAreaSwarmEngine:
             except Exception as e:
                 print(f"⚠️ Error cargando estado del enjambre adaptativo: {e}")
 
-        if not self.active_tasks:
-            self._seed_sample_tasks()
+        # (Adenda 181 · «nada simulado») La siembra de tareas de MUESTRA con logs
+        # inventados queda desactivada: una cola vacía se muestra vacía. Las
+        # tareas reales llegan por schedules, Director, proactivo o el usuario.
+        # if not self.active_tasks:
+        #     self._seed_sample_tasks()
 
     def _save_state(self):
         try:
@@ -737,12 +740,50 @@ class AdaptiveMultiAreaSwarmEngine:
     KEEP_COMPLETED = 12
     STUCK_SECONDS = 600  # running sin completar > 10 min = atascada por contención
 
+    def _limite_fondo(self) -> int:
+        """(Adenda 181) Tareas de fondo SIMULTÁNEAS honestas para este hardware:
+        en ≤8.5 GB el motor 1.58 solo puede servir UNA generación real a la vez
+        (medido: 4% de respuestas reales con 2-3 concurrentes)."""
+        try:
+            gb = psutil.virtual_memory().total / (1024 ** 3)
+            return 1 if gb <= 8.5 else 2
+        except Exception:
+            return 1
+
+    def _throttle_running(self, now: float) -> None:
+        """(Adenda 181) Cuello de botella honesto: solo `limite` tareas RUNNING a la
+        vez; el resto espera en `queued` (y se promueve por orden de llegada).
+        Atrapa TODAS las fuentes (schedules, Director, renovaciones, proactivo)."""
+        limite = self._limite_fondo()
+        running = sorted([t for t in self.active_tasks if t.get("status") == "running"],
+                         key=lambda t: t.get("started_at", now))
+        for t in running[limite:]:
+            t["status"] = "queued"
+            t["phase_label"] = "En cola: el motor 1.58 sirve una generación real a la vez"
+        activos = len(running[:limite])
+        if activos < limite:
+            queued = sorted([t for t in self.active_tasks if t.get("status") == "queued"],
+                            key=lambda t: t.get("started_at", now))
+            for t in queued[: limite - activos]:
+                t["status"] = "running"
+                t["started_at"] = now  # reinicia el reloj anti-atasco al ENTRAR de verdad
+                t["phase_label"] = "Retomada: turno del motor 1.58"
+
     def _prune_active_tasks(self, now: float) -> int:
         before = len(self.active_tasks)
         running, terminadas = [], []
+        queued = [t for t in self.active_tasks if t.get("status") == "queued"]
+        # La cola de espera también se acota (honesto): las más viejas se liberan.
+        queued.sort(key=lambda t: t.get("started_at", now), reverse=True)
+        for t in queued[6:]:
+            t["status"] = "failed"
+            t["phase_label"] = "Liberada: la cola de fondo estaba llena"
         for t in self.active_tasks:
             st = t.get("status")
             started = t.get("started_at", now)
+            if st == "queued" and t.get("phase_label") != "Liberada: la cola de fondo estaba llena":
+                running.append(t)  # las encoladas vivas se conservan como las running
+                continue
             if st == "running" and (now - started) > self.STUCK_SECONDS:
                 t["status"] = "failed"
                 t["phase_label"] = "Liberada: atascada por contención de cómputo"
@@ -780,6 +821,7 @@ class AdaptiveMultiAreaSwarmEngine:
                 # acotada (running vivas + N completadas), libera atascadas y evita el
                 # pile-up que satura la cognición (el visor mostró 504 tareas).
                 self._prune_active_tasks(now)
+                self._throttle_running(now)
 
                 # Check user interaction cooldown
                 if now - self.last_user_activity_time > 20:
@@ -874,7 +916,7 @@ class AdaptiveMultiAreaSwarmEngine:
                             print(f"⚠️ Error lanzando la finalización de la tarea {t.get('id')}: {e}")
 
                 # 2. Autonomous Proactive Swarm Dispatcher (Maintains continuous intelligent pipeline)
-                if len(running_tasks) < 2:
+                if len(running_tasks) < self._limite_fondo():
                     pool = [
                         ("area_engineering", "hephaestus", "Optimización de Microkernel Vectorial NEON en 1.58b", "Refactorizar bucles SIMD para Apple Silicon M1.", f"{WORKSPACE}/backend/app"),
                         ("area_web_intel", "hermes", "Rastreo de Preprints arXiv sobre Modelos Ternarios", "Extracción y análisis de papers sobre cuantización ternaria.", f"{WORKSPACE}/data/research"),
