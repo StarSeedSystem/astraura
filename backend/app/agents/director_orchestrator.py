@@ -769,11 +769,15 @@ class DirectorOrchestratorEngine:
         partir de la especialidad del agente, la última tarea completada y la memoria
         ejecutiva. Si no hay modelo o el JSON no sirve → plantilla (random.choice).
         """
+        # (Adenda 182 · «nada simulado») La plantilla random SOLO sirve de CONTEXTO
+        # (área/carpeta base); si el motor no formula de verdad, NO se renueva
+        # (se devuelve None) — jamás se despacha una tarea inventada al azar.
         template_spec = self.formulate_next_intelligent_task(agent_id, last_completed_task)
         try:
             from app.core import cognition
             if not cognition.real_available():
-                return template_spec
+                print(f"👑 [Director] Sin motor real disponible: no se formula tarea para {agent_id} (honesto, sin plantilla).")
+                return None
             role = ""
             area_name = ""
             try:
@@ -800,18 +804,21 @@ class DirectorOrchestratorEngine:
                 "Formula UNA sola tarea siguiente, distinta de la última, que avance el proyecto. Devuelve SOLO: "
                 "{\"title\": \"título específico (máx. 14 palabras)\", \"prompt\": \"instrucción de 1-3 frases con el resultado esperado\"}"
             )
-            res = await cognition.generate(prompt, system=system, max_tokens=200, temperature=0.5, timeout=60.0)
+            # (Adenda 182) Timeout acorde al hardware (a ~3 tok/s, 200 tokens ≈ 60 s + prefill).
+            res = await cognition.generate(prompt, system=system, max_tokens=200, temperature=0.5, timeout=150.0)
             if not res.get("real"):
-                return template_spec
+                print(f"👑 [Director] El motor no sirvió formulación real para {agent_id}: no se renueva (sin plantilla).")
+                return None
             data = cognition.extract_json(res["text"])
             title = cognition.field(data, "title", max_len=140, min_len=10)
             task_prompt = cognition.field(data, "prompt", max_len=600, min_len=20)
             if not title or not task_prompt or title.strip().lower() == str(last_title).strip().lower():
-                return template_spec
+                print(f"👑 [Director] Formulación real inválida/repetida para {agent_id}: no se renueva (sin plantilla).")
+                return None
             return {**template_spec, "title": title, "prompt": task_prompt, "generated_by": "llm"}
         except Exception as e:
-            print(f"⚠️ [Director] Formulación real de tarea falló, se usa plantilla: {e}")
-            return template_spec
+            print(f"⚠️ [Director] Formulación real de tarea falló para {agent_id}: no se renueva. {e}")
+            return None
 
     async def auto_renew_completed_task_async(self, completed_task: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """
@@ -822,6 +829,20 @@ class DirectorOrchestratorEngine:
         audit_res = await self.audit_and_verify_task_output_async(completed_task)
         next_task_spec = await self.formulate_next_intelligent_task_async(agent_id, completed_task)
         now = time.time()
+        if next_task_spec is None:
+            # (Adenda 182) Sin formulación REAL no hay renovación — y la decisión
+            # honesta queda registrada (auditoría hecha, renovación omitida).
+            self.decision_history.insert(0, {
+                "id": f"dec_norenew_{int(now)}_{random.randint(10, 99)}",
+                "timestamp": now,
+                "action": f"Renovación omitida (sin formulación real): {agent_id}",
+                "agent_id": agent_id,
+                "reasoning": f"Tarea anterior '{completed_task.get('title')}' auditada ({audit_res['audit']['quality_score']}%). El motor no sirvió una formulación real; no se despacha tarea inventada.",
+                "generated_by": "ninguno",
+                "status": "skipped",
+            })
+            self._save_memory()
+            return None
         self.decision_history.insert(0, {
             "id": f"dec_renew_{int(now)}_{random.randint(10, 99)}",
             "timestamp": now,

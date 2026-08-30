@@ -472,8 +472,12 @@ async def renew_director_tasks_endpoint():
     pool = ["hephaestus", "hermes", "mnemosyne", "oneiros", "athena", "daedalus"]
     renewed = []
     for ag_id in pool[:3]:
-        # (OS · Ola 3) Tarea formulada por el motor real (plantilla random.choice si no hay modelo).
+        # (Adenda 182 · «nada simulado») Solo se despachan tareas FORMULADAS por el
+        # motor real; sin formulación real, ese agente se omite honestamente.
         spec = await director_orchestrator.formulate_next_intelligent_task_async(ag_id)
+        if not spec:
+            renewed.append({"agent_id": ag_id, "skipped": True, "reason": "sin formulación real del motor"})
+            continue
         swarm_manager.dispatch_task(
             area_id=spec["area_id"],
             title=spec["title"],

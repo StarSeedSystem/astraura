@@ -734,7 +734,7 @@ class AdaptiveMultiAreaSwarmEngine:
             try:
                 from app.agents.director_orchestrator import director_orchestrator
                 next_task = await director_orchestrator.auto_renew_completed_task_async(t)
-                t["logs"].append("👑 Auditado por Director Metis. Siguiente ciclo formulado.")
+                t["logs"].append("👑 Auditado por Director Metis." + (" Siguiente ciclo formulado por el motor." if next_task else " Renovación omitida: sin formulación real (honesto)."))
                 if next_task and len([tk for tk in self.active_tasks if tk["status"] == "running"]) < 4:
                     self.dispatch_task(
                         area_id=next_task["area_id"],
