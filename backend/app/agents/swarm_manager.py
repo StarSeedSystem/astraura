@@ -728,6 +728,43 @@ class AdaptiveMultiAreaSwarmEngine:
 
     # ================= Background Scheduler & Autonomous Reactivator =================
 
+    # (Adenda 178) Tope duro y poda de la cola. Sin esto, `active_tasks` crece
+    # sin límite: las completadas nunca se retiran y las running se atascan por
+    # la contención de cognición — el visor en vivo mostró 504 tareas martillando
+    # el motor 1.58. Mantiene todas las running vivas + las N terminadas más
+    # recientes, libera honestamente las atascadas y aplica un tope absoluto.
+    MAX_ACTIVE_TASKS = 40
+    KEEP_COMPLETED = 12
+    STUCK_SECONDS = 600  # running sin completar > 10 min = atascada por contención
+
+    def _prune_active_tasks(self, now: float) -> int:
+        before = len(self.active_tasks)
+        running, terminadas = [], []
+        for t in self.active_tasks:
+            st = t.get("status")
+            started = t.get("started_at", now)
+            if st == "running" and (now - started) > self.STUCK_SECONDS:
+                t["status"] = "failed"
+                t["phase_label"] = "Liberada: atascada por contención de cómputo"
+                t.setdefault("logs", []).append("⏱️ Tarea liberada: superó el máximo sin completar (contención de cognición).")
+                terminadas.append(t)
+            elif st == "running":
+                running.append(t)
+            else:
+                terminadas.append(t)
+        terminadas.sort(key=lambda x: x.get("completed_at") or x.get("started_at") or 0, reverse=True)
+        kept = running + terminadas[:self.KEEP_COMPLETED]
+        if len(kept) > self.MAX_ACTIVE_TASKS:
+            # Tope absoluto: prioriza las running vivas, rellena con terminadas recientes.
+            kept = (running[:self.MAX_ACTIVE_TASKS] if len(running) >= self.MAX_ACTIVE_TASKS
+                    else running + terminadas[:self.MAX_ACTIVE_TASKS - len(running)])
+        self.active_tasks = kept
+        removed = before - len(self.active_tasks)
+        if removed > 0:
+            try: self.save_state()
+            except Exception: pass
+        return removed
+
     async def start_scheduler_loop(self):
         """
         Bucle continuo del planificador de reactivaciones programadas.
@@ -738,7 +775,12 @@ class AdaptiveMultiAreaSwarmEngine:
             try:
                 await asyncio.sleep(5)
                 now = time.time()
-                
+
+                # (Adenda 178) Poda de la cola ANTES de avanzar: mantiene active_tasks
+                # acotada (running vivas + N completadas), libera atascadas y evita el
+                # pile-up que satura la cognición (el visor mostró 504 tareas).
+                self._prune_active_tasks(now)
+
                 # Check user interaction cooldown
                 if now - self.last_user_activity_time > 20:
                     self.is_user_interactive = False
