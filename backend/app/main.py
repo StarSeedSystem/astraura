@@ -146,9 +146,21 @@ async def lifespan(app: FastAPI):
                 ("agent_memory", lambda: sft.train_subsystem("agent_memory", 2, "auto", 1500)),
                 ("persona_embed", lambda: sft.train_subsystem("persona_embed", 2, "auto", 600)),
             ]
+            # (Adenda 179) Entorno SIN torch (p.ej. Cloud Run headless): el
+            # entrenamiento federado no aplica → se salta con aviso honesto en vez
+            # de romper el arranque. Antes esta PRIMERA llamada no estaba protegida
+            # y su AssertionError quedaba sin recoger (fallo del probe en la nube).
+            try:
+                import torch as _torch  # noqa: F401
+            except Exception:
+                print("[fed] torch no disponible (headless/nube): entrenamiento federado desactivado.")
+                return
             idx = 0
             name, fn = order[idx]
-            await _a.to_thread(fn)
+            try:
+                await _a.to_thread(fn)
+            except Exception as e:
+                print(f"[fed] primer ciclo omitido: {e}")
             while True:
                 for name, fn in order:
                     try:
