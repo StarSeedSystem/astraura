@@ -641,11 +641,32 @@ class AdaptiveMultiAreaSwarmEngine:
             "Escribe el ENTREGABLE de esta tarea: 1) hallazgos, 2) cambios o propuestas concretas (con fragmentos "
             "de código o pasos si aplica), 3) cómo verificarlo. Máximo ~250 palabras."
         )
-        res = await cognition.generate(prompt, system=system, max_tokens=400, temperature=0.45, timeout=90.0)
+        # (Adenda 181) El fondo tiene PACIENCIA real: a ~3 tok/s en 8 GB, 400 tokens
+        # tardan ~130 s; con 90 s el timeout fallaba tareas que SÍ iban a completar.
+        res = await cognition.generate(prompt, system=system, max_tokens=400, temperature=0.45, timeout=240.0)
         if not res.get("real"):
             return None
         text = res["text"].strip()
         return text if len(text) >= 40 else None
+
+    async def _generate_real(self, t: Dict[str, Any]) -> None:
+        """(Adenda 181 · 100% real) La generación del motor 1.58 ocurre DENTRO del
+        ciclo de la tarea (fase 2). Sin plantillas: si el motor no responde, la
+        tarea falla con su motivo y se ve tal cual."""
+        t0 = time.perf_counter()
+        try:
+            real = await self._cognize_deliverable(t)
+        except Exception as e:
+            real = None
+            t["fail_reason"] = f"Generación real falló: {str(e)[:120]}"
+        t["deliverable_ms"] = int((time.perf_counter() - t0) * 1000)
+        if real:
+            t["deliverable_full"] = real
+            t["generated_by"] = "llm"
+            t["real_stage"] = "synthesize"
+        else:
+            t.setdefault("fail_reason", "El motor 1.58 no sirvió respuesta real (sin plantilla de relleno)")
+            t["real_stage"] = "failed"
 
     async def _finalize_completed_task(self, t: Dict[str, Any]) -> None:
         """
@@ -655,18 +676,25 @@ class AdaptiveMultiAreaSwarmEngine:
         """
         import hashlib
         try:
-            deliverable = self._template_deliverable(t)
-            generated_by = "template"
-            t0 = time.perf_counter()
-            try:
-                real = await self._cognize_deliverable(t)
-            except Exception as e:
-                real = None
-                print(f"⚠️ [Swarm] Entregable real falló para {t.get('id')}: {e}")
-            if real:
-                deliverable = real
-                generated_by = "llm"
-            ms = int((time.perf_counter() - t0) * 1000)
+            # (Adenda 181 · 100% real) El entregable ya viene generado en fase 2
+            # (`_generate_real`). Para tareas legadas sin él se intenta UNA pasada
+            # real; si el motor no responde, se dice — JAMÁS plantilla de relleno.
+            deliverable = t.get("deliverable_full")
+            generated_by = t.get("generated_by") or "llm"
+            ms = int(t.get("deliverable_ms") or 0)
+            if not deliverable:
+                t0 = time.perf_counter()
+                try:
+                    real = await self._cognize_deliverable(t)
+                except Exception as e:
+                    real = None
+                    print(f"⚠️ [Swarm] Entregable real falló para {t.get('id')}: {e}")
+                ms = int((time.perf_counter() - t0) * 1000)
+                if real:
+                    deliverable, generated_by = real, "llm"
+                else:
+                    deliverable = "(sin entregable: el motor 1.58 no sirvió respuesta real en esta pasada)"
+                    generated_by = "ninguno"
 
             agent_id = t.get("agent_id", "hephaestus")
             artifact_dir = Path(f"{WORKSPACE}/data/vault/artifacts")
@@ -830,90 +858,67 @@ class AdaptiveMultiAreaSwarmEngine:
                 # 1. Update running tasks progress through real physical execution phases
                 running_tasks = [t for t in self.active_tasks if t["status"] == "running"]
                 
+                # (Adenda 181 · 100% REAL) Máquina de estados por HITOS REALES:
+                # fase 1 = escaneo real de archivos · fase 2 = la GENERACIÓN del
+                # motor 1.58 ocurre AQUÍ (no después de «completed») · fase 3 =
+                # entregable real listo · fase 4 = auditoría. Sin temporizadores
+                # decorativos, sin np.dot de adorno, sin plantillas de relleno:
+                # si el motor no sirve respuesta real, la tarea FALLA con motivo.
                 for t in running_tasks:
-                    current_prog = t.get("progress", 10)
-                    
-                    # Real RAM and CPU check via psutil
                     proc = psutil.Process()
                     t["real_memory_mb"] = round(proc.memory_info().rss / (1024 * 1024), 1)
                     t["real_cpu_usage"] = psutil.cpu_percent(interval=None)
+                    stage = t.get("real_stage") or "scan"
 
-                    # Real filesystem target path
-                    target_path = Path(t.get("target_folder_path", f"{WORKSPACE}/backend/app"))
-                    target_path.mkdir(parents=True, exist_ok=True)
-                    real_files = [f.name for f in target_path.glob("*.*") if not f.name.startswith(".")][:8] if target_path.exists() else []
-                    t["real_files_scanned_count"] = len(real_files)
-
-                    if current_prog < 35:
-                        t["progress"] = min(35, current_prog + 10)
+                    if stage == "scan":
+                        target_path = Path(t.get("target_folder_path", f"{WORKSPACE}/backend/app"))
+                        target_path.mkdir(parents=True, exist_ok=True)
+                        real_files = [f.name for f in target_path.glob("*.*") if not f.name.startswith(".")][:8] if target_path.exists() else []
+                        t["real_files_scanned_count"] = len(real_files)
+                        total_bytes = sum(f.stat().st_size for f in target_path.glob("*.*") if f.is_file()) if target_path.exists() else 0
+                        t.setdefault("logs", []).append(f"Inspeccionados {len(real_files)} archivos reales ({round(total_bytes/1024, 1)} KB) en {target_path.name}.")
+                        t["progress"] = 25
                         t["execution_phase"] = "phase_1_inspection"
-                        t["phase_label"] = "Fase 1/4: Inspección de Archivos Locales & Telemetría M1"
-                        if len(t["logs"]) < 3:
-                            total_bytes = sum(f.stat().st_size for f in target_path.glob("*.*") if f.is_file()) if target_path.exists() else 0
-                            t["logs"].append(f"Inspeccionados {len(real_files)} archivos locales ({round(total_bytes/1024, 1)} KB) en {target_path.name}.")
-                    elif current_prog < 70:
-                        t["progress"] = min(70, current_prog + 12)
-                        t["execution_phase"] = "phase_2_inference"
-                        t["phase_label"] = "Fase 2/4: Formulación de Hipótesis & Inferencia 1.58b"
-                        if len(t["logs"]) < 4:
-                            t_start = time.perf_counter()
-                            # Real ternary kernel simulation on 64-element vector
-                            v_w = np.array([1, 0, -1, 1, 0, -1, 1, 1] * 8, dtype=np.int8)
-                            v_act = np.array([12, -4, 0, 8, -15, 3, 0, 7] * 8, dtype=np.int8)
-                            dot_res = int(np.dot(v_w, v_act))
-                            t_us = (time.perf_counter() - t_start) * 1_000_000.0
-                            t["logs"].append(f"Inferencia ternaria {{-1, 0, +1}} ejecutada en {t_us:.1f}µs (Res: {dot_res}). Cuota: {t['allocated_cpu_percent']}% CPU.")
-                    elif current_prog < 98:
-                        t["progress"] = min(98, current_prog + 15)
+                        t["phase_label"] = "Fase 1/4: Inspección REAL de archivos y telemetría"
+                        t["real_stage"] = "generate"
+                    elif stage == "generate":
+                        if not t.get("_gen_launched"):
+                            t["_gen_launched"] = True
+                            t["generation_started_at"] = now
+                            t["progress"] = 30
+                            t["execution_phase"] = "phase_2_inference"
+                            t["phase_label"] = "Fase 2/4: Generación REAL lanzada al motor 1.58"
+                            try:
+                                asyncio.create_task(self._generate_real(t))
+                            except Exception as e:
+                                t["fail_reason"] = f"No se pudo lanzar la generación: {str(e)[:100]}"
+                                t["real_stage"] = "failed"
+                        else:
+                            el = int(now - t.get("generation_started_at", now))
+                            t["progress"] = min(88, 30 + el // 3)
+                            t["phase_label"] = f"Fase 2/4: Generación REAL en curso · {el}s del motor 1.58"
+                    elif stage == "synthesize":
+                        t["progress"] = 92
                         t["execution_phase"] = "phase_3_synthesis"
-                        t["phase_label"] = "Fase 3/4: Forja de Código, Shaders o Síntesis de Conocimiento"
-                        if len(t["logs"]) < 5:
-                            # Real physical artifact persistence on disk
-                            agent_id = t.get("agent_id", "hephaestus")
-                            artifact_dir = Path(f"{WORKSPACE}/data/vault/artifacts")
-                            artifact_dir.mkdir(parents=True, exist_ok=True)
-                            artifact_file = artifact_dir / f"artifact_{agent_id}_{t['id']}.json"
-                            artifact_data = {
-                                "task_id": t["id"],
-                                "agent_id": agent_id,
-                                "title": t["title"],
-                                "timestamp": now,
-                                "target_project_id": t.get("target_project_id", "proj_astraura_core"),
-                                "target_folder": str(target_path),
-                                "scanned_files_count": len(real_files),
-                                "hardware_telemetry": {
-                                    "pid": proc.pid,
-                                    "ram_rss_mb": t["real_memory_mb"],
-                                    "cpu_percent": t["real_cpu_usage"]
-                                }
-                            }
-                            raw_json = json.dumps(artifact_data, indent=2, ensure_ascii=False)
-                            artifact_file.write_text(raw_json, encoding="utf-8")
-                            
-                            # Real SHA-256 hash computation
-                            import hashlib
-                            sha256_hash = hashlib.sha256(raw_json.encode("utf-8")).hexdigest()
-                            t["artifact_file"] = str(artifact_file)
-                            t["artifact_sha256"] = sha256_hash
-                            t["artifact_bytes"] = len(raw_json.encode("utf-8"))
-                            t["logs"].append(f"Artefacto soberano guardado en disco: {artifact_file.name} (SHA-256: {sha256_hash[:12]}...).")
-                    else:
+                        t["phase_label"] = f"Fase 3/4: Entregable REAL listo ({t.get('deliverable_ms', 0)} ms del motor)"
+                        t["real_stage"] = "finish"
+                    elif stage == "finish":
                         t["progress"] = 100
                         t["status"] = "completed"
                         t["execution_phase"] = "phase_4_verification"
                         t["phase_label"] = "Fase 4/4: Auditoría Técnica del Director & Enrutamiento"
                         t["completed_at"] = now
-                        t["logs"].append("✅ Tarea completada y validada en disco.")
+                        t["logs"].append("✅ Entregable REAL producido por el motor; pasa a auditoría.")
                         if t["agent_id"] in self.agents:
                             self.agents[t["agent_id"]]["completed_tasks"] += 1
-
-                        # (OS · Ola 3) Entregable REAL + auditoría del Director + renovación, en una
-                        # tarea de fondo para no congelar este tick de 5 s mientras el motor genera.
-                        # La cadencia simulada de progreso se conserva intacta.
                         try:
                             asyncio.create_task(self._finalize_completed_task(t))
                         except Exception as e:
                             print(f"⚠️ Error lanzando la finalización de la tarea {t.get('id')}: {e}")
+                    elif stage == "failed":
+                        t["status"] = "failed"
+                        t["phase_label"] = t.get("fail_reason", "El motor 1.58 no sirvió respuesta real (sin plantilla de relleno)")
+                        t.setdefault("logs", []).append(f"❌ {t['phase_label']}")
 
                 # 2. Autonomous Proactive Swarm Dispatcher (Maintains continuous intelligent pipeline)
                 if len(running_tasks) < self._limite_fondo():
