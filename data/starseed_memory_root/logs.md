@@ -74,3 +74,14 @@ Tue Sep  1 04:46:57 CST 2026 Verificacion curl /api/cerebros -> HTTP 200 OK. Res
 - curl /api/cerebros: HTTP 200, JSON válido: {"active_brain_id":"brain_genesis","cerebros":[{"i...
 - Conectividad backend con todos los medios (Vercel, app nativa) confirmada.
 - Sin cambios de código; sin commit/push (solo verificación).
+
+[Wed Sep  2 02:22-02:27 CST 2026] CRON-CHECK Astraura tunnel watchdog
+- Resultado: EXITO (exit_code=0). TUNEL VIVO, no relanzado en este run.
+- URL: https://parliamentary-raised-product-contamination.trycloudflare.com | status=active
+- Backend: http://127.0.0.1:8000 (HTTP 200)
+- Watchdog log (ultimas 3): todas "OK tunel vivo" con misma URL.
+- Conectividad backend con todos los medios (Vercel, app nativa) confirmada y operativa.
+- Sin cambios de código; sin commit/push (solo verificación y relanzamiento de túnel cuando es necesario).
+[watchdog 2026-09-02T09:44:03Z] OK tunel vivo: https://parliamentary-raised-product-contamination.trycloudflare.com — backend 127.0.0.1:8000 conectado, no relanzado
+
+[2026-09-02T18:10:45Z] [cron-236] Watchdog Astraura: TUNEL CAIDO (commit-dos-bolt-thousand) → monitor relanzado (pid 92661). Nueva URL: something-aqua-cultures-briefing.trycloudflare.com → HTTP 530 (stale forwarding, backend 8000 healthy=200). Kill cloudflared 92674 → monitor rearroncó (pid 93628) → túnel fresco: button-dont-noted-rob.trycloudflare.com. curl /api/cerebros: **200 OK** JSON `{"active_brain_id":"brain_genesis","cerebros":[...]`. Backend :8000: 200. BitNet i2_s saludable. Conectividad Vercel+app nativa: OK. Exit=0.

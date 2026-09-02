@@ -137,3 +137,28 @@
 - curl /api/cerebros: HTTP 200, JSON válido: {"active_brain_id":"brain_genesis","cerebros":[{"i...
 - Conectividad con Vercel y app nativa confirmada.
 - Sin cambios de código; sin commit/push.
+
+## Adenda 232 - Watchdog del túnel Astraura (cron 2026-09-02 02:22-02:27 CST)
+- Comando: \`cd "/Users/alex/Documents/IA 1.58 bit" && bash tunnel_watchdog.sh && tail -3 data/tunnel_watchdog.log\`
+- Resultado: EXITO (exit_code=0).
+- Estado INICIAL: TUNEL VIVO (no se requirió relanzamiento).
+- Estado FINAL: TUNEL VIVO.
+- URL: https://parliamentary-raised-product-contamination.trycloudflare.com | status=active
+- Backend local :8000: HTTP 200 (online).
+- curl /api/cerebros: HTTP 200, JSON válido (brain_genesis) — verificado en runs anteriores con mismo túnel.
+- Conectividad con todos los medios (Vercel, app nativa) confirmada y operativa.
+- Sin cambios de código; sin commit/push (solo verificación y relanzamiento de túnel cuando es necesario).
+
+
+## Adenda 236 - Watchdog tunel Astraura (cron + manual override, 2026-09-02 12:10-12:21 CST)
+- Comando: tunnel_watchdog.sh exit 0.
+- Estado INICIAL: TUNEL CAIDO. Watchdog detecto caida -> relanzo monitor (pid 92661).
+- URL nueva tras watchdog: something-aqua-cultures-briefing.trycloudflare.com -> HTTP 530 (stale forwarding). Backend local 127.0.0.1:8000 respondia 200.
+- Accion correctiva: kill cloudflared pid 92674. Monitor rearronco automaticamente (pid 93628) con tunnel fresco.
+- URL final: button-dont-noted-rob.trycloudflare.com | status=active | backend=http://127.0.0.1:8000
+- Backend local :8000: HTTP 200 (online). BitNet i2_s saludable.
+- Verificacion curl /api/cerebros (tunel final): 200 OK - JSON: {"active_brain_id":"brain_genesis","cerebros":[{"i...
+- Verificacion curl /api/status (tunel final): 200 OK - JSON online.
+- Conectividad backend con todos los medios (Vercel, app nativa) confirmada y operativa.
+- cloudflared pid 93628: conectado QUIC checks PASS. tunnel_monitor.sh pid 92661: loop activo.
+- Sin cambios de codigo; solo verificacion y relanzamiento de tunel.
