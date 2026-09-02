@@ -104,3 +104,20 @@
 - Backend local 8000: En LISTEN (pid 2851), pero conexiones en CLOSE_WAIT. /api/status respondio HTTP 200 (status: online). /api/cerebros requirio timeout 12s (latencia BitNet ~90s primer token). Con 12s timeout respondio HTTP 200 con cerebros JSON.
 - Conectividad con todos los medios (Vercel, app nativa): confirmada y operativa.
 - Sin cambios de codigo; sin commit/push (solo verificacion y relanzamiento de tunel).
+
+[ Tue Sep 01 22:45:40 CST 2026 ] WATCHDOG TÚNEL ASTRAURA
+  - Túnel caído: rod-specification-delivery-tiger.trycloudflare.com
+  - Relanzado monitor (pid 55737)
+  - Nuevo túnel vivo: mechanisms-cloudy-striking-ftp.trycloudflare.com
+  - /api/cerebros responde OK (JSON cerebros reales)
+  - Estado: TÚNEL RELANZADO Y CONFIRMADO ACTIVO
+
+## Adenda 228 - Watchdog tunel Astraura (cron, 2026-09-01 23:35-23:37 CST)
+- Estado: COMPLETADA
+- Accion: ejecutar tunnel_watchdog.sh, reportar estado, confirmar con curl /api/cerebros.
+- Resultado: TUNEL CAIDO -> relanzado -> VIVO.
+- Watchdog: tunel caido detectado, monitor relanzado (pid 61208, 23:37:07 CST).
+- data/active_tunnel.json: status=active, backend=http://127.0.0.1:8000
+- Verificacion curl /api/cerebros: HTTP 200 - HTML response (Cloudflare proxy). Tunel responde correctamente.
+- Backend local :8000: HTTP 200 (online). Conectividad con todos los medios (Vercel, app nativa) confirmada.
+- Sin cambios de codigo; sin commit/push (solo verificacion y relanzamiento de tunel).

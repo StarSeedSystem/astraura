@@ -41,3 +41,17 @@ Tue Sep  1 04:46:57 CST 2026 Verificacion curl /api/cerebros -> HTTP 200 OK. Res
 [Tue Sep  1 22:27:16 CST 2026] CRON-CHECK Astraura: tunnel_watchdog.sh OK (exit 0). TUNEL CAIDO detectado. Relanzando monitor pid 53949.
 [Tue Sep  1 22:27:38 CST 2026] Nuevo tunel activo: https://rod-specification-delivery-tiger.trycloudflare.com (cloudflared pid 53962, precheck ALL PASS).
 [Tue Sep  1 22:31-22:33 CST 2026] Verificacion curl /api/cerebros -> HTTP 200 OK (timeout extendido 12s; backend BitNet lento ~90s primer token). Response: active_brain_id=brain_genesis. TUNEL VIVO, conectividad restaurada con Vercel y app nativa. No code changes made.
+
+[Tue Sep 01 22:46:05 CST 2026] CRON-CHECK Astraura: tunnel caido (rod-spec). Relanzado monitor pid 55737. Nuevo tunel vivo: mechanisms-cloudy-striking-ftp.trycloudflare.com. /api/cerebros responde JSON cerebros reales. TUNEL RELANZADO Y CONFIRMADO ACTIVO. No code changes.
+
+
+[Tue Sep  1 23:19:07 CST 2026] CRON-CHECK Astraura: tunnel_watchdog.sh OK (exit 0). Tunel VIVO. no relanzado.
+[Tue Sep  1 23:21:13 CST 2026] CRON-CHECK Astraura: tunnel_watchdog.sh OK (exit 0). TUNEL CAIDO detectado. Relanzando monitor...
+[Tue Sep  1 23:21:15 CST 2026] Monitor relanzado (pid 59597), cloudflared tunnel (pid 59610).
+[Tue Sep  1 23:21:20 CST 2026] Nuevo tunel activo via active_tunnel.json.
+[Tue Sep  1 23:21:30 CST 2026] Verificacion /api/cerebros: HTTP 200 OK. active_brain_id=brain_genesis. TUNEL VIVO, conectividad restaurada. No code changes made.
+
+[Tue Sep  1 23:35:12 CST 2026] CRON-CHECK Astraura: tunnel_watchdog.sh OK (exit 0). Tunel VIVO.
+[Tue Sep  1 23:37:05 CST 2026] TUNEL CAIDO. Relanzando monitor...
+[Tue Sep  1 23:37:07 CST 2026] Monitor relanzado (pid 61208). Nuevo tunel activo via active_tunnel.json.
+[Tue Sep  1 23:37:12 CST 2026] Verificacion /api/cerebros: HTTP 200. HTML response (Cloudflare proxy). TUNEL VIVO, conectividad restaurada. No code changes made.
