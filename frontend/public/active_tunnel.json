@@ -1,7 +1,6 @@
 {
-  "url": "https://astraura-backend-334237619848.us-central1.run.app",
-  "updated_at": "2026-08-22T04:30:00Z",
-  "backend": "https://astraura-backend-334237619848.us-central1.run.app",
-  "status": "active",
-  "note": "Backend en Cloud Run (24/7). Sustituye el tunel efimero de la Mac."
+  "url": "https://pets-cabin-mileage-isaac.trycloudflare.com",
+  "updated_at": "2026-09-02T07:17:49Z",
+  "backend": "http://127.0.0.1:8000",
+  "status": "active"
 }
