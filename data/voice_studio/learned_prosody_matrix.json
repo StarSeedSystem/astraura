@@ -3,14 +3,14 @@
   "personas": {
     "aurora": {
       "rapport_level": 100,
-      "total_interactions": 669,
+      "total_interactions": 1014,
       "domains": {
         "filosofia": 100,
         "emocional": 95,
         "creatividad": 100,
         "general": 100,
-        "memoria": 66,
-        "codigo": 64
+        "memoria": 86,
+        "codigo": 66
       },
       "inflection_offsets": {
         "pitch_delta": 2.0,
@@ -110,5 +110,5 @@
       }
     }
   },
-  "last_updated": 1787196121.579183
+  "last_updated": 1787449662.374059
 }

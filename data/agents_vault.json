@@ -1,6 +1,6 @@
 {
   "version": "1.58.0",
-  "updated_at": 1787170010.6945338,
+  "updated_at": 1787698521.887261,
   "agents": {
     "agent_aurora": {
       "id": "agent_aurora",
@@ -117,7 +117,69 @@
         }
       ],
       "is_custom": false,
-      "created_at": 1787105584.2507892
+      "created_at": 1787105584.2507892,
+      "genesis_soberania": {
+        "dominio": [],
+        "exploracion": [],
+        "medios": [],
+        "cerebros": [],
+        "puedeProponerFuera": true,
+        "prefijoRamaVariante": "variante/",
+        "limitesDuros": []
+      },
+      "genesis_enrutado": {
+        "escalera": [
+          "openrouter/free",
+          "bitnet-158-local"
+        ],
+        "soloGratuitos": true,
+        "ultimoUsado": null,
+        "ultimaFueDegradada": false
+      },
+      "genesis_linaje": {
+        "progenitorId": null,
+        "descendientes": [],
+        "generacion": 0,
+        "origen": "usuario",
+        "familiaId": null
+      },
+      "genesis_estado": "activo",
+      "genesis_esencia": null,
+      "genesis_arquetipo": null,
+      "genesis_habilidades": [],
+      "genesis_herramientas": [],
+      "genesis_reglas": [],
+      "genesis_comunidades": [],
+      "genesis_espacio_hogar_id": null,
+      "genesis_experiencia": 0,
+      "genesis_adn": {
+        "semilla": 4189180692,
+        "solido": "dodecaedro",
+        "frecuencia": 963,
+        "pulso": 2.229,
+        "paleta": {
+          "primario": "hsl(330.366 92% 62%)",
+          "secundario": "hsl(107.874 85% 58%)",
+          "acento": "hsl(245.381 96% 70%)"
+        },
+        "matiz": 330.366,
+        "orbitas": 2,
+        "radiosOrbitales": [
+          1.398,
+          1.778
+        ],
+        "densidad": 0.542,
+        "simetria": 0.704,
+        "rugosidad": 0.15,
+        "aura": 0.378,
+        "evolucion": 0.0,
+        "facetas": 1
+      },
+      "genesis_adn_ajustes": null,
+      "genesis_internet": null,
+      "genesis_avatar_fuente": null,
+      "genesis_cerebros_propios": [],
+      "genesis_proceso_tipo_id": null
     },
     "agent_hephaestus": {
       "id": "agent_hephaestus",
@@ -217,7 +279,69 @@
         }
       ],
       "is_custom": false,
-      "created_at": 1787105584.2507908
+      "created_at": 1787105584.2507908,
+      "genesis_soberania": {
+        "dominio": [],
+        "exploracion": [],
+        "medios": [],
+        "cerebros": [],
+        "puedeProponerFuera": true,
+        "prefijoRamaVariante": "variante/",
+        "limitesDuros": []
+      },
+      "genesis_enrutado": {
+        "escalera": [
+          "openrouter/free",
+          "bitnet-158-local"
+        ],
+        "soloGratuitos": true,
+        "ultimoUsado": null,
+        "ultimaFueDegradada": false
+      },
+      "genesis_linaje": {
+        "progenitorId": null,
+        "descendientes": [],
+        "generacion": 0,
+        "origen": "usuario",
+        "familiaId": null
+      },
+      "genesis_estado": "activo",
+      "genesis_esencia": null,
+      "genesis_arquetipo": null,
+      "genesis_habilidades": [],
+      "genesis_herramientas": [],
+      "genesis_reglas": [],
+      "genesis_comunidades": [],
+      "genesis_espacio_hogar_id": null,
+      "genesis_experiencia": 0,
+      "genesis_adn": {
+        "semilla": 3646016788,
+        "solido": "cubo",
+        "frecuencia": 639,
+        "pulso": 1.479,
+        "paleta": {
+          "primario": "hsl(37.692 92% 62%)",
+          "secundario": "hsl(175.2 85% 58%)",
+          "acento": "hsl(312.708 96% 70%)"
+        },
+        "matiz": 37.692,
+        "orbitas": 2,
+        "radiosOrbitales": [
+          1.332,
+          1.695
+        ],
+        "densidad": 0.423,
+        "simetria": 0.579,
+        "rugosidad": 0.017,
+        "aura": 0.486,
+        "evolucion": 0.0,
+        "facetas": 1
+      },
+      "genesis_adn_ajustes": null,
+      "genesis_internet": null,
+      "genesis_avatar_fuente": null,
+      "genesis_cerebros_propios": [],
+      "genesis_proceso_tipo_id": null
     },
     "agent_hermione": {
       "id": "agent_hermione",
@@ -288,7 +412,70 @@
         }
       ],
       "is_custom": false,
-      "created_at": 1787105584.250793
+      "created_at": 1787105584.250793,
+      "genesis_soberania": {
+        "dominio": [],
+        "exploracion": [],
+        "medios": [],
+        "cerebros": [],
+        "puedeProponerFuera": true,
+        "prefijoRamaVariante": "variante/",
+        "limitesDuros": []
+      },
+      "genesis_enrutado": {
+        "escalera": [
+          "openrouter/free",
+          "bitnet-158-local"
+        ],
+        "soloGratuitos": true,
+        "ultimoUsado": null,
+        "ultimaFueDegradada": false
+      },
+      "genesis_linaje": {
+        "progenitorId": null,
+        "descendientes": [],
+        "generacion": 0,
+        "origen": "usuario",
+        "familiaId": null
+      },
+      "genesis_estado": "activo",
+      "genesis_esencia": null,
+      "genesis_arquetipo": null,
+      "genesis_habilidades": [],
+      "genesis_herramientas": [],
+      "genesis_reglas": [],
+      "genesis_comunidades": [],
+      "genesis_espacio_hogar_id": null,
+      "genesis_experiencia": 0,
+      "genesis_adn": {
+        "semilla": 38593957,
+        "solido": "icosaedro",
+        "frecuencia": 852,
+        "pulso": 1.972,
+        "paleta": {
+          "primario": "hsl(198.438 92% 62%)",
+          "secundario": "hsl(335.945 85% 58%)",
+          "acento": "hsl(113.453 96% 70%)"
+        },
+        "matiz": 198.438,
+        "orbitas": 3,
+        "radiosOrbitales": [
+          1.156,
+          1.47,
+          1.87
+        ],
+        "densidad": 0.651,
+        "simetria": 0.858,
+        "rugosidad": 0.432,
+        "aura": 0.615,
+        "evolucion": 0.0,
+        "facetas": 1
+      },
+      "genesis_adn_ajustes": null,
+      "genesis_internet": null,
+      "genesis_avatar_fuente": null,
+      "genesis_cerebros_propios": [],
+      "genesis_proceso_tipo_id": null
     },
     "agent_athena": {
       "id": "agent_athena",
@@ -375,7 +562,70 @@
         }
       ],
       "is_custom": false,
-      "created_at": 1787105584.250794
+      "created_at": 1787105584.250794,
+      "genesis_soberania": {
+        "dominio": [],
+        "exploracion": [],
+        "medios": [],
+        "cerebros": [],
+        "puedeProponerFuera": true,
+        "prefijoRamaVariante": "variante/",
+        "limitesDuros": []
+      },
+      "genesis_enrutado": {
+        "escalera": [
+          "openrouter/free",
+          "bitnet-158-local"
+        ],
+        "soloGratuitos": true,
+        "ultimoUsado": null,
+        "ultimaFueDegradada": false
+      },
+      "genesis_linaje": {
+        "progenitorId": null,
+        "descendientes": [],
+        "generacion": 0,
+        "origen": "usuario",
+        "familiaId": null
+      },
+      "genesis_estado": "activo",
+      "genesis_esencia": null,
+      "genesis_arquetipo": null,
+      "genesis_habilidades": [],
+      "genesis_herramientas": [],
+      "genesis_reglas": [],
+      "genesis_comunidades": [],
+      "genesis_espacio_hogar_id": null,
+      "genesis_experiencia": 0,
+      "genesis_adn": {
+        "semilla": 3526965464,
+        "solido": "octaedro",
+        "frecuencia": 528,
+        "pulso": 1.222,
+        "paleta": {
+          "primario": "hsl(160.118 92% 62%)",
+          "secundario": "hsl(297.626 85% 58%)",
+          "acento": "hsl(75.134 96% 70%)"
+        },
+        "matiz": 160.118,
+        "orbitas": 3,
+        "radiosOrbitales": [
+          1.171,
+          1.489,
+          1.894
+        ],
+        "densidad": 0.621,
+        "simetria": 0.887,
+        "rugosidad": 0.396,
+        "aura": 0.639,
+        "evolucion": 0.0,
+        "facetas": 1
+      },
+      "genesis_adn_ajustes": null,
+      "genesis_internet": null,
+      "genesis_avatar_fuente": null,
+      "genesis_cerebros_propios": [],
+      "genesis_proceso_tipo_id": null
     },
     "agent_oneiros": {
       "id": "agent_oneiros",
@@ -468,7 +718,69 @@
         }
       ],
       "is_custom": false,
-      "created_at": 1787105584.2507951
+      "created_at": 1787105584.2507951,
+      "genesis_soberania": {
+        "dominio": [],
+        "exploracion": [],
+        "medios": [],
+        "cerebros": [],
+        "puedeProponerFuera": true,
+        "prefijoRamaVariante": "variante/",
+        "limitesDuros": []
+      },
+      "genesis_enrutado": {
+        "escalera": [
+          "openrouter/free",
+          "bitnet-158-local"
+        ],
+        "soloGratuitos": true,
+        "ultimoUsado": null,
+        "ultimaFueDegradada": false
+      },
+      "genesis_linaje": {
+        "progenitorId": null,
+        "descendientes": [],
+        "generacion": 0,
+        "origen": "usuario",
+        "familiaId": null
+      },
+      "genesis_estado": "activo",
+      "genesis_esencia": null,
+      "genesis_arquetipo": null,
+      "genesis_habilidades": [],
+      "genesis_herramientas": [],
+      "genesis_reglas": [],
+      "genesis_comunidades": [],
+      "genesis_espacio_hogar_id": null,
+      "genesis_experiencia": 0,
+      "genesis_adn": {
+        "semilla": 3393480080,
+        "solido": "icosaedro",
+        "frecuencia": 852,
+        "pulso": 1.972,
+        "paleta": {
+          "primario": "hsl(330.366 92% 62%)",
+          "secundario": "hsl(107.874 85% 58%)",
+          "acento": "hsl(245.381 96% 70%)"
+        },
+        "matiz": 330.366,
+        "orbitas": 2,
+        "radiosOrbitales": [
+          1.365,
+          1.736
+        ],
+        "densidad": 0.483,
+        "simetria": 0.759,
+        "rugosidad": 0.229,
+        "aura": 0.326,
+        "evolucion": 0.0,
+        "facetas": 1
+      },
+      "genesis_adn_ajustes": null,
+      "genesis_internet": null,
+      "genesis_avatar_fuente": null,
+      "genesis_cerebros_propios": [],
+      "genesis_proceso_tipo_id": null
     },
     "agent_hermes": {
       "id": "agent_hermes",
@@ -556,7 +868,69 @@
         }
       ],
       "is_custom": false,
-      "created_at": 1787105584.250796
+      "created_at": 1787105584.250796,
+      "genesis_soberania": {
+        "dominio": [],
+        "exploracion": [],
+        "medios": [],
+        "cerebros": [],
+        "puedeProponerFuera": true,
+        "prefijoRamaVariante": "variante/",
+        "limitesDuros": []
+      },
+      "genesis_enrutado": {
+        "escalera": [
+          "openrouter/free",
+          "bitnet-158-local"
+        ],
+        "soloGratuitos": true,
+        "ultimoUsado": null,
+        "ultimaFueDegradada": false
+      },
+      "genesis_linaje": {
+        "progenitorId": null,
+        "descendientes": [],
+        "generacion": 0,
+        "origen": "usuario",
+        "familiaId": null
+      },
+      "genesis_estado": "activo",
+      "genesis_esencia": null,
+      "genesis_arquetipo": null,
+      "genesis_habilidades": [],
+      "genesis_herramientas": [],
+      "genesis_reglas": [],
+      "genesis_comunidades": [],
+      "genesis_espacio_hogar_id": null,
+      "genesis_experiencia": 0,
+      "genesis_adn": {
+        "semilla": 2678678735,
+        "solido": "tetraedro",
+        "frecuencia": 741,
+        "pulso": 1.715,
+        "paleta": {
+          "primario": "hsl(160.118 92% 62%)",
+          "secundario": "hsl(297.626 85% 58%)",
+          "acento": "hsl(75.134 96% 70%)"
+        },
+        "matiz": 160.118,
+        "orbitas": 2,
+        "radiosOrbitales": [
+          1.292,
+          1.643
+        ],
+        "densidad": 0.379,
+        "simetria": 0.655,
+        "rugosidad": 0.104,
+        "aura": 0.446,
+        "evolucion": 0.0,
+        "facetas": 1
+      },
+      "genesis_adn_ajustes": null,
+      "genesis_internet": null,
+      "genesis_avatar_fuente": null,
+      "genesis_cerebros_propios": [],
+      "genesis_proceso_tipo_id": null
     },
     "agent_mnemosyne": {
       "id": "agent_mnemosyne",
@@ -649,7 +1023,744 @@
         }
       ],
       "is_custom": false,
-      "created_at": 1787105584.250797
+      "created_at": 1787105584.250797,
+      "genesis_soberania": {
+        "dominio": [],
+        "exploracion": [],
+        "medios": [],
+        "cerebros": [],
+        "puedeProponerFuera": true,
+        "prefijoRamaVariante": "variante/",
+        "limitesDuros": []
+      },
+      "genesis_enrutado": {
+        "escalera": [
+          "openrouter/free",
+          "bitnet-158-local"
+        ],
+        "soloGratuitos": true,
+        "ultimoUsado": null,
+        "ultimaFueDegradada": false
+      },
+      "genesis_linaje": {
+        "progenitorId": null,
+        "descendientes": [],
+        "generacion": 0,
+        "origen": "usuario",
+        "familiaId": null
+      },
+      "genesis_estado": "activo",
+      "genesis_esencia": null,
+      "genesis_arquetipo": null,
+      "genesis_habilidades": [],
+      "genesis_herramientas": [],
+      "genesis_reglas": [],
+      "genesis_comunidades": [],
+      "genesis_espacio_hogar_id": null,
+      "genesis_experiencia": 0,
+      "genesis_adn": {
+        "semilla": 998920127,
+        "solido": "esfera",
+        "frecuencia": 432,
+        "pulso": 1.0,
+        "paleta": {
+          "primario": "hsl(270.741 92% 62%)",
+          "secundario": "hsl(48.249 85% 58%)",
+          "acento": "hsl(185.756 96% 70%)"
+        },
+        "matiz": 270.741,
+        "orbitas": 3,
+        "radiosOrbitales": [
+          1.269,
+          1.614,
+          2.053
+        ],
+        "densidad": 0.799,
+        "simetria": 0.921,
+        "rugosidad": 0.46,
+        "aura": 0.584,
+        "evolucion": 0.0,
+        "facetas": 1
+      },
+      "genesis_adn_ajustes": null,
+      "genesis_internet": null,
+      "genesis_avatar_fuente": null,
+      "genesis_cerebros_propios": [],
+      "genesis_proceso_tipo_id": null
+    },
+    "custom_agent_fa2ff0d80b3e": {
+      "status": "active",
+      "concurrency": 1,
+      "cpu_quota_percent": 10,
+      "ram_limit_mb": 64,
+      "compute_trunk": "trunk_b",
+      "hardware_acceleration": "",
+      "imagination_enabled": false,
+      "imagination_frequency": "manual",
+      "imagination_permission_level": "always_ask",
+      "used_personalities": [],
+      "linked_cerebros": [],
+      "memory_access": {
+        "mem0_enabled": false,
+        "knowledge_graph_enabled": false,
+        "vector_store_enabled": false,
+        "openviking_context": false
+      },
+      "developing_processes": [],
+      "generated_branches": {
+        "max_parallel_threads": 1,
+        "speedup_factor": "1.0x",
+        "subagents": [],
+        "branch_tree": []
+      },
+      "interconnections": [],
+      "id": "custom_agent_fa2ff0d80b3e",
+      "name": "Mnemosyne · Memoria Sináptica",
+      "role": "Consolidación de Memoria",
+      "color": "#a855f7",
+      "is_custom": true,
+      "updated_at": 1787698521.659841,
+      "created_at": 1787698521.562964,
+      "genesis_estado": "activo",
+      "genesis_esencia": "Entrelaza recuerdos recientes, códigos y grafos conceptuales para forjar memoria a largo plazo.",
+      "genesis_arquetipo": null,
+      "genesis_habilidades": [],
+      "genesis_herramientas": [],
+      "genesis_reglas": [],
+      "genesis_comunidades": [],
+      "genesis_espacio_hogar_id": null,
+      "genesis_experiencia": 0,
+      "genesis_adn": {
+        "semilla": 956831288,
+        "solido": "tetraedro",
+        "frecuencia": 741,
+        "pulso": 1.715,
+        "paleta": {
+          "primario": "hsl(270.741 92% 62%)",
+          "secundario": "hsl(48.249 85% 58%)",
+          "acento": "hsl(185.756 96% 70%)"
+        },
+        "matiz": 270.741,
+        "orbitas": 3,
+        "radiosOrbitales": [
+          1.156,
+          1.47,
+          1.87
+        ],
+        "densidad": 0.651,
+        "simetria": 0.854,
+        "rugosidad": 0.44,
+        "aura": 0.616,
+        "evolucion": 0.0,
+        "facetas": 1
+      },
+      "genesis_adn_ajustes": null,
+      "genesis_enrutado": {
+        "escalera": [
+          "openrouter/free",
+          "bitnet-158-local"
+        ],
+        "soloGratuitos": true,
+        "ultimoUsado": null,
+        "ultimaFueDegradada": false
+      },
+      "genesis_soberania": {
+        "dominio": [],
+        "exploracion": [],
+        "medios": [],
+        "cerebros": [],
+        "puedeProponerFuera": true,
+        "prefijoRamaVariante": "variante/",
+        "limitesDuros": []
+      },
+      "genesis_linaje": {
+        "progenitorId": null,
+        "descendientes": [],
+        "generacion": 0,
+        "origen": "usuario",
+        "familiaId": null
+      },
+      "genesis_internet": null,
+      "genesis_avatar_fuente": null,
+      "genesis_cerebros_propios": [],
+      "genesis_proceso_tipo_id": "rem_synaptic_consolidation"
+    },
+    "custom_agent_2824c3c81e23": {
+      "status": "active",
+      "concurrency": 1,
+      "cpu_quota_percent": 10,
+      "ram_limit_mb": 64,
+      "compute_trunk": "trunk_b",
+      "hardware_acceleration": "",
+      "imagination_enabled": false,
+      "imagination_frequency": "manual",
+      "imagination_permission_level": "always_ask",
+      "used_personalities": [],
+      "linked_cerebros": [],
+      "memory_access": {
+        "mem0_enabled": false,
+        "knowledge_graph_enabled": false,
+        "vector_store_enabled": false,
+        "openviking_context": false
+      },
+      "developing_processes": [],
+      "generated_branches": {
+        "max_parallel_threads": 1,
+        "speedup_factor": "1.0x",
+        "subagents": [],
+        "branch_tree": []
+      },
+      "interconnections": [],
+      "id": "custom_agent_2824c3c81e23",
+      "name": "Hermes · Inteligencia Web",
+      "role": "Razonamiento Hipotético",
+      "color": "#00f0ff",
+      "is_custom": true,
+      "updated_at": 1787698521.746086,
+      "created_at": 1787698521.74033,
+      "genesis_estado": "activo",
+      "genesis_esencia": "Explora escenarios '¿Qué pasaría si...?' alterando variables del sistema y leyes lógicas.",
+      "genesis_arquetipo": null,
+      "genesis_habilidades": [],
+      "genesis_herramientas": [],
+      "genesis_reglas": [],
+      "genesis_comunidades": [],
+      "genesis_espacio_hogar_id": null,
+      "genesis_experiencia": 0,
+      "genesis_adn": {
+        "semilla": 4062430348,
+        "solido": "dodecaedro",
+        "frecuencia": 963,
+        "pulso": 2.229,
+        "paleta": {
+          "primario": "hsl(183.529 92% 62%)",
+          "secundario": "hsl(321.037 85% 58%)",
+          "acento": "hsl(98.545 96% 70%)"
+        },
+        "matiz": 183.529,
+        "orbitas": 2,
+        "radiosOrbitales": [
+          1.299,
+          1.653
+        ],
+        "densidad": 0.364,
+        "simetria": 0.638,
+        "rugosidad": 0.087,
+        "aura": 0.432,
+        "evolucion": 0.0,
+        "facetas": 1
+      },
+      "genesis_adn_ajustes": null,
+      "genesis_enrutado": {
+        "escalera": [
+          "openrouter/free",
+          "bitnet-158-local"
+        ],
+        "soloGratuitos": true,
+        "ultimoUsado": null,
+        "ultimaFueDegradada": false
+      },
+      "genesis_soberania": {
+        "dominio": [],
+        "exploracion": [],
+        "medios": [],
+        "cerebros": [],
+        "puedeProponerFuera": true,
+        "prefijoRamaVariante": "variante/",
+        "limitesDuros": []
+      },
+      "genesis_linaje": {
+        "progenitorId": null,
+        "descendientes": [],
+        "generacion": 0,
+        "origen": "usuario",
+        "familiaId": null
+      },
+      "genesis_internet": null,
+      "genesis_avatar_fuente": null,
+      "genesis_cerebros_propios": [],
+      "genesis_proceso_tipo_id": "counterfactual_quantum_imagination"
+    },
+    "custom_agent_f4995b3b7b19": {
+      "status": "active",
+      "concurrency": 1,
+      "cpu_quota_percent": 10,
+      "ram_limit_mb": 64,
+      "compute_trunk": "trunk_b",
+      "hardware_acceleration": "",
+      "imagination_enabled": false,
+      "imagination_frequency": "manual",
+      "imagination_permission_level": "always_ask",
+      "used_personalities": [],
+      "linked_cerebros": [],
+      "memory_access": {
+        "mem0_enabled": false,
+        "knowledge_graph_enabled": false,
+        "vector_store_enabled": false,
+        "openviking_context": false
+      },
+      "developing_processes": [],
+      "generated_branches": {
+        "max_parallel_threads": 1,
+        "speedup_factor": "1.0x",
+        "subagents": [],
+        "branch_tree": []
+      },
+      "interconnections": [],
+      "id": "custom_agent_f4995b3b7b19",
+      "name": "Oneiros · Síntesis Creativa",
+      "role": "Síntesis Estética",
+      "color": "#ec4899",
+      "is_custom": true,
+      "updated_at": 1787698521.782361,
+      "created_at": 1787698521.776747,
+      "genesis_estado": "activo",
+      "genesis_esencia": "Forja diseños de interfaces, mundos volumétricos 3D en WebGL, paletas de color y shaders.",
+      "genesis_arquetipo": null,
+      "genesis_habilidades": [],
+      "genesis_herramientas": [],
+      "genesis_reglas": [],
+      "genesis_comunidades": [],
+      "genesis_espacio_hogar_id": null,
+      "genesis_experiencia": 0,
+      "genesis_adn": {
+        "semilla": 1758726099,
+        "solido": "icosaedro",
+        "frecuencia": 852,
+        "pulso": 1.972,
+        "paleta": {
+          "primario": "hsl(330.366 92% 62%)",
+          "secundario": "hsl(107.874 85% 58%)",
+          "acento": "hsl(245.381 96% 70%)"
+        },
+        "matiz": 330.366,
+        "orbitas": 2,
+        "radiosOrbitales": [
+          1.316,
+          1.674
+        ],
+        "densidad": 0.456,
+        "simetria": 0.556,
+        "rugosidad": 0.048,
+        "aura": 0.459,
+        "evolucion": 0.0,
+        "facetas": 1
+      },
+      "genesis_adn_ajustes": null,
+      "genesis_enrutado": {
+        "escalera": [
+          "openrouter/free",
+          "bitnet-158-local"
+        ],
+        "soloGratuitos": true,
+        "ultimoUsado": null,
+        "ultimaFueDegradada": false
+      },
+      "genesis_soberania": {
+        "dominio": [],
+        "exploracion": [],
+        "medios": [],
+        "cerebros": [],
+        "puedeProponerFuera": true,
+        "prefijoRamaVariante": "variante/",
+        "limitesDuros": []
+      },
+      "genesis_linaje": {
+        "progenitorId": null,
+        "descendientes": [],
+        "generacion": 0,
+        "origen": "usuario",
+        "familiaId": null
+      },
+      "genesis_internet": null,
+      "genesis_avatar_fuente": null,
+      "genesis_cerebros_propios": [],
+      "genesis_proceso_tipo_id": "lucid_cyberdelic_creativity"
+    },
+    "custom_agent_916caf73d173": {
+      "status": "active",
+      "concurrency": 1,
+      "cpu_quota_percent": 10,
+      "ram_limit_mb": 64,
+      "compute_trunk": "trunk_b",
+      "hardware_acceleration": "",
+      "imagination_enabled": false,
+      "imagination_frequency": "manual",
+      "imagination_permission_level": "always_ask",
+      "used_personalities": [],
+      "linked_cerebros": [],
+      "memory_access": {
+        "mem0_enabled": false,
+        "knowledge_graph_enabled": false,
+        "vector_store_enabled": false,
+        "openviking_context": false
+      },
+      "developing_processes": [],
+      "generated_branches": {
+        "max_parallel_threads": 1,
+        "speedup_factor": "1.0x",
+        "subagents": [],
+        "branch_tree": []
+      },
+      "interconnections": [],
+      "id": "custom_agent_916caf73d173",
+      "name": "Hephaestus · Ingeniería",
+      "role": "Ingeniería Soberana",
+      "color": "#10b981",
+      "is_custom": true,
+      "updated_at": 1787698521.819767,
+      "created_at": 1787698521.8126311,
+      "genesis_estado": "activo",
+      "genesis_esencia": "Audita el código fuente de Astraura 1.58b, optimiza bucles SIMD y reduce el consumo energético.",
+      "genesis_arquetipo": null,
+      "genesis_habilidades": [],
+      "genesis_herramientas": [],
+      "genesis_reglas": [],
+      "genesis_comunidades": [],
+      "genesis_espacio_hogar_id": null,
+      "genesis_experiencia": 0,
+      "genesis_adn": {
+        "semilla": 1671994690,
+        "solido": "tetraedro",
+        "frecuencia": 741,
+        "pulso": 1.715,
+        "paleta": {
+          "primario": "hsl(160.118 92% 62%)",
+          "secundario": "hsl(297.626 85% 58%)",
+          "acento": "hsl(75.134 96% 70%)"
+        },
+        "matiz": 160.118,
+        "orbitas": 3,
+        "radiosOrbitales": [
+          1.201,
+          1.528,
+          1.943
+        ],
+        "densidad": 0.686,
+        "simetria": 0.829,
+        "rugosidad": 0.323,
+        "aura": 0.688,
+        "evolucion": 0.0,
+        "facetas": 1
+      },
+      "genesis_adn_ajustes": null,
+      "genesis_enrutado": {
+        "escalera": [
+          "openrouter/free",
+          "bitnet-158-local"
+        ],
+        "soloGratuitos": true,
+        "ultimoUsado": null,
+        "ultimaFueDegradada": false
+      },
+      "genesis_soberania": {
+        "dominio": [],
+        "exploracion": [],
+        "medios": [],
+        "cerebros": [],
+        "puedeProponerFuera": true,
+        "prefijoRamaVariante": "variante/",
+        "limitesDuros": []
+      },
+      "genesis_linaje": {
+        "progenitorId": null,
+        "descendientes": [],
+        "generacion": 0,
+        "origen": "usuario",
+        "familiaId": null
+      },
+      "genesis_internet": null,
+      "genesis_avatar_fuente": null,
+      "genesis_cerebros_propios": [],
+      "genesis_proceso_tipo_id": "code_self_reflection_opt"
+    },
+    "custom_agent_e380b60eeec4": {
+      "status": "active",
+      "concurrency": 1,
+      "cpu_quota_percent": 10,
+      "ram_limit_mb": 64,
+      "compute_trunk": "trunk_b",
+      "hardware_acceleration": "",
+      "imagination_enabled": false,
+      "imagination_frequency": "manual",
+      "imagination_permission_level": "always_ask",
+      "used_personalities": [],
+      "linked_cerebros": [],
+      "memory_access": {
+        "mem0_enabled": false,
+        "knowledge_graph_enabled": false,
+        "vector_store_enabled": false,
+        "openviking_context": false
+      },
+      "developing_processes": [],
+      "generated_branches": {
+        "max_parallel_threads": 1,
+        "speedup_factor": "1.0x",
+        "subagents": [],
+        "branch_tree": []
+      },
+      "interconnections": [],
+      "id": "custom_agent_e380b60eeec4",
+      "name": "Hermes · Inteligencia Web",
+      "role": "Prospectiva Estratégica",
+      "color": "#f59e0b",
+      "is_custom": true,
+      "updated_at": 1787698521.834661,
+      "created_at": 1787698521.830316,
+      "genesis_estado": "activo",
+      "genesis_esencia": "Modela trayectorias científicas, evoluciones de la IA y dinámicas tecnológicas emergentes.",
+      "genesis_arquetipo": null,
+      "genesis_habilidades": [],
+      "genesis_herramientas": [],
+      "genesis_reglas": [],
+      "genesis_comunidades": [],
+      "genesis_espacio_hogar_id": null,
+      "genesis_experiencia": 0,
+      "genesis_adn": {
+        "semilla": 3362429590,
+        "solido": "icosaedro",
+        "frecuencia": 852,
+        "pulso": 1.972,
+        "paleta": {
+          "primario": "hsl(37.692 92% 62%)",
+          "secundario": "hsl(175.2 85% 58%)",
+          "acento": "hsl(312.708 96% 70%)"
+        },
+        "matiz": 37.692,
+        "orbitas": 2,
+        "radiosOrbitales": [
+          1.33,
+          1.692
+        ],
+        "densidad": 0.428,
+        "simetria": 0.583,
+        "rugosidad": 0.013,
+        "aura": 0.482,
+        "evolucion": 0.0,
+        "facetas": 1
+      },
+      "genesis_adn_ajustes": null,
+      "genesis_enrutado": {
+        "escalera": [
+          "openrouter/free",
+          "bitnet-158-local"
+        ],
+        "soloGratuitos": true,
+        "ultimoUsado": null,
+        "ultimaFueDegradada": false
+      },
+      "genesis_soberania": {
+        "dominio": [],
+        "exploracion": [],
+        "medios": [],
+        "cerebros": [],
+        "puedeProponerFuera": true,
+        "prefijoRamaVariante": "variante/",
+        "limitesDuros": []
+      },
+      "genesis_linaje": {
+        "progenitorId": null,
+        "descendientes": [],
+        "generacion": 0,
+        "origen": "usuario",
+        "familiaId": null
+      },
+      "genesis_internet": null,
+      "genesis_avatar_fuente": null,
+      "genesis_cerebros_propios": [],
+      "genesis_proceso_tipo_id": "predictive_future_simulation"
+    },
+    "custom_agent_239adfa74c2c": {
+      "status": "active",
+      "concurrency": 1,
+      "cpu_quota_percent": 10,
+      "ram_limit_mb": 64,
+      "compute_trunk": "trunk_b",
+      "hardware_acceleration": "",
+      "imagination_enabled": false,
+      "imagination_frequency": "manual",
+      "imagination_permission_level": "always_ask",
+      "used_personalities": [],
+      "linked_cerebros": [],
+      "memory_access": {
+        "mem0_enabled": false,
+        "knowledge_graph_enabled": false,
+        "vector_store_enabled": false,
+        "openviking_context": false
+      },
+      "developing_processes": [],
+      "generated_branches": {
+        "max_parallel_threads": 1,
+        "speedup_factor": "1.0x",
+        "subagents": [],
+        "branch_tree": []
+      },
+      "interconnections": [],
+      "id": "custom_agent_239adfa74c2c",
+      "name": "Atenea · Centinela & Privacidad",
+      "role": "Arquitectura Multiagéntica",
+      "color": "#6366f1",
+      "is_custom": true,
+      "updated_at": 1787698521.852164,
+      "created_at": 1787698521.847733,
+      "genesis_estado": "activo",
+      "genesis_esencia": "Promueve la recombinación sináptica entre Génesis, Hephaestus y Hermes para crear nuevas habilidades.",
+      "genesis_arquetipo": null,
+      "genesis_habilidades": [],
+      "genesis_herramientas": [],
+      "genesis_reglas": [],
+      "genesis_comunidades": [],
+      "genesis_espacio_hogar_id": null,
+      "genesis_experiencia": 0,
+      "genesis_adn": {
+        "semilla": 2984892745,
+        "solido": "dodecaedro",
+        "frecuencia": 963,
+        "pulso": 2.229,
+        "paleta": {
+          "primario": "hsl(238.732 92% 62%)",
+          "secundario": "hsl(16.24 85% 58%)",
+          "acento": "hsl(153.748 96% 70%)"
+        },
+        "matiz": 238.732,
+        "orbitas": 2,
+        "radiosOrbitales": [
+          1.297,
+          1.65
+        ],
+        "densidad": 0.368,
+        "simetria": 0.656,
+        "rugosidad": 0.102,
+        "aura": 0.441,
+        "evolucion": 0.0,
+        "facetas": 1
+      },
+      "genesis_adn_ajustes": null,
+      "genesis_enrutado": {
+        "escalera": [
+          "openrouter/free",
+          "bitnet-158-local"
+        ],
+        "soloGratuitos": true,
+        "ultimoUsado": null,
+        "ultimaFueDegradada": false
+      },
+      "genesis_soberania": {
+        "dominio": [],
+        "exploracion": [],
+        "medios": [],
+        "cerebros": [],
+        "puedeProponerFuera": true,
+        "prefijoRamaVariante": "variante/",
+        "limitesDuros": []
+      },
+      "genesis_linaje": {
+        "progenitorId": null,
+        "descendientes": [],
+        "generacion": 0,
+        "origen": "usuario",
+        "familiaId": null
+      },
+      "genesis_internet": null,
+      "genesis_avatar_fuente": null,
+      "genesis_cerebros_propios": [],
+      "genesis_proceso_tipo_id": "inter_brain_evolutionary_mutation"
+    },
+    "custom_agent_0d306b3dcfab": {
+      "status": "active",
+      "concurrency": 1,
+      "cpu_quota_percent": 10,
+      "ram_limit_mb": 64,
+      "compute_trunk": "trunk_b",
+      "hardware_acceleration": "",
+      "imagination_enabled": false,
+      "imagination_frequency": "manual",
+      "imagination_permission_level": "always_ask",
+      "used_personalities": [],
+      "linked_cerebros": [],
+      "memory_access": {
+        "mem0_enabled": false,
+        "knowledge_graph_enabled": false,
+        "vector_store_enabled": false,
+        "openviking_context": false
+      },
+      "developing_processes": [],
+      "generated_branches": {
+        "max_parallel_threads": 1,
+        "speedup_factor": "1.0x",
+        "subagents": [],
+        "branch_tree": []
+      },
+      "interconnections": [],
+      "id": "custom_agent_0d306b3dcfab",
+      "name": "Architectus · ProjectMaster",
+      "role": "Administración de Proyectos",
+      "color": "#38bdf8",
+      "is_custom": true,
+      "updated_at": 1787698521.882868,
+      "created_at": 1787698521.8769841,
+      "genesis_estado": "activo",
+      "genesis_esencia": "Estructura, auto-organiza, forja ramas y vincula creaciones en la Bóveda de Proyectos bajo supervisión de Metis Prime.",
+      "genesis_arquetipo": null,
+      "genesis_habilidades": [],
+      "genesis_herramientas": [],
+      "genesis_reglas": [],
+      "genesis_comunidades": [],
+      "genesis_espacio_hogar_id": null,
+      "genesis_experiencia": 0,
+      "genesis_adn": {
+        "semilla": 859551518,
+        "solido": "icosaedro",
+        "frecuencia": 852,
+        "pulso": 1.972,
+        "paleta": {
+          "primario": "hsl(198.438 92% 62%)",
+          "secundario": "hsl(335.945 85% 58%)",
+          "acento": "hsl(113.453 96% 70%)"
+        },
+        "matiz": 198.438,
+        "orbitas": 2,
+        "radiosOrbitales": [
+          1.333,
+          1.695
+        ],
+        "densidad": 0.422,
+        "simetria": 0.578,
+        "rugosidad": 0.017,
+        "aura": 0.485,
+        "evolucion": 0.0,
+        "facetas": 1
+      },
+      "genesis_adn_ajustes": null,
+      "genesis_enrutado": {
+        "escalera": [
+          "openrouter/free",
+          "bitnet-158-local"
+        ],
+        "soloGratuitos": true,
+        "ultimoUsado": null,
+        "ultimaFueDegradada": false
+      },
+      "genesis_soberania": {
+        "dominio": [],
+        "exploracion": [],
+        "medios": [],
+        "cerebros": [],
+        "puedeProponerFuera": true,
+        "prefijoRamaVariante": "variante/",
+        "limitesDuros": []
+      },
+      "genesis_linaje": {
+        "progenitorId": null,
+        "descendientes": [],
+        "generacion": 0,
+        "origen": "usuario",
+        "familiaId": null
+      },
+      "genesis_internet": null,
+      "genesis_avatar_fuente": null,
+      "genesis_cerebros_propios": [],
+      "genesis_proceso_tipo_id": "project_architectural_synthesis"
     }
   }
 }

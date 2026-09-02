@@ -28,3 +28,14 @@
 - Nota: inestabilidad recurrente cloudflared (~6-8 min entre caidas). Watchdog relanza automaticamente.
 - Vercel starseed-system: READY (sin cambios desde A192). Sin deploy necesario.
 - Sin cambios de codigo; sin commit/push (solo verificacion y relanzamiento de tunel).
+
+### §0.0 — Medios actualización (cron watchdog Astraura, 2026-09-02 01:44 CST)
+- Túnel Astraura: VIVO (no relanzado en este run). URL: https://parliamentary-raised-product-contamination.trycloudflare.com | status=active | backend=http://127.0.0.1:8000
+- Backend local :8000: HTTP 200 (online). BitNet i2_s saludable (llama-server 8790).
+- curl /api/cerebros: HTTP 200 — JSON válido (brain_genesis respondiendo).
+- Conectividad con todos los medios (Vercel, app nativa) confirmada.
+- Nota: túnel fue relanzado previamente (~01:24 CST) con URL nueva; watchdog de este run lo encontró VIVO.
+- Sin cambios de código; sin commit/push (solo verificación).
+### §2.3 Vercel — Estado (2026-09-02 01:44 CST)
+- starseed-system: READY (sin cambios desde A192). Sin deploy necesario.
+- Astraura túnel: VIVO. Backend BitNet conectado OK.

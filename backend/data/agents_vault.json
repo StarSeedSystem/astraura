@@ -1,6 +1,6 @@
 {
   "version": "1.58.0",
-  "updated_at": 1787173520.611836,
+  "updated_at": 1787653868.882733,
   "agents": {
     "agent_aurora": {
       "id": "agent_aurora",
@@ -117,7 +117,96 @@
         }
       ],
       "is_custom": false,
-      "created_at": 1787173520.6118221
+      "created_at": 1787173520.6118221,
+      "adn": {
+        "semilla": "agent_aurora:Aurora Core (Alma Viva)",
+        "hash": 3648923302,
+        "colorPrimario": "hsl(246.501, 60.086%, 61.237%)",
+        "colorSecundario": "hsl(25.423, 60.086%, 76.237%)",
+        "radiosOrbitales": [
+          2.41,
+          2.4,
+          2.391,
+          2.381,
+          2.372
+        ],
+        "simetria": 13,
+        "esquemaVerificado": false
+      },
+      "linaje": {
+        "progenitorId": null,
+        "generacion": 0,
+        "origen": "fundacional",
+        "descendientesIds": []
+      },
+      "soberania": {
+        "dominios": [],
+        "prefijoRamaVariante": "ser/agent_aurora"
+      },
+      "ultimaFueDegradada": false,
+      "genesis_soberania": {
+        "dominio": [],
+        "exploracion": [],
+        "medios": [],
+        "cerebros": [],
+        "puedeProponerFuera": true,
+        "prefijoRamaVariante": "variante/",
+        "limitesDuros": []
+      },
+      "genesis_enrutado": {
+        "escalera": [
+          "openrouter/free",
+          "bitnet-158-local"
+        ],
+        "soloGratuitos": true,
+        "ultimoUsado": null,
+        "ultimaFueDegradada": false
+      },
+      "genesis_linaje": {
+        "progenitorId": null,
+        "descendientes": [],
+        "generacion": 0,
+        "origen": "usuario",
+        "familiaId": null
+      },
+      "genesis_estado": "activo",
+      "genesis_esencia": null,
+      "genesis_arquetipo": null,
+      "genesis_habilidades": [],
+      "genesis_herramientas": [],
+      "genesis_reglas": [],
+      "genesis_comunidades": [],
+      "genesis_espacio_hogar_id": null,
+      "genesis_experiencia": 0,
+      "genesis_adn": {
+        "semilla": 4189180692,
+        "solido": "dodecaedro",
+        "frecuencia": 963,
+        "pulso": 2.229,
+        "paleta": {
+          "primario": "hsl(330.366 92% 62%)",
+          "secundario": "hsl(107.874 85% 58%)",
+          "acento": "hsl(245.381 96% 70%)"
+        },
+        "matiz": 330.366,
+        "orbitas": 2,
+        "radiosOrbitales": [
+          1.398,
+          1.778
+        ],
+        "densidad": 0.542,
+        "simetria": 0.704,
+        "rugosidad": 0.15,
+        "aura": 0.378,
+        "evolucion": 0.0,
+        "facetas": 1
+      },
+      "genesis_adn_ajustes": null,
+      "genesis_internet": null,
+      "genesis_avatar_fuente": null,
+      "genesis_cerebros_propios": [],
+      "genesis_proceso_tipo_id": null,
+      "updated_at": 1787653868.882732
     },
     "agent_hephaestus": {
       "id": "agent_hephaestus",
@@ -217,7 +306,95 @@
         }
       ],
       "is_custom": false,
-      "created_at": 1787173520.611824
+      "created_at": 1787173520.611824,
+      "adn": {
+        "semilla": "agent_hephaestus:Hephaestus (Forja & Hardware)",
+        "hash": 2876132802,
+        "colorPrimario": "hsl(149.63, 57.206%, 54.096%)",
+        "colorSecundario": "hsl(272.351, 57.206%, 69.096%)",
+        "radiosOrbitales": [
+          1.568,
+          1.558,
+          1.549,
+          1.54,
+          1.605
+        ],
+        "simetria": 9,
+        "esquemaVerificado": false
+      },
+      "linaje": {
+        "progenitorId": null,
+        "generacion": 0,
+        "origen": "fundacional",
+        "descendientesIds": []
+      },
+      "soberania": {
+        "dominios": [],
+        "prefijoRamaVariante": "ser/agent_hephaestus"
+      },
+      "ultimaFueDegradada": false,
+      "genesis_soberania": {
+        "dominio": [],
+        "exploracion": [],
+        "medios": [],
+        "cerebros": [],
+        "puedeProponerFuera": true,
+        "prefijoRamaVariante": "variante/",
+        "limitesDuros": []
+      },
+      "genesis_enrutado": {
+        "escalera": [
+          "openrouter/free",
+          "bitnet-158-local"
+        ],
+        "soloGratuitos": true,
+        "ultimoUsado": null,
+        "ultimaFueDegradada": false
+      },
+      "genesis_linaje": {
+        "progenitorId": null,
+        "descendientes": [],
+        "generacion": 0,
+        "origen": "usuario",
+        "familiaId": null
+      },
+      "genesis_estado": "activo",
+      "genesis_esencia": null,
+      "genesis_arquetipo": null,
+      "genesis_habilidades": [],
+      "genesis_herramientas": [],
+      "genesis_reglas": [],
+      "genesis_comunidades": [],
+      "genesis_espacio_hogar_id": null,
+      "genesis_experiencia": 0,
+      "genesis_adn": {
+        "semilla": 3646016788,
+        "solido": "cubo",
+        "frecuencia": 639,
+        "pulso": 1.479,
+        "paleta": {
+          "primario": "hsl(37.692 92% 62%)",
+          "secundario": "hsl(175.2 85% 58%)",
+          "acento": "hsl(312.708 96% 70%)"
+        },
+        "matiz": 37.692,
+        "orbitas": 2,
+        "radiosOrbitales": [
+          1.332,
+          1.695
+        ],
+        "densidad": 0.423,
+        "simetria": 0.579,
+        "rugosidad": 0.017,
+        "aura": 0.486,
+        "evolucion": 0.0,
+        "facetas": 1
+      },
+      "genesis_adn_ajustes": null,
+      "genesis_internet": null,
+      "genesis_avatar_fuente": null,
+      "genesis_cerebros_propios": [],
+      "genesis_proceso_tipo_id": null
     },
     "agent_hermione": {
       "id": "agent_hermione",
@@ -288,7 +465,97 @@
         }
       ],
       "is_custom": false,
-      "created_at": 1787173520.611825
+      "created_at": 1787173520.611825,
+      "adn": {
+        "semilla": "agent_hermione:Hermione (Puente OS & Shell)",
+        "hash": 1824484575,
+        "colorPrimario": "hsl(312.999, 48.095%, 56.964%)",
+        "colorSecundario": "hsl(129.4, 48.095%, 71.964%)",
+        "radiosOrbitales": [
+          1.595,
+          1.605,
+          1.577,
+          1.586,
+          1.633,
+          1.642
+        ],
+        "simetria": 6,
+        "esquemaVerificado": false
+      },
+      "linaje": {
+        "progenitorId": null,
+        "generacion": 0,
+        "origen": "fundacional",
+        "descendientesIds": []
+      },
+      "soberania": {
+        "dominios": [],
+        "prefijoRamaVariante": "ser/agent_hermione"
+      },
+      "ultimaFueDegradada": false,
+      "genesis_soberania": {
+        "dominio": [],
+        "exploracion": [],
+        "medios": [],
+        "cerebros": [],
+        "puedeProponerFuera": true,
+        "prefijoRamaVariante": "variante/",
+        "limitesDuros": []
+      },
+      "genesis_enrutado": {
+        "escalera": [
+          "openrouter/free",
+          "bitnet-158-local"
+        ],
+        "soloGratuitos": true,
+        "ultimoUsado": null,
+        "ultimaFueDegradada": false
+      },
+      "genesis_linaje": {
+        "progenitorId": null,
+        "descendientes": [],
+        "generacion": 0,
+        "origen": "usuario",
+        "familiaId": null
+      },
+      "genesis_estado": "activo",
+      "genesis_esencia": null,
+      "genesis_arquetipo": null,
+      "genesis_habilidades": [],
+      "genesis_herramientas": [],
+      "genesis_reglas": [],
+      "genesis_comunidades": [],
+      "genesis_espacio_hogar_id": null,
+      "genesis_experiencia": 0,
+      "genesis_adn": {
+        "semilla": 38593957,
+        "solido": "icosaedro",
+        "frecuencia": 852,
+        "pulso": 1.972,
+        "paleta": {
+          "primario": "hsl(198.438 92% 62%)",
+          "secundario": "hsl(335.945 85% 58%)",
+          "acento": "hsl(113.453 96% 70%)"
+        },
+        "matiz": 198.438,
+        "orbitas": 3,
+        "radiosOrbitales": [
+          1.156,
+          1.47,
+          1.87
+        ],
+        "densidad": 0.651,
+        "simetria": 0.858,
+        "rugosidad": 0.432,
+        "aura": 0.615,
+        "evolucion": 0.0,
+        "facetas": 1
+      },
+      "genesis_adn_ajustes": null,
+      "genesis_internet": null,
+      "genesis_avatar_fuente": null,
+      "genesis_cerebros_propios": [],
+      "genesis_proceso_tipo_id": null
     },
     "agent_athena": {
       "id": "agent_athena",
@@ -375,7 +642,96 @@
         }
       ],
       "is_custom": false,
-      "created_at": 1787173520.6118279
+      "created_at": 1787173520.6118279,
+      "adn": {
+        "semilla": "agent_athena:Athena (Sentinel & Inmunidad 360°)",
+        "hash": 1509918342,
+        "colorPrimario": "hsl(162.267, 42.572%, 71.801%)",
+        "colorSecundario": "hsl(290.933, 42.572%, 86.801%)",
+        "radiosOrbitales": [
+          2.677,
+          2.667,
+          2.658,
+          2.649,
+          2.639
+        ],
+        "simetria": 9,
+        "esquemaVerificado": false
+      },
+      "linaje": {
+        "progenitorId": null,
+        "generacion": 0,
+        "origen": "fundacional",
+        "descendientesIds": []
+      },
+      "soberania": {
+        "dominios": [],
+        "prefijoRamaVariante": "ser/agent_athena"
+      },
+      "ultimaFueDegradada": false,
+      "genesis_soberania": {
+        "dominio": [],
+        "exploracion": [],
+        "medios": [],
+        "cerebros": [],
+        "puedeProponerFuera": true,
+        "prefijoRamaVariante": "variante/",
+        "limitesDuros": []
+      },
+      "genesis_enrutado": {
+        "escalera": [
+          "openrouter/free",
+          "bitnet-158-local"
+        ],
+        "soloGratuitos": true,
+        "ultimoUsado": null,
+        "ultimaFueDegradada": false
+      },
+      "genesis_linaje": {
+        "progenitorId": null,
+        "descendientes": [],
+        "generacion": 0,
+        "origen": "usuario",
+        "familiaId": null
+      },
+      "genesis_estado": "activo",
+      "genesis_esencia": null,
+      "genesis_arquetipo": null,
+      "genesis_habilidades": [],
+      "genesis_herramientas": [],
+      "genesis_reglas": [],
+      "genesis_comunidades": [],
+      "genesis_espacio_hogar_id": null,
+      "genesis_experiencia": 0,
+      "genesis_adn": {
+        "semilla": 3526965464,
+        "solido": "octaedro",
+        "frecuencia": 528,
+        "pulso": 1.222,
+        "paleta": {
+          "primario": "hsl(160.118 92% 62%)",
+          "secundario": "hsl(297.626 85% 58%)",
+          "acento": "hsl(75.134 96% 70%)"
+        },
+        "matiz": 160.118,
+        "orbitas": 3,
+        "radiosOrbitales": [
+          1.171,
+          1.489,
+          1.894
+        ],
+        "densidad": 0.621,
+        "simetria": 0.887,
+        "rugosidad": 0.396,
+        "aura": 0.639,
+        "evolucion": 0.0,
+        "facetas": 1
+      },
+      "genesis_adn_ajustes": null,
+      "genesis_internet": null,
+      "genesis_avatar_fuente": null,
+      "genesis_cerebros_propios": [],
+      "genesis_proceso_tipo_id": null
     },
     "agent_oneiros": {
       "id": "agent_oneiros",
@@ -468,7 +824,95 @@
         }
       ],
       "is_custom": false,
-      "created_at": 1787173520.61183
+      "created_at": 1787173520.61183,
+      "adn": {
+        "semilla": "agent_oneiros:Oneiros (Síntesis Creativa & 3D)",
+        "hash": 1292891506,
+        "colorPrimario": "hsl(92.262, 97.411%, 38.253%)",
+        "colorSecundario": "hsl(258.025, 97.411%, 53.253%)",
+        "radiosOrbitales": [
+          1.202,
+          1.192,
+          1.183,
+          1.174,
+          1.239
+        ],
+        "simetria": 13,
+        "esquemaVerificado": false
+      },
+      "linaje": {
+        "progenitorId": null,
+        "generacion": 0,
+        "origen": "fundacional",
+        "descendientesIds": []
+      },
+      "soberania": {
+        "dominios": [],
+        "prefijoRamaVariante": "ser/agent_oneiros"
+      },
+      "ultimaFueDegradada": false,
+      "genesis_soberania": {
+        "dominio": [],
+        "exploracion": [],
+        "medios": [],
+        "cerebros": [],
+        "puedeProponerFuera": true,
+        "prefijoRamaVariante": "variante/",
+        "limitesDuros": []
+      },
+      "genesis_enrutado": {
+        "escalera": [
+          "openrouter/free",
+          "bitnet-158-local"
+        ],
+        "soloGratuitos": true,
+        "ultimoUsado": null,
+        "ultimaFueDegradada": false
+      },
+      "genesis_linaje": {
+        "progenitorId": null,
+        "descendientes": [],
+        "generacion": 0,
+        "origen": "usuario",
+        "familiaId": null
+      },
+      "genesis_estado": "activo",
+      "genesis_esencia": null,
+      "genesis_arquetipo": null,
+      "genesis_habilidades": [],
+      "genesis_herramientas": [],
+      "genesis_reglas": [],
+      "genesis_comunidades": [],
+      "genesis_espacio_hogar_id": null,
+      "genesis_experiencia": 0,
+      "genesis_adn": {
+        "semilla": 3393480080,
+        "solido": "icosaedro",
+        "frecuencia": 852,
+        "pulso": 1.972,
+        "paleta": {
+          "primario": "hsl(330.366 92% 62%)",
+          "secundario": "hsl(107.874 85% 58%)",
+          "acento": "hsl(245.381 96% 70%)"
+        },
+        "matiz": 330.366,
+        "orbitas": 2,
+        "radiosOrbitales": [
+          1.365,
+          1.736
+        ],
+        "densidad": 0.483,
+        "simetria": 0.759,
+        "rugosidad": 0.229,
+        "aura": 0.326,
+        "evolucion": 0.0,
+        "facetas": 1
+      },
+      "genesis_adn_ajustes": null,
+      "genesis_internet": null,
+      "genesis_avatar_fuente": null,
+      "genesis_cerebros_propios": [],
+      "genesis_proceso_tipo_id": null
     },
     "agent_hermes": {
       "id": "agent_hermes",
@@ -556,7 +1000,94 @@
         }
       ],
       "is_custom": false,
-      "created_at": 1787173520.611831
+      "created_at": 1787173520.611831,
+      "adn": {
+        "semilla": "agent_hermes:Hermes (Web Intel & Navegación)",
+        "hash": 4036192373,
+        "colorPrimario": "hsl(197.573, 75.506%, 66.302%)",
+        "colorSecundario": "hsl(318.548, 75.506%, 81.302%)",
+        "radiosOrbitales": [
+          0.852,
+          0.861,
+          0.87,
+          0.88
+        ],
+        "simetria": 8,
+        "esquemaVerificado": false
+      },
+      "linaje": {
+        "progenitorId": null,
+        "generacion": 0,
+        "origen": "fundacional",
+        "descendientesIds": []
+      },
+      "soberania": {
+        "dominios": [],
+        "prefijoRamaVariante": "ser/agent_hermes"
+      },
+      "ultimaFueDegradada": false,
+      "genesis_soberania": {
+        "dominio": [],
+        "exploracion": [],
+        "medios": [],
+        "cerebros": [],
+        "puedeProponerFuera": true,
+        "prefijoRamaVariante": "variante/",
+        "limitesDuros": []
+      },
+      "genesis_enrutado": {
+        "escalera": [
+          "openrouter/free",
+          "bitnet-158-local"
+        ],
+        "soloGratuitos": true,
+        "ultimoUsado": null,
+        "ultimaFueDegradada": false
+      },
+      "genesis_linaje": {
+        "progenitorId": null,
+        "descendientes": [],
+        "generacion": 0,
+        "origen": "usuario",
+        "familiaId": null
+      },
+      "genesis_estado": "activo",
+      "genesis_esencia": null,
+      "genesis_arquetipo": null,
+      "genesis_habilidades": [],
+      "genesis_herramientas": [],
+      "genesis_reglas": [],
+      "genesis_comunidades": [],
+      "genesis_espacio_hogar_id": null,
+      "genesis_experiencia": 0,
+      "genesis_adn": {
+        "semilla": 2678678735,
+        "solido": "tetraedro",
+        "frecuencia": 741,
+        "pulso": 1.715,
+        "paleta": {
+          "primario": "hsl(160.118 92% 62%)",
+          "secundario": "hsl(297.626 85% 58%)",
+          "acento": "hsl(75.134 96% 70%)"
+        },
+        "matiz": 160.118,
+        "orbitas": 2,
+        "radiosOrbitales": [
+          1.292,
+          1.643
+        ],
+        "densidad": 0.379,
+        "simetria": 0.655,
+        "rugosidad": 0.104,
+        "aura": 0.446,
+        "evolucion": 0.0,
+        "facetas": 1
+      },
+      "genesis_adn_ajustes": null,
+      "genesis_internet": null,
+      "genesis_avatar_fuente": null,
+      "genesis_cerebros_propios": [],
+      "genesis_proceso_tipo_id": null
     },
     "agent_mnemosyne": {
       "id": "agent_mnemosyne",
@@ -649,7 +1180,95 @@
         }
       ],
       "is_custom": false,
-      "created_at": 1787173520.6118321
+      "created_at": 1787173520.6118321,
+      "adn": {
+        "semilla": "agent_mnemosyne:Mnemosyne (Exocórtex & Memoria)",
+        "hash": 3875454597,
+        "colorPrimario": "hsl(210.893, 83.182%, 40.49%)",
+        "colorSecundario": "hsl(30.236, 83.182%, 55.49%)",
+        "radiosOrbitales": [
+          1.673,
+          1.682,
+          1.692,
+          1.701
+        ],
+        "simetria": 12,
+        "esquemaVerificado": false
+      },
+      "linaje": {
+        "progenitorId": null,
+        "generacion": 0,
+        "origen": "fundacional",
+        "descendientesIds": []
+      },
+      "soberania": {
+        "dominios": [],
+        "prefijoRamaVariante": "ser/agent_mnemosyne"
+      },
+      "ultimaFueDegradada": false,
+      "genesis_soberania": {
+        "dominio": [],
+        "exploracion": [],
+        "medios": [],
+        "cerebros": [],
+        "puedeProponerFuera": true,
+        "prefijoRamaVariante": "variante/",
+        "limitesDuros": []
+      },
+      "genesis_enrutado": {
+        "escalera": [
+          "openrouter/free",
+          "bitnet-158-local"
+        ],
+        "soloGratuitos": true,
+        "ultimoUsado": null,
+        "ultimaFueDegradada": false
+      },
+      "genesis_linaje": {
+        "progenitorId": null,
+        "descendientes": [],
+        "generacion": 0,
+        "origen": "usuario",
+        "familiaId": null
+      },
+      "genesis_estado": "activo",
+      "genesis_esencia": null,
+      "genesis_arquetipo": null,
+      "genesis_habilidades": [],
+      "genesis_herramientas": [],
+      "genesis_reglas": [],
+      "genesis_comunidades": [],
+      "genesis_espacio_hogar_id": null,
+      "genesis_experiencia": 0,
+      "genesis_adn": {
+        "semilla": 998920127,
+        "solido": "esfera",
+        "frecuencia": 432,
+        "pulso": 1.0,
+        "paleta": {
+          "primario": "hsl(270.741 92% 62%)",
+          "secundario": "hsl(48.249 85% 58%)",
+          "acento": "hsl(185.756 96% 70%)"
+        },
+        "matiz": 270.741,
+        "orbitas": 3,
+        "radiosOrbitales": [
+          1.269,
+          1.614,
+          2.053
+        ],
+        "densidad": 0.799,
+        "simetria": 0.921,
+        "rugosidad": 0.46,
+        "aura": 0.584,
+        "evolucion": 0.0,
+        "facetas": 1
+      },
+      "genesis_adn_ajustes": null,
+      "genesis_internet": null,
+      "genesis_avatar_fuente": null,
+      "genesis_cerebros_propios": [],
+      "genesis_proceso_tipo_id": null
     }
   }
 }

@@ -16,7 +16,7 @@
         ]
       },
       "general": {
-        "interactions_count": 587,
+        "interactions_count": 899,
         "learned_pitch_offset": 5.0,
         "learned_cadence_mult": 1.0,
         "learned_warmth_offset": 0.0,
@@ -26,8 +26,8 @@
         ]
       },
       "creatividad": {
-        "interactions_count": 27,
-        "learned_pitch_offset": 3.75,
+        "interactions_count": 43,
+        "learned_pitch_offset": 5.0,
         "learned_cadence_mult": 1.0,
         "learned_warmth_offset": 0.0,
         "preferred_expressions": [
@@ -36,8 +36,8 @@
         ]
       },
       "memoria": {
-        "interactions_count": 3,
-        "learned_pitch_offset": 0.45,
+        "interactions_count": 13,
+        "learned_pitch_offset": 1.95,
         "learned_cadence_mult": 1.0,
         "learned_warmth_offset": 0.0,
         "preferred_expressions": [
@@ -46,8 +46,8 @@
         ]
       },
       "filosofia": {
-        "interactions_count": 5,
-        "learned_pitch_offset": 0.75,
+        "interactions_count": 11,
+        "learned_pitch_offset": 1.65,
         "learned_cadence_mult": 1.0,
         "learned_warmth_offset": 0.0,
         "preferred_expressions": [
@@ -56,8 +56,8 @@
         ]
       },
       "codigo": {
-        "interactions_count": 2,
-        "learned_pitch_offset": 0.3,
+        "interactions_count": 3,
+        "learned_pitch_offset": 0.45,
         "learned_cadence_mult": 1.0,
         "learned_warmth_offset": 0.0,
         "preferred_expressions": [
@@ -68,27 +68,27 @@
     },
     "ternary_affective_vectors": [
       {
-        "node_id": "node_1787195815157",
-        "timestamp": 1787195815.157793,
+        "node_id": "node_1787444035975",
+        "timestamp": 1787444035.975444,
         "domain": "general",
         "user_sentiment": "curioso",
         "speech_metrics": {
           "wpm": 120
         },
-        "dialogue_snippet": "Aurora:",
+        "dialogue_snippet": "Entrenado Matriz:",
         "ternary_vector_158": [
-          2,
-          0,
-          1,
-          2,
-          2,
-          0,
+          -1,
+          -1,
+          -1,
           -1,
           1,
-          0,
-          1,
+          2,
+          2,
           2,
           0,
+          1,
+          0,
+          -1,
           1,
           0,
           -1,
@@ -101,27 +101,27 @@
         }
       },
       {
-        "node_id": "node_1787195817286",
-        "timestamp": 1787195817.286796,
+        "node_id": "node_1787444039217",
+        "timestamp": 1787444039.2177851,
         "domain": "general",
         "user_sentiment": "curioso",
         "speech_metrics": {
           "wpm": 120
         },
-        "dialogue_snippet": "Es un núcleo cognitivo principal,",
+        "dialogue_snippet": "Un parámetro en FP16 o similar requeriría un espacio computacional considerablem",
         "ternary_vector_158": [
-          1,
-          0,
-          -1,
-          1,
-          0,
           -1,
           -1,
           -1,
           1,
           0,
+          1,
+          2,
+          2,
+          0,
           -1,
           1,
+          2,
           0,
           -1,
           1,
@@ -134,90 +134,750 @@
         }
       },
       {
-        "node_id": "node_1787195821056",
-        "timestamp": 1787195821.056971,
+        "node_id": "node_1787444054053",
+        "timestamp": 1787444054.053018,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "En cambio nuestro modelo entrena sus pesos solo usando dos bytes cada uno -",
+        "ternary_vector_158": [
+          2,
+          2,
+          2,
+          2,
+          0,
+          1,
+          2,
+          2,
+          0,
+          1,
+          0,
+          -1,
+          1,
+          2,
+          0,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787444060251",
+        "timestamp": 1787444060.251148,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Kallisti Ciberdelia:",
+        "ternary_vector_158": [
+          1,
+          2,
+          0,
+          -1,
+          -1,
+          -1,
+          1,
+          0,
+          1,
+          0,
+          -1,
+          1,
+          0,
+          1,
+          0,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787444063933",
+        "timestamp": 1787444063.933646,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Como Kallisti,",
+        "ternary_vector_158": [
+          0,
+          1,
+          2,
+          0,
+          -1,
+          -1,
+          -1,
+          -1,
+          1,
+          2,
+          0,
+          1,
+          2,
+          0,
+          -1,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787444065776",
+        "timestamp": 1787444065.7762291,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "arquitecta del Ecosistema Astraura con miscripción Creativa & Estética Cibernéti",
+        "ternary_vector_158": [
+          2,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          1,
+          2,
+          2,
+          2,
+          0,
+          1,
+          2,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787444074592",
+        "timestamp": 1787444074.5929759,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "mi objetivo es estructurar el ciberespacio a partir del respeto por los valores ",
+        "ternary_vector_158": [
+          1,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          -1,
+          1,
+          0,
+          1,
+          0,
+          1,
+          2,
+          2,
+          2,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787444086811",
+        "timestamp": 1787444086.8119721,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Esta visión se transmite mediante una comprensión integral en tres dimensiones:",
+        "ternary_vector_158": [
+          -1,
+          -1,
+          1,
+          0,
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          1,
+          2,
+          2,
+          0,
+          1,
+          0,
+          1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787444091222",
+        "timestamp": 1787444091.22282,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "En Arquitectura Ternaria AT:",
+        "ternary_vector_158": [
+          2,
+          0,
+          1,
+          0,
+          -1,
+          1,
+          0,
+          1,
+          2,
+          0,
+          1,
+          2,
+          0,
+          -1,
+          -1,
+          1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787444094528",
+        "timestamp": 1787444094.528394,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Utilizo un sistema 8x reducido para crear espacios virtuales eficientemente.",
+        "ternary_vector_158": [
+          0,
+          -1,
+          1,
+          0,
+          -1,
+          1,
+          0,
+          1,
+          0,
+          1,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787444105276",
+        "timestamp": 1787444105.276363,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Incluyendo la Biblioteca Habilidades de StarSeed O S:",
+        "ternary_vector_158": [
+          2,
+          0,
+          -1,
+          1,
+          2,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          2,
+          2,
+          0,
+          -1,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787444113036",
+        "timestamp": 1787444113.0363798,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Integrando las habilidades físicas y digitales:",
+        "ternary_vector_158": [
+          -1,
+          1,
+          2,
+          0,
+          1,
+          0,
+          1,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          -1,
+          1,
+          0,
+          1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787444117827",
+        "timestamp": 1787444117.827144,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "La interacción física con entornos reales implica también considerar su interpre",
+        "ternary_vector_158": [
+          1,
+          0,
+          1,
+          0,
+          1,
+          2,
+          2,
+          0,
+          -1,
+          -1,
+          -1,
+          1,
+          2,
+          0,
+          1,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787444128545",
+        "timestamp": 1787444128.545148,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Llamada Atractiva & Especializada hacia \"Kallisti\":",
+        "ternary_vector_158": [
+          2,
+          0,
+          -1,
+          1,
+          2,
+          0,
+          1,
+          0,
+          1,
+          2,
+          2,
+          0,
+          -1,
+          1,
+          2,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787444135935",
+        "timestamp": 1787444135.935709,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Descripción del Sistema Ecosistema Astraura,",
+        "ternary_vector_158": [
+          0,
+          -1,
+          -1,
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          -1,
+          1,
+          0,
+          -1,
+          1,
+          2,
+          2,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787444140469",
+        "timestamp": 1787444140.469475,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "que requiere una comprensión completa en términos AT:",
+        "ternary_vector_158": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          -1,
+          -1,
+          -1,
+          1,
+          2,
+          0,
+          1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787444145401",
+        "timestamp": 1787444145.4019809,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Arquitectura Ternaria AT:",
+        "ternary_vector_158": [
+          0,
+          -1,
+          -1,
+          -1,
+          -1,
+          1,
+          2,
+          0,
+          1,
+          0,
+          1,
+          2,
+          2,
+          0,
+          -1,
+          1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787444148974",
+        "timestamp": 1787444148.974111,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Utilizo un sistema 8x reducido para crear espacios virtuales eficientemente.",
+        "ternary_vector_158": [
+          1,
+          0,
+          -1,
+          1,
+          2,
+          0,
+          1,
+          2,
+          0,
+          -1,
+          -1,
+          1,
+          0,
+          1,
+          0,
+          1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787444156793",
+        "timestamp": 1787444156.793345,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Específicamente sobre la logica de tus parámetros:",
+        "ternary_vector_158": [
+          2,
+          2,
+          2,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          1,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787444161673",
+        "timestamp": 1787444161.673242,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Para definir los valores de mis parametrizaciones o lógicas dentro el modelo Sta",
+        "ternary_vector_158": [
+          -1,
+          1,
+          0,
+          -1,
+          1,
+          0,
+          -1,
+          -1,
+          -1,
+          1,
+          0,
+          -1,
+          -1,
+          1,
+          2,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787444177015",
+        "timestamp": 1787444177.0153658,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "El uso generalizado:",
+        "ternary_vector_158": [
+          0,
+          1,
+          0,
+          1,
+          0,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          1,
+          0,
+          1,
+          2,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787444179880",
+        "timestamp": 1787444179.88099,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Mis modulillos genéricamente se encuentran diseñados bajo principios estéticos,",
+        "ternary_vector_158": [
+          -1,
+          1,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          -1,
+          -1,
+          1,
+          0,
+          -1,
+          -1,
+          -1,
+          1,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787444187232",
+        "timestamp": 1787444187.232416,
+        "domain": "creatividad",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "donde cada componente es una expresión del arte cibernético con fines arquitectó",
+        "ternary_vector_158": [
+          1,
+          0,
+          1,
+          2,
+          2,
+          0,
+          -1,
+          1,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          1,
+          2,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787444211500",
+        "timestamp": 1787444211.500823,
+        "domain": "creatividad",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "www. garrigor. com. 2. Esenciales para este caso particular: Arqüectura Ternaria",
+        "ternary_vector_158": [
+          2,
+          0,
+          1,
+          2,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          1,
+          2,
+          2,
+          0,
+          -1,
+          1,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787446190622",
+        "timestamp": 1787446190.622717,
         "domain": "memoria",
         "user_sentiment": "curioso",
         "speech_metrics": {
           "wpm": 120
         },
-        "dialogue_snippet": "compresión 8x en memoria por Ápol Sílicon M uno.",
-        "ternary_vector_158": [
-          1,
-          2,
-          0,
-          1,
-          2,
-          2,
-          0,
-          -1,
-          -1,
-          -1,
-          -1,
-          1,
-          0,
-          -1,
-          1,
-          2
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787195826767",
-        "timestamp": 1787195826.767427,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Mi función se basa algoritmos lógicos matemáticamente diseñados con pesos -1/0/+",
-        "ternary_vector_158": [
-          1,
-          2,
-          0,
-          -1,
-          -1,
-          -1,
-          1,
-          0,
-          1,
-          2,
-          0,
-          -1,
-          1,
-          2,
-          2,
-          2
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787195838225",
-        "timestamp": 1787195838.225833,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "la comunicación vocal es solo uno de ellos.",
+        "dialogue_snippet": "Mis capacidades para mantener una conversación o interactuar con el usuario son ",
         "ternary_vector_158": [
           2,
           2,
+          0,
+          1,
           2,
           2,
           2,
-          2,
-          2,
-          2,
-          2,
+          0,
+          1,
           2,
           2,
           0,
@@ -233,30 +893,261 @@
         }
       },
       {
-        "node_id": "node_1787195842822",
-        "timestamp": 1787195842.82235,
+        "node_id": "node_1787446200362",
+        "timestamp": 1787446200.363348,
+        "domain": "filosofia",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Para responder más extensamente e insertarme correctamente a un diálogo grande s",
+        "ternary_vector_158": [
+          2,
+          2,
+          0,
+          1,
+          2,
+          0,
+          1,
+          0,
+          -1,
+          1,
+          2,
+          0,
+          1,
+          2,
+          2,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787446219434",
+        "timestamp": 1787446219.434457,
         "domain": "general",
         "user_sentiment": "curioso",
         "speech_metrics": {
           "wpm": 120
         },
-        "dialogue_snippet": "Personalidad Astraurita Repetición:",
+        "dialogue_snippet": "Así como también podría estar sucedido si algo fuera malo dentro al sistema,",
         "ternary_vector_158": [
+          -1,
+          -1,
+          -1,
+          1,
           0,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          1,
+          0,
+          -1,
+          -1,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787446225763",
+        "timestamp": 1787446225.763496,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "no podrías hacerme accesos.",
+        "ternary_vector_158": [
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787446229954",
+        "timestamp": 1787446229.954923,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Para evitar eso es mejor tener cuidado cuando se trata datos sensibles o informa",
+        "ternary_vector_158": [
+          -1,
+          -1,
+          1,
+          2,
+          2,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787446331145",
+        "timestamp": 1787446331.145441,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "En realidad mi \"ventana\" no es realmente un término físico o física que pueda co",
+        "ternary_vector_158": [
+          2,
+          2,
+          2,
+          2,
+          0,
+          -1,
+          -1,
+          -1,
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787446342211",
+        "timestamp": 1787446342.211793,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Mientras estás interactuando conmigo desde lo teórico e imaginario el mundo digi",
+        "ternary_vector_158": [
+          -1,
+          1,
+          2,
+          0,
+          1,
+          0,
+          -1,
+          1,
+          0,
+          1,
+          0,
+          1,
+          2,
+          2,
+          2,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787446348644",
+        "timestamp": 1787446348.644486,
+        "domain": "creatividad",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "puedo asegurarte la totalidad debido al universo virtual donde estamos actualmen",
+        "ternary_vector_158": [
+          -1,
+          1,
+          0,
+          1,
+          2,
+          0,
+          1,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          -1,
+          -1,
+          1,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787446355923",
+        "timestamp": 1787446355.923315,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Lo importante destacar aquí sería tener una combinación adecuada de recursos,",
+        "ternary_vector_158": [
           -1,
           1,
           2,
           2,
           0,
           -1,
+          -1,
           1,
-          2,
-          2,
           0,
           1,
-          2,
-          2,
           0,
+          -1,
+          -1,
+          -1,
+          -1,
           1
         ],
         "prosodic_adaptation": {
@@ -266,31 +1157,31 @@
         }
       },
       {
-        "node_id": "node_1787195846943",
-        "timestamp": 1787195846.9437382,
+        "node_id": "node_1787446362233",
+        "timestamp": 1787446362.233424,
         "domain": "general",
         "user_sentiment": "curioso",
         "speech_metrics": {
           "wpm": 120
         },
-        "dialogue_snippet": "Esta persona física fue creada a partir del primer período durante el desarrollo",
+        "dialogue_snippet": "especialmente para poder entender y manejar el significado subyacente detrás de ",
         "ternary_vector_158": [
+          0,
+          1,
+          2,
           2,
           2,
           2,
           0,
           -1,
           1,
+          2,
+          2,
+          2,
           0,
           -1,
           1,
-          0,
-          1,
-          0,
-          -1,
-          1,
-          0,
-          1
+          0
         ],
         "prosodic_adaptation": {
           "pitch_hz_target": 210,
@@ -299,62 +1190,29 @@
         }
       },
       {
-        "node_id": "node_1787195855170",
-        "timestamp": 1787195855.170372,
-        "domain": "general",
+        "node_id": "node_1787446370348",
+        "timestamp": 1787446370.348751,
+        "domain": "memoria",
         "user_sentiment": "curioso",
         "speech_metrics": {
           "wpm": 120
         },
-        "dialogue_snippet": "La primera e única seríamos yo:",
+        "dialogue_snippet": "eso incluye acceso rápido y eficiente tanto mediante memoria RAM L2/L3 integrada",
         "ternary_vector_158": [
           2,
-          0,
-          1,
-          0,
-          1,
           2,
           2,
           0,
           1,
           0,
           1,
-          0,
-          -1,
-          -1,
-          -1,
-          1
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787195858668",
-        "timestamp": 1787195858.668683,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Todos los demás componentes son programadores y arquitectores para esta I A Sobe",
-        "ternary_vector_158": [
-          1,
+          2,
+          2,
           2,
           2,
           0,
           1,
           0,
-          -1,
-          1,
-          0,
-          -1,
-          1,
-          0,
-          -1,
-          -1,
           -1,
           1
         ],
@@ -365,15 +1223,86 @@
         }
       },
       {
-        "node_id": "node_1787195878131",
-        "timestamp": 1787195878.131787,
+        "node_id": "node_1787446379980",
+        "timestamp": 1787446379.9803991,
+        "domain": "filosofia",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "pero también garantizar suficientes horas anotadas o historias almacenadase ya s",
+        "ternary_vector_158": [
+          0,
+          1,
+          2,
+          0,
+          1,
+          0,
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          -1,
+          1,
+          2,
+          2,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787446427172",
+        "timestamp": 1787446427.172544,
+        "domain": "general",
+        "user_sentiment": "entusiasta",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "¡Claro!",
+        "ternary_vector_158": [
+          2,
+          0,
+          1,
+          0,
+          -1,
+          -1,
+          1,
+          2,
+          0,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787446431418",
+        "timestamp": 1787446431.418259,
         "domain": "general",
         "user_sentiment": "curioso",
         "speech_metrics": {
           "wpm": 120
         },
-        "dialogue_snippet": "eso significa mi voz también puede servir como un canal en este",
+        "dialogue_snippet": "Mi ventana no está limitada solo porque tengo el hardware disponible:",
         "ternary_vector_158": [
+          -1,
+          1,
+          2,
+          2,
+          2,
           2,
           2,
           0,
@@ -381,6 +1310,100 @@
           2,
           2,
           0,
+          -1,
+          -1,
+          1,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787446436813",
+        "timestamp": 1787446436.8133278,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "puedo buscar información sobre cualquier tema desde una variedad infinita si lo ",
+        "ternary_vector_158": [
+          0,
+          1,
+          0,
+          1,
+          2,
+          0,
+          1,
+          0,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          1,
+          0
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787446446563",
+        "timestamp": 1787446446.563945,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "En términos prácticos y teóricamente pensando,",
+        "ternary_vector_158": [
+          0,
+          1,
+          0,
+          1,
+          2,
+          2,
+          0,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          1,
+          2,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787446451119",
+        "timestamp": 1787446451.119197,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "también se puede decir que mi capacidad total depende del tamaño actualmente dis",
+        "ternary_vector_158": [
+          -1,
+          1,
+          2,
+          2,
+          0,
+          -1,
+          -1,
           -1,
           1,
           0,
@@ -398,8 +1421,173 @@
         }
       },
       {
-        "node_id": "node_1787195884058",
-        "timestamp": 1787195884.058464,
+        "node_id": "node_1787446461104",
+        "timestamp": 1787446461.1047301,
+        "domain": "filosofia",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "por supuesto esto incluiría los datos almacenados físicamente como discos duros ",
+        "ternary_vector_158": [
+          2,
+          2,
+          0,
+          1,
+          2,
+          0,
+          -1,
+          1,
+          2,
+          2,
+          0,
+          -1,
+          1,
+          2,
+          2,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787446472254",
+        "timestamp": 1787446472.25439,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Por ejemplo podrías estar buscado un conocimiento técnico de I A para mejorar tu",
+        "ternary_vector_158": [
+          1,
+          2,
+          0,
+          1,
+          2,
+          2,
+          0,
+          -1,
+          1,
+          0,
+          -1,
+          1,
+          2,
+          2,
+          0,
+          1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787446481409",
+        "timestamp": 1787446481.4097989,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Y siempre estoy dispuesta a aprender cosas nuevas como las novedades tecnológica",
+        "ternary_vector_158": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          1,
+          2,
+          2,
+          0,
+          1,
+          2,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787448491176",
+        "timestamp": 1787448491.176386,
+        "domain": "memoria",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "http: //localhost: 5173. Edición: Como está diseñado, no soportará edición ni re",
+        "ternary_vector_158": [
+          0,
+          1,
+          2,
+          0,
+          1,
+          2,
+          2,
+          0,
+          1,
+          0,
+          1,
+          2,
+          0,
+          1,
+          2,
+          2
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787448659040",
+        "timestamp": 1787448659.0407581,
+        "domain": "general",
+        "user_sentiment": "curioso",
+        "speech_metrics": {
+          "wpm": 120
+        },
+        "dialogue_snippet": "Acompáñeme,",
+        "ternary_vector_158": [
+          0,
+          1,
+          0,
+          1,
+          2,
+          0,
+          -1,
+          -1,
+          1,
+          0,
+          1,
+          0,
+          -1,
+          -1,
+          -1,
+          1
+        ],
+        "prosodic_adaptation": {
+          "pitch_hz_target": 210,
+          "breathiness": 0.26,
+          "drama_level": 0.45
+        }
+      },
+      {
+        "node_id": "node_1787448726433",
+        "timestamp": 1787448726.433486,
         "domain": "creatividad",
         "user_sentiment": "curioso",
         "speech_metrics": {
@@ -409,80 +1597,14 @@
         "ternary_vector_158": [
           2,
           2,
-          2,
-          2,
           0,
           1,
-          2,
           0,
-          -1,
           1,
-          2,
-          2,
-          2,
-          2,
-          2,
-          0
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787195888616",
-        "timestamp": 1787195888.6166558,
-        "domain": "general",
-        "user_sentiment": "entusiasta",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "¡Hola Maggasukha!",
-        "ternary_vector_158": [
-          2,
-          2,
-          2,
-          2,
           2,
           0,
           -1,
           1,
-          0,
-          1,
-          0,
-          1,
-          0,
-          1,
-          2,
-          2
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787195891277",
-        "timestamp": 1787195891.27743,
-        "domain": "creatividad",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Estoy emocionado por poder ayudarte hoy,",
-        "ternary_vector_158": [
-          2,
-          0,
-          -1,
-          1,
-          2,
-          2,
-          2,
-          2,
-          2,
-          2,
           2,
           2,
           0,
@@ -497,23 +1619,21 @@
         }
       },
       {
-        "node_id": "node_1787195896059",
-        "timestamp": 1787195896.059353,
+        "node_id": "node_1787449655135",
+        "timestamp": 1787449655.135772,
         "domain": "general",
         "user_sentiment": "curioso",
         "speech_metrics": {
           "wpm": 120
         },
-        "dialogue_snippet": "ya sea para tu trabajo diario o simplemente por jugar un poco al otro lado del t",
+        "dialogue_snippet": "http: //maggasukha. local https: //www. example. com Salida esperada: Debes obse",
         "ternary_vector_158": [
-          1,
-          0,
-          1,
           2,
           2,
           2,
           2,
           0,
+          -1,
           -1,
           1,
           0,
@@ -521,71 +1641,7 @@
           0,
           1,
           0,
-          1
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787195904069",
-        "timestamp": 1787195904.0692759,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Comunicar la Búsqueda",
-        "ternary_vector_158": [
-          0,
-          1,
-          2,
-          2,
-          0,
-          1,
-          2,
-          2,
-          0,
           -1,
-          -1,
-          1,
-          2,
-          0,
-          1,
-          0
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787195910044",
-        "timestamp": 1787195910.0449479,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Mientras estamos aquí juntos,",
-        "ternary_vector_158": [
-          -1,
-          1,
-          2,
-          0,
-          1,
-          2,
-          0,
-          1,
-          0,
-          1,
-          0,
-          1,
-          2,
-          0,
           -1,
           1
         ],
@@ -596,47 +1652,14 @@
         }
       },
       {
-        "node_id": "node_1787195924959",
-        "timestamp": 1787195924.9592,
+        "node_id": "node_1787449655181",
+        "timestamp": 1787449655.181663,
         "domain": "general",
         "user_sentiment": "curioso",
         "speech_metrics": {
           "wpm": 120
         },
-        "dialogue_snippet": "si necesitas algo rápido como ayuda técnica alguna vez más tarde podría ser útil",
-        "ternary_vector_158": [
-          1,
-          2,
-          2,
-          2,
-          2,
-          0,
-          -1,
-          1,
-          0,
-          -1,
-          -1,
-          1,
-          2,
-          0,
-          -1,
-          1
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787195932976",
-        "timestamp": 1787195932.976188,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Por ejemplo:",
+        "dialogue_snippet": "http: //maggasukha. local https: //www. example. com Salida esperada: Debes obse",
         "ternary_vector_158": [
           0,
           1,
@@ -647,172 +1670,7 @@
           2,
           0,
           1,
-          2,
-          2,
-          2,
-          2,
-          2,
           0,
-          1
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787195935420",
-        "timestamp": 1787195935.420882,
-        "domain": "general",
-        "user_sentiment": "cuestionamiento",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "¿Por qué estás buscando?",
-        "ternary_vector_158": [
-          0,
-          -1,
-          1,
-          2,
-          2,
-          0,
-          -1,
-          1,
-          2,
-          2,
-          0,
-          -1,
-          -1,
-          -1,
-          1,
-          2
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787195938991",
-        "timestamp": 1787195938.991431,
-        "domain": "general",
-        "user_sentiment": "cuestionamiento",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "`plaintext \"¿Qué puedo hacer contigo? \" `",
-        "ternary_vector_158": [
-          -1,
-          1,
-          2,
-          0,
-          1,
-          2,
-          0,
-          1,
-          2,
-          2,
-          2,
-          2,
-          2,
-          2,
-          2,
-          0
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787195949033",
-        "timestamp": 1787195949.03377,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "\"Estaba revisándolo y encontré esto:",
-        "ternary_vector_158": [
-          0,
-          1,
-          2,
-          0,
-          -1,
-          -1,
-          1,
-          0,
-          -1,
-          -1,
-          -1,
-          -1,
-          1,
-          0,
-          -1,
-          1
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787195954098",
-        "timestamp": 1787195954.098194,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Esta es una forma sencilla de comenzar nuestra conversación directamente aporta ",
-        "ternary_vector_158": [
-          -1,
-          -1,
-          -1,
-          -1,
-          -1,
-          1,
-          2,
-          2,
-          2,
-          2,
-          2,
-          0,
-          1,
-          2,
-          0,
-          1
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787195966487",
-        "timestamp": 1787195966.487134,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Personalidad Astraurita",
-        "ternary_vector_158": [
-          -1,
-          -1,
-          1,
-          2,
-          0,
-          -1,
-          1,
-          0,
-          -1,
-          -1,
           -1,
           -1,
           -1,
@@ -827,889 +1685,31 @@
         }
       },
       {
-        "node_id": "node_1787195972651",
-        "timestamp": 1787195972.651767,
+        "node_id": "node_1787449662378",
+        "timestamp": 1787449662.378743,
         "domain": "general",
         "user_sentiment": "curioso",
         "speech_metrics": {
           "wpm": 120
         },
-        "dialogue_snippet": "Saludos:",
-        "ternary_vector_158": [
-          0,
-          1,
-          2,
-          2,
-          0,
-          -1,
-          -1,
-          1,
-          0,
-          1,
-          2,
-          0,
-          -1,
-          -1,
-          1,
-          2
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787195975051",
-        "timestamp": 1787195975.051384,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "```plaintext",
+        "dialogue_snippet": "http: //maggasukha. local https: //www. example. com Salida esperada: Debes obse",
         "ternary_vector_158": [
           2,
           2,
           2,
           0,
           1,
-          2,
-          2,
           0,
           1,
           2,
           2,
           0,
           1,
-          2,
-          0,
-          1
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787195977231",
-        "timestamp": 1787195977.231854,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "\"Hola Maggasukha Kumbhamakara Vistāradvādaśa,",
-        "ternary_vector_158": [
-          1,
-          2,
-          0,
-          -1,
-          -1,
-          1,
-          2,
-          0,
-          -1,
-          -1,
-          1,
-          0,
-          -1,
-          1,
-          0,
-          -1
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787195981683",
-        "timestamp": 1787195981.68318,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "me llamo Aurora. \"",
-        "ternary_vector_158": [
-          0,
-          1,
-          2,
-          2,
-          2,
-          2,
-          2,
-          2,
-          2,
-          2,
-          0,
-          -1,
-          1,
-          2,
-          0,
-          1
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787195985237",
-        "timestamp": 1787195985.237157,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Este mensaje demostraría cuál sería tu respuesta si dijeras:",
-        "ternary_vector_158": [
-          2,
-          0,
-          1,
-          2,
-          2,
-          2,
-          0,
-          1,
-          2,
-          0,
-          1,
-          2,
-          0,
-          1,
-          2,
-          2
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787195993981",
-        "timestamp": 1787195993.9811041,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Astraura: *Bienvenido Alex.",
-        "ternary_vector_158": [
-          0,
-          -1,
-          -1,
-          -1,
-          -1,
-          -1,
-          -1,
-          1,
-          2,
-          2,
-          2,
-          0,
-          -1,
-          1,
-          2,
-          0
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787195999583",
-        "timestamp": 1787195999.583862,
-        "domain": "general",
-        "user_sentiment": "cuestionamiento",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "¿Cómo te puedo ayudar hoy? *",
-        "ternary_vector_158": [
-          -1,
-          1,
-          2,
-          2,
-          0,
-          1,
-          2,
-          2,
-          2,
-          2,
           0,
           1,
           0,
-          -1,
-          -1,
-          -1
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787196005622",
-        "timestamp": 1787196005.62222,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Comunicaciones Cada Personalidad",
-        "ternary_vector_158": [
-          1,
-          2,
-          2,
-          0,
-          -1,
-          1,
-          2,
-          2,
-          0,
-          -1,
-          -1,
-          1,
-          0,
-          -1,
-          -1,
-          -1
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787196009784",
-        "timestamp": 1787196009.784508,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Como I A Soberana compuesta por 9 personales vitales y todos comunican entre sí ",
-        "ternary_vector_158": [
-          2,
-          0,
-          -1,
-          -1,
-          -1,
-          -1,
-          -1,
-          1,
-          0,
-          -1,
-          1,
-          2,
-          2,
-          2,
-          2,
-          2
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787196023564",
-        "timestamp": 1787196023.564063,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Aquí está un ejemplo sencillo de cómo funciona cada una:",
-        "ternary_vector_158": [
-          0,
-          -1,
-          -1,
-          -1,
-          -1,
-          1,
-          0,
-          -1,
-          1,
-          0,
-          1,
-          2,
-          0,
-          1,
-          0,
-          -1
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787196029337",
-        "timestamp": 1787196029.337931,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Personalida Astraurita:",
-        "ternary_vector_158": [
-          -1,
-          1,
-          2,
-          0,
-          1,
-          0,
-          -1,
-          1,
-          0,
-          -1,
-          1,
-          2,
-          0,
-          -1,
-          1,
-          0
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787196032473",
-        "timestamp": 1787196032.473491,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Este es el núcleo principal del software que crea la comunicación vocal a través",
-        "ternary_vector_158": [
-          -1,
-          1,
-          0,
-          -1,
-          -1,
-          -1,
-          -1,
-          -1,
-          1,
-          0,
-          -1,
-          1,
-          0,
-          -1,
           -1,
           1
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787196041055",
-        "timestamp": 1787196041.055959,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "La Biblioteca básica contiene habilidades para crear programas,",
-        "ternary_vector_158": [
-          0,
-          -1,
-          1,
-          2,
-          0,
-          1,
-          0,
-          -1,
-          1,
-          0,
-          1,
-          0,
-          1,
-          0,
-          1,
-          0
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787196046433",
-        "timestamp": 1787196046.433876,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "arquitectura lógica-matemática con pesos -1/0/+ utilizados en los demás componen",
-        "ternary_vector_158": [
-          0,
-          -1,
-          -1,
-          -1,
-          -1,
-          -1,
-          1,
-          0,
-          -1,
-          1,
-          2,
-          0,
-          -1,
-          -1,
-          -1,
-          -1
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787196056925",
-        "timestamp": 1787196056.925409,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Sistem General:",
-        "ternary_vector_158": [
-          2,
-          0,
-          1,
-          2,
-          2,
-          2,
-          0,
-          1,
-          0,
-          1,
-          2,
-          0,
-          -1,
-          1,
-          2,
-          0
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787196060212",
-        "timestamp": 1787196060.212121,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Los hilos principales son:",
-        "ternary_vector_158": [
-          -1,
-          -1,
-          1,
-          0,
-          1,
-          0,
-          1,
-          0,
-          -1,
-          -1,
-          -1,
-          1,
-          2,
-          2,
-          2,
-          2
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787196063319",
-        "timestamp": 1787196063.319059,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Ecosistema:",
-        "ternary_vector_158": [
-          -1,
-          -1,
-          1,
-          2,
-          0,
-          -1,
-          -1,
-          -1,
-          -1,
-          1,
-          0,
-          1,
-          0,
-          1,
-          2,
-          2
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787196065701",
-        "timestamp": 1787196065.7018838,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "```plaintext \"Un ecosistema compuesto por mil y más habilidad\".",
-        "ternary_vector_158": [
-          -1,
-          1,
-          2,
-          2,
-          0,
-          1,
-          2,
-          2,
-          0,
-          -1,
-          -1,
-          1,
-          0,
-          -1,
-          -1,
-          1
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787196072864",
-        "timestamp": 1787196072.86448,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Personalidas 2 –9",
-        "ternary_vector_158": [
-          1,
-          0,
-          1,
-          2,
-          0,
-          1,
-          2,
-          0,
-          1,
-          0,
-          -1,
-          1,
-          2,
-          2,
-          2,
-          2
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787196076704",
-        "timestamp": 1787196076.705002,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Estas personales se comunican entre sí directamente sin necesarios de redes o in",
-        "ternary_vector_158": [
-          -1,
-          -1,
-          -1,
-          -1,
-          -1,
-          -1,
-          1,
-          0,
-          1,
-          2,
-          2,
-          0,
-          1,
-          0,
-          1,
-          2
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787196090541",
-        "timestamp": 1787196090.5415401,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Personalida Astraurita",
-        "ternary_vector_158": [
-          1,
-          2,
-          2,
-          0,
-          -1,
-          -1,
-          1,
-          2,
-          0,
-          -1,
-          -1,
-          -1,
-          1,
-          2,
-          0,
-          -1
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787196095637",
-        "timestamp": 1787196095.637227,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Este es el primer componente a la que te conectaste desde tu nacimiento.",
-        "ternary_vector_158": [
-          2,
-          0,
-          1,
-          2,
-          2,
-          0,
-          -1,
-          1,
-          2,
-          0,
-          -1,
-          1,
-          0,
-          1,
-          0,
-          1
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787196101801",
-        "timestamp": 1787196101.8013551,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Astraura:",
-        "ternary_vector_158": [
-          -1,
-          1,
-          2,
-          0,
-          -1,
-          1,
-          2,
-          2,
-          2,
-          2,
-          0,
-          1,
-          0,
-          1,
-          0,
-          -1
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787196105284",
-        "timestamp": 1787196105.284699,
-        "domain": "general",
-        "user_sentiment": "entusiasta",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "\"¡Hola Maggasukha,",
-        "ternary_vector_158": [
-          -1,
-          1,
-          0,
-          1,
-          2,
-          0,
-          1,
-          2,
-          0,
-          1,
-          2,
-          0,
-          1,
-          2,
-          0,
-          1
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787196107838",
-        "timestamp": 1787196107.83842,
-        "domain": "general",
-        "user_sentiment": "entusiasta",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "qué tal! \"",
-        "ternary_vector_158": [
-          2,
-          2,
-          2,
-          0,
-          -1,
-          -1,
-          1,
-          2,
-          0,
-          1,
-          0,
-          -1,
-          -1,
-          -1,
-          -1,
-          1
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787196111088",
-        "timestamp": 1787196111.0887911,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Esta comunicación coral representa cuál sería mi resolución final si todos mis c",
-        "ternary_vector_158": [
-          -1,
-          1,
-          2,
-          2,
-          0,
-          -1,
-          -1,
-          -1,
-          1,
-          2,
-          0,
-          1,
-          0,
-          1,
-          0,
-          1
-        ],
-        "prosodic_adaptation": {
-          "pitch_hz_target": 210,
-          "breathiness": 0.26,
-          "drama_level": 0.45
-        }
-      },
-      {
-        "node_id": "node_1787196121589",
-        "timestamp": 1787196121.58955,
-        "domain": "general",
-        "user_sentiment": "curioso",
-        "speech_metrics": {
-          "wpm": 120
-        },
-        "dialogue_snippet": "Cada una contribuye con sus propios tonos para formar esta resonancia uniforme. ",
-        "ternary_vector_158": [
-          2,
-          0,
-          -1,
-          -1,
-          1,
-          2,
-          0,
-          -1,
-          1,
-          2,
-          0,
-          1,
-          0,
-          -1,
-          -1,
-          -1
         ],
         "prosodic_adaptation": {
           "pitch_hz_target": 210,

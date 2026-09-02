@@ -55,3 +55,22 @@ Tue Sep  1 04:46:57 CST 2026 Verificacion curl /api/cerebros -> HTTP 200 OK. Res
 [Tue Sep  1 23:37:05 CST 2026] TUNEL CAIDO. Relanzando monitor...
 [Tue Sep  1 23:37:07 CST 2026] Monitor relanzado (pid 61208). Nuevo tunel activo via active_tunnel.json.
 [Tue Sep  1 23:37:12 CST 2026] Verificacion /api/cerebros: HTTP 200. HTML response (Cloudflare proxy). TUNEL VIVO, conectividad restaurada. No code changes made.
+
+---
+
+[Wed Sep  2 01:11-01:14 CST 2026] Adenda 230 - Watchdog del túnel Astraura (cron)
+- Estado INICIAL: TUNEL CAIDO → relanzado por watchdog.
+- Estado FINAL: TUNEL VIVO (post-fix JSON URL).
+- URL: https://pets-cabin-mileage-isaac.trycloudflare.com
+- curl /api/cerebros: HTTP 200, JSON válido (brain_genesis).
+- Sin cambios de código; sin commit/push (solo verificación y relanzamiento).
+
+[Wed Sep  2 01:44:44 CST 2026] CRON-CHECK Astraura tunnel watchdog
+- Resultado: EXITO (exit_code=0). TUNEL VIVO, no relanzado en este run.
+- URL: https://parliamentary-raised-product-contamination.trycloudflare.com | status=active
+- Backend: http://127.0.0.1:8000 (HTTP 200)
+- Watchdog log (ultimas 3): todas "OK tunel vivo" con misma URL.
+- Backend local 8000: HTTP 200 (online, JSON válido).
+- curl /api/cerebros: HTTP 200, JSON válido: {"active_brain_id":"brain_genesis","cerebros":[{"i...
+- Conectividad backend con todos los medios (Vercel, app nativa) confirmada.
+- Sin cambios de código; sin commit/push (solo verificación).

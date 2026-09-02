@@ -121,3 +121,19 @@
 - Verificacion curl /api/cerebros: HTTP 200 - HTML response (Cloudflare proxy). Tunel responde correctamente.
 - Backend local :8000: HTTP 200 (online). Conectividad con todos los medios (Vercel, app nativa) confirmada.
 - Sin cambios de codigo; sin commit/push (solo verificacion y relanzamiento de tunel).
+
+
+## Adenda 230 - Watchdog del túnel Astraura (cron 2026-09-02 01:11-01:14 CST)
+- Estado INICIAL: TUNEL CAIDO → relanzado.
+- Estado FINAL: TUNEL VIVO.
+- URL: https://pets-cabin-mileage-isaac.trycloudflare.com
+- curl /api/cerebros: HTTP 200, JSON válido (brain_genesis).
+- Sin cambios de código; sin commit/push.
+
+## Adenda 231 - Watchdog del túnel Astraura (cron 2026-09-02 01:44 CST)
+- Estado: TUNEL VIVO (no relanzado en este run).
+- URL: https://parliamentary-raised-product-contamination.trycloudflare.com | status=active
+- Backend local :8000: HTTP 200 (online).
+- curl /api/cerebros: HTTP 200, JSON válido: {"active_brain_id":"brain_genesis","cerebros":[{"i...
+- Conectividad con Vercel y app nativa confirmada.
+- Sin cambios de código; sin commit/push.
