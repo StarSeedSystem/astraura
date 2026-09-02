@@ -85,3 +85,7 @@ Tue Sep  1 04:46:57 CST 2026 Verificacion curl /api/cerebros -> HTTP 200 OK. Res
 [watchdog 2026-09-02T09:44:03Z] OK tunel vivo: https://parliamentary-raised-product-contamination.trycloudflare.com — backend 127.0.0.1:8000 conectado, no relanzado
 
 [2026-09-02T18:10:45Z] [cron-236] Watchdog Astraura: TUNEL CAIDO (commit-dos-bolt-thousand) → monitor relanzado (pid 92661). Nueva URL: something-aqua-cultures-briefing.trycloudflare.com → HTTP 530 (stale forwarding, backend 8000 healthy=200). Kill cloudflared 92674 → monitor rearroncó (pid 93628) → túnel fresco: button-dont-noted-rob.trycloudflare.com. curl /api/cerebros: **200 OK** JSON `{"active_brain_id":"brain_genesis","cerebros":[...]`. Backend :8000: 200. BitNet i2_s saludable. Conectividad Vercel+app nativa: OK. Exit=0.
+
+[Wed Sep 2 15:06:22] Monitor relanzado (pid 4976)
+[Wed Sep 2 15:06:24] Nuevo tunel activo: asia-round-pages-discrete trycloudflare
+[Wed Sep 2 15:07:50] Verificacion cerebros OK: active_brain_id=brain_genesis

@@ -162,3 +162,10 @@
 - Conectividad backend con todos los medios (Vercel, app nativa) confirmada y operativa.
 - cloudflared pid 93628: conectado QUIC checks PASS. tunnel_monitor.sh pid 92661: loop activo.
 - Sin cambios de codigo; solo verificacion y relanzamiento de tunel.
+
+## [HECHO] Watchdog tunnel Astraura — Wed Sep 2 15:04-15:08 CST 2026
+- Accion: Ejecutado bash tunnel_watchdog.sh desde raiz de proyecto
+- Resultado: Tunel caido detectado 15:06:20 relanzado (pid 4976)
+- Nuevo URL activo: asia-round-pages-discrete dot trycloudflare dot com
+- Verificacion curl api slash cerebros: 200 OK, active_brain_id = brain_genesis
+- Notas: Sin cambios de codigo. Solo verificacion y relanzo.
