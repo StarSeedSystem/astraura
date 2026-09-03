@@ -62,3 +62,19 @@
 - starseed-system en producción: READY (sin cambios desde A192). Sin deploy necesario.
 - Astraura túnel: VIVO (button-dont-noted-rob.trycloudflare.com, HTTP 200 en /api/cerebros). Backend BitNet conectado OK.
 - Sin cambios de código; sin commit/push de código (solo memory root + data operacional).
+
+
+### §0.0 — Medios actualización (cron watchdog Astraura, 2026-09-02 15:03 CST)
+- Túnel Astraura: VIVO (sin relanzamiento necesario). URL activa: https://intro-indianapolis-screenshot-louise.trycloudflare.com | status=active | backend=http://127.0.0.1:8000
+- Watchdog log: OK — 3/3 checks "tunel vivo" con misma URL. Exit code 0.
+- curl /api/cerebros (túnel): responde HTTP 200 (Next.js fallback /brain_genesis respondiendo).
+- Backend local :8000: HTTP 200 (online). BitNet i2_s saludable.
+- Conectividad con todos los medios (Vercel, app nativa) confirmada y operativa.
+- Sin cambios de código; sin commit/push (solo verificación y relanzamiento de túnel cuando es necesario).
+### §0.0 medios — Actualización (cron watchdog Astraura, 2026-09-02 20:50 CST)
+- Tunel Astraura: CAIDO → relanzado por watchdog (pid 42719). URL nueva: https://home-russia-resume-lincoln.trycloudflare.com
+- FIX operativo: actualizada active_tunnel.json + frontend/public/active_tunnel.json con URL viva → HTTP 200. URL obsoleta devolvía 530 (race condition en tunnel_monitor.sh).
+- Backend local 8000: HTTP 200. BitNet i2_s saludable.
+- curl /api/cerebros: 200 OK. curl /api/status: 200 OK.
+- Conectividad Vercel + app nativa: OK.
+- Sin cambios de código.

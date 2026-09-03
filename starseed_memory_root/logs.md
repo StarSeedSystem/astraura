@@ -20,3 +20,6 @@
 [Wed Sep  2 18:04:47 CST 2026] Monitor relanzado pid 22608
 [Wed Sep  2 18:06:41 CST 2026] OK tunel vivo: rebates-picnic-darwin-outstanding trycloudflare com
 [Wed Sep  2 18:06:50 CST 2026] Healthcheck /api/cerebros OK. Response: active_brain_id brain_genesis
+[2026-09-03T01:37:01.899935Z] watchdog cron OK: tunel vivo en https://dsl-gloves-ram-advertise.trycloudflare.com (backend 127.0.0.1:8000). Sin relanzar.
+
+[2026-09-02T20:50:36Z] [cron-238] Watchdog Astraura: TUNEL CAIDO (norm-wishing-concern-discrete) → relanzado (pid 42719). URL nueva: home-russia-resume-lincoln.trycloudflare.com. RACE CONDITION: active_tunnel.json retuvo URL vieja → 530. FIX: actualizada active_tunnel.json + frontend/public/active_tunnel.json con URL correcta. curl /api/cerebros: 200 OK. Backend :8000: 200. Exit=0.
