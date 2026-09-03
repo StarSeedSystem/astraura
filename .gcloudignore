@@ -1,7 +1,22 @@
-# Contexto mínimo para gcloud run deploy --source: SOLO backend.
-# Excluye datos masivos, frontend y artefactos para no llenar el disco al empaquetar.
-*
-!backend/
-!backend/**
-!Dockerfile
-!requirements.txt
+# Contexto de build mínimo: solo el backend entra en la imagen.
+# El resto (modelos, datos, apps de escritorio, PDFs) se queda fuera: la nube
+# no hace inferencia pesada y así la imagen es pequeña y barata de guardar.
+.git/
+data/
+desktop-app/
+frontend/
+deploy/dist/
+deploy/installers/
+**/models/
+**/BitNet/
+**/*.gguf
+**/*.bin
+**/*.onnx
+**/*.safetensors
+**/__pycache__/
+**/*.pyc
+**/.venv/
+**/venv/
+**/node_modules/
+**/*.log
+*.pdf
