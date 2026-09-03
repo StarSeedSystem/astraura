@@ -21,3 +21,9 @@
 - Backend local :8000: HTTP 200. BitNet i2_s saludable.
 - curl /api/cerebros (túnel): 200 OK JSON {"active_brain_id":"brain_genesis","cerebros":[{"i
 - Conectividad Vercel + app nativa: OK.
+
+## Adenda 243 - Watchdog túnel Astraura (cron, 2026-09-02 21:04:13 CST)
+- Estado: TÚNEL VIVO — no fue necesario relanzar.
+- URL activa: https://home-russia-resume-lincoln.trycloudflare.com
+- /api/cerebros: 200 OK. Vercel + app nativa conectadas.
+- Ref: §0.0 Medios actualizado.
