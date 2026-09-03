@@ -1,0 +1,87 @@
+{
+  "name": "astraura_starseed_memory_root",
+  "kind": "memory_root",
+  "version": "2.2.0",
+  "owner": "alexbordongarrigos@gmail.com",
+  "structure": "root+branches",
+  "portable": true,
+  "accountConnected": true,
+  "sync": {
+    "local": {
+      "path": "/Users/alex/Documents/IA 1.58 bit/backend/data/starseed_memory_root",
+      "active": true
+    },
+    "cloud": {
+      "provider": "Vercel / Supabase",
+      "active": true
+    },
+    "graph_sync": {
+      "active": true
+    }
+  },
+  "branches": [
+    {
+      "rama": "soul",
+      "tipo": "soul",
+      "nombre": "Alma & Ontocracia",
+      "color": "#00f0ff",
+      "scope": "global"
+    },
+    {
+      "rama": "ego",
+      "tipo": "aurora",
+      "nombre": "Ego & Personalidad",
+      "color": "#a855f7",
+      "scope": "global"
+    },
+    {
+      "rama": "skills",
+      "tipo": "skill",
+      "nombre": "Habilidades Nativas",
+      "color": "#10b981",
+      "scope": "global"
+    },
+    {
+      "rama": "style",
+      "tipo": "style",
+      "nombre": "Estilo & Criterio Visual",
+      "color": "#ec4899",
+      "scope": "global"
+    },
+    {
+      "rama": "memory",
+      "tipo": "memory",
+      "nombre": "Exocórtex & Memorias",
+      "color": "#3b82f6",
+      "scope": "global"
+    },
+    {
+      "rama": "dream",
+      "tipo": "dream",
+      "nombre": "Procesos Oníricos",
+      "color": "#8b5cf6",
+      "scope": "global"
+    },
+    {
+      "rama": "accounts",
+      "tipo": "accounts",
+      "nombre": "Cuentas & Conexiones",
+      "color": "#f59e0b",
+      "scope": "privado"
+    },
+    {
+      "rama": "tasks",
+      "tipo": "task",
+      "nombre": "Tareas & Metas",
+      "color": "#06b6d4",
+      "scope": "operativo"
+    },
+    {
+      "rama": "logs",
+      "tipo": "log",
+      "nombre": "Bitácora & Telemetría",
+      "color": "#64748b",
+      "scope": "operativo"
+    }
+  ]
+}

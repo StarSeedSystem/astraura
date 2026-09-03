@@ -1,0 +1,50 @@
+{
+  "ts": 1788381905.371076,
+  "micelium": {},
+  "voice": {},
+  "voice_packs_158": [
+    "voice158_Speaker-Test.pack"
+  ],
+  "datasets_prepared": [
+    "css10_es",
+    "es_Speaker-TEST"
+  ],
+  "agents": {
+    "trainer": {
+      "estado": "parado",
+      "actividad": "1 pack(s) 1.58-bit"
+    },
+    "mesh": {
+      "estado": "local",
+      "actividad": "node "
+    },
+    "tts": {
+      "estado": "—",
+      "actividad": "procedural"
+    },
+    "asr": {
+      "estado": "no instalado",
+      "actividad": "pendiente"
+    },
+    "trainer_gpu": {
+      "estado": "entrenando",
+      "actividad": "1 pack(s) real(es)"
+    },
+    "datasets": {
+      "estado": "2 listos",
+      "actividad": "css10_es, es_Speaker-TEST"
+    },
+    "orchest": {
+      "estado": "vivo",
+      "actividad": "memorias corto/medio/largo"
+    },
+    "harmony": {
+      "estado": "vivo",
+      "actividad": "homeostasis de carga/prosodia"
+    },
+    "evolution": {
+      "estado": "simbiótica",
+      "actividad": "0 packs locales en malla"
+    }
+  }
+}

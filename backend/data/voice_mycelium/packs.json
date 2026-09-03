@@ -1,0 +1,44 @@
+{
+  "packs": {
+    "Speaker-0@v1": {
+      "speaker": "Speaker-0",
+      "version": 1,
+      "path": "/tmp/test_voice.wav",
+      "mos": 3.1,
+      "mb": 0.2,
+      "note": "prueba local 1.58-bit",
+      "owner_node": "vm-e996f62fc5b9",
+      "updated_at": 1787806320.982729,
+      "hash": "1717b7a061d8ac64"
+    },
+    "Speaker-Test@v1": {
+      "speaker": "Speaker-Test",
+      "version": 1,
+      "path": "/Users/alex/Documents/IA 1.58 bit/backend/data/voice_mycelium/packs/voice158_Speaker-Test.pack",
+      "mos": 3.0,
+      "mb": 0.0177,
+      "note": "voice pack 1.58-bit real (QAT, nodo local MPS/CPU)",
+      "owner_node": "vm-e996f62fc5b9",
+      "updated_at": 1787812072.40207,
+      "hash": "16349a3478904776"
+    }
+  },
+  "datasets": {
+    "es_Speaker-TEST": {
+      "lang": "es",
+      "speaker": "Speaker-TEST",
+      "samples": 2,
+      "dir": "/Users/alex/Documents/IA 1.58 bit/backend/data/voice_mycelium/datasets/es_Speaker-TEST",
+      "ready_for_training": true,
+      "updated_at": 1787807466.08273
+    },
+    "es_Speaker-Test": {
+      "lang": "es",
+      "speaker": "Speaker-Test",
+      "samples": 2,
+      "dir": "/Users/alex/Documents/IA 1.58 bit/backend/data/voice_mycelium/datasets/es_Speaker-Test",
+      "ready_for_training": true,
+      "updated_at": 1787807539.204093
+    }
+  }
+}

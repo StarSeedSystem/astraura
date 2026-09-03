@@ -89,7 +89,7 @@
         "total_loc": 0,
         "integrity_verdict": "VERIFIED_100_REAL"
       },
-      "_metrics_cached_at": 1788335506.115527
+      "_metrics_cached_at": 1788404424.7995148
     },
     {
       "id": "proj_astraura_core",
@@ -97,7 +97,7 @@
       "description": "Núcleo del sistema operativo cognitivo.",
       "type": "automatic",
       "created_at": 1786741520.5937548,
-      "updated_at": 1788335628.023763,
+      "updated_at": 1788404556.142405,
       "linked_creations": [
         "creation_neon_kernel_v2",
         "creation_dataset_ternary_v2",
@@ -225,17 +225,17 @@
         }
       ],
       "key_memories": [
-        "Axioma (mnemosyne): Auto-Reactivación: Sincronización & Poda del Grafo de Memoria [Auditado por Director]",
-        "Axioma (daedalus): Orquestación General: Consolidar 28 tareas de autorización recién c... [Auditado por Director]",
-        "Axioma (oneiros): Forja Visual: MODO DRENAJE ACTIVADO: 28 solicitudes pendien... [Auditado por Director]",
-        "Axioma (oneiros): Auto-Reactivación: Forja de Shaders & Prototipos Visuales [Auditado por Director]",
-        "Axioma (oneiros): Forja Visual: MODO DRENAJE ACTIVADO: 22 solicitudes pendien... [Auditado por Director]",
-        "Axioma (daedalus): Orquestación General: Consolidar 31 tareas de autorización recién c... [Auditado por Director]",
-        "Axioma (hermes): Auto-Reactivación: Rastreo de Tendencias & Preprints de IA 1.58b [Auditado por Director]",
-        "Axioma (hephaestus): Auto-Reactivación: Auditoría de Código & Archivos Locales [Auditado por Director]",
         "Axioma (athena): Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1 [Auditado por Director]",
-        "Axioma (daedalus): Orquestación General: Consolidar 29 tareas de autorización recién c... [Auditado por Director]",
-        "Axioma (oneiros): Forja Visual: MODO DRENAJE ACTIVADO: 29 solicitudes pendien... [Auditado por Director]"
+        "Axioma (athena): Revisión Completa [Auditado por Director]",
+        "Axioma (hephaestus): Auto-Reactivación: Auditoría de Código & Archivos Locales [Auditado por Director]",
+        "Axioma (daedalus): Orquestación General: Consolidar 25 tareas de autorización recién c... [Auditado por Director]",
+        "Axioma (oneiros): Forja Visual: MODO DRENAJE ACTIVADO: 25 solicitudes pendien... [Auditado por Director]",
+        "Axioma (oneiros): Auto-Reactivación: Forja de Shaders & Prototipos Visuales [Auditado por Director]",
+        "Axioma (hermes): Auto-Reactivación: Rastreo de Tendencias & Preprints de IA 1.58b [Auditado por Director]",
+        "Axioma (athena): Revisión Completa sobre Sistema Informativo [Auditado por Director]",
+        "Axioma (oneiros): Forja Visual: MODO DRENAJE ACTIVADO: 29 solicitudes pendien... [Auditado por Director]",
+        "Axioma (daedalus): Orquestación General: Consolidar 5 tareas de autorización recién co... [Auditado por Director]",
+        "Axioma (athena): Cargar Archivo Telemétrico desde /Users/alex/Documents/IA_1.58_bit/data/sensor_data [Auditado por Director]"
       ],
       "linked_folders": [
         "/Users/alex/Documents/IA 1.58 bit/backend/app/core",
@@ -249,364 +249,364 @@
       ],
       "logs_history": [
         {
-          "timestamp": 1788335628.023773,
+          "timestamp": 1788404556.142435,
           "action": "Modificación de Proyecto",
           "agent": "Alex Bordón / Daedalus",
           "details": "Proyecto actualizado y sincronizado en el grafo."
         },
         {
-          "timestamp": 1788335628.023406,
-          "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: mnemosyne."
-        },
-        {
-          "timestamp": 1788335483.773757,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1788335483.773356,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 28 tareas de autorización recién c...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1788335328.084834,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1788335328.08444,
-          "action": "Entregable Verificado: Forja Visual: MODO DRENAJE ACTIVADO: 28 solicitudes pendien...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: oneiros."
-        },
-        {
-          "timestamp": 1788335177.8405561,
+          "timestamp": 1788404556.1417742,
           "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
         },
         {
-          "timestamp": 1788335039.919599,
-          "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: mnemosyne."
+          "timestamp": 1788404112.896669,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
         },
         {
-          "timestamp": 1788334888.3319511,
+          "timestamp": 1788404112.896245,
+          "action": "Entregable Verificado: Revisión Completa",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
+        },
+        {
+          "timestamp": 1788403912.797792,
           "action": "Entregable Verificado: Auto-Reactivación: Forja de Shaders & Prototipos Visuales",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 98%). Agente: oneiros."
         },
         {
-          "timestamp": 1788334738.0814772,
-          "action": "Entregable Verificado: Auto-Reactivación: Rastreo de Tendencias & Preprints de IA 1.58b",
+          "timestamp": 1788403526.3060942,
+          "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
           "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: hermes."
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: mnemosyne."
         },
         {
-          "timestamp": 1788334612.975148,
+          "timestamp": 1788403315.859061,
+          "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1788402933.212471,
+          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
+        },
+        {
+          "timestamp": 1788402738.515425,
+          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
+        },
+        {
+          "timestamp": 1788402233.190968,
+          "action": "Entregable Verificado: Auto-Reactivación: Forja de Shaders & Prototipos Visuales",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: oneiros."
+        },
+        {
+          "timestamp": 1788402029.115537,
+          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
+        },
+        {
+          "timestamp": 1788401625.0505202,
           "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Código & Archivos Locales",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 98%). Agente: hephaestus."
         },
         {
-          "timestamp": 1788334489.108402,
-          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
-        },
-        {
-          "timestamp": 1788334329.2801769,
-          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
-        },
-        {
-          "timestamp": 1788334145.07785,
-          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
-        },
-        {
-          "timestamp": 1788333796.39008,
+          "timestamp": 1788401304.629121,
           "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 98%). Agente: mnemosyne."
         },
         {
-          "timestamp": 1788333670.1066089,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
+          "timestamp": 1788400985.784977,
+          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
           "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: daedalus."
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
         },
         {
-          "timestamp": 1788333241.990026,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1788333241.989943,
+          "timestamp": 1788400855.8199968,
           "action": "Entregable Verificado: Auto-Reactivación: Forja de Shaders & Prototipos Visuales",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 98%). Agente: oneiros."
         },
         {
-          "timestamp": 1788332841.3529081,
-          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
-        },
-        {
-          "timestamp": 1788332692.7600992,
-          "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: mnemosyne."
-        },
-        {
-          "timestamp": 1788332116.032992,
-          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
-        },
-        {
-          "timestamp": 1788331346.626202,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1788331346.626069,
-          "action": "Entregable Verificado: Forja Visual: MODO DRENAJE ACTIVADO: 22 solicitudes pendien...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: oneiros."
-        },
-        {
-          "timestamp": 1788330528.041524,
-          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
-        },
-        {
-          "timestamp": 1788330382.476247,
-          "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: mnemosyne."
-        },
-        {
-          "timestamp": 1788329533.562819,
-          "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: mnemosyne."
-        },
-        {
-          "timestamp": 1788329434.620804,
-          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
-        },
-        {
-          "timestamp": 1788324972.065084,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1788324972.064775,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 31 tareas de autorización recién c...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1788324357.845024,
-          "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: mnemosyne."
-        },
-        {
-          "timestamp": 1788312978.14046,
-          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
-        },
-        {
-          "timestamp": 1788312333.066549,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: daedalus."
-        },
-        {
-          "timestamp": 1788312067.549515,
-          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
-        },
-        {
-          "timestamp": 1788310353.112841,
-          "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: mnemosyne."
-        },
-        {
-          "timestamp": 1788310154.644767,
+          "timestamp": 1788400490.431564,
           "action": "Entregable Verificado: Auto-Reactivación: Forja de Shaders & Prototipos Visuales",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 98%). Agente: oneiros."
         },
         {
-          "timestamp": 1788309986.08217,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1788309986.081859,
+          "timestamp": 1788400222.154187,
           "action": "Entregable Verificado: Auto-Reactivación: Rastreo de Tendencias & Preprints de IA 1.58b",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 98%). Agente: hermes."
         },
         {
-          "timestamp": 1788309836.3878138,
-          "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: mnemosyne."
-        },
-        {
-          "timestamp": 1788309739.3530939,
+          "timestamp": 1788400068.737272,
           "action": "Modificación de Proyecto",
           "agent": "Alex Bordón / Daedalus",
           "details": "Proyecto actualizado y sincronizado en el grafo."
         },
         {
-          "timestamp": 1788309739.352722,
+          "timestamp": 1788400068.736995,
           "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Código & Archivos Locales",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 98%). Agente: hephaestus."
         },
         {
-          "timestamp": 1788309587.9421608,
+          "timestamp": 1788399862.956073,
           "action": "Modificación de Proyecto",
           "agent": "Alex Bordón / Daedalus",
           "details": "Proyecto actualizado y sincronizado en el grafo."
         },
         {
-          "timestamp": 1788309587.941795,
+          "timestamp": 1788399862.954096,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 25 tareas de autorización recién c...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: daedalus."
+        },
+        {
+          "timestamp": 1788399672.234061,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1788399672.232932,
+          "action": "Entregable Verificado: Forja Visual: MODO DRENAJE ACTIVADO: 25 solicitudes pendien...",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: oneiros."
+        },
+        {
+          "timestamp": 1788399494.839587,
           "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
         },
         {
-          "timestamp": 1788280604.889589,
+          "timestamp": 1788399404.173055,
           "action": "Modificación de Proyecto",
           "agent": "Alex Bordón / Daedalus",
           "details": "Proyecto actualizado y sincronizado en el grafo."
         },
         {
-          "timestamp": 1788280604.8884852,
-          "action": "Entregable Verificado: Orquestación General: Consolidar 29 tareas de autorización recién c...",
+          "timestamp": 1788399404.172916,
+          "action": "Entregable Verificado: Auto-Reactivación: Forja de Shaders & Prototipos Visuales",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: oneiros."
+        },
+        {
+          "timestamp": 1788399197.801826,
+          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
+        },
+        {
+          "timestamp": 1788399093.257257,
+          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Código & Archivos Locales",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: hephaestus."
+        },
+        {
+          "timestamp": 1788398886.5327969,
+          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
+        },
+        {
+          "timestamp": 1788398688.127882,
+          "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 98%). Agente: daedalus."
         },
         {
-          "timestamp": 1788280399.388792,
+          "timestamp": 1788398557.7509131,
+          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
+        },
+        {
+          "timestamp": 1788398404.280672,
           "action": "Modificación de Proyecto",
           "agent": "Alex Bordón / Daedalus",
           "details": "Proyecto actualizado y sincronizado en el grafo."
         },
         {
-          "timestamp": 1788280399.387726,
+          "timestamp": 1788398404.280312,
+          "action": "Entregable Verificado: Auto-Reactivación: Rastreo de Tendencias & Preprints de IA 1.58b",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: hermes."
+        },
+        {
+          "timestamp": 1788398188.3417668,
+          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
+        },
+        {
+          "timestamp": 1788398029.219213,
+          "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1788397882.540948,
+          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
+        },
+        {
+          "timestamp": 1788397735.146925,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1788397735.1462772,
+          "action": "Entregable Verificado: Revisión Completa sobre Sistema Informativo",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
+        },
+        {
+          "timestamp": 1788397567.1485791,
+          "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1788397331.306755,
+          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
+        },
+        {
+          "timestamp": 1788397087.194411,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1788397087.193633,
           "action": "Entregable Verificado: Forja Visual: MODO DRENAJE ACTIVADO: 29 solicitudes pendien...",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 98%). Agente: oneiros."
         },
         {
-          "timestamp": 1788279006.419827,
-          "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: mnemosyne."
-        },
-        {
-          "timestamp": 1788278174.815124,
-          "action": "Entregable Verificado: Auto-Reactivación: Forja de Shaders & Prototipos Visuales",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: oneiros."
-        },
-        {
-          "timestamp": 1788276133.631377,
+          "timestamp": 1788396683.71979,
           "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
         },
         {
-          "timestamp": 1788275360.216776,
-          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
-        },
-        {
-          "timestamp": 1788275101.60351,
-          "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: mnemosyne."
-        },
-        {
-          "timestamp": 1788274871.074365,
+          "timestamp": 1788396545.8667982,
           "action": "Entregable Verificado: Auto-Reactivación: Forja de Shaders & Prototipos Visuales",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 98%). Agente: oneiros."
         },
         {
-          "timestamp": 1788259800.999506,
+          "timestamp": 1788396301.774325,
+          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Código & Archivos Locales",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: hephaestus."
+        },
+        {
+          "timestamp": 1788396163.0815759,
           "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 98%). Agente: mnemosyne."
         },
         {
-          "timestamp": 1788259565.080822,
+          "timestamp": 1788395995.29658,
+          "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1788395861.047643,
           "action": "Entregable Verificado: Auto-Reactivación: Forja de Shaders & Prototipos Visuales",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 98%). Agente: oneiros."
         },
         {
-          "timestamp": 1788258385.582976,
+          "timestamp": 1788395641.533087,
           "action": "Modificación de Proyecto",
           "agent": "Alex Bordón / Daedalus",
           "details": "Proyecto actualizado y sincronizado en el grafo."
         },
         {
-          "timestamp": 1788258385.582062,
+          "timestamp": 1788395641.5325131,
           "action": "Entregable Verificado: Orquestación General: Consolidar 5 tareas de autorización recién co...",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 98%). Agente: daedalus."
         },
         {
-          "timestamp": 1788258265.246311,
-          "action": "Modificación de Proyecto",
-          "agent": "Alex Bordón / Daedalus",
-          "details": "Proyecto actualizado y sincronizado en el grafo."
-        },
-        {
-          "timestamp": 1788258265.245552,
-          "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
-          "agent": "Astraura Director // Metis Prime",
-          "details": "Aprobado por Director Metis (Score: 98%). Agente: mnemosyne."
-        },
-        {
-          "timestamp": 1788258151.957428,
+          "timestamp": 1788395514.764367,
           "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
         },
         {
-          "timestamp": 1788257983.0293,
+          "timestamp": 1788395339.542358,
+          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Código & Archivos Locales",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: hephaestus."
+        },
+        {
+          "timestamp": 1788395135.024319,
+          "action": "Entregable Verificado: Auto-Reactivación: Sincronización & Poda del Grafo de Memoria",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: mnemosyne."
+        },
+        {
+          "timestamp": 1788394913.8738902,
+          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
+        },
+        {
+          "timestamp": 1788394743.3607402,
+          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
+        },
+        {
+          "timestamp": 1788394018.1285918,
+          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
+        },
+        {
+          "timestamp": 1788392665.6685069,
+          "action": "Modificación de Proyecto",
+          "agent": "Alex Bordón / Daedalus",
+          "details": "Proyecto actualizado y sincronizado en el grafo."
+        },
+        {
+          "timestamp": 1788392665.666647,
+          "action": "Entregable Verificado: Cargar Archivo Telemétrico desde /Users/alex/Documents/IA_1.58_bit/data/sensor_data",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
+        },
+        {
+          "timestamp": 1788392505.825472,
           "action": "Entregable Verificado: Auto-Reactivación: Forja de Shaders & Prototipos Visuales",
           "agent": "Astraura Director // Metis Prime",
           "details": "Aprobado por Director Metis (Score: 98%). Agente: oneiros."
+        },
+        {
+          "timestamp": 1788392074.342978,
+          "action": "Entregable Verificado: Auto-Reactivación: Auditoría de Sensores Físicos & Térmicos M1",
+          "agent": "Astraura Director // Metis Prime",
+          "details": "Aprobado por Director Metis (Score: 98%). Agente: athena."
         }
       ],
       "linked_processs": [
@@ -633,7 +633,7 @@
         "total_loc": 25747,
         "integrity_verdict": "VERIFIED_100_REAL"
       },
-      "_metrics_cached_at": 1788335506.172717
+      "_metrics_cached_at": 1788404424.875128
     },
     {
       "id": "proj_cyberdelic_arts",
@@ -739,8 +739,8 @@
         "total_loc": 0,
         "integrity_verdict": "VERIFIED_100_REAL"
       },
-      "_metrics_cached_at": 1788335506.172852
+      "_metrics_cached_at": 1788404424.8752089
     }
   ],
-  "saved_at": 1788335628.0237749
+  "saved_at": 1788404556.1425002
 }

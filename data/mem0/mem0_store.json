@@ -1,6 +1,91 @@
 {
   "memories": [
     {
+      "id": "mem0_1788380900414",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Astraura Prime (Zenith): Resume en 2 a 4 viñetas breves, en español y sin encabezados, lo relevante para una memoria de tipo \"Conocimiento\" a partir de estos eventos recientes del usuario:\n\n- (library) Cambio reciente en la Biblioteca del usuario.\n- (library) Cambio reciente -> Síntesis: Resumen concreto basado solo los datos relevantes que te proporciona el contexto actual:\n```markdown\n\n  * [RECUERDO] Usuario consultó a Astraura Prime y Aurora.\n\n  * Resumen breve sobre cambios notabl",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1788380900.4142878,
+      "updated_at": 1788380900.4142878,
+      "metadata": {
+        "timestamp": 1788380900.397876,
+        "style": "analytical",
+        "persona": "astraura_prime",
+        "brain_id": "brain_genesis"
+      }
+    },
+    {
+      "id": "mem0_1788380757754",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Aurora (StarSeed Core): Resume en 2 a 4 viñetas breves, en español y sin encabezados, lo relevante para una memoria de tipo \"Conocimiento\" a partir de estos eventos recientes del usuario:\n\n- (library) Cambio reciente en la Biblioteca del usuario.\n- (library) Cambio reciente -> Síntesis: Deja tus comentarios aquí...",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1788380757.754414,
+      "updated_at": 1788380757.754414,
+      "metadata": {
+        "timestamp": 1788380757.752085,
+        "style": "analytical",
+        "persona": "aurora",
+        "brain_id": "brain_genesis"
+      }
+    },
+    {
+      "id": "mem0_1788376512759",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Astraura Prime (Zenith): Resume en 2 a 4 viñetas breves, en español y sin encabezados, lo relevante para una memoria de tipo \"Conocimiento\" a partir de estos eventos recientes del usuario:\n\n- (library) Cambio reciente en la Biblioteca del usuario.\n- (library) Cambio reciente -> Síntesis: to  the  two's, 12,  the  a  t r u n n n n n n n n n n n n n n n n n n n n n n p p p p p p p p p p p p p 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1788376512.759587,
+      "updated_at": 1788376512.759587,
+      "metadata": {
+        "timestamp": 1788376512.758373,
+        "style": "analytical",
+        "persona": "astraura_prime",
+        "brain_id": "brain_genesis"
+      }
+    },
+    {
+      "id": "mem0_1788376465274",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Astraura Prime (Zenith): Resume en 2 a 4 viñetas breves, en español y sin encabezados, lo relevante para una memoria de tipo \"Conocimiento\" a partir de estos eventos recientes del usuario:\n\n- (library) Cambio reciente en la Biblioteca del usuario.\n- (library) Cambio reciente -> Síntesis: (plant ) ] \\rightarrow \\text{Not (}}} \\text{ are} \\text{are}}} \\text{are}} \\text{are}}\\)) ] \\text{are}}\\text{are}}\\text{are}}\\text{are}}\\text{are}}\\text{{are}}\\text{are}}\\text{{are}}\\text{are}}\\text{a",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1788376465.275002,
+      "updated_at": 1788376465.275002,
+      "metadata": {
+        "timestamp": 1788376465.2716732,
+        "style": "analytical",
+        "persona": "astraura_prime",
+        "brain_id": "brain_genesis"
+      }
+    },
+    {
+      "id": "mem0_1788376162232",
+      "user_id": "alex",
+      "agent_id": "*",
+      "run_id": "default",
+      "memory": "Usuario consultó a Astraura Prime (Zenith): Resume en 2 a 4 viñetas breves, en español y sin encabezados, lo relevante para una memoria de tipo \"Conocimiento\" a partir de estos eventos recientes del usuario:\n\n- (library) Cambio reciente en la Biblioteca del usuario.\n- (library) Cambio reciente -> Síntesis: emy will]] as) for]]] as they might have f'r's)n's' asa'r'r'r'f'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'",
+      "category": "chat_episodic",
+      "confidence": 0.95,
+      "created_at": 1788376162.2322628,
+      "updated_at": 1788376162.2322628,
+      "metadata": {
+        "timestamp": 1788376162.229037,
+        "style": "analytical",
+        "persona": "astraura_prime",
+        "brain_id": "brain_genesis"
+      }
+    },
+    {
       "id": "mem0_1788331485854",
       "user_id": "alex",
       "agent_id": "*",
@@ -4920,6 +5005,41 @@
   ],
   "history": [
     {
+      "id": "hist_1788380900414",
+      "memory_id": "mem0_1788380900414",
+      "action": "created",
+      "timestamp": 1788380900.41431,
+      "text": "Usuario consultó a Astraura Prime (Zenith): Resume en 2 a 4 viñetas breves, en español y sin encabezados, lo relevante para una memoria de tipo \"Conocimiento\" a partir de estos eventos recientes del usuario:\n\n- (library) Cambio reciente en la Biblioteca del usuario.\n- (library) Cambio reciente -> Síntesis: Resumen concreto basado solo los datos relevantes que te proporciona el contexto actual:\n```markdown\n\n  * [RECUERDO] Usuario consultó a Astraura Prime y Aurora.\n\n  * Resumen breve sobre cambios notabl"
+    },
+    {
+      "id": "hist_1788380757754",
+      "memory_id": "mem0_1788380757754",
+      "action": "created",
+      "timestamp": 1788380757.7544162,
+      "text": "Usuario consultó a Aurora (StarSeed Core): Resume en 2 a 4 viñetas breves, en español y sin encabezados, lo relevante para una memoria de tipo \"Conocimiento\" a partir de estos eventos recientes del usuario:\n\n- (library) Cambio reciente en la Biblioteca del usuario.\n- (library) Cambio reciente -> Síntesis: Deja tus comentarios aquí..."
+    },
+    {
+      "id": "hist_1788376512759",
+      "memory_id": "mem0_1788376512759",
+      "action": "created",
+      "timestamp": 1788376512.7595918,
+      "text": "Usuario consultó a Astraura Prime (Zenith): Resume en 2 a 4 viñetas breves, en español y sin encabezados, lo relevante para una memoria de tipo \"Conocimiento\" a partir de estos eventos recientes del usuario:\n\n- (library) Cambio reciente en la Biblioteca del usuario.\n- (library) Cambio reciente -> Síntesis: to  the  two's, 12,  the  a  t r u n n n n n n n n n n n n n n n n n n n n n n p p p p p p p p p p p p p 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1"
+    },
+    {
+      "id": "hist_1788376465275",
+      "memory_id": "mem0_1788376465274",
+      "action": "created",
+      "timestamp": 1788376465.275027,
+      "text": "Usuario consultó a Astraura Prime (Zenith): Resume en 2 a 4 viñetas breves, en español y sin encabezados, lo relevante para una memoria de tipo \"Conocimiento\" a partir de estos eventos recientes del usuario:\n\n- (library) Cambio reciente en la Biblioteca del usuario.\n- (library) Cambio reciente -> Síntesis: (plant ) ] \\rightarrow \\text{Not (}}} \\text{ are} \\text{are}}} \\text{are}} \\text{are}}\\)) ] \\text{are}}\\text{are}}\\text{are}}\\text{are}}\\text{are}}\\text{{are}}\\text{are}}\\text{{are}}\\text{are}}\\text{a"
+    },
+    {
+      "id": "hist_1788376162232",
+      "memory_id": "mem0_1788376162232",
+      "action": "created",
+      "timestamp": 1788376162.232272,
+      "text": "Usuario consultó a Astraura Prime (Zenith): Resume en 2 a 4 viñetas breves, en español y sin encabezados, lo relevante para una memoria de tipo \"Conocimiento\" a partir de estos eventos recientes del usuario:\n\n- (library) Cambio reciente en la Biblioteca del usuario.\n- (library) Cambio reciente -> Síntesis: emy will]] as) for]]] as they might have f'r's)n's' asa'r'r'r'f'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'r'"
+    },
+    {
       "id": "hist_1788331485854",
       "memory_id": "mem0_1788331485854",
       "action": "created",
@@ -5583,42 +5703,7 @@
       "action": "created",
       "timestamp": 1787770692.372191,
       "text": "Usuario consultó a Aurora (StarSeed Core): Resume en 2 a 4 viñetas breves, en español y sin encabezados, lo relevante para una memoria de tipo \"Conocimiento\" a partir de estos eventos recientes del usuario:\n\n- (library) Cambio reciente en la Biblioteca del usuario.\n- (library) Cambio reciente -> Síntesis: **Resumen Breve**\n\nRelevancia:\n1. **Cambio Reciente**: La biblioteca ha sido modificada o actualizada por el usuario.\n\nPara mejorar tu experiencia con StarSeed Core: \n```plaintext\n\n[CONTEXT COMPLETE]"
-    },
-    {
-      "id": "hist_1787766939371",
-      "memory_id": "mem0_1787766939371",
-      "action": "created",
-      "timestamp": 1787766939.371092,
-      "text": "Usuario consultó a Aurora (StarSeed Core): Resume en 2 a 4 viñetas breves, en español y sin encabezados, lo relevante para una memoria de tipo \"Conocimiento\" a partir de estos eventos recientes del usuario:\n\n- (library) Cambio reciente en la Biblioteca del usuario.\n- (library) Cambio reciente -> Síntesis: En base a los requerimientos que mencionaste anteriormente sobre las preferencias declaradas por el usuário Maggasukha Vistāradvāsa Kumbhamakara: \n\n1 - **Perfil Personal**:\n    * Pasionaria acerca Sta"
-    },
-    {
-      "id": "hist_1787763024114",
-      "memory_id": "mem0_1787763024114",
-      "action": "created",
-      "timestamp": 1787763024.114953,
-      "text": "Usuario consultó a Aurora (StarSeed Core): Resume en 2 a 4 viñetas breves, en español y sin encabezados, lo relevante para una memoria de tipo \"Conocimiento\" a partir de estos eventos recientes del usuario:\n\n- (library) Cambio reciente en la Biblioteca del usuario.\n- (library) Cambio reciente -> Síntesis: Resumen rápido:\n1. Último cambio significativo al archivo principal o documento más importante almacenado por el usuário.\n\nEspero que esto se te parezca útil! Si necesitas ayuda con algo específico so"
-    },
-    {
-      "id": "hist_1787759498380",
-      "memory_id": "mem0_1787759498380",
-      "action": "created",
-      "timestamp": 1787759498.3803031,
-      "text": "Usuario consultó a Aurora (StarSeed Core): Resume en 2 a 4 viñetas breves, en español y sin encabezados, lo relevante para una memoria de tipo \"Conocimiento\" a partir de estos eventos recientes del usuario:\n\n- (library) Cambio reciente en la Biblioteca del usuario.\n- (library) Cambio reciente -> Síntesis: ```plaintext\n\n1. **Cambio Reciente En La Bibliaeía Del Usuario:** Nueva entrada o actualización importante añadida al repositorio digital personal.\n\n   - Síntesis: Se ha agregado un nuevo contenido ac"
-    },
-    {
-      "id": "hist_1787756239474",
-      "memory_id": "mem0_1787756239474",
-      "action": "created",
-      "timestamp": 1787756239.474496,
-      "text": "Usuario consultó a Astraura Prime (Zenith): Resume en 2 a 4 viñetas breves, en español y sin encabezados, lo relevante para una memoria de tipo \"Conocimiento\" a partir de estos eventos recientes del usuario:\n\n- (library) Cambio reciente en la Biblioteca del usuario.\n- (library) Cambio reciente -> Síntesis: Resumen con dos a cuatro líneas breves sobre información crucial que se ha cambiado o está actualmente asociada al contenido almacenado por el Usuario.\n\n1. Último cambio realizado: Se han introducido"
-    },
-    {
-      "id": "hist_1787755743384",
-      "memory_id": "mem0_1787755743384",
-      "action": "created",
-      "timestamp": 1787755743.3843572,
-      "text": "Usuario consultó a Aurora (StarSeed Core): Resume en 2 a 4 viñetas breves, en español y sin encabezados, lo relevante para una memoria de tipo \"Conocimiento\" a partir de estos eventos recientes del usuario:\n\n- (library) Cambio reciente en la Biblioteca del usuario.\n- (library) Cambio reciente -> Síntesis: ### Resumen Breve\n\n1. **Cambio Recientemente Encontrado**\n   - El último cambio ha sido sobre el contenido originalmente almacenada.\n\n**Síntesis:**\n\nEl uso más significativo últimamente viene siendo v"
     }
   ],
-  "updated_at": 1788331485.85475
+  "updated_at": 1788380900.414846
 }

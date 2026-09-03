@@ -1,0 +1,3386 @@
+diff --git a/.gitignore b/.gitignore
+index 8bb4485e..64fb1b42 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -81,3 +81,11 @@ astraura_r2_credentials.json
+ *.swp
+ *.swo
+ .cursor/
++
++# --- (Adenda 153 · StarSeed OS) Claves de API de personalidades/agentes y ubicación: NUNCA en el repo ---
++data/personality_apis.json
++data/agent_apis.json
++backend/data/personality_apis.json
++backend/data/agent_apis.json
++data/sensorium/sensorium_location.json
++**/master_key.txt
+diff --git a/Dockerfile b/Dockerfile
+index 3f7ccd89..14861796 100644
+--- a/Dockerfile
++++ b/Dockerfile
+@@ -26,6 +26,12 @@ RUN pip install --upgrade pip && pip install -r backend/requirements.txt
+ # Copiar el backend completo
+ COPY backend/ ./backend/
+ 
++# (Adenda 153) Control de acceso: en Cloud Run NO hay loopback de confianza, así que las
++# rutas peligrosas quedan cerradas salvo clave. Para exigir clave en TODO (recomendado si el
++# servicio es público): ASTRAURA_AUTH_MODE=key + ASTRAURA_API_KEY (y la misma clave como
++# ASTRAURA_158_KEY en el StarSeed OS). Ver backend/app/core/security.py.
++ENV ASTRAURA_AUTH_MODE=local-only
++
+ # Puerto que inyecta Cloud Run (run_backend.py usa $PORT)
+ ENV PORT=8080
+ EXPOSE 8080
+diff --git a/README.md b/README.md
+index d68fe99f..88d9ad4d 100644
+--- a/README.md
++++ b/README.md
+@@ -177,6 +177,47 @@ idf.py -p /dev/cu.usbmodem* flash monitor
+ 
+ ---
+ 
++## 🧩 Integración oficial con StarSeed OS (puente `/api/starseed`)
++
++Astraura 1.58-bit es el **sistema primario de inteligencia** de [StarSeed OS](https://starseed-os.vercel.app) (Adenda 153 del OS). El OS lo coloca primero en su cadena de inteligencia y mantiene el resto de fuentes como secundarias. El backend expone un puente estable:
++
++| Ruta | Uso |
++|---|---|
++| `GET /api/starseed/health` | Latido ligero (motor real, BitNet compilado, modelos en disco). |
++| `GET /api/starseed/manifest` | Motor + personalidades + agentes + habilidades + cerebros en una llamada. |
++| `POST /api/starseed/chat` | Chat con `messages[]` estilo OpenAI (`system`/`user`/`assistant`) + `persona_id`; mismo SSE que `/api/chat/stream`. |
++
++`GET /api/status` incluye ahora `engine.real_mode` (`bitnet-native` · `ollama` · `templates`), `security` y `starseed_bridge`: el estado es **honesto** (si no hay Ollama ni GGUF, lo dice).
++
++## 🔐 Seguridad (modos de acceso)
++
++| `ASTRAURA_AUTH_MODE` | Comportamiento |
++|---|---|
++| `local-only` (defecto) | Las rutas peligrosas (ejecución, archivos, OS, túnel, claves, almacenamiento, navegador server-side) solo se aceptan desde **loopback** o con `X-Astraura-Key`. Chat y lecturas abiertas. |
++| `key` | **Todo** `/api/*` exige `X-Astraura-Key` (salvo `/api/status`, `/api/starseed/health`, `/active_tunnel.json`). Recomendado en Cloud Run/túneles públicos. |
++| `open` | Sin auth (solo desarrollo aislado). |
++
++- Clave maestra: `ASTRAURA_API_KEY` o `~/.astraura/master_key.txt` (se genera sola; nunca se imprime).
++- Las claves de personalidades/agentes viven en `~/.astraura/keys/` (`ASTRAURA_KEYS_DIR`), **fuera del repo**. `api_status` devuelve la clave **enmascarada** salvo con la clave maestra.
++- Si tus claves estuvieron en `data/*_apis.json` (commiteadas), rótalas: `cd backend && python3 ../scripts/rotate_keys.py` y luego `bash scripts/purge_secrets_from_repo.sh`.
++
++## ⚙️ Variables de entorno útiles
++
++| Variable | Para qué |
++|---|---|
++| `ASTRAURA_OLLAMA_URL` / `ASTRAURA_OLLAMA_MODEL` | Servidor y modelo de Ollama preferidos (antes: primer modelo de `/api/tags`). |
++| `ASTRAURA_AUTH_MODE` / `ASTRAURA_API_KEY` / `ASTRAURA_KEYS_DIR` | Seguridad (arriba). |
++| `ASTRAURA_SYNC_MAX_MB` (5) | Tope por sección al sincronizar con Supabase/R2 (la sincronización es incremental: solo lo que cambió). |
++| `ASTRAURA_MAX_AUTOGEN_DOCS` (150) | Tope FIFO por categoría de documentos generados por imaginación/enrutamiento/sueños en el memory root. |
++| `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` · `R2_*` | Sincronización (Cloud Run). |
++
++Rutas portables: todo deriva de la raíz del repo (`backend/app/core/config.py`) y de `~` — ya no hay rutas `/Users/alex/...` fijas.
++
++## 🧹 Mantenimiento
++
++- `python3 scripts/compact_memory_docs.py --apply` — compacta el memory root (archiva los documentos sintéticos con copia completa `.json.gz`).
++- `python3 scripts/rotate_keys.py` — rota todas las claves de API.
++
+ ## 🗺️ Fases de Desarrollo & Roadmap
+ 
+ - [x] **Fase 1:** Núcleo BitNet b1.58 Ternary SIMD/NEON en C++.
+diff --git a/backend/app/agents/director_orchestrator.py b/backend/app/agents/director_orchestrator.py
+index 7ffbb8f0..4b8bb0d7 100644
+--- a/backend/app/agents/director_orchestrator.py
++++ b/backend/app/agents/director_orchestrator.py
+@@ -7,6 +7,13 @@ from pathlib import Path
+ from typing import Dict, Any, List, Optional
+ import psutil
+ 
++# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
++# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
++from pathlib import Path as _SSPath
++from ..core.config import settings as _ss_settings
++WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
++HOME = str(_SSPath.home()).rstrip("/")
++
+ class DirectorOrchestratorEngine:
+     """
+     Agente Orquestador Director Supremo // Astraura Director (Metis-Prime).
+@@ -15,7 +22,7 @@ class DirectorOrchestratorEngine:
+     Cerebros, Memorias y Recuerdos Clave con memoria ejecutiva propia.
+     """
+     def __init__(self, workspace_path: Optional[Path] = None):
+-        self.workspace_path = workspace_path or Path("/Users/alex/Documents/IA 1.58 bit")
++        self.workspace_path = workspace_path or Path(f"{WORKSPACE}")
+         self.vault_dir = self.workspace_path / "data/vault/director"
+         self.vault_dir.mkdir(parents=True, exist_ok=True)
+         self.memory_file = self.vault_dir / "director_memory_vault.json"
+@@ -466,14 +473,14 @@ class DirectorOrchestratorEngine:
+ 
+         # 2. Map Folder
+         folder_map = {
+-            "area_engineering": "/Users/alex/Documents/IA 1.58 bit/backend/app",
+-            "area_web_intel": "/Users/alex/Documents/IA 1.58 bit/data/research",
+-            "area_synaptic_memory": "/Users/alex/Documents/IA 1.58 bit/data/vault/memories",
+-            "area_creative_synthesis": "/Users/alex/Documents/IA 1.58 bit/frontend/src/components",
+-            "area_sentinel_privacy": "/Users/alex/Documents/IA 1.58 bit/data/telemetry",
+-            "area_project_management": "/Users/alex/Documents/IA 1.58 bit/data/vault/projects"
++            "area_engineering": f"{WORKSPACE}/backend/app",
++            "area_web_intel": f"{WORKSPACE}/data/research",
++            "area_synaptic_memory": f"{WORKSPACE}/data/vault/memories",
++            "area_creative_synthesis": f"{WORKSPACE}/frontend/src/components",
++            "area_sentinel_privacy": f"{WORKSPACE}/data/telemetry",
++            "area_project_management": f"{WORKSPACE}/data/vault/projects"
+         }
+-        target_folder = folder_map.get(area_id, "/Users/alex/Documents/IA 1.58 bit")
++        target_folder = folder_map.get(area_id, f"{WORKSPACE}")
+ 
+         # 3. Associate with Project
+         target_proj_id = "proj_astraura_core"
+@@ -595,68 +602,68 @@ class DirectorOrchestratorEngine:
+             "hephaestus": [
+                 ("Optimización de Kernel ARM64 NEON: Reducción de Latencia en BitNet 1.58b",
+                  "Refactorizar bucles vectoriales NEON de 128 bits para acelerar la multiplicación ternaria sin operaciones en punto flotante.",
+-                 "area_engineering", "/Users/alex/Documents/IA 1.58 bit/backend/app"),
++                 "area_engineering", f"{WORKSPACE}/backend/app"),
+                 ("Vectorización SIMD de Pesos Ternarios {-1, 0, +1} en Ensamblador ARM",
+                  "Implementar instrucciones vld1q_s8 y vaddq_s8 en el microkernel C++ para maximizar el throughput de inferencia.",
+-                 "area_engineering", "/Users/alex/Documents/IA 1.58 bit/backend/app"),
++                 "area_engineering", f"{WORKSPACE}/backend/app"),
+                 ("Compactación de Huella de Memoria RAM para Modelos de 1.58 Bits",
+                  "Verificar empaquetado de 2 bits por peso (bitpacking) reduciendo el uso de memoria a menos de 0.25 bytes por parámetro.",
+-                 "area_engineering", "/Users/alex/Documents/IA 1.58 bit/backend/BitNet")
++                 "area_engineering", f"{WORKSPACE}/backend/BitNet")
+             ],
+             "hermes": [
+                 ("Rastreo y Extracción de Preprints arXiv sobre Modelos Ternarios y Eficiencia 1.58b",
+                  "Indexar papers recientes sobre cuantización extrema y leyes de escala ternarias en el exocórtex de investigación.",
+-                 "area_web_intel", "/Users/alex/Documents/IA 1.58 bit/data/research"),
++                 "area_web_intel", f"{WORKSPACE}/data/research"),
+                 ("Síntesis Comparativa de Arquitecturas: Transformers vs Ternary BitNet",
+                  "Analizar métricas de perplejidad, consumo energético por token y aceleración en silicio Apple M1.",
+-                 "area_web_intel", "/Users/alex/Documents/IA 1.58 bit/data/research"),
++                 "area_web_intel", f"{WORKSPACE}/data/research"),
+                 ("Mapeo de Referencias Académicas y Citaciones para StarSeed OS",
+                  "Extraer abstractos clave y consolidar la bibliografía técnica del sistema soberano.",
+-                 "area_web_intel", "/Users/alex/Documents/IA 1.58 bit/data/research")
++                 "area_web_intel", f"{WORKSPACE}/data/research")
+             ],
+             "mnemosyne": [
+                 ("Poda y Reestructuración del Grafo Sináptico de Memoria StarSeed",
+                  "Identificar nodos conceptuales huérfanos, calcular densidad semántica y fortalecer conexiones de alta resonancia.",
+-                 "area_synaptic_memory", "/Users/alex/Documents/IA 1.58 bit/data/vault/memories"),
++                 "area_synaptic_memory", f"{WORKSPACE}/data/vault/memories"),
+                 ("Destilación de Axiomas Soberanos y Recuerdos Clave a Largo Plazo",
+                  "Sintetizar principios epistemológicos basados en las directivas del Arquitecto Alex Bordón Garrigós.",
+-                 "area_synaptic_memory", "/Users/alex/Documents/IA 1.58 bit/data/vault/memories"),
++                 "area_synaptic_memory", f"{WORKSPACE}/data/vault/memories"),
+                 ("Indexación Rápida de Fragmentos de Memoria Episódica en Bóveda",
+                  "Optimizar el motor de recuperación por similitud de cosenos para respuestas contextuales instantáneas.",
+-                 "area_synaptic_memory", "/Users/alex/Documents/IA 1.58 bit/data/vault/memories")
++                 "area_synaptic_memory", f"{WORKSPACE}/data/vault/memories")
+             ],
+             "oneiros": [
+                 ("Síntesis de Shader Procedural WebGL Reactivo al Sensorium Ambiental",
+                  "Crear geometrías visuales ciberdélicas que oscilan con la temperatura, nivel de entropía y carga de CPU.",
+-                 "area_creative_synthesis", "/Users/alex/Documents/IA 1.58 bit/frontend/src/components"),
++                 "area_creative_synthesis", f"{WORKSPACE}/frontend/src/components"),
+                 ("Generación de Mallas y Texturas Dinámicas para la Bóveda de Creaciones",
+                  "Desarrollar componentes interactivos con glassmorphism, paletas HSL cuánticas y shaders WebGL en tiempo real.",
+-                 "area_creative_synthesis", "/Users/alex/Documents/IA 1.58 bit/data/vault/creations"),
++                 "area_creative_synthesis", f"{WORKSPACE}/data/vault/creations"),
+                 ("Forja de Prototipos de Interfaces Intuitivas de Resonancia Sináptica",
+                  "Explorar visualizaciones de grafos neuronales tridimensionales para la navegación cognitiva del usuario.",
+-                 "area_creative_synthesis", "/Users/alex/Documents/IA 1.58 bit/frontend/src/components")
++                 "area_creative_synthesis", f"{WORKSPACE}/frontend/src/components")
+             ],
+             "athena": [
+                 ("Auditoría Continua de Sensores Físicos, Térmica M1 y Batería",
+                  "Monitorear la temperatura del SoC M1 y modular la cuota de CPU de los agentes secundarios para evitar estrangulamiento térmico.",
+-                 "area_sentinel_privacy", "/Users/alex/Documents/IA 1.58 bit/data/telemetry"),
++                 "area_sentinel_privacy", f"{WORKSPACE}/data/telemetry"),
+                 ("Verificación de Protocolos de Privacidad Air-Gap y Bóveda Soberana",
+                  "Asegurar que todas las inferencias y escrituras de archivos se mantengan 100% locales sin fugas externas.",
+-                 "area_sentinel_privacy", "/Users/alex/Documents/IA 1.58 bit/data/telemetry"),
++                 "area_sentinel_privacy", f"{WORKSPACE}/data/telemetry"),
+                 ("Calibración de Sensores de Entorno y Resonancia Acústica",
+                  "Sincronizar telemetría física con el módulo Sensorium 360° para enriquecer el contexto cognitivo.",
+-                 "area_sentinel_privacy", "/Users/alex/Documents/IA 1.58 bit/data/telemetry")
++                 "area_sentinel_privacy", f"{WORKSPACE}/data/telemetry")
+             ],
+             "daedalus": [
+                 ("Auditoría de Topología de Proyectos y Salud de la Bóveda Soberana",
+                  "Revisar el árbol de dependencias de 'proj_astraura_core' y calcular el porcentaje de completitud de hitos.",
+-                 "area_project_management", "/Users/alex/Documents/IA 1.58 bit/data/vault/projects"),
++                 "area_project_management", f"{WORKSPACE}/data/vault/projects"),
+                 ("Sincronización de Versiones y Diffing de Entregables Multi-Agente",
+                  "Validar que el código, shaders y memorias generadas cumplan los estándares de arquitectura modular.",
+-                 "area_project_management", "/Users/alex/Documents/IA 1.58 bit/data/vault/projects"),
++                 "area_project_management", f"{WORKSPACE}/data/vault/projects"),
+                 ("Planificación de Hitos para el Núcleo Cognitivo de 1.58 Bits",
+                  "Organizar la hoja de ruta evolutiva de Astraura y asignar micro-tareas a los cerebros especializados.",
+-                 "area_project_management", "/Users/alex/Documents/IA 1.58 bit/data/vault/projects")
++                 "area_project_management", f"{WORKSPACE}/data/vault/projects")
+             ]
+         }
+ 
+diff --git a/backend/app/agents/intelligent_authorization_orchestrator.py b/backend/app/agents/intelligent_authorization_orchestrator.py
+index 08c0b4b0..f68af3e9 100644
+--- a/backend/app/agents/intelligent_authorization_orchestrator.py
++++ b/backend/app/agents/intelligent_authorization_orchestrator.py
+@@ -31,6 +31,13 @@ from typing import Dict, List, Any, Optional
+ # DREAM_PROCESS_TYPES es constante de módulo (no atributo de instancia)
+ from ..core.intuitive_imagination_engine import DREAM_PROCESS_TYPES
+ 
++# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
++# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
++from pathlib import Path as _SSPath
++from ..core.config import settings as _ss_settings
++WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
++HOME = str(_SSPath.home()).rstrip("/")
++
+ # Importación perezosa para evitar ciclos en el arranque de FastAPI
+ _intuitive = None
+ _notifications = None
+@@ -101,7 +108,7 @@ _LOW_PRIORITY_KW = ["cosmetic", "estetica", "decor", "minor", "menor", "opcional
+ class IntelligentAuthorizationOrchestrator:
+     """Orquestador inteligente de autorizaciones en 2do plano (1.58-bit)."""
+ 
+-    AUTO_MODE_FILE = Path("/Users/alex/Documents/IA 1.58 bit/data/vault/astraura_auth_auto_mode.json")
++    AUTO_MODE_FILE = Path(f"{WORKSPACE}/data/vault/astraura_auth_auto_mode.json")
+ 
+     def __init__(self):
+         self.orchestrations_run = 0
+diff --git a/backend/app/agents/routing_storage_agent.py b/backend/app/agents/routing_storage_agent.py
+index 09656aca..6d828682 100644
+--- a/backend/app/agents/routing_storage_agent.py
++++ b/backend/app/agents/routing_storage_agent.py
+@@ -26,6 +26,13 @@ import platform
+ from pathlib import Path
+ from typing import Dict, Any, List, Optional
+ 
++# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
++# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
++from pathlib import Path as _SSPath
++from ..core.config import settings as _ss_settings
++WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
++HOME = str(_SSPath.home()).rstrip("/")
++
+ # Lazy resolution para evitar ciclos en el arranque de FastAPI
+ _cerebros = None
+ _memory = None
+@@ -37,17 +44,17 @@ def _resolve():
+     global _cerebros, _memory, _personality, _storage
+     if _cerebros is None:
+         try:
+-            from app.core.cerebros_manager import cerebros_manager as _cerebros
++            from app.cerebros.cerebros_manager import cerebros_manager as _cerebros
+         except Exception:
+             _cerebros = None
+     if _memory is None:
+         try:
+-            from app.core.starseed_memory_engine import starseed_memory_engine as _memory
++            from app.memory.starseed_memory_engine import starseed_memory_engine as _memory
+         except Exception:
+             _memory = None
+     if _personality is None:
+         try:
+-            from app.core.personality_engine import personality_engine as _personality
++            from app.personalities.personality_engine import personality_engine as _personality
+         except Exception:
+             _personality = None
+     if _storage is None:
+@@ -58,13 +65,13 @@ def _resolve():
+ 
+ 
+ # Carpeta raíz del ecosistema Astraura
+-ROOT = Path("/Users/alex/Documents/IA 1.58 bit")
++ROOT = Path(f"{WORKSPACE}")
+ CONFIG_FILE = ROOT / "data" / "vault" / "routing_storage_agent_config.json"
+ 
+ # Dispositivos/medios conocidos a escanear por defecto
+ DEFAULT_SCAN_TARGETS = [
+     str(ROOT),
+-    "/Users/alex/Documents",
++    f"{HOME}/Documents",
+     "/Volumes",
+     str(Path.home() / "Desktop"),
+     str(Path.home() / "Downloads"),
+diff --git a/backend/app/agents/swarm_manager.py b/backend/app/agents/swarm_manager.py
+index cd0879f9..7da5be05 100644
+--- a/backend/app/agents/swarm_manager.py
++++ b/backend/app/agents/swarm_manager.py
+@@ -9,6 +9,13 @@ from typing import Dict, Any, List, Optional
+ import psutil
+ import numpy as np
+ 
++# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
++# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
++from pathlib import Path as _SSPath
++from ..core.config import settings as _ss_settings
++WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
++HOME = str(_SSPath.home()).rstrip("/")
++
+ SWARM_AREAS = [
+     {
+         "id": "area_engineering",
+@@ -66,7 +73,7 @@ class AdaptiveMultiAreaSwarmEngine:
+     y Sistema de Reactivaciones Programadas Autónomas (StarSeed OS // Astraura 1.58b).
+     """
+     def __init__(self, data_dir: Optional[Path] = None):
+-        self.workspace_path = Path("/Users/alex/Documents/IA 1.58 bit")
++        self.workspace_path = Path(f"{WORKSPACE}")
+         self.data_dir = data_dir or (self.workspace_path / "data/swarm")
+         self.data_dir.mkdir(parents=True, exist_ok=True)
+         self.state_file = self.data_dir / "swarm_adaptive_state.json"
+@@ -472,7 +479,7 @@ class AdaptiveMultiAreaSwarmEngine:
+ 
+     # ================= Multi-Agent Task Dispatcher & Execution =================
+ 
+-    def dispatch_task(self, area_id: str, title: str, prompt: str, agent_id: Optional[str] = None, target_project_id: Optional[str] = None, priority_level: int = 5, origin: str = "user") -> Dict[str, Any]:
++    def dispatch_task(self, area_id: str, title: str, prompt: str, agent_id: Optional[str] = None, target_project_id: Optional[str] = None, priority_level: int = 5, origin: str = "user", target_folder_path: Optional[str] = None) -> Dict[str, Any]:
+         """
+         Despacha una nueva tarea concurrente con telemetría real del sistema,
+         rutas de disco físicas y fases de ejecución concretas.
+@@ -483,14 +490,14 @@ class AdaptiveMultiAreaSwarmEngine:
+         target_agent = agent_id or area["lead_agent"]
+         
+         folder_map = {
+-            "area_engineering": "/Users/alex/Documents/IA 1.58 bit/backend/app",
+-            "area_web_intel": "/Users/alex/Documents/IA 1.58 bit/data/research",
+-            "area_synaptic_memory": "/Users/alex/Documents/IA 1.58 bit/data/vault/memories",
+-            "area_creative_synthesis": "/Users/alex/Documents/IA 1.58 bit/frontend/src/components",
+-            "area_sentinel_privacy": "/Users/alex/Documents/IA 1.58 bit/data/telemetry",
+-            "area_project_management": "/Users/alex/Documents/IA 1.58 bit/data/vault/projects"
++            "area_engineering": f"{WORKSPACE}/backend/app",
++            "area_web_intel": f"{WORKSPACE}/data/research",
++            "area_synaptic_memory": f"{WORKSPACE}/data/vault/memories",
++            "area_creative_synthesis": f"{WORKSPACE}/frontend/src/components",
++            "area_sentinel_privacy": f"{WORKSPACE}/data/telemetry",
++            "area_project_management": f"{WORKSPACE}/data/vault/projects"
+         }
+-        target_folder = folder_map.get(area_id, "/Users/alex/Documents/IA 1.58 bit")
++        target_folder = folder_map.get(area_id, f"{WORKSPACE}")
+         
+         # Real system metrics
+         proc = psutil.Process()
+@@ -515,7 +522,9 @@ class AdaptiveMultiAreaSwarmEngine:
+             "real_memory_mb": ram_mb,
+             "real_cpu_usage": cpu_usage,
+             "real_pid": os.getpid(),
+-            "target_folder_path": target_folder,
++            # (Adenda 153) El despachador proactivo pasa la carpeta objetivo; antes el
++            # kwarg no existía y cada ciclo de 5 s moría con TypeError.
++            "target_folder_path": target_folder_path or target_folder,
+             "target_project_id": target_project_id or "proj_astraura_core",
+             "priority_level": priority_level,
+             "origin": origin,
+@@ -612,7 +621,7 @@ class AdaptiveMultiAreaSwarmEngine:
+                     t["real_cpu_usage"] = psutil.cpu_percent(interval=None)
+ 
+                     # Real filesystem target path
+-                    target_path = Path(t.get("target_folder_path", "/Users/alex/Documents/IA 1.58 bit/backend/app"))
++                    target_path = Path(t.get("target_folder_path", f"{WORKSPACE}/backend/app"))
+                     target_path.mkdir(parents=True, exist_ok=True)
+                     real_files = [f.name for f in target_path.glob("*.*") if not f.name.startswith(".")][:8] if target_path.exists() else []
+                     t["real_files_scanned_count"] = len(real_files)
+@@ -643,7 +652,7 @@ class AdaptiveMultiAreaSwarmEngine:
+                         if len(t["logs"]) < 5:
+                             # Real physical artifact persistence on disk
+                             agent_id = t.get("agent_id", "hephaestus")
+-                            artifact_dir = Path("/Users/alex/Documents/IA 1.58 bit/data/vault/artifacts")
++                            artifact_dir = Path(f"{WORKSPACE}/data/vault/artifacts")
+                             artifact_dir.mkdir(parents=True, exist_ok=True)
+                             artifact_file = artifact_dir / f"artifact_{agent_id}_{t['id']}.json"
+                             artifact_data = {
+@@ -699,12 +708,12 @@ class AdaptiveMultiAreaSwarmEngine:
+                 # 2. Autonomous Proactive Swarm Dispatcher (Maintains continuous intelligent pipeline)
+                 if len(running_tasks) < 2:
+                     pool = [
+-                        ("area_engineering", "hephaestus", "Optimización de Microkernel Vectorial NEON en 1.58b", "Refactorizar bucles SIMD para Apple Silicon M1.", "/Users/alex/Documents/IA 1.58 bit/backend/app"),
+-                        ("area_web_intel", "hermes", "Rastreo de Preprints arXiv sobre Modelos Ternarios", "Extracción y análisis de papers sobre cuantización ternaria.", "/Users/alex/Documents/IA 1.58 bit/data/research"),
+-                        ("area_creative_synthesis", "oneiros", "Síntesis de Shader Procedural WebGL Reactivo", "Generación de geometría sagrada y shaders de baja entropía.", "/Users/alex/Documents/IA 1.58 bit/frontend/src/components"),
+-                        ("area_synaptic_memory", "mnemosyne", "Consolidación de Grafo de Memoria StarSeed", "Extracción de axiomas y compactación de memoria a largo plazo.", "/Users/alex/Documents/IA 1.58 bit/data/vault/memories"),
+-                        ("area_sentinel_privacy", "athena", "Auditoría de Sensores Físicos & Privacidad 360°", "Comprobación de aislamiento y telemetría de silicio M1.", "/Users/alex/Documents/IA 1.58 bit/data/telemetry"),
+-                        ("area_project_management", "daedalus", "Sincronización de Topología & Versiones de Proyecto", "Evaluación de métricas de salud en Bóveda de Proyectos.", "/Users/alex/Documents/IA 1.58 bit/data/vault/projects")
++                        ("area_engineering", "hephaestus", "Optimización de Microkernel Vectorial NEON en 1.58b", "Refactorizar bucles SIMD para Apple Silicon M1.", f"{WORKSPACE}/backend/app"),
++                        ("area_web_intel", "hermes", "Rastreo de Preprints arXiv sobre Modelos Ternarios", "Extracción y análisis de papers sobre cuantización ternaria.", f"{WORKSPACE}/data/research"),
++                        ("area_creative_synthesis", "oneiros", "Síntesis de Shader Procedural WebGL Reactivo", "Generación de geometría sagrada y shaders de baja entropía.", f"{WORKSPACE}/frontend/src/components"),
++                        ("area_synaptic_memory", "mnemosyne", "Consolidación de Grafo de Memoria StarSeed", "Extracción de axiomas y compactación de memoria a largo plazo.", f"{WORKSPACE}/data/vault/memories"),
++                        ("area_sentinel_privacy", "athena", "Auditoría de Sensores Físicos & Privacidad 360°", "Comprobación de aislamiento y telemetría de silicio M1.", f"{WORKSPACE}/data/telemetry"),
++                        ("area_project_management", "daedalus", "Sincronización de Topología & Versiones de Proyecto", "Evaluación de métricas de salud en Bóveda de Proyectos.", f"{WORKSPACE}/data/vault/projects")
+                     ]
+                     # Select least recently dispatched area
+                     dispatched_areas = [t["area_id"] for t in self.active_tasks]
+diff --git a/backend/app/api/starseed_bridge.py b/backend/app/api/starseed_bridge.py
+new file mode 100644
+index 00000000..398de874
+--- /dev/null
++++ b/backend/app/api/starseed_bridge.py
+@@ -0,0 +1,199 @@
++"""
++starseed_bridge.py — Puente oficial Astraura 1.58-bit ⇄ StarSeed OS (Adenda 153 del OS).
++
++Tres rutas pequeñas y estables que el OS usa para tratar a este backend como su
++SISTEMA PRIMARIO de inteligencia (ver en el repo del OS
++`architecture/astraura-158-sistema-primario.md`):
++
++  GET  /api/starseed/health    — latido ligero (sin telemetría pesada).
++  GET  /api/starseed/manifest  — motor + personalidades + agentes + habilidades +
++                                 cerebros en UNA llamada (el panel del OS).
++  POST /api/starseed/chat      — chat con `messages[]` estilo OpenAI (system/user/
++                                 assistant). El backend es single-turn: aquí se
++                                 construye la transcripción en el servidor y se
++                                 reusa `orchestrator.generate_response_stream`,
++                                 devolviendo el MISMO SSE que /api/chat/stream
++                                 (branching_plan · agent_traces · token · done).
++
++Compatibilidad: si un OS antiguo no conoce estas rutas sigue usando
++/api/chat/stream; si un backend antiguo no las tiene, el OS recibe 404 y cae a
++/api/chat/stream. Sin dependencias nuevas.
++"""
++from __future__ import annotations
++
++import json
++import time
++from typing import Any, Dict, List, Optional
++
++from fastapi import APIRouter
++from fastapi.responses import StreamingResponse
++from pydantic import BaseModel
++
++router = APIRouter(prefix="/api/starseed", tags=["StarSeed OS bridge"])
++
++BRIDGE_VERSION = "1.0.0"
++HISTORY_BUDGET_CHARS = 9000
++
++
++class BridgeMessage(BaseModel):
++    role: str
++    content: str
++
++
++class BridgeChatRequest(BaseModel):
++    messages: List[BridgeMessage]
++    persona_id: Optional[str] = None
++    system_prompt: Optional[str] = None
++    preferences: Optional[Dict[str, Any]] = None
++    stream: Optional[bool] = True
++
++
++def build_prompt(messages: List[BridgeMessage], extra_system: Optional[str] = None) -> Dict[str, str]:
++    """Transcripción single-turn (misma regla que el adaptador del OS)."""
++    systems = [m.content.strip() for m in messages if m.role == "system" and m.content.strip()]
++    if extra_system and extra_system.strip():
++        systems.append(extra_system.strip())
++    system_prompt = "\n\n".join(systems)
++    turns = [m for m in messages if m.role != "system"]
++    if not turns:
++        return {"system_prompt": system_prompt, "prompt": ""}
++    last = turns[-1]
++    last_user = last.content if last.role == "user" else ""
++    history = turns[:-1] if last.role == "user" else turns
++    if not history:
++        return {"system_prompt": system_prompt, "prompt": last_user.strip()}
++    lines: List[str] = []
++    used = 0
++    for m in reversed(history):
++        who = "Usuario" if m.role == "user" else "Astraura"
++        line = f"{who}: {m.content.strip()}"
++        if used + len(line) > HISTORY_BUDGET_CHARS:
++            break
++        lines.insert(0, line)
++        used += len(line) + 1
++    transcript = "\n".join(lines)
++    if last_user:
++        prompt = (
++            "Transcripción de la conversación hasta ahora (responde SOLO al último mensaje "
++            "del usuario, sin repetir la transcripción):\n"
++            f"{transcript}\n\nÚltimo mensaje del usuario:\n{last_user.strip()}"
++        )
++    else:
++        prompt = f"Transcripción de la conversación hasta ahora. Continúa de forma natural:\n{transcript}"
++    return {"system_prompt": system_prompt, "prompt": prompt}
++
++
++def _safe(fn, default):
++    try:
++        return fn()
++    except Exception:
++        return default
++
++
++@router.get("/health")
++async def starseed_health():
++    from ..engine.bitnet_engine import bitnet_engine
++    engine = _safe(bitnet_engine.get_engine_status, {})
++    return {
++        "status": "online",
++        "bridge": BRIDGE_VERSION,
++        "engine": {
++            "active_model": engine.get("active_model"),
++            "bitnet_cpp_installed": engine.get("bitnet_cpp_installed"),
++            "models_on_disk": len(engine.get("models_on_disk") or []),
++        },
++        "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
++    }
++
++
++@router.get("/manifest")
++async def starseed_manifest():
++    from ..engine.bitnet_engine import bitnet_engine
++    from ..personalities.personality_engine import personality_engine
++    from ..skills.starseed_library import starseed_library
++    from ..core.agent_vault_engine import agent_vault_engine
++    from ..agents.agent_registry import agent_registry
++    from ..cerebros.cerebros_manager import cerebros_manager
++
++    engine = _safe(bitnet_engine.get_engine_status, {})
++    personalities = _safe(personality_engine.list_personalities, [])
++    active = _safe(personality_engine.get_active_persona, {}) or {}
++    skills = _safe(starseed_library.get_all_skills, [])
++    vault_agents = [dict(a, origin="vault") for a in (_safe(agent_vault_engine.list_agents, []) or [])]
++    eco_agents = [dict(a, origin="ecosystem") for a in (_safe(agent_registry.get_all_agents, []) or [])]
++    cerebros = _safe(cerebros_manager.get_cerebros, {}) or {}
++
++    # Catálogo compacto: el OS no necesita los prompts completos ni las claves.
++    def slim_persona(p: Dict[str, Any]) -> Dict[str, Any]:
++        return {
++            "id": p.get("id"),
++            "name": p.get("name"),
++            "title": p.get("title"),
++            "color": p.get("color"),
++            "description": (p.get("description") or "")[:240],
++            "is_custom": bool(p.get("is_custom")),
++            "temperature": p.get("temperature"),
++            "voice_profile": {
++                "voice_id": (p.get("voice_profile") or {}).get("voice_id"),
++                "caracter": (p.get("voice_profile") or {}).get("caracter"),
++            },
++            "tags": p.get("tags") or [],
++        }
++
++    def slim_brain(b: Dict[str, Any]) -> Dict[str, Any]:
++        return {
++            "id": b.get("id"),
++            "name": b.get("name"),
++            "scope": b.get("scope"),
++            "role": b.get("role"),
++            "color": b.get("color"),
++            "active_persona": b.get("active_persona"),
++            "md_layers": {k: (v or "")[:160] for k, v in (b.get("md_layers") or {}).items()},
++            "memory_neurons": [
++                {"id": n.get("id"), "name": n.get("name"), "type": n.get("type"), "enabled": n.get("enabled", True)}
++                for n in (b.get("memory_neurons") or [])
++            ],
++            "linked_personalities": b.get("linked_personalities") or [],
++        }
++
++    return {
++        "bridge": BRIDGE_VERSION,
++        "status": {"status": "online", "engine": engine},
++        "personalities": [slim_persona(p) for p in personalities],
++        "active_persona_id": active.get("id"),
++        "agents": vault_agents + eco_agents,
++        "skills": skills,
++        "cerebros": [slim_brain(b) for b in (cerebros.get("cerebros") or [])],
++        "active_brain_id": cerebros.get("active_brain_id"),
++    }
++
++
++@router.post("/chat")
++async def starseed_chat(req: BridgeChatRequest):
++    from ..agents.orchestrator import orchestrator
++
++    built = build_prompt(req.messages, req.system_prompt)
++    prefs: Dict[str, Any] = dict(req.preferences or {})
++    if req.persona_id:
++        prefs.setdefault("personaId", req.persona_id)
++        prefs.setdefault("selected_personalities", [req.persona_id])
++    prefs.setdefault("multi_personality_mode", "single")
++    prefs.setdefault("client", "starseed-os")
++
++    if not built["prompt"].strip():
++        return {"error": "messages sin mensaje de usuario"}
++
++    if req.stream is False:
++        full = ""
++        async for event in orchestrator.generate_response_stream(built["prompt"], built["system_prompt"], preferences=prefs):
++            if event.get("type") == "token":
++                full += event.get("token", "")
++            elif event.get("type") == "done" and not full:
++                full = event.get("full_text", "")
++        return {"response": full, "persona_id": req.persona_id, "bridge": BRIDGE_VERSION}
++
++    async def sse_generator():
++        async for event in orchestrator.generate_response_stream(built["prompt"], built["system_prompt"], preferences=prefs):
++            yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
++
++    return StreamingResponse(sse_generator(), media_type="text/event-stream")
+diff --git a/backend/app/cerebros/cerebros_manager.py b/backend/app/cerebros/cerebros_manager.py
+index a3cb6f89..529dd8e3 100644
+--- a/backend/app/cerebros/cerebros_manager.py
++++ b/backend/app/cerebros/cerebros_manager.py
+@@ -6,6 +6,13 @@ import threading
+ from pathlib import Path
+ from typing import Dict, Any, List, Optional
+ 
++# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
++# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
++from pathlib import Path as _SSPath
++from ..core.config import settings as _ss_settings
++WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
++HOME = str(_SSPath.home()).rstrip("/")
++
+ try:
+     from ..memory.starseed_memory_engine import starseed_memory_engine
+ except Exception:
+@@ -559,7 +566,7 @@ class CerebrosManager:
+     """
+     def __init__(self, storage_dir: Optional[Path] = None):
+         if storage_dir is None:
+-            self.storage_dir = Path("/Users/alex/Documents/IA 1.58 bit/data/cerebros")
++            self.storage_dir = Path(f"{WORKSPACE}/data/cerebros")
+         else:
+             self.storage_dir = Path(storage_dir)
+         self.storage_dir.mkdir(parents=True, exist_ok=True)
+@@ -606,7 +613,7 @@ class CerebrosManager:
+                     "id": "dest_local_default",
+                     "name": "Almacén Local Soberano (Predeterminado)",
+                     "type": "local_fs",
+-                    "path": f"/Users/alex/Documents/IA 1.58 bit/data/cerebros/{b_id}",
++                    "path": f"{WORKSPACE}/data/cerebros/{b_id}",
+                     "is_primary": True,
+                     "sync_mode": "realtime_fs_watcher",
+                     "enabled": True,
+@@ -661,8 +668,8 @@ class CerebrosManager:
+ 
+         if "context_folders" not in b or not b["context_folders"]:
+             default_paths = [
+-                "/Users/alex/Documents/IA 1.58 bit",
+-                "/Users/alex/Documents/starseed-os-main"
++                f"{WORKSPACE}",
++                f"{HOME}/Documents/starseed-os-main"
+             ]
+             folders = []
+             for p in default_paths:
+@@ -711,7 +718,7 @@ class CerebrosManager:
+                 },
+                 "storage_backend": {
+                     "type": "local_fs",
+-                    "path": "/Users/alex/Documents/IA 1.58 bit/data/starseed_memory_root",
++                    "path": f"{WORKSPACE}/data/starseed_memory_root",
+                     "cloud_sync": True,
+                     "cloud_provider": "Vercel / Supabase"
+                 },
+@@ -727,12 +734,12 @@ class CerebrosManager:
+                 "context_folders": [
+                     {
+                         "id": "ctx_ia_bit",
+-                        "path": "/Users/alex/Documents/IA 1.58 bit",
++                        "path": f"{WORKSPACE}",
+                         "label": "IA 1.58 bit (Workspace Principal)",
+                         "access_mode": "read_write",
+                         "resonance_weight": 95,
+                         "enabled": True,
+-                        "metrics": scan_context_folder_metrics("/Users/alex/Documents/IA 1.58 bit")
++                        "metrics": scan_context_folder_metrics(f"{WORKSPACE}")
+                     }
+                 ],
+                 "md_layers": {
+@@ -768,7 +775,7 @@ class CerebrosManager:
+                 },
+                 "storage_backend": {
+                     "type": "local_fs",
+-                    "path": "/Users/alex/Documents/IA 1.58 bit/backend/BitNet",
++                    "path": f"{WORKSPACE}/backend/BitNet",
+                     "cloud_sync": False
+                 },
+                 "security_permissions": {
+@@ -783,12 +790,12 @@ class CerebrosManager:
+                 "context_folders": [
+                     {
+                         "id": "ctx_bitnet_cpp",
+-                        "path": "/Users/alex/Documents/IA 1.58 bit/backend/BitNet",
++                        "path": f"{WORKSPACE}/backend/BitNet",
+                         "label": "BitNet C++ Core",
+                         "access_mode": "read_write",
+                         "resonance_weight": 95,
+                         "enabled": True,
+-                        "metrics": scan_context_folder_metrics("/Users/alex/Documents/IA 1.58 bit/backend/BitNet")
++                        "metrics": scan_context_folder_metrics(f"{WORKSPACE}/backend/BitNet")
+                     }
+                 ],
+                 "md_layers": {
+@@ -839,12 +846,12 @@ class CerebrosManager:
+                 "context_folders": [
+                     {
+                         "id": "ctx_web_data",
+-                        "path": "/Users/alex/Documents/IA 1.58 bit/data",
++                        "path": f"{WORKSPACE}/data",
+                         "label": "Astraura Data Root",
+                         "access_mode": "read_write",
+                         "resonance_weight": 90,
+                         "enabled": True,
+-                        "metrics": scan_context_folder_metrics("/Users/alex/Documents/IA 1.58 bit/data")
++                        "metrics": scan_context_folder_metrics(f"{WORKSPACE}/data")
+                     }
+                 ],
+                 "md_layers": {
+@@ -880,7 +887,7 @@ class CerebrosManager:
+                 },
+                 "storage_backend": {
+                     "type": "local_fs",
+-                    "path": "/Users/alex/Documents/IA 1.58 bit/data/security_vault",
++                    "path": f"{WORKSPACE}/data/security_vault",
+                     "cloud_sync": False
+                 },
+                 "security_permissions": {
+@@ -926,7 +933,7 @@ class CerebrosManager:
+                 },
+                 "storage_backend": {
+                     "type": "local_fs",
+-                    "path": "/Users/alex/Documents/IA 1.58 bit/data/imagination",
++                    "path": f"{WORKSPACE}/data/imagination",
+                     "cloud_sync": True
+                 },
+                 "security_permissions": {
+@@ -972,7 +979,7 @@ class CerebrosManager:
+                 },
+                 "storage_backend": {
+                     "type": "local_fs",
+-                    "path": "/Users/alex/Documents/IA 1.58 bit/data/starseed_memory_root",
++                    "path": f"{WORKSPACE}/data/starseed_memory_root",
+                     "cloud_sync": True
+                 },
+                 "security_permissions": {
+@@ -1083,7 +1090,7 @@ class CerebrosManager:
+                 pass
+ 
+         try:
+-            gdrive_token = Path("/Users/alex/Documents/IA 1.58 bit/data/cerebros/gdrive_token.json")
++            gdrive_token = Path(f"{WORKSPACE}/data/cerebros/gdrive_token.json")
+             if gdrive_token.exists():
+                 detected.append({
+                     "id": "gdrive_brain_vault",
+diff --git a/backend/app/core/agent_vault_engine.py b/backend/app/core/agent_vault_engine.py
+index c7fc5f49..1e020ee7 100644
+--- a/backend/app/core/agent_vault_engine.py
++++ b/backend/app/core/agent_vault_engine.py
+@@ -23,7 +23,20 @@ class AgentVaultEngine:
+         self.data_dir = Path(data_dir)
+         self.data_dir.mkdir(parents=True, exist_ok=True)
+         self.agents_file = self.data_dir / "agents_vault.json"
+-        self.apis_file = self.data_dir / "agent_apis.json"
++        # (Adenda 153) Las CLAVES viven FUERA del repo (~/.astraura/keys o ASTRAURA_KEYS_DIR).
++        # Migración única desde las ubicaciones antiguas (data/ y backend/data/, que
++        # acabaron commiteadas en git → rotar con scripts/rotate_keys.py).
++        from .security import keys_dir as _keys_dir
++        self.apis_file = _keys_dir() / "agent_apis.json"
++        if not self.apis_file.exists():
++            for legacy in (self.data_dir / "agent_apis.json", Path("data") / "agent_apis.json", Path("backend/data") / "agent_apis.json"):
++                try:
++                    if legacy.exists():
++                        self.apis_file.write_text(legacy.read_text(encoding="utf-8"), encoding="utf-8")
++                        print(f"🔐 [Seguridad] Claves migradas de {legacy} a {self.apis_file}. ROTA las claves: python3 scripts/rotate_keys.py")
++                        break
++                except Exception:
++                    pass
+ 
+         self.default_agent_scopes = {
+             "read_memory": True,
+diff --git a/backend/app/core/audio_cpp_engine.py b/backend/app/core/audio_cpp_engine.py
+index 6708c14e..63c665cb 100644
+--- a/backend/app/core/audio_cpp_engine.py
++++ b/backend/app/core/audio_cpp_engine.py
+@@ -15,6 +15,13 @@ import wave
+ from pathlib import Path
+ from typing import Dict, List, Any, Optional
+ 
++# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
++# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
++from pathlib import Path as _SSPath
++from .config import settings as _ss_settings
++WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
++HOME = str(_SSPath.home()).rstrip("/")
++
+ class AudioCppEngine:
+     """
+     Core audio inference & holographic voice engine.
+@@ -24,7 +31,7 @@ class AudioCppEngine:
+ 
+     def __init__(self, storage_dir: Optional[str] = None):
+         if storage_dir is None:
+-            self.storage_dir = Path("/Users/alex/Documents/IA 1.58 bit/data/voice_matrix")
++            self.storage_dir = Path(f"{WORKSPACE}/data/voice_matrix")
+         else:
+             self.storage_dir = Path(storage_dir)
+         self.storage_dir.mkdir(parents=True, exist_ok=True)
+@@ -585,6 +592,30 @@ class AudioCppEngine:
+             "total_memories": len(memories[persona_id])
+         }
+ 
++    async def synthesize_speech(self, text: str, voice_params: Optional[Dict[str, Any]] = None, stream: bool = False, persona_id: Optional[str] = None) -> Dict[str, Any]:
++        """(Adenda 153) Contrato que usa /api/voice_studio/preview (antes no existía → 500).
++        Devuelve el WAV procedural como data-URI base64. Honesto: no es TTS neuronal."""
++        import base64
++        profile = dict(voice_params or {})
++        if persona_id and not profile:
++            try:
++                profile = (self._read_profiles() or {}).get(persona_id, {}) or {}
++            except Exception:
++                profile = {}
++        try:
++            pcm = self.synthesize_native_pcm(text, profile)
++            return {
++                "success": True,
++                "persona_id": persona_id or profile.get("persona_id", "custom"),
++                "audio_base64": "data:audio/wav;base64," + base64.b64encode(pcm).decode("ascii"),
++                "sample_rate": 24000,
++                "format": "wav",
++                "engine": "procedural_1.58b",
++                "note": "Síntesis procedural (no neuronal): usa OmniVoice/Web Speech para voz inteligible.",
++            }
++        except Exception as e:
++            return {"success": False, "error": str(e)}
++
+     def synthesize_native_pcm(self, text: str, voice_profile: Dict[str, Any]) -> bytes:
+         """
+         Synthesizes a high-fidelity 24kHz 16-bit Mono WAV buffer using 1.58-bit acoustic glottal flow,
+diff --git a/backend/app/core/continuous_voice_daemon.py b/backend/app/core/continuous_voice_daemon.py
+index 6a140305..99024edd 100644
+--- a/backend/app/core/continuous_voice_daemon.py
++++ b/backend/app/core/continuous_voice_daemon.py
+@@ -18,6 +18,13 @@ from .audio_cpp_engine import audio_cpp_engine
+ from ..memory.mem0_engine import mem0_engine
+ from ..personalities.personality_engine import personality_engine
+ 
++# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
++# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
++from pathlib import Path as _SSPath
++from .config import settings as _ss_settings
++WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
++HOME = str(_SSPath.home()).rstrip("/")
++
+ class ContinuousVoiceDaemon:
+     """
+     Central Sensory & Autonomous Voice Daemon for StarSeed OS.
+@@ -27,7 +34,7 @@ class ContinuousVoiceDaemon:
+ 
+     def __init__(self, data_dir: Optional[str] = None):
+         if data_dir is None:
+-            self.data_dir = Path("/Users/alex/Documents/IA 1.58 bit/data/voice_daemon")
++            self.data_dir = Path(f"{WORKSPACE}/data/voice_daemon")
+         else:
+             self.data_dir = Path(data_dir)
+         self.data_dir.mkdir(parents=True, exist_ok=True)
+@@ -265,7 +272,7 @@ class ContinuousVoiceDaemon:
+         context_memories = mem0_engine.search_memories(user_transcript, user_id="alex", limit=3)
+         relevant_files = []
+         try:
+-            ws = Path("/Users/alex/Documents/IA 1.58 bit")
++            ws = Path(f"{WORKSPACE}")
+             keyword = user_transcript.split()[0].lower() if user_transcript.split() else "main"
+             for f in ws.glob(f"**/*{keyword}*"):
+                 if f.is_file() and not f.name.startswith("."):
+diff --git a/backend/app/core/dream_engine.py b/backend/app/core/dream_engine.py
+index 4e8f22d2..9c516f67 100644
+--- a/backend/app/core/dream_engine.py
++++ b/backend/app/core/dream_engine.py
+@@ -413,6 +413,10 @@ class AstrauraDreamEngine:
+         self.is_dreaming = False
+         return result_payload
+ 
++    async def trigger_manual_dream(self, theme: Optional[str] = None, process_type: Optional[str] = None, target_project_id: Optional[str] = None) -> Dict[str, Any]:
++        """(Adenda 153) Alias estable que usaba workflow_engine (`dream_reflect`) sin existir."""
++        return await self.execute_dream_burst(theme=theme, process_type=process_type, target_project_id=target_project_id)
++
+     def register_callback(self, cb):
+         if cb not in self.callbacks:
+             self.callbacks.append(cb)
+diff --git a/backend/app/core/intuitive_imagination_engine.py b/backend/app/core/intuitive_imagination_engine.py
+index b340ac65..bab87cf1 100644
+--- a/backend/app/core/intuitive_imagination_engine.py
++++ b/backend/app/core/intuitive_imagination_engine.py
+@@ -12,6 +12,13 @@ from ..memory.openviking_engine import openviking_memory
+ from .system_notifications_engine import system_notifications_engine
+ from .synthesis_reporter_engine import synthesis_reporter_engine
+ 
++# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
++# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
++from pathlib import Path as _SSPath
++from .config import settings as _ss_settings
++WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
++HOME = str(_SSPath.home()).rstrip("/")
++
+ DREAM_PROCESS_TYPES = [
+     {
+         "id": "rem_synaptic_consolidation",
+@@ -118,7 +125,7 @@ class IntuitiveImaginationEngine:
+       - Ventanas de información completa, historial y ramas por proceso.
+     """
+     def __init__(self, storage_dir: Optional[Path] = None):
+-        self.workspace_path = Path("/Users/alex/Documents/IA 1.58 bit")
++        self.workspace_path = Path(f"{WORKSPACE}")
+         self.storage_dir = storage_dir or (self.workspace_path / "data/imagination")
+         self.storage_dir.mkdir(parents=True, exist_ok=True)
+         self.state_file = self.storage_dir / "intuitive_imagination_state.json"
+@@ -1255,7 +1262,7 @@ class IntuitiveImaginationEngine:
+                         "author": "Daedalus-Architect",
+                         "summary": "Scaffolding inicial y distribución de registros escalares.",
+                         "changes": ["Creación de estructura base", "Lógica de control inicial"],
+-                        "file_link": "/Users/alex/Documents/IA 1.58 bit/backend/app/core/intuitive_imagination_engine.py"
++                        "file_link": f"{WORKSPACE}/backend/app/core/intuitive_imagination_engine.py"
+                     },
+                     {
+                         "version": "v1.1",
+@@ -1263,7 +1270,7 @@ class IntuitiveImaginationEngine:
+                         "author": "Hephaestus Forjador",
+                         "summary": "Compilación ARM64 NEON i2_s sin desborde de registros.",
+                         "changes": ["Vectorización 128-bit", "Reducción de latencia a sub-milisegundo"],
+-                        "file_link": "/Users/alex/Documents/IA 1.58 bit/backend/app/core/bitnet_neon_engine.cpp"
++                        "file_link": f"{WORKSPACE}/backend/app/core/bitnet_neon_engine.cpp"
+                     },
+                     {
+                         "version": "v1.3",
+@@ -1271,7 +1278,7 @@ class IntuitiveImaginationEngine:
+                         "author": "Astraura Director // Metis Prime",
+                         "summary": "Auditoría de veracidad en silicio M1 y calibración de entropía determinista.",
+                         "changes": ["Veredicto 100% verificado", "Sincronía con Bóveda de Proyectos"],
+-                        "file_link": "/Users/alex/Documents/IA 1.58 bit/backend/vault/projects/projects_vault.json"
++                        "file_link": f"{WORKSPACE}/backend/vault/projects/projects_vault.json"
+                     }
+                 ]
+ 
+@@ -1280,13 +1287,13 @@ class IntuitiveImaginationEngine:
+                     "files": [
+                         {
+                             "name": "intuitive_imagination_engine.py",
+-                            "path": "/Users/alex/Documents/IA 1.58 bit/backend/app/core/intuitive_imagination_engine.py",
++                            "path": f"{WORKSPACE}/backend/app/core/intuitive_imagination_engine.py",
+                             "size_formatted": "68 KB",
+                             "status": "Activo (Modificable)"
+                         },
+                         {
+                             "name": "projects_vault.json",
+-                            "path": "/Users/alex/Documents/IA 1.58 bit/backend/vault/projects/projects_vault.json",
++                            "path": f"{WORKSPACE}/backend/vault/projects/projects_vault.json",
+                             "size_formatted": "24 KB",
+                             "status": "Bóveda Sincronizada"
+                         }
+@@ -1294,11 +1301,11 @@ class IntuitiveImaginationEngine:
+                     "folders": [
+                         {
+                             "name": "backend/app/core",
+-                            "path": "/Users/alex/Documents/IA 1.58 bit/backend/app/core"
++                            "path": f"{WORKSPACE}/backend/app/core"
+                         },
+                         {
+                             "name": "data/vault/projects",
+-                            "path": "/Users/alex/Documents/IA 1.58 bit/backend/vault/projects"
++                            "path": f"{WORKSPACE}/backend/vault/projects"
+                         }
+                     ],
+                     "memories": [
+diff --git a/backend/app/core/needle_engine.py b/backend/app/core/needle_engine.py
+index 2fec72d3..3d1a3f91 100644
+--- a/backend/app/core/needle_engine.py
++++ b/backend/app/core/needle_engine.py
+@@ -14,13 +14,20 @@ import subprocess
+ from pathlib import Path
+ from typing import Dict, List, Any, Optional
+ 
++# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
++# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
++from pathlib import Path as _SSPath
++from .config import settings as _ss_settings
++WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
++HOME = str(_SSPath.home()).rstrip("/")
++
+ class Needle2Engine:
+     """
+     Core manager for Needle 2 (45M parameter .cact model) and ESP32-S3 hardware bridge.
+     Guarantees 100% schema-valid JSON tool calling through C99 pushdown automata.
+     """
+ 
+-    def __init__(self, workspace_path: str = "/Users/alex/Documents/IA 1.58 bit"):
++    def __init__(self, workspace_path: str = f"{WORKSPACE}"):
+         self.workspace = Path(workspace_path)
+         self.data_dir = self.workspace / "data" / "needle"
+         self.data_dir.mkdir(parents=True, exist_ok=True)
+diff --git a/backend/app/core/personality_api_engine.py b/backend/app/core/personality_api_engine.py
+index 54a19ae1..da4292b7 100644
+--- a/backend/app/core/personality_api_engine.py
++++ b/backend/app/core/personality_api_engine.py
+@@ -19,7 +19,20 @@ class PersonalityApiEngine:
+     def __init__(self, data_dir: str = "data"):
+         self.data_dir = Path(data_dir)
+         self.data_dir.mkdir(parents=True, exist_ok=True)
+-        self.storage_file = self.data_dir / "personality_apis.json"
++        # (Adenda 153) Las CLAVES viven FUERA del repo (~/.astraura/keys o ASTRAURA_KEYS_DIR).
++        # Migración única desde las ubicaciones antiguas (data/ y backend/data/, que
++        # acabaron commiteadas en git → rotar con scripts/rotate_keys.py).
++        from .security import keys_dir as _keys_dir
++        self.storage_file = _keys_dir() / "personality_apis.json"
++        if not self.storage_file.exists():
++            for legacy in (self.data_dir / "personality_apis.json", Path("data") / "personality_apis.json", Path("backend/data") / "personality_apis.json"):
++                try:
++                    if legacy.exists():
++                        self.storage_file.write_text(legacy.read_text(encoding="utf-8"), encoding="utf-8")
++                        print(f"🔐 [Seguridad] Claves migradas de {legacy} a {self.storage_file}. ROTA las claves: python3 scripts/rotate_keys.py")
++                        break
++                except Exception:
++                    pass
+         
+         self.default_scopes = {
+             "read_memory": True,
+diff --git a/backend/app/core/privacy_manager.py b/backend/app/core/privacy_manager.py
+index 54b13df5..55f08e03 100644
+--- a/backend/app/core/privacy_manager.py
++++ b/backend/app/core/privacy_manager.py
+@@ -3,6 +3,13 @@ import json
+ from pathlib import Path
+ from typing import Dict, Any, List, Optional
+ 
++# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
++# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
++from pathlib import Path as _SSPath
++from .config import settings as _ss_settings
++WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
++HOME = str(_SSPath.home()).rstrip("/")
++
+ class PrivacyManager:
+     """
+     Gestor de Privacidad Soberana, Control de Acceso a Sensores y Gobernanza de Datos (StarSeed OS).
+@@ -21,7 +28,7 @@ class PrivacyManager:
+       - Modo Air-Gap Soberano Estricto (aislamiento total de red y sensores externos con 1 clic).
+     """
+     def __init__(self, storage_dir: Optional[Path] = None):
+-        self.storage_dir = storage_dir or Path("/Users/alex/Documents/IA 1.58 bit/data/privacy")
++        self.storage_dir = storage_dir or Path(f"{WORKSPACE}/data/privacy")
+         self.storage_dir.mkdir(parents=True, exist_ok=True)
+         self.config_file = self.storage_dir / "privacy_settings.json"
+         self.audit_file = self.storage_dir / "privacy_audit_log.json"
+diff --git a/backend/app/core/security.py b/backend/app/core/security.py
+new file mode 100644
+index 00000000..a3a0d454
+--- /dev/null
++++ b/backend/app/core/security.py
+@@ -0,0 +1,248 @@
++"""
++security.py — Control de acceso del backend Astraura 1.58-bit (Adenda 153 · StarSeed OS).
++
++Antes: NINGUNA ruta tenía autenticación (salvo /api/v1/*/invoke) con CORS `*`,
++y el backend se publicaba por túnel/Cloud Run → ejecución de comandos, lectura y
++escritura de archivos, claves de API y cambios del OS al alcance de cualquiera.
++
++Ahora, tres modos (variable de entorno `ASTRAURA_AUTH_MODE`):
++
++  · "local-only" (POR DEFECTO) — las rutas PELIGROSAS (ejecución de código y
++    comandos, sistema de archivos, proyectos en disco, OS, túnel, claves de API,
++    bóveda, almacenamiento, navegador server-side, sync) solo se aceptan desde
++    LOOPBACK (127.0.0.1/::1 sin cabeceras de proxy) o con una clave válida. El
++    chat, las lecturas y los catálogos siguen abiertos (compatibles con la UI
++    pública y con StarSeed OS).
++  · "key" — TODA ruta /api/* exige clave (salvo /api/status, /api/starseed/health,
++    /active_tunnel.json, /api/bitnet/status y los estáticos de la UI).
++  · "open" — comportamiento previo, sin auth. Solo para desarrollo aislado.
++
++Claves aceptadas (cabecera `X-Astraura-Key`, `Authorization: Bearer …` o `?api_key=`):
++  · la CLAVE MAESTRA: `ASTRAURA_API_KEY` (env) o `~/.astraura/master_key.txt`
++    (se genera al arrancar si no existe; en los logs se imprime la RUTA, nunca la clave);
++  · cualquier clave de personalidad/agente ACTIVA (`ast_…`) de los vault engines,
++    respetando su scope: `exec_terminal` para ejecutar, `fs_write` para escribir,
++    `fs_read` para leer, `sync_external` para túnel/sync, `modify_*` para claves.
++
++Cloud Run / cloudflared: la conexión llega desde 127.0.0.1 (túnel) o desde un
++front-end de Google, pero SIEMPRE con `CF-Connecting-IP` / `X-Forwarded-For` →
++se trata como remota (no loopback). Las comparaciones de clave son en tiempo
++constante (`hmac.compare_digest`).
++"""
++from __future__ import annotations
++
++import hmac
++import os
++import re
++import secrets
++from pathlib import Path
++from typing import Callable, Dict, Optional
++
++from starlette.middleware.base import BaseHTTPMiddleware
++from starlette.requests import Request
++from starlette.responses import JSONResponse
++
++AUTH_MODES = ("local-only", "key", "open")
++
++# Rutas SIEMPRE públicas (latido, descubrimiento, UI estática).
++PUBLIC_PATHS = re.compile(
++    r"^(/api/status|/api/bitnet/status|/api/starseed/health|/active_tunnel\.json|/api/system/tunnel/status)$"
++)
++
++# Rutas PELIGROSAS → scope requerido. Orden: la primera que casa decide.
++DANGEROUS: list[tuple[re.Pattern[str], str]] = [
++    (re.compile(r"^/api/system/exec"), "exec_terminal"),
++    (re.compile(r"^/api/execute/"), "exec_terminal"),
++    (re.compile(r"^/api/creations/execute_sample"), "exec_terminal"),
++    (re.compile(r"^/api/projects/file/"), "fs_write"),
++    (re.compile(r"^/api/projects/(apply_proposal|link_folder|export|vault/save)"), "fs_write"),
++    (re.compile(r"^/api/creations/(fork_version|recycle)"), "fs_write"),
++    (re.compile(r"^/api/system/os/"), "fs_write"),
++    (re.compile(r"^/api/system/(open_native|index-path|index_path)"), "fs_write"),
++    (re.compile(r"^/api/system/(fs|file|search|item_details)"), "fs_read"),
++    (re.compile(r"^/api/system/storage/"), "fs_read"),
++    (re.compile(r"^/api/system/universal_device_access"), "fs_write"),
++    (re.compile(r"^/api/system/tunnel/(start|stop|restart|qr_data)"), "sync_external"),
++    (re.compile(r"^/api/system/sync/"), "sync_external"),
++    (re.compile(r"^/api/sync/"), "sync_external"),
++    (re.compile(r"^/api/routing_storage/sync"), "sync_external"),
++    (re.compile(r"^/api/storage/"), "fs_write"),
++    (re.compile(r"^/api/cerebros/(scan_folder|link_gdrive|portable/|external/|sync_sources)"), "fs_read"),
++    (re.compile(r"^/api/cerebros/context_metrics"), "fs_read"),
++    (re.compile(r"^/api/vault"), "modify_personality_profile"),
++    (re.compile(r"^/api/personalities/api_keys"), "modify_personality_profile"),
++    (re.compile(r"^/api/personalities/[^/]+/(api_status|generate_key|revoke_key|restore_key|update_permissions|sync_server|trigger_sync)"), "modify_personality_profile"),
++    (re.compile(r"^/api/agents_api/"), "modify_agent_config"),
++    (re.compile(r"^/api/browser/(navigate|action)"), "fs_read"),
++    (re.compile(r"^/api/workflows/(run|save|toggle)"), "exec_terminal"),
++    (re.compile(r"^/api/workflows/[^/]+$"), "exec_terminal"),  # DELETE
++    (re.compile(r"^/api/discovery/scan"), "fs_read"),
++    (re.compile(r"^/api/installer/script"), "fs_read"),
++]
++
++PROXY_HEADERS = ("cf-connecting-ip", "x-forwarded-for", "x-real-ip", "forwarded")
++
++
++def auth_mode() -> str:
++    m = (os.environ.get("ASTRAURA_AUTH_MODE") or "local-only").strip().lower()
++    return m if m in AUTH_MODES else "local-only"
++
++
++def keys_dir() -> Path:
++    d = os.environ.get("ASTRAURA_KEYS_DIR")
++    p = Path(d).expanduser() if d else Path.home() / ".astraura" / "keys"
++    try:
++        p.mkdir(parents=True, exist_ok=True)
++    except Exception:
++        pass
++    return p
++
++
++_master_cache: Optional[str] = None
++
++
++def master_key() -> str:
++    """Clave maestra: env o archivo; se crea si falta (modos con auth)."""
++    global _master_cache
++    if _master_cache:
++        return _master_cache
++    env = (os.environ.get("ASTRAURA_API_KEY") or "").strip()
++    if env:
++        _master_cache = env
++        return env
++    f = Path.home() / ".astraura" / "master_key.txt"
++    try:
++        if f.exists():
++            v = f.read_text(encoding="utf-8").strip()
++            if v:
++                _master_cache = v
++                return v
++        f.parent.mkdir(parents=True, exist_ok=True)
++        v = "ast_master_" + secrets.token_hex(24)
++        f.write_text(v + "\n", encoding="utf-8")
++        try:
++            os.chmod(f, 0o600)
++        except Exception:
++            pass
++        print(f"🔐 [Seguridad] Clave maestra generada en {f} (no se imprime). Úsala como X-Astraura-Key.")
++        _master_cache = v
++        return v
++    except Exception:
++        # Sin disco escribible (contenedor efímero): clave volátil por proceso.
++        v = "ast_master_" + secrets.token_hex(24)
++        _master_cache = v
++        return v
++
++
++def extract_key(request: Request) -> str:
++    k = request.headers.get("x-astraura-key") or request.query_params.get("api_key") or ""
++    if not k:
++        auth = request.headers.get("authorization") or ""
++        if auth.lower().startswith("bearer "):
++            k = auth[7:].strip()
++    return k.strip()
++
++
++def is_loopback(request: Request) -> bool:
++    host = (request.client.host if request.client else "") or ""
++    if host not in ("127.0.0.1", "::1", "localhost"):
++        return False
++    # Túnel/Cloud Run: llega por loopback pero con cabeceras de proxy → remoto.
++    return not any(h in request.headers for h in PROXY_HEADERS)
++
++
++def dangerous_scope(path: str) -> Optional[str]:
++    for rx, scope in DANGEROUS:
++        if rx.search(path):
++            return scope
++    return None
++
++
++def key_is_master(raw: str) -> bool:
++    if not raw:
++        return False
++    try:
++        return hmac.compare_digest(raw.encode("utf-8"), master_key().encode("utf-8"))
++    except Exception:
++        return False
++
++
++def key_has_scope(raw: str, scope: Optional[str]) -> bool:
++    """Maestra ⇒ todo. Clave ast_ de personalidad/agente ⇒ según su scope."""
++    if key_is_master(raw):
++        return True
++    if not raw:
++        return False
++    try:
++        from .personality_api_engine import personality_api_engine
++        a = personality_api_engine.verify_api_key_access(raw, required_scope=scope)
++        if a.get("authenticated"):
++            return True
++    except Exception:
++        pass
++    try:
++        from .agent_vault_engine import agent_vault_engine
++        a = agent_vault_engine.verify_agent_api_key_access(raw, required_scope=scope)
++        if a.get("authenticated"):
++            return True
++    except Exception:
++        pass
++    return False
++
++
++def mask_key(raw: Optional[str]) -> str:
++    s = str(raw or "")
++    if len(s) <= 12:
++        return "••••"
++    return f"{s[:8]}…{s[-4:]}"
++
++
++class AstrauraAuthMiddleware(BaseHTTPMiddleware):
++    async def dispatch(self, request: Request, call_next: Callable):
++        mode = auth_mode()
++        path = request.url.path
++        if mode == "open" or request.method == "OPTIONS":
++            return await call_next(request)
++        if PUBLIC_PATHS.match(path) or not path.startswith("/api/"):
++            return await call_next(request)
++
++        scope = dangerous_scope(path)
++        raw = extract_key(request)
++
++        if mode == "key":
++            if key_has_scope(raw, scope):
++                return await call_next(request)
++            return JSONResponse(
++                status_code=401,
++                content={
++                    "success": False,
++                    "error": "Este backend exige clave (X-Astraura-Key). Modo ASTRAURA_AUTH_MODE=key.",
++                    "auth_mode": mode,
++                },
++            )
++
++        # local-only: solo las peligrosas requieren loopback o clave con scope.
++        if scope is None:
++            return await call_next(request)
++        if is_loopback(request) or key_has_scope(raw, scope):
++            return await call_next(request)
++        return JSONResponse(
++            status_code=403,
++            content={
++                "success": False,
++                "error": "Ruta protegida: solo desde esta máquina (loopback) o con X-Astraura-Key con permiso "
++                         f"'{scope}'. Modo ASTRAURA_AUTH_MODE=local-only.",
++                "auth_mode": mode,
++                "required_scope": scope,
++            },
++        )
++
++
++def security_status() -> Dict[str, object]:
++    """Resumen honesto para /api/status y el panel del OS."""
++    return {
++        "auth_mode": auth_mode(),
++        "keys_dir": str(keys_dir()),
++        "master_key_source": "env" if os.environ.get("ASTRAURA_API_KEY") else "file",
++        "dangerous_routes": len(DANGEROUS),
++    }
+diff --git a/backend/app/core/sensorium_engine.py b/backend/app/core/sensorium_engine.py
+index 5c5109c3..279ae7c2 100644
+--- a/backend/app/core/sensorium_engine.py
++++ b/backend/app/core/sensorium_engine.py
+@@ -9,6 +9,13 @@ from typing import Dict, Any, List, Optional
+ import psutil
+ import httpx
+ 
++# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
++# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
++from pathlib import Path as _SSPath
++from .config import settings as _ss_settings
++WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
++HOME = str(_SSPath.home()).rstrip("/")
++
+ class SensoriumEngine:
+     """
+     Sensorium 360° y Motor de Conciencia Sensorial para StarSeed OS & Astraura 1.58b.
+@@ -20,8 +27,8 @@ class SensoriumEngine:
+         Giroscopio/Acelerómetro (ejes X, Y, Z), Cámaras, Batería, CPU (8 núcleos M1) y RAM unificada.
+     """
+     def __init__(self):
+-        self.workspace_path = "/Users/alex/Documents/IA 1.58 bit"
+-        self.data_dir = Path("/Users/alex/Documents/IA 1.58 bit/data/sensorium")
++        self.workspace_path = f"{WORKSPACE}"
++        self.data_dir = Path(f"{WORKSPACE}/data/sensorium")
+         self.data_dir.mkdir(parents=True, exist_ok=True)
+         self.location_file = self.data_dir / "sensorium_location.json"
+ 
+diff --git a/backend/app/core/storage_routing_engine.py b/backend/app/core/storage_routing_engine.py
+index 5039d03d..6b5883e4 100644
+--- a/backend/app/core/storage_routing_engine.py
++++ b/backend/app/core/storage_routing_engine.py
+@@ -11,6 +11,13 @@ from datetime import datetime
+ from .system_notifications_engine import system_notifications_engine
+ from ..memory.starseed_memory_engine import starseed_memory_engine
+ 
++# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
++# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
++from pathlib import Path as _SSPath
++from .config import settings as _ss_settings
++WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
++HOME = str(_SSPath.home()).rstrip("/")
++
+ class StorageRoutingEngine:
+     """
+     Motor Soberano de Detección y Enrutamiento Automático de Medios de Almacenamiento,
+@@ -24,7 +31,7 @@ class StorageRoutingEngine:
+       - Modificación y ajuste dinámico de límites de capacidades relativas (Doble Tronco 1.58b: Imaginación % y Multi-Agentes %).
+     """
+     def __init__(self, storage_dir: Optional[Path] = None):
+-        self.workspace_path = Path("/Users/alex/Documents/IA 1.58 bit")
++        self.workspace_path = Path(f"{WORKSPACE}")
+         self.storage_dir = storage_dir or (self.workspace_path / "data/storage_routing")
+         self.storage_dir.mkdir(parents=True, exist_ok=True)
+         self.rules_file = self.storage_dir / "storage_routing_rules.json"
+diff --git a/backend/app/core/sync_engine.py b/backend/app/core/sync_engine.py
+index a3e10fcb..88f10ab1 100644
+--- a/backend/app/core/sync_engine.py
++++ b/backend/app/core/sync_engine.py
+@@ -43,6 +43,13 @@ SECTIONS = {
+     "config/swarm_state.json": "swarm/swarm_adaptive_state.json",
+     "config/vector_store.json": "vector_store/vectors.json",
+     "config/storage_routing.json": "storage_routing/storage_routing_rules.json",
++    # (Adenda 153) Secciones que antes NO viajaban: personalidades propias y activa,
++    # habilidades, recuerdos nucleares y manifiesto del memory root.
++    "config/personalities.json": "personalities/custom_personalities.json",
++    "config/active_personality.json": "personalities/active_personality.json",
++    "config/skills.json": "starseed_skills.json",
++    "memory/recuerdos_core.json": "starseed_memory_root/recuerdos_core.json",
++    "memory/memory_manifest.json": "starseed_memory_root/memory.manifest.json",
+ }
+ 
+ # key plano usado en Supabase astraura_state (sin barras)
+@@ -99,16 +106,58 @@ def pull_all(verbose: bool = False) -> dict:
+     return {"success": True, "seeded": results}
+ 
+ 
+-def push_all(verbose: bool = False) -> dict:
+-    """Espeja el estado local a Supabase (+R2) en tiempo real."""
++# (Adenda 153) Empuje INCREMENTAL: solo se sube una sección si cambió desde el
++# último push (hash SHA-256 del JSON serializado) y si no supera el tope de
++# tamaño (`ASTRAURA_SYNC_MAX_MB`, defecto 5 MB) — antes se subían 4 MB de
++# vectores cada 2 min aunque nada hubiera cambiado, y una sección de 24 MB
++# habría roto el upsert.
++_last_hashes: dict = {}
++
++
++def _section_payload(local_rel):
++    """Devuelve (data, hash, size_bytes) o (None, None, 0)."""
++    import hashlib
++    data = _read_local(local_rel)
++    if data is None:
++        return None, None, 0
++    try:
++        raw = json.dumps(data, ensure_ascii=False, sort_keys=True).encode("utf-8")
++    except Exception:
++        return None, None, 0
++    return data, hashlib.sha256(raw).hexdigest(), len(raw)
++
++
++def _max_bytes() -> int:
++    try:
++        return int(float(os.environ.get("ASTRAURA_SYNC_MAX_MB", "5")) * 1024 * 1024)
++    except Exception:
++        return 5 * 1024 * 1024
++
++
++def push_all(verbose: bool = False, force: bool = False) -> dict:
++    """Espeja el estado local a Supabase (+R2). Incremental: solo lo que cambió."""
+     results = {}
++    skipped = {}
++    changed_sections = {}
++    for r2_key, local_rel in SECTIONS.items():
++        data, h, size = _section_payload(local_rel)
++        if data is None:
++            continue
++        if size > _max_bytes():
++            skipped[r2_key] = f"demasiado grande ({size // 1024} KB > {_max_bytes() // 1024} KB); compacta con scripts/compact_memory_docs.py"
++            continue
++        if not force and _last_hashes.get(r2_key) == h:
++            continue
++        changed_sections[r2_key] = (data, h)
++    if skipped:
++        results["skipped"] = skipped
++    if not changed_sections:
++        return {"success": True, "pushed": results, "unchanged": True}
+     # Supabase (capa en línea)
+     if supabase_sync.is_available():
+         sb_sections = {}
+-        for r2_key, local_rel in SECTIONS.items():
+-            data = _read_local(local_rel)
+-            if data is not None:
+-                sb_sections[_sb_key(r2_key)] = data
++        for r2_key, (data, _h) in changed_sections.items():
++            sb_sections[_sb_key(r2_key)] = data
+         try:
+             results["supabase"] = supabase_sync.push_all(sb_sections)
+         except Exception as e:
+@@ -120,16 +169,17 @@ def push_all(verbose: bool = False) -> dict:
+         except Exception:
+             pass
+         r2_results = {}
+-        for r2_key, local_rel in SECTIONS.items():
+-            data = _read_local(local_rel)
+-            if data is None:
+-                continue
++        for r2_key, (data, _h) in changed_sections.items():
+             try:
+                 ok = r2_storage.upload_json(r2_key, data)
+                 r2_results[r2_key] = "pushed" if ok else "push-failed"
+             except Exception as e:
+                 r2_results[r2_key] = f"error:{e}"
+         results["r2"] = r2_results
++    # Recordar qué se subió (solo si hubo al menos un destino disponible).
++    if supabase_sync.is_available() or r2_storage.is_available():
++        for r2_key, (_data, h) in changed_sections.items():
++            _last_hashes[r2_key] = h
+     return {"success": True, "pushed": results}
+ 
+ 
+diff --git a/backend/app/core/synthesis_reporter_engine.py b/backend/app/core/synthesis_reporter_engine.py
+index b38bdc12..8b4c0fdd 100644
+--- a/backend/app/core/synthesis_reporter_engine.py
++++ b/backend/app/core/synthesis_reporter_engine.py
+@@ -6,6 +6,13 @@ from pathlib import Path
+ from typing import Dict, Any, List, Optional
+ from datetime import datetime
+ 
++# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
++# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
++from pathlib import Path as _SSPath
++from .config import settings as _ss_settings
++WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
++HOME = str(_SSPath.home()).rstrip("/")
++
+ class SynthesisReporterEngine:
+     """
+     Motor del Agente Especializado Cronista & Sintetizador (Hermes-Chronicler & Mnemosyne-Scribe).
+@@ -19,7 +26,7 @@ class SynthesisReporterEngine:
+     """
+     def __init__(self, storage_dir: Optional[Path] = None):
+         if storage_dir is None:
+-            self.storage_dir = Path("/Users/alex/Documents/IA 1.58 bit/data")
++            self.storage_dir = Path(f"{WORKSPACE}/data")
+         else:
+             self.storage_dir = storage_dir
+             
+diff --git a/backend/app/core/system_notifications_engine.py b/backend/app/core/system_notifications_engine.py
+index c53116b4..bf07bd70 100644
+--- a/backend/app/core/system_notifications_engine.py
++++ b/backend/app/core/system_notifications_engine.py
+@@ -3,6 +3,13 @@ import json
+ from pathlib import Path
+ from typing import Dict, Any, List, Optional
+ 
++# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
++# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
++from pathlib import Path as _SSPath
++from .config import settings as _ss_settings
++WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
++HOME = str(_SSPath.home()).rstrip("/")
++
+ class SystemNotificationsEngine:
+     """
+     Centro Unificado de Notificaciones y Árbol de Logs de Procesos en Segundo Plano.
+@@ -13,7 +20,7 @@ class SystemNotificationsEngine:
+       - Árbol de ramificación de logs con filtrado interactivo y acciones en un clic.
+     """
+     def __init__(self, storage_dir: Optional[Path] = None):
+-        self.storage_dir = storage_dir or Path("/Users/alex/Documents/IA 1.58 bit/data/notifications")
++        self.storage_dir = storage_dir or Path(f"{WORKSPACE}/data/notifications")
+         self.storage_dir.mkdir(parents=True, exist_ok=True)
+         self.notif_file = self.storage_dir / "notifications_registry.json"
+         
+diff --git a/backend/app/core/universal_device_access.py b/backend/app/core/universal_device_access.py
+index 3a61391d..1b354da0 100644
+--- a/backend/app/core/universal_device_access.py
++++ b/backend/app/core/universal_device_access.py
+@@ -7,6 +7,13 @@ import json
+ from pathlib import Path
+ from typing import Dict, Any, List, Optional
+ 
++# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
++# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
++from pathlib import Path as _SSPath
++from .config import settings as _ss_settings
++WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
++HOME = str(_SSPath.home()).rstrip("/")
++
+ class UniversalDeviceAccessEngine:
+     """
+     Motor Universal de Acceso a Dispositivos, Procesadores y Sistemas Operativos.
+@@ -18,7 +25,7 @@ class UniversalDeviceAccessEngine:
+       - Aceleración WASM SIMD 128-bit / WebGPU.
+     """
+     def __init__(self):
+-        self.workspace_path = Path("/Users/alex/Documents/IA 1.58 bit")
++        self.workspace_path = Path(f"{WORKSPACE}")
+         self.storage_dir = self.workspace_path / "data/device_access"
+         self.storage_dir.mkdir(parents=True, exist_ok=True)
+         self.state_file = self.storage_dir / "device_permissions.json"
+diff --git a/backend/app/engine/bitnet_cpp_manager.py b/backend/app/engine/bitnet_cpp_manager.py
+index d289a253..7afc8760 100644
+--- a/backend/app/engine/bitnet_cpp_manager.py
++++ b/backend/app/engine/bitnet_cpp_manager.py
+@@ -20,7 +20,11 @@ class BitNetCppManager:
+         Inspects whether bitnet.cpp is cloned, compiled, and what models are available.
+         """
+         is_cloned = (self.repo_dir / "setup_env.py").exists() or (self.repo_dir / "CMakeLists.txt").exists()
+-        is_compiled = (self.build_dir / "bin" / "main").exists() or (self.build_dir / "bin" / "bitnet-cli").exists() or (self.repo_dir / "run_inference.py").exists()
++        # (Adenda 153) HONESTO: compilado = existe un binario de inferencia real. Antes
++        # bastaba con que existiera `run_inference.py` (el submódulo sin build) y el
++        # estado decía "BitNet instalado" sin serlo.
++        bin_dir = self.build_dir / "bin"
++        is_compiled = any((bin_dir / b).exists() for b in ("llama-cli", "main", "bitnet-cli", "llama-server"))
+         
+         # Check available GGUF models in models directory
+         found_models = []
+diff --git a/backend/app/engine/bitnet_engine.py b/backend/app/engine/bitnet_engine.py
+index 051f2226..f07ba339 100644
+--- a/backend/app/engine/bitnet_engine.py
++++ b/backend/app/engine/bitnet_engine.py
+@@ -18,7 +18,11 @@ class BitNetUnifiedEngine:
+     """
+     def __init__(self):
+         self.engine_name = "Astraura 1.58b Cognitive Engine (Microsoft BitNet / Local Core)"
+-        self.ollama_url = "http://127.0.0.1:11434"
++        # (Adenda 153 · StarSeed OS) Configurables por entorno: servidor Ollama y
++        # modelo preferido. Sin variables, se conserva el comportamiento previo
++        # (127.0.0.1:11434 y el primer modelo que liste /api/tags).
++        self.ollama_url = (os.environ.get("ASTRAURA_OLLAMA_URL") or "http://127.0.0.1:11434").rstrip("/")
++        self.preferred_model = (os.environ.get("ASTRAURA_OLLAMA_MODEL") or "").strip()
+         self.active_model_name = "qwen2.5:1.5b (Neural Core) // BitNet b1.58"
+         self.stats = {
+             "tokens_generated": 0,
+@@ -39,11 +43,54 @@ class BitNetUnifiedEngine:
+             pass
+         return []
+ 
++    _ollama_probe_cache: Dict[str, Any] = {"at": 0.0, "models": []}
++
++    def probe_ollama_models_sync(self, ttl: float = 30.0) -> List[str]:
++        """(Adenda 153) Sonda SÍNCRONA y cacheada a Ollama para que /api/status diga la
++        verdad sin esperar a la primera generación."""
++        import time as _t
++        now = _t.time()
++        if now - float(self._ollama_probe_cache.get("at", 0)) < ttl:
++            return list(self._ollama_probe_cache.get("models") or [])
++        models: List[str] = []
++        try:
++            with httpx.Client(timeout=0.8) as client:
++                res = client.get(f"{self.ollama_url}/api/tags")
++                if res.status_code == 200:
++                    models = [m.get("name") for m in res.json().get("models", []) if m.get("name")]
++        except Exception:
++            models = []
++        self._ollama_probe_cache = {"at": now, "models": models}
++        return models
++
+     def get_engine_status(self) -> Dict[str, Any]:
+         cpp_status = bitnet_cpp_manager.check_status()
++        # (Adenda 153) Estado HONESTO del motor real: BitNet nativo si hay binario +
++        # GGUF; si no, Ollama (modelo preferido/primero); si no, plantillas.
++        ollama_models = self.probe_ollama_models_sync()
++        if cpp_status["is_compiled"] and cpp_status["models_available"]:
++            real_mode = "bitnet-native"
++            model_label = f"BitNet b1.58 nativo · {Path(cpp_status['models_available'][0]['path']).name}"
++        elif ollama_models:
++            real_mode = "ollama"
++            chosen = ollama_models[0]
++            if self.preferred_model:
++                for m in ollama_models:
++                    if m == self.preferred_model or m.split(":")[0] == self.preferred_model.split(":")[0]:
++                        chosen = m
++                        break
++            model_label = f"{chosen} (Ollama) // BitNet b1.58 pendiente"
++        else:
++            real_mode = "templates"
++            model_label = "sin modelo real (plantillas) — arranca Ollama o compila BitNet"
++        self.active_model_name = model_label
+         return {
+             "engine_name": self.engine_name,
+-            "active_model": self.active_model_name,
++            "active_model": model_label,
++            "real_mode": real_mode,
++            "ollama_url": self.ollama_url,
++            "ollama_models": ollama_models[:12],
++            "preferred_model": self.preferred_model or None,
+             "bitnet_cpp_installed": cpp_status["is_compiled"],
+             "models_on_disk": cpp_status["models_available"],
+             "inference_mode": self.stats["inference_mode"],
+@@ -68,7 +115,17 @@ class BitNetUnifiedEngine:
+         # 1. Try streaming from local high-performance neural engine (Ollama)
+         ollama_models = await self.get_available_ollama_models()
+         if ollama_models:
++            # Modelo preferido por entorno (si está instalado); si no, el primero.
+             model_to_use = ollama_models[0]
++            if self.preferred_model and self.preferred_model in ollama_models:
++                model_to_use = self.preferred_model
++            elif self.preferred_model:
++                for m in ollama_models:
++                    if m.split(":")[0] == self.preferred_model.split(":")[0]:
++                        model_to_use = m
++                        break
++            # Estado honesto: el modelo REAL que responde (antes era un texto fijo).
++            self.active_model_name = f"{model_to_use} (Ollama) // BitNet b1.58 pendiente"
+             
+             # Format clean, context-rich system prompt
+             context_summary = ""
+diff --git a/backend/app/main.py b/backend/app/main.py
+index 7b4ba761..5487358c 100644
+--- a/backend/app/main.py
++++ b/backend/app/main.py
+@@ -6,7 +6,7 @@ from pathlib import Path
+ from contextlib import asynccontextmanager
+ from typing import Dict, Any, List, Optional
+ 
+-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File, Form, BackgroundTasks, Query, Header, Response
++from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File, Form, BackgroundTasks, Query, Header, Response, HTTPException, Request
+ from fastapi.middleware.cors import CORSMiddleware
+ from fastapi.responses import StreamingResponse, JSONResponse, PlainTextResponse
+ from fastapi.staticfiles import StaticFiles
+@@ -59,6 +59,17 @@ from .core.personality_api_engine import personality_api_engine
+ from .core.agent_vault_engine import agent_vault_engine
+ from .core.synthesis_reporter_engine import synthesis_reporter_engine
+ from .api.voice_studio import router as voice_studio_router
++# Puente oficial con StarSeed OS (sistema primario · Adenda 153 del OS).
++from .api.starseed_bridge import router as starseed_bridge_router
++# Control de acceso (Adenda 153): modos local-only (defecto) · key · open. Ver core/security.py.
++from .core.security import AstrauraAuthMiddleware, security_status, key_is_master, extract_key, mask_key
++
++# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
++# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
++from pathlib import Path as _SSPath
++from .core.config import settings as _ss_settings
++WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
++HOME = str(_SSPath.home()).rstrip("/")
+ 
+ @asynccontextmanager
+ async def lifespan(app: FastAPI):
+@@ -138,6 +149,10 @@ app = FastAPI(
+     lifespan=lifespan
+ )
+ 
++# Auth primero en el stack (interior); CORS después (exterior) para que los 401/403
++# sigan siendo legibles desde el navegador de la UI.
++app.add_middleware(AstrauraAuthMiddleware)
++
+ app.add_middleware(
+     CORSMiddleware,
+     allow_origins=["*"],
+@@ -148,6 +163,7 @@ app.add_middleware(
+ )
+ 
+ app.include_router(voice_studio_router)
++app.include_router(starseed_bridge_router)
+ 
+ class ConnectionManager:
+     def __init__(self):
+@@ -199,27 +215,15 @@ async def get_status():
+         },
+         "skills_active": len([s for s in starseed_library.get_all_skills() if s["enabled"]]),
+         "dream_status": dream_engine.get_status(),
+-        "swarm_status": swarm_manager.get_swarm_status()
++        "swarm_status": swarm_manager.get_swarm_status(),
++        # (Adenda 153) Estado honesto de seguridad y del puente con StarSeed OS.
++        "security": security_status(),
++        "starseed_bridge": "1.0.0"
+     }
+ 
+-@app.get("/active_tunnel.json")
+-async def get_active_tunnel():
+-    """Devuelve la URL del túnel activo (se actualiza dinámicamente por el
+-    script de túnel sin necesidad de rebuild). El frontend lo consulta para
+-    apuntar siempre al backend correcto desde cualquier medio."""
+-    import json as _json
+-    from pathlib import Path as _Path
+-    candidates = [
+-        _Path("/Users/alex/Documents/IA 1.58 bit/data/active_tunnel.json"),
+-        _Path("/Users/alex/Documents/IA 1.58 bit/frontend/public/active_tunnel.json"),
+-    ]
+-    for c in candidates:
+-        if c.exists():
+-            try:
+-                return _json.loads(c.read_text())
+-            except Exception:
+-                pass
+-    return {"url": "", "status": "unknown"}
++# (Adenda 153) La ruta /active_tunnel.json única es la DINÁMICA de más abajo
++# (get_active_tunnel_json_dynamic): antes había dos handlers y ganaba el de
++# archivo con ruta /Users/alex fija.
+ 
+ @app.get("/api/profile")
+ async def get_hardware_profile():
+@@ -1154,7 +1158,8 @@ async def sync_r2_force():
+     try:
+         from app.core import sync_engine
+         pull = await asyncio.to_thread(sync_engine.pull_all)
+-        push = await asyncio.to_thread(sync_engine.push_all)
++        # (Adenda 153) Forzado manual: empuja todo aunque no haya cambiado (respeta el tope de tamaño).
++        push = await asyncio.to_thread(sync_engine.push_all, False, True)
+         return {"success": True, "pull": pull, "push": push}
+     except Exception as e:
+         return {"success": False, "error": str(e)[:200]}
+@@ -1468,11 +1473,17 @@ async def list_personality_api_keys():
+     return {"success": True, "personalities": personality_api_engine.list_personality_apis()}
+ 
+ @app.get("/api/personalities/{persona_id}/api_status")
+-async def get_personality_api_detail_endpoint(persona_id: str):
+-    """Returns detailed API status, full key, permissions, active processes, and connections for a personality."""
++async def get_personality_api_detail_endpoint(persona_id: str, request: Request):
++    """Returns detailed API status, permissions, active processes, and connections for a personality.
++    (Adenda 153) La clave completa SOLO se devuelve si la petición trae la clave maestra o
++    esa misma clave; en cualquier otro caso va enmascarada."""
+     detail = personality_api_engine.get_personality_api_detail(persona_id)
+     if not detail:
+         return JSONResponse(status_code=404, content={"success": False, "error": f"Personalidad '{persona_id}' no encontrada."})
++    raw = extract_key(request)
++    full = detail.get("api_key") or ""
++    if not (key_is_master(raw) or (raw and full and raw == full)):
++        detail = {**detail, "api_key": mask_key(full), "api_key_masked": True}
+     return {"success": True, "detail": detail}
+ 
+ @app.post("/api/personalities/{persona_id}/generate_key")
+@@ -1632,11 +1643,16 @@ async def list_agent_api_keys_endpoint():
+     return {"success": True, "agents": agent_vault_engine.list_agent_apis()}
+ 
+ @app.get("/api/agents_api/{agent_id}/api_status")
+-async def get_agent_api_detail_endpoint(agent_id: str):
+-    """Returns detailed API status, full key, permissions, active processes, and connections for an agent."""
++async def get_agent_api_detail_endpoint(agent_id: str, request: Request):
++    """Returns detailed API status, permissions, active processes, and connections for an agent.
++    (Adenda 153) Clave completa solo con clave maestra o con esa misma clave; si no, enmascarada."""
+     detail = agent_vault_engine.get_agent_api_detail(agent_id)
+     if not detail:
+         return JSONResponse(status_code=404, content={"success": False, "error": f"Agente '{agent_id}' no encontrado."})
++    raw = extract_key(request)
++    full = detail.get("api_key") or ""
++    if not (key_is_master(raw) or (raw and full and raw == full)):
++        detail = {**detail, "api_key": mask_key(full), "api_key_masked": True}
+     return {"success": True, "detail": detail}
+ 
+ @app.post("/api/agents_api/{agent_id}/generate_key")
+@@ -2306,7 +2322,8 @@ async def get_synthesis_report_memory_graph(report_id: str):
+         return {"success": False, "error": "Informe no encontrado"}
+     
+     from pathlib import Path as PathLib
+-    from app.core.memory_graph_engine import memory_graph_engine
++    # (Adenda 153) Módulo real: el grafo vive en app.memory.knowledge_graph
++    from app.memory.knowledge_graph import knowledge_graph as memory_graph_engine
+     
+     # Get linked memory references from the report
+     real_links = report.get("real_links", {})
+@@ -2415,7 +2432,8 @@ async def get_synthesis_report_brain_cerebros(report_id: str):
+     if not report:
+         return {"success": False, "error": "Informe no encontrado"}
+     
+-    from app.core.personality_engine import personality_engine
++    # (Adenda 153) Módulos reales (antes apuntaban a app.core.* inexistentes → 500)
++    from app.personalities.personality_engine import personality_engine
+     from app.memory.starseed_memory_engine import starseed_memory_engine
+     
+     # Get participating agents and their cerebro mappings
+@@ -3158,7 +3176,8 @@ async def get_tunnel_qr_data():
+ async def get_cerebros_media_map():
+     """Returns which media/storage devices each Cerebro has access to, and which Cerebros are linked to each storage volume."""
+     from .core.tunnel_manager import tunnel_manager
+-    from app.core.starseed_memory_engine import starseed_memory_engine
++    # (Adenda 153) Módulo real (antes app.core.* inexistente → 500)
++    from app.memory.starseed_memory_engine import starseed_memory_engine
+     
+     tunnel_status = tunnel_manager.get_status()
+     
+diff --git a/backend/app/memory/mem0_engine.py b/backend/app/memory/mem0_engine.py
+index 49c61fc1..703422ea 100644
+--- a/backend/app/memory/mem0_engine.py
++++ b/backend/app/memory/mem0_engine.py
+@@ -4,6 +4,13 @@ import re
+ from pathlib import Path
+ from typing import Dict, Any, List, Optional
+ 
++# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
++# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
++from pathlib import Path as _SSPath
++from ..core.config import settings as _ss_settings
++WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
++HOME = str(_SSPath.home()).rstrip("/")
++
+ class Mem0UniversalMemoryEngine:
+     """
+     Motor de Memoria Universal Mem0 (https://github.com/mem0ai/mem0) para StarSeed OS & Astraura 1.58b.
+@@ -15,7 +22,7 @@ class Mem0UniversalMemoryEngine:
+       - Trazabilidad y versionado de cambios con historial de mutaciones (memory history).
+     """
+     def __init__(self, storage_dir: Optional[Path] = None):
+-        self.storage_dir = storage_dir or Path("/Users/alex/Documents/IA 1.58 bit/data/mem0")
++        self.storage_dir = storage_dir or Path(f"{WORKSPACE}/data/mem0")
+         self.storage_dir.mkdir(parents=True, exist_ok=True)
+         self.store_file = self.storage_dir / "mem0_store.json"
+         
+diff --git a/backend/app/memory/starseed_memory_engine.py b/backend/app/memory/starseed_memory_engine.py
+index 75b1b9c7..e224ea4f 100644
+--- a/backend/app/memory/starseed_memory_engine.py
++++ b/backend/app/memory/starseed_memory_engine.py
+@@ -1,3 +1,4 @@
++import re
+ import os
+ import json
+ import time
+@@ -24,7 +25,20 @@ class StarSeedMemoryEngine:
+     y sincronización continua.
+     """
+     def __init__(self, storage_dir: Optional[Path] = None):
+-        self.storage_dir = storage_dir or Path(__file__).resolve().parent.parent.parent / "data" / "starseed_memory_root"
++        # (Adenda 153) El memory root vive en DATA_DIR (raíz del repo /data), que es lo
++        # que sincroniza sync_engine («memory/starseed_memory.json»). Antes estaba en
++        # backend/data/ y esa sección NUNCA se sincronizaba. Migración única si el
++        # destino no existe y el legado sí.
++        from ..core.config import DATA_DIR as _DATA_DIR
++        legacy_dir = Path(__file__).resolve().parent.parent.parent / "data" / "starseed_memory_root"
++        self.storage_dir = storage_dir or (_DATA_DIR / "starseed_memory_root")
++        if storage_dir is None and not self.storage_dir.exists() and legacy_dir.exists():
++            try:
++                import shutil
++                shutil.copytree(legacy_dir, self.storage_dir)
++                print(f"🧠 [MemoryRoot] Migrado de {legacy_dir} a {self.storage_dir}")
++            except Exception as e:
++                print(f"🧠 [MemoryRoot] No se pudo migrar el memory root: {e}")
+         self.storage_dir.mkdir(parents=True, exist_ok=True)
+         self.manifest_path = self.storage_dir / "memory.manifest.json"
+         self.recuerdos_path = self.storage_dir / "recuerdos_core.json"
+@@ -275,11 +289,48 @@ class StarSeedMemoryEngine:
+         except Exception:
+             return {"branches": STARSEED_BRANCHES}
+ 
++    def search_documents(self, query: str, branch: Optional[str] = None, top_k: int = 5) -> List[Dict[str, Any]]:
++        """(Adenda 153) Búsqueda léxica simple por solapamiento de tokens (la usaba
++        layered_quantum_orchestrator sin existir → AttributeError)."""
++        tokens = {t for t in re.findall(r"[\wáéíóúñü]+", (query or "").lower()) if len(t) > 2}
++        scored: List[tuple] = []
++        for d in self.list_documents(branch):
++            text = f"{d.get('name', '')} {d.get('markdown', '')} {' '.join(d.get('tags', []) or [])}".lower()
++            hits = sum(1 for t in tokens if t in text)
++            if hits:
++                scored.append((hits, d))
++        scored.sort(key=lambda x: x[0], reverse=True)
++        return [d for _, d in scored[:max(1, top_k)]]
++
+     def list_documents(self, branch: Optional[str] = None) -> List[Dict[str, Any]]:
+         if branch:
+             return [d for d in self.documents if d.get("branch") == branch]
+         return self.documents
+ 
++    # (Adenda 153) Categorías que producen los motores AUTOMÁTICOS (imaginación,
++    # enrutamiento de medios, sueños, enjambre). Sin tope, el memory root creció a
++    # 33 789 documentos / 24 MB y se reescribía entero en cada alta. Se conservan
++    # como máximo `ASTRAURA_MAX_AUTOGEN_DOCS` por categoría (FIFO; defecto 150).
++    AUTOGEN_CATEGORY_RE = re.compile(r"^(Almacenamiento Enrutado|Exoc[oó]rtex (Autorizado|Sincronizado)|Imaginaci[oó]n|Sue[ñn]o)", re.I)
++
++    def is_autogen_doc(self, doc: Dict[str, Any]) -> bool:
++        cat = str(doc.get("category") or "")
++        return bool(self.AUTOGEN_CATEGORY_RE.match(cat))
++
++    def _trim_autogen(self, category: str) -> int:
++        try:
++            cap = max(10, int(os.environ.get("ASTRAURA_MAX_AUTOGEN_DOCS", "150")))
++        except Exception:
++            cap = 150
++        same = [d for d in self.documents if str(d.get("category") or "") == category]
++        if len(same) <= cap:
++            return 0
++        # Los documentos se insertan al principio (más nuevos primero): se podan los más antiguos.
++        keep_ids = {d.get("id") for d in same[:cap]}
++        before = len(self.documents)
++        self.documents = [d for d in self.documents if str(d.get("category") or "") != category or d.get("id") in keep_ids]
++        return before - len(self.documents)
++
+     def create_or_update_document(self, doc_data: Dict[str, Any]) -> Dict[str, Any]:
+         doc_id = doc_data.get("id") or f"doc_{int(time.time())}"
+         now = time.time()
+@@ -295,6 +346,8 @@ class StarSeedMemoryEngine:
+             doc_data["updated_at"] = now
+             self.documents.insert(0, doc_data)
+             saved_doc = doc_data
++            if self.is_autogen_doc(doc_data):
++                self._trim_autogen(str(doc_data.get("category") or ""))
+             
+         self.save_documents()
+         return saved_doc
+diff --git a/backend/app/personalities/personality_engine.py b/backend/app/personalities/personality_engine.py
+index 25267229..0a2b68fa 100644
+--- a/backend/app/personalities/personality_engine.py
++++ b/backend/app/personalities/personality_engine.py
+@@ -9,6 +9,13 @@ import time
+ from pathlib import Path
+ from typing import Dict, List, Any, Optional
+ 
++# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
++# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
++from pathlib import Path as _SSPath
++from ..core.config import settings as _ss_settings
++WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
++HOME = str(_SSPath.home()).rstrip("/")
++
+ DEFAULT_TRAITS = {
+     # Emociones & Afecto
+     "empatia": 85,
+@@ -612,7 +619,7 @@ PRESET_PERSONALITY_PROFILES = [
+ class PersonalityEngine:
+     def __init__(self, data_dir: Optional[str] = None):
+         if data_dir is None:
+-            self.data_dir = Path("/Users/alex/Documents/IA 1.58 bit/data/personalities")
++            self.data_dir = Path(f"{WORKSPACE}/data/personalities")
+         else:
+             self.data_dir = Path(data_dir)
+         self.data_dir.mkdir(parents=True, exist_ok=True)
+diff --git a/backend/app/projects/project_vault.py b/backend/app/projects/project_vault.py
+index f1b3c0a8..d5487f0d 100644
+--- a/backend/app/projects/project_vault.py
++++ b/backend/app/projects/project_vault.py
+@@ -6,6 +6,13 @@ from typing import Dict, Any, List, Optional
+ from ..memory.starseed_memory_engine import starseed_memory_engine
+ from ..memory.openviking_engine import openviking_memory
+ 
++# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
++# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
++from pathlib import Path as _SSPath
++from ..core.config import settings as _ss_settings
++WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
++HOME = str(_SSPath.home()).rstrip("/")
++
+ class ProjectVaultManager:
+     """
+     Gestor de Proyectos Multifacéticos y Desarrollos de Software para Astraura (StarSeed OS).
+@@ -44,7 +51,7 @@ class ProjectVaultManager:
+                 "brain_id": "cerebro_genesis",
+                 "created_at": time.time() - 86400,
+                 "updated_at": time.time(),
+-                "linked_folder": "/Users/alex/Documents/IA 1.58 bit",
++                "linked_folder": f"{WORKSPACE}",
+                 "files": [
+                     {
+                         "filename": "main.py",
+diff --git a/backend/app/projects/projects_manager.py b/backend/app/projects/projects_manager.py
+index 759e1f64..ba49f63d 100644
+--- a/backend/app/projects/projects_manager.py
++++ b/backend/app/projects/projects_manager.py
+@@ -8,6 +8,13 @@ import shutil
+ from pathlib import Path
+ from typing import Dict, Any, List, Optional, Tuple
+ 
++# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
++# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
++from pathlib import Path as _SSPath
++from ..core.config import settings as _ss_settings
++WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
++HOME = str(_SSPath.home()).rstrip("/")
++
+ try:
+     from app.memory.starseed_memory_engine import starseed_memory_engine
+ except ImportError:
+@@ -137,7 +144,7 @@ class ProjectsManager:
+                 "Optimizado para cuantización ternaria ARM64 NEON 1.58b"
+             ])
+             p.setdefault("linked_folders", [
+-                f"/Users/alex/Documents/IA 1.58 bit/data/projects/{p['id']}"
++                f"{WORKSPACE}/data/projects/{p['id']}"
+             ])
+             p.setdefault("linked_files", [])
+             p.setdefault("linked_projects", [])
+@@ -238,11 +245,11 @@ class ProjectsManager:
+                     "Reducción total de FP32 a pesos ternarios {-1, 0, +1}"
+                 ],
+                 "linked_folders": [
+-                    "/Users/alex/Documents/IA 1.58 bit/backend/app/core",
+-                    "/Users/alex/Documents/IA 1.58 bit/backend/BitNet"
++                    f"{WORKSPACE}/backend/app/core",
++                    f"{WORKSPACE}/backend/BitNet"
+                 ],
+                 "linked_files": [
+-                    "/Users/alex/Documents/IA 1.58 bit/backend/run_backend.py"
++                    f"{WORKSPACE}/backend/run_backend.py"
+                 ],
+                 "logs_history": [
+                     {
+@@ -321,7 +328,7 @@ class ProjectsManager:
+                     "Diseño visual de baja entropía con estética dark-mode futurista"
+                 ],
+                 "linked_folders": [
+-                    "/Users/alex/Documents/IA 1.58 bit/frontend/src/components"
++                    f"{WORKSPACE}/frontend/src/components"
+                 ],
+                 "linked_files": [],
+                 "logs_history": [
+diff --git a/backend/app/tools/system_explorer.py b/backend/app/tools/system_explorer.py
+index 796b2d63..3894fdb1 100644
+--- a/backend/app/tools/system_explorer.py
++++ b/backend/app/tools/system_explorer.py
+@@ -8,6 +8,13 @@ from pathlib import Path
+ from typing import Dict, Any, List, Optional
+ import pypdf
+ 
++# (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
++# (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
++from pathlib import Path as _SSPath
++from ..core.config import settings as _ss_settings
++WORKSPACE = str(_ss_settings.workspace_path).rstrip("/")
++HOME = str(_SSPath.home()).rstrip("/")
++
+ class SystemExplorer:
+     """
+     Computer-wide file system explorer and indexing utility.
+@@ -226,7 +233,7 @@ class SystemExplorer:
+             p = Path(target_path).expanduser().resolve()
+             if not p.exists():
+                 # If path does not exist, try finding workspace relative path
+-                workspace_p = (Path("/Users/alex/Documents/IA 1.58 bit") / target_path).resolve()
++                workspace_p = (Path(f"{WORKSPACE}") / target_path).resolve()
+                 if workspace_p.exists():
+                     p = workspace_p
+                 else:
+@@ -271,7 +278,7 @@ class SystemExplorer:
+         try:
+             p = Path(target_path).expanduser().resolve()
+             if not p.exists():
+-                workspace_p = (Path("/Users/alex/Documents/IA 1.58 bit") / target_path).resolve()
++                workspace_p = (Path(f"{WORKSPACE}") / target_path).resolve()
+                 if workspace_p.exists():
+                     p = workspace_p
+                 else:
+diff --git a/frontend/src/App.jsx b/frontend/src/App.jsx
+index 9783e624..09988b77 100644
+--- a/frontend/src/App.jsx
++++ b/frontend/src/App.jsx
+@@ -34,7 +34,8 @@ import {
+   Palette,
+   Headphones,
+   PanelLeftClose,
+-  PanelLeftOpen
++  PanelLeftOpen,
++  Link2
+ } from 'lucide-react';
+ 
+ import ChatInterface from './components/ChatInterface';
+@@ -70,7 +71,7 @@ import GatewayModal from './components/GatewayModal';
+ import UniversalDeviceModal from './components/UniversalDeviceModal';
+ import ThemePickerModal from './components/ThemePickerModal';
+ import UniversalFileViewerModal from './components/UniversalFileViewerModal';
+-import { ChatWebSocketClient, fetchStatus, fetchSystemNotifications, autoDetectAndSetLiveTunnel, getGatewayUrl } from './services/api';
++import { ChatWebSocketClient, fetchStatus, fetchSystemNotifications, autoDetectAndSetLiveTunnel, getGatewayUrl, apiUrl } from './services/api';
+ import { webCognition } from './services/webCognition';
+ import { deviceContextDetector } from './services/deviceContextDetector';
+ import { omniVoice } from './services/omniVoice';
+@@ -444,8 +445,9 @@ export default function App() {
+     }
+ 
+     // 2. Try HTTP REST API endpoint /api/chat if local server is reachable
++    //    (apiUrl respeta el gateway activo: custom / túnel / default, también en Electron file://)
+     try {
+-      const httpRes = await fetch('/api/chat', {
++      const httpRes = await fetch(apiUrl('/api/chat'), {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ prompt: text, system_prompt: settings.systemPrompt, preferences: preferences || {} }),
+@@ -773,6 +775,16 @@ export default function App() {
+               )}
+             </button>
+ 
++            {/* Puente Soberano / Gateway (túnel HTTPS · LAN · QR multi-dispositivo) */}
++            <button
++              onClick={() => setIsGatewayModalOpen(true)}
++              className="text-xs px-2.5 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 font-mono transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
++              title="Puente soberano / Gateway"
++            >
++              <Link2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
++              <span className="hidden md:inline">Gateway</span>
++            </button>
++
+             {/* Notifications */}
+             <button
+               onClick={() => handleTabChange('notifications')}
+@@ -860,6 +872,19 @@ export default function App() {
+                 )}
+               </button>
+             ))}
++
++            {/* Puente Soberano / Gateway (acceso móvil desde "Más") */}
++            <button
++              onClick={() => {
++                setIsGatewayModalOpen(true);
++                setIsMobileMenuOpen(false);
++              }}
++              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-cyan-300 border-t border-white/10 mt-1 pt-2.5"
++              title="Puente soberano / Gateway"
++            >
++              <Link2 className="w-4 h-4 flex-shrink-0 text-cyan-400/80" />
++              <span className="flex-1 text-left">Puente Soberano / Gateway</span>
++            </button>
+           </div>
+         )}
+ 
+diff --git a/frontend/src/components/GatewayModal.jsx b/frontend/src/components/GatewayModal.jsx
+index e318e492..fc3a0bbf 100644
+--- a/frontend/src/components/GatewayModal.jsx
++++ b/frontend/src/components/GatewayModal.jsx
+@@ -25,34 +25,53 @@ import {
+   fetchTunnelStatus,
+   autoDetectAndSetLiveTunnel
+ } from '../services/api';
++import { drawQRToCanvas } from '../services/qrCode';
+ 
+-/** Minimal QR code generator using a data URL via the canvas API */
++/**
++ * QR generado 100% en local (services/qrCode.js) — sin servicios externos:
++ * la URL del túnel/gateway nunca sale del dispositivo (antes se enviaba a api.qrserver.com).
++ */
+ function QRCodeCanvas({ text, size = 160 }) {
+   const canvasRef = useRef(null);
++  const [renderError, setRenderError] = useState('');
+ 
+   useEffect(() => {
+     if (!text || !canvasRef.current) return;
+-    // Use the free QR API to generate a QR image
+-    const img = new Image();
+-    img.crossOrigin = 'anonymous';
+-    img.src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}&bgcolor=0b0e17&color=00e5ff&qzone=1&margin=0&format=png`;
+-    img.onload = () => {
++    try {
++      // Canvas a 2x para módulos nítidos en pantallas HiDPI; zona de silencio de 4 módulos (norma).
++      drawQRToCanvas(canvasRef.current, text, {
++        dark: '#00e5ff',
++        light: '#0b0e17',
++        quietZone: 4,
++        ecLevel: 'M'
++      });
++      setRenderError('');
++    } catch (e) {
++      console.warn('QR local render notice:', e?.message || e);
+       const ctx = canvasRef.current?.getContext('2d');
+       if (ctx) {
+-        ctx.clearRect(0, 0, size, size);
+-        ctx.drawImage(img, 0, 0, size, size);
++        ctx.fillStyle = '#0b0e17';
++        ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+       }
+-    };
++      setRenderError('QR no disponible (enlace demasiado largo). Copia el enlace directo.');
++    }
+   }, [text, size]);
+ 
+   return (
+-    <canvas
+-      ref={canvasRef}
+-      width={size}
+-      height={size}
+-      className="rounded-xl border border-cyan-500/30"
+-      style={{ imageRendering: 'pixelated', background: '#0b0e17' }}
+-    />
++    <div className="relative" style={{ width: size, height: size }}>
++      <canvas
++        ref={canvasRef}
++        width={size * 2}
++        height={size * 2}
++        className="rounded-xl border border-cyan-500/30"
++        style={{ width: size, height: size, imageRendering: 'pixelated', background: '#0b0e17' }}
++      />
++      {renderError && (
++        <div className="absolute inset-0 rounded-xl flex items-center justify-center text-slate-400 text-[10px] text-center p-4 bg-[#0b0e17]/90">
++          {renderError}
++        </div>
++      )}
++    </div>
+   );
+ }
+ 
+@@ -115,7 +134,8 @@ export default function GatewayModal({ isOpen, onClose, onConnected }) {
+         const fallback = tunnelData?.url;
+         if (fallback) {
+           setGatewayInput(fallback);
+-          setCustomGateway(fallback);
++          // URL derivada de la auto-detección: origen 'auto' (la detección futura puede actualizarla)
++          setCustomGateway(fallback, 'auto');
+           const res = await testGatewayConnection(fallback);
+           setStatusResult({ success: true, data: res });
+           if (onConnected) onConnected(res);
+@@ -339,7 +359,7 @@ export default function GatewayModal({ isOpen, onClose, onConnected }) {
+                       Túnel no detectado aún.<br />Verifica que el backend corre.
+                     </div>
+                   )}
+-                  <span className="text-[10px] text-slate-500">Escanear abre Astraura conectado</span>
++                  <span className="text-[10px] text-slate-500">Escanear abre Astraura conectado · QR generado localmente (sin servicios externos)</span>
+                 </div>
+ 
+                 <div className="flex-1 space-y-3 min-w-0">
+diff --git a/frontend/src/components/Sensorium360View.jsx b/frontend/src/components/Sensorium360View.jsx
+index 0d179329..86b05437 100644
+--- a/frontend/src/components/Sensorium360View.jsx
++++ b/frontend/src/components/Sensorium360View.jsx
+@@ -36,7 +36,7 @@ import {
+   Edit3,
+   SlidersHorizontal
+ } from 'lucide-react';
+-import { fetchSensoriumLive, updateClientSensors, fetchLiveWeather, updateSensoriumLocation } from '../services/api';
++import { fetchSensoriumLive, updateClientSensors, fetchLiveWeather, updateSensoriumLocation, apiUrl } from '../services/api';
+ import { deviceContextDetector } from '../services/deviceContextDetector';
+ 
+ export default function Sensorium360View() {
+@@ -113,7 +113,8 @@ export default function Sensorium360View() {
+   const checkPing = async () => {
+     const start = performance.now();
+     try {
+-      await fetch('/api/status');
++      // apiUrl respeta el gateway activo (custom / túnel / default) en vez del '/api' relativo
++      await fetch(apiUrl('/api/status'));
+       const latency = Math.round(performance.now() - start);
+       setNetworkLatency(latency);
+     } catch {
+diff --git a/frontend/src/services/api.js b/frontend/src/services/api.js
+index 86e8353c..9f065f8c 100644
+--- a/frontend/src/services/api.js
++++ b/frontend/src/services/api.js
+@@ -26,8 +26,59 @@ async function refreshDynamicGateway() {
+   }
+ }
+ 
++/**
++ * Enlace profundo `?gateway=<url>` (lo generan el QR del GatewayModal y
++ * `connect_links.vercel_app_linked` del backend). Si el parámetro es una URL http(s)
++ * válida, se guarda como gateway personalizado (origen 'user') y se elimina de la
++ * barra de direcciones conservando el resto de la URL (ruta, otros parámetros y hash).
++ * Devuelve la URL aplicada o null si no había parámetro válido.
++ */
++export function applyGatewayFromUrl() {
++  if (typeof window === 'undefined') return null;
++  try {
++    const params = new URLSearchParams(window.location.search || '');
++    const raw = params.get('gateway');
++    if (!raw || !raw.trim()) return null;
++
++    const candidate = raw.trim();
++    let parsed = null;
++    try {
++      parsed = new URL(candidate);
++    } catch {
++      parsed = null;
++    }
++    if (!parsed || (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') || !parsed.hostname) {
++      console.warn(`[Astraura Bridge] Parámetro ?gateway= ignorado (URL inválida): ${candidate}`);
++      return null;
++    }
++
++    const cleanUrl = candidate.replace(/\/+$/, '');
++    setCustomGateway(cleanUrl, 'user');
++    console.log(`[Astraura Bridge] 🔗 Gateway aplicado desde enlace profundo: ${cleanUrl}`);
++
++    // Limpiar el parámetro de la barra de direcciones sin recargar la página.
++    params.delete('gateway');
++    const rest = params.toString();
++    const newUrl = `${window.location.pathname}${rest ? `?${rest}` : ''}${window.location.hash || ''}`;
++    if (window.history && typeof window.history.replaceState === 'function') {
++      try {
++        window.history.replaceState(window.history.state, '', newUrl);
++      } catch {
++        // Algunos contextos (file://, sandbox) no permiten replaceState: no es crítico.
++      }
++    }
++    return cleanUrl;
++  } catch (e) {
++    console.warn('[Astraura Bridge] No se pudo procesar el enlace profundo ?gateway=:', e?.message || e);
++    return null;
++  }
++}
++
+ // Refrescar el gateway al cargar y cada 30s.
+ if (typeof window !== 'undefined') {
++  // El enlace profundo se procesa ANTES de cualquier petición para que todo el
++  // frontend (fetch, WebSocket, voz) apunte al gateway indicado desde el primer momento.
++  applyGatewayFromUrl();
+   refreshDynamicGateway();
+   setInterval(refreshDynamicGateway, 30000);
+ }
+@@ -36,7 +87,7 @@ export function getGatewayUrl() {
+   if (typeof window !== 'undefined') {
+     const custom = localStorage.getItem('astraura_backend_gateway');
+     if (custom && custom.trim()) return custom.trim().replace(/\/$/, '');
+-    
++
+     const h = window.location.hostname;
+     // localhost/127.0.0.1 → backend local (relativo)
+     if (h === 'localhost' || h === '127.0.0.1') {
+@@ -50,12 +101,20 @@ export function getGatewayUrl() {
+   return '';
+ }
+ 
+-export function setCustomGateway(url) {
++/**
++ * Guarda (o borra) el gateway personalizado.
++ * `source` indica quién lo fijó: 'user' (modal / enlace profundo) o 'auto' (auto-detección de túnel).
++ * La auto-detección solo puede sustituir entradas 'auto' (o sin origen, por compatibilidad) — nunca
++ * un gateway fijado manualmente por el usuario.
++ */
++export function setCustomGateway(url, source = 'user') {
+   if (typeof localStorage !== 'undefined') {
+     if (url && url.trim()) {
+       localStorage.setItem('astraura_backend_gateway', url.trim());
++      localStorage.setItem('astraura_backend_gateway_source', source === 'auto' ? 'auto' : 'user');
+     } else {
+       localStorage.removeItem('astraura_backend_gateway');
++      localStorage.removeItem('astraura_backend_gateway_source');
+     }
+   }
+ }
+@@ -65,6 +124,36 @@ export function getApiBase() {
+   return gw ? `${gw}/api` : '/api';
+ }
+ 
++/**
++ * Normaliza una ruta de endpoint a su forma relativa al API, sin el prefijo '/api'.
++ *   '/api/status' | 'status' | '/status' → '/status'   ·   URL absoluta → su pathname + query
++ */
++function normalizeApiPath(path = '') {
++  let rel = typeof path === 'string' ? path : String(path || '');
++  if (/^https?:\/\//i.test(rel)) {
++    try {
++      const u = new URL(rel);
++      rel = `${u.pathname}${u.search}`;
++    } catch {
++      rel = '/';
++    }
++  }
++  if (!rel.startsWith('/')) rel = `/${rel}`;
++  return rel.replace(/^\/api(?=\/|$)/, '');
++}
++
++/**
++ * Construye la URL de un endpoint respetando el gateway activo (personalizado en localStorage,
++ * túnel dinámico o default). Acepta rutas con o sin prefijo '/api' para poder sustituir
++ * llamadas `fetch('/api/...')` directas sin cambiar la ruta:
++ *   apiUrl('/api/status') === apiUrl('/status') → `${getApiBase()}/status`
++ * Las URLs absolutas (http/https) se devuelven sin cambios.
++ */
++export function apiUrl(path = '') {
++  if (typeof path === 'string' && /^https?:\/\//i.test(path)) return path;
++  return `${getApiBase()}${normalizeApiPath(path)}`;
++}
++
+ export async function testGatewayConnection(urlToTest = null) {
+   const target = (urlToTest !== null ? urlToTest : getGatewayUrl()) || '';
+   const endpoint = target ? `${target.replace(/\/$/, '')}/api/status` : '/api/status';
+@@ -99,7 +188,9 @@ export async function apiFetch(path, options = {}) {
+           window.location.hostname !== 'localhost' && 
+           window.location.hostname !== '127.0.0.1') {
+         console.warn(`[Astraura Bridge] Gateway ${url} returned ${res.status}, trying localhost fallback...`);
+-        const fallbackUrl = `http://127.0.0.1:8000${path}`;
++        // `path` es relativo a la base del API (p. ej. '/status'): el backend local expone
++        // todo bajo '/api', así que se antepone el prefijo (normalizado para evitar '/api/api').
++        const fallbackUrl = `http://127.0.0.1:8000/api${normalizeApiPath(path)}`;
+         try {
+           const fallbackRes = await fetch(fallbackUrl, { ...options, signal: AbortSignal.timeout(5000) });
+           if (fallbackRes.ok) {
+@@ -1899,9 +1990,11 @@ export async function fetchAuthOrchestratorStatus() {
+   return apiFetch('/notifications/auth_orchestrator_status');
+ }
+ 
++// Nota: FastAPI/pydantic solo parsea el cuerpo como JSON si llega 'Content-Type: application/json'.
+ export async function setAuthOrchestratorAuto(enabled) {
+   return apiFetch('/notifications/auth_orchestrator_auto', {
+     method: 'POST',
++    headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({ enabled }),
+   });
+ }
+@@ -1909,6 +2002,7 @@ export async function setAuthOrchestratorAuto(enabled) {
+ export async function updateAgentConfig(agentId, config) {
+   return apiFetch(`/ecosystem/agents/${agentId}/config`, {
+     method: 'POST',
++    headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({ config }),
+   });
+ }
+@@ -1916,6 +2010,7 @@ export async function updateAgentConfig(agentId, config) {
+ export async function toggleAgentEnabled(agentId, enabled) {
+   return apiFetch(`/ecosystem/agents/${agentId}/toggle`, {
+     method: 'POST',
++    headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({ enabled }),
+   });
+ }
+@@ -2000,10 +2095,18 @@ export async function autoDetectAndSetLiveTunnel() {
+             signal: AbortSignal.timeout(5000) 
+           });
+           if (verifyRes.ok) {
+-            const saved = localStorage.getItem('astraura_backend_gateway');
+-            if (saved !== tunnelUrl) {
++            const saved = (localStorage.getItem('astraura_backend_gateway') || '').trim().replace(/\/$/, '');
++            const savedSource = localStorage.getItem('astraura_backend_gateway_source');
++            const normalizedTunnel = tunnelUrl.replace(/\/$/, '');
++            if (saved && saved !== normalizedTunnel && savedSource === 'user') {
++              // Gateway fijado manualmente (modal / enlace profundo): la auto-detección NO lo sobrescribe.
++              // Solo puede sustituir entradas 'auto' (o vacías / sin origen, por compatibilidad).
++              console.log(`[Astraura Bridge] Gateway manual conservado (${saved}); túnel detectado no aplicado: ${normalizedTunnel}`);
++              return tunnelUrl;
++            }
++            if (saved !== normalizedTunnel) {
+               console.log(`[Astraura Bridge] 🌐 Túnel vivo detectado: ${tunnelUrl}`);
+-              setCustomGateway(tunnelUrl);
++              setCustomGateway(tunnelUrl, 'auto');
+             }
+             return tunnelUrl;
+           }
+diff --git a/frontend/src/services/deviceContextDetector.js b/frontend/src/services/deviceContextDetector.js
+index 2acebfe8..7252ccae 100644
+--- a/frontend/src/services/deviceContextDetector.js
++++ b/frontend/src/services/deviceContextDetector.js
+@@ -4,6 +4,9 @@
+  * Bridges local backend (http://127.0.0.1:8000) when available, or activates sovereign client mode.
+  */
+ 
++// Gateway activo (custom / túnel / default) para sondear el puente antes que el localhost fijo.
++import { getGatewayUrl } from './api';
++
+ class DeviceContextDetector {
+   constructor() {
+     this.deviceProfile = null;
+@@ -112,25 +115,37 @@ class DeviceContextDetector {
+       }
+     } catch {}
+ 
+-    // 7. Test Local Host Agent Bridge (http://127.0.0.1:8000)
+-    let localBridge = { connected: false, latencyMs: null, hostData: null };
++    // 7. Test Host Agent Bridge: primero el gateway configurado (custom en localStorage / túnel / default),
++    //    después la sonda local directa (http://127.0.0.1:8000). Se reporta hostData del primero que responda.
++    let localBridge = { connected: false, latencyMs: null, hostData: null, endpoint: null };
++    const probeEndpoints = [];
+     try {
+-      const t0 = performance.now();
+-      const ctrl = new AbortController();
+-      const timeoutId = setTimeout(() => ctrl.abort(), 2000);
+-      const res = await fetch('http://127.0.0.1:8000/api/status', { signal: ctrl.signal });
+-      clearTimeout(timeoutId);
+-      if (res.ok) {
+-        const data = await res.json();
+-        localBridge = {
+-          connected: true,
+-          latencyMs: Math.round(performance.now() - t0),
+-          hostData: data
+-        };
+-        this.isLocalAgentConnected = true;
++      const gw = getGatewayUrl();
++      if (gw) probeEndpoints.push(`${gw.replace(/\/$/, '')}/api/status`);
++    } catch {}
++    probeEndpoints.push('http://127.0.0.1:8000/api/status');
++    this.isLocalAgentConnected = false;
++    for (const endpoint of [...new Set(probeEndpoints)]) {
++      try {
++        const t0 = performance.now();
++        const ctrl = new AbortController();
++        const timeoutId = setTimeout(() => ctrl.abort(), 2000);
++        const res = await fetch(endpoint, { signal: ctrl.signal });
++        clearTimeout(timeoutId);
++        if (res.ok) {
++          const data = await res.json();
++          localBridge = {
++            connected: true,
++            latencyMs: Math.round(performance.now() - t0),
++            hostData: data,
++            endpoint
++          };
++          this.isLocalAgentConnected = true;
++          break;
++        }
++      } catch {
++        // Endpoint sin respuesta: se prueba el siguiente.
+       }
+-    } catch {
+-      this.isLocalAgentConnected = false;
+     }
+ 
+     // 8. Permissions Status Audit
+diff --git a/frontend/src/services/fs_access_api.js b/frontend/src/services/fs_access_api.js
+index 0e24e38a..4e6063c5 100644
+--- a/frontend/src/services/fs_access_api.js
++++ b/frontend/src/services/fs_access_api.js
+@@ -6,6 +6,9 @@
+   ================================================================================
+ */
+ 
++// apiFetch respeta el gateway activo (custom / túnel / default) — necesario para submitFolderToBackend().
++import { apiFetch } from './api';
++
+ // ── Solicita acceso a una carpeta via showDirectoryPicker ──
+ export async function requestFolderAccess(prompt) {
+   if (typeof window !== 'undefined' && window.showDirectoryPicker) {
+diff --git a/frontend/src/services/omniVoice.js b/frontend/src/services/omniVoice.js
+index cdef50e0..7805e013 100644
+--- a/frontend/src/services/omniVoice.js
++++ b/frontend/src/services/omniVoice.js
+@@ -10,6 +10,11 @@
+  * - Multi-personality dialogue routing with authentic prosody per persona
+  */
+ 
++// apiUrl() resuelve cada endpoint contra el gateway activo (custom en localStorage, túnel o default),
++// para que VoiceStudio/síntesis funcionen también en Vercel con túnel y en la app Electron (file://).
++// (api.js no importa este módulo: sin dependencia circular.)
++import { apiUrl } from './api';
++
+ class OmniVoiceEngine {
+   constructor() {
+     this.synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
+@@ -294,7 +299,7 @@ class OmniVoiceEngine {
+    */
+   async autoEvolveVoice(personaId = 'aurora', context = '', memories = [], mood = 'natural') {
+     try {
+-      const res = await fetch('/api/voice_studio/auto_evolve', {
++      const res = await fetch(apiUrl('/api/voice_studio/auto_evolve'), {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ persona_id: personaId, context, memories, mood })
+@@ -307,7 +312,7 @@ class OmniVoiceEngine {
+ 
+   async fetchVoiceStudioProfiles() {
+     try {
+-      const res = await fetch('/api/voice_studio/profiles');
++      const res = await fetch(apiUrl('/api/voice_studio/profiles'));
+       if (res.ok) {
+         const data = await res.json();
+         const profiles = data.profiles || [];
+@@ -330,7 +335,7 @@ class OmniVoiceEngine {
+ 
+   async fetchLanguagesCatalogue() {
+     try {
+-      const res = await fetch('/api/voice_studio/languages');
++      const res = await fetch(apiUrl('/api/voice_studio/languages'));
+       if (res.ok) {
+         const data = await res.json();
+         return data.languages || [];
+@@ -343,7 +348,7 @@ class OmniVoiceEngine {
+ 
+   async cloneVoiceFromSample(audioBase64, name, language = 'es', personaId = null) {
+     try {
+-      const res = await fetch('/api/voice_studio/clone', {
++      const res = await fetch(apiUrl('/api/voice_studio/clone'), {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ audio_base64: audioBase64, name, language, persona_id: personaId })
+@@ -356,7 +361,7 @@ class OmniVoiceEngine {
+ 
+   async designVoiceProfile(params) {
+     try {
+-      const res = await fetch('/api/voice_studio/design', {
++      const res = await fetch(apiUrl('/api/voice_studio/design'), {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify(params)
+@@ -369,7 +374,7 @@ class OmniVoiceEngine {
+ 
+   async updateVoiceStudioProfile(voiceId, updates) {
+     try {
+-      const res = await fetch(`/api/voice_studio/profiles/${voiceId}`, {
++      const res = await fetch(apiUrl(`/api/voice_studio/profiles/${voiceId}`), {
+         method: 'PUT',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify(updates)
+@@ -382,7 +387,7 @@ class OmniVoiceEngine {
+ 
+   async deleteVoiceStudioProfile(voiceId) {
+     try {
+-      const res = await fetch(`/api/voice_studio/profiles/${voiceId}`, {
++      const res = await fetch(apiUrl(`/api/voice_studio/profiles/${voiceId}`), {
+         method: 'DELETE'
+       });
+       return await res.json();
+@@ -393,7 +398,7 @@ class OmniVoiceEngine {
+ 
+   async assignVoiceToPersona(voiceId, personaId) {
+     try {
+-      const res = await fetch('/api/voice_studio/assign', {
++      const res = await fetch(apiUrl('/api/voice_studio/assign'), {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ voice_id: voiceId, persona_id: personaId })
+@@ -411,7 +416,7 @@ class OmniVoiceEngine {
+ 
+   async exportVoiceProfile(voiceId) {
+     try {
+-      const res = await fetch(`/api/voice_studio/export/${voiceId}`);
++      const res = await fetch(apiUrl(`/api/voice_studio/export/${voiceId}`));
+       if (!res.ok) throw new Error('Error al exportar perfil');
+       const data = await res.json();
+       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+@@ -429,7 +434,7 @@ class OmniVoiceEngine {
+ 
+   async exportAllVoiceProfiles() {
+     try {
+-      const res = await fetch('/api/voice_studio/export_all');
++      const res = await fetch(apiUrl('/api/voice_studio/export_all'));
+       if (!res.ok) throw new Error('Error al exportar bóveda');
+       const data = await res.json();
+       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+@@ -447,7 +452,7 @@ class OmniVoiceEngine {
+ 
+   async importVoiceProfiles(jsonData) {
+     try {
+-      const res = await fetch('/api/voice_studio/import', {
++      const res = await fetch(apiUrl('/api/voice_studio/import'), {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify(jsonData)
+@@ -461,7 +466,7 @@ class OmniVoiceEngine {
+   async fetchLearningMatrix(personaId = null) {
+     try {
+       const url = personaId ? `/api/voice_studio/learning_matrix?persona_id=${encodeURIComponent(personaId)}` : '/api/voice_studio/learning_matrix';
+-      const res = await fetch(url);
++      const res = await fetch(apiUrl(url));
+       if (res.ok) {
+         return await res.json();
+       }
+@@ -485,7 +490,7 @@ class OmniVoiceEngine {
+         });
+       }
+ 
+-      const res = await fetch('/api/voice_studio/analyze_mic_158', {
++      const res = await fetch(apiUrl('/api/voice_studio/analyze_mic_158'), {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ audio_data: b64, target_persona_id: targetPersonaId })
+@@ -503,7 +508,7 @@ class OmniVoiceEngine {
+   async fetchBranchedMemories(personaId = null) {
+     try {
+       const url = personaId ? `/api/voice_studio/branched_memories?persona_id=${encodeURIComponent(personaId)}` : '/api/voice_studio/branched_memories';
+-      const res = await fetch(url);
++      const res = await fetch(apiUrl(url));
+       if (res.ok) {
+         return await res.json();
+       }
+@@ -518,7 +523,7 @@ class OmniVoiceEngine {
+    */
+   async recordBranchedAcousticMemory(personaId, domain, userSentiment, speechMetrics = {}, dialogueSnippet = '') {
+     try {
+-      const res = await fetch('/api/voice_studio/branched_memories/record', {
++      const res = await fetch(apiUrl('/api/voice_studio/branched_memories/record'), {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({
+@@ -537,7 +542,7 @@ class OmniVoiceEngine {
+ 
+   async generateSFX(prompt, category = 'ambient', durationSeconds = 3.0, parameters = {}) {
+     try {
+-      const res = await fetch('/api/voice_studio/generate_sfx', {
++      const res = await fetch(apiUrl('/api/voice_studio/generate_sfx'), {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ prompt, category, duration_seconds: durationSeconds, parameters })
+@@ -966,7 +971,7 @@ class OmniVoiceEngine {
+       this.emit('state_change', 'speaking');
+       if (onStart) onStart();
+ 
+-      const response = await fetch('/api/voice/synthesize', {
++      const response = await fetch(apiUrl('/api/voice/synthesize'), {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({
+@@ -1485,7 +1490,7 @@ class OmniVoiceEngine {
+       else if (text.includes('...')) userSentiment = 'reflexivo';
+ 
+       // Send non-blocking background learning update to backend
+-      fetch('/api/voice_studio/learn_interaction', {
++      fetch(apiUrl('/api/voice_studio/learn_interaction'), {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({
+@@ -1525,6 +1530,24 @@ class OmniVoiceEngine {
+     this.emit('state_change', 'idle');
+   }
+ 
++  /**
++   * Detención total de la locución (usado por VoiceStudio → handleStopPreview y controles de voz):
++   * - Cancela speechSynthesis (cola de cláusulas de speak()/speakMultiPersonalityDialogue()).
++   * - Vacía y desactiva el flujo progresivo en tiempo real (tokens/cláusulas pendientes).
++   * - Detiene cualquier <audio> iniciado por speakWithAudioCpp() o el daemon ambiental.
++   * - Emite state_change 'idle' (lo hace stopSpeaking()).
++   */
++  stop() {
++    // 1. Flujo progresivo: sin esto, _drainProgressiveQueue() seguiría encolando cláusulas
++    //    y isPlayingProgressiveChunk quedaría atascado (el onEnd de speak() no se dispara al cancelar).
++    this.isProgressiveStreamActive = false;
++    this.progressiveQueue = [];
++    this.progressiveTokenAccumulator = '';
++    this.isPlayingProgressiveChunk = false;
++    // 2. Reutiliza la lógica de cancelación existente: <audio> audio.cpp + speechSynthesis.cancel() + 'idle'.
++    this.stopSpeaking();
++  }
++
+   /**
+    * Parses multi-personality responses into distinct speaker blocks.
+    * Accurately parses markdown headers, emojis, subtitles and list items.
+@@ -1923,7 +1946,7 @@ class OmniVoiceEngine {
+           if (onSpeechRecognized) onSpeechRecognized(transcript);
+ 
+           try {
+-            const resp = await fetch('/api/voice/daemon/ambient_perceive', {
++            const resp = await fetch(apiUrl('/api/voice/daemon/ambient_perceive'), {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({
+diff --git a/frontend/src/services/qrCode.js b/frontend/src/services/qrCode.js
+new file mode 100644
+index 00000000..deab6212
+--- /dev/null
++++ b/frontend/src/services/qrCode.js
+@@ -0,0 +1,458 @@
++/**
++ * Astraura — Generador de códigos QR 100% local (sin servicios externos)
++ * ------------------------------------------------------------------------------------------
++ * Sustituye la generación del QR del Puente Soberano vía api.qrserver.com: la URL del gateway
++ * (túnel/LAN del usuario) es información sensible y NUNCA debe salir del dispositivo.
++ *
++ * Implementa ISO/IEC 18004 sin dependencias:
++ *  - Modo Byte (UTF-8), versiones 1–10 (hasta 271 bytes en nivel L / 213 en nivel M),
++ *  - Niveles de corrección L / M / Q / H, Reed-Solomon sobre GF(256) (polinomio 0x11D),
++ *  - Patrones de función (localizadores, temporización, alineación), información de formato y versión,
++ *  - Selección automática de máscara (0–7) por puntuación de penalización.
++ *
++ * API:
++ *   encodeQR(text, { ecLevel }) → { version, size, ecLevel, mask, modules: boolean[][] }
++ *   drawQRToCanvas(canvas, text, { dark, light, quietZone, ecLevel }) → dibuja y devuelve el resultado
++ */
++
++// ───────────────────────────── Tablas (versiones 1..10) ─────────────────────────────
++// Por versión y nivel: [codewordsEC por bloque, bloques grupo1, datos/bloque g1, bloques grupo2, datos/bloque g2]
++const EC_TABLE = [
++  null,
++  { L: [7, 1, 19, 0, 0],   M: [10, 1, 16, 0, 0], Q: [13, 1, 13, 0, 0], H: [17, 1, 9, 0, 0] },
++  { L: [10, 1, 34, 0, 0],  M: [16, 1, 28, 0, 0], Q: [22, 1, 22, 0, 0], H: [28, 1, 16, 0, 0] },
++  { L: [15, 1, 55, 0, 0],  M: [26, 1, 44, 0, 0], Q: [18, 2, 17, 0, 0], H: [22, 2, 13, 0, 0] },
++  { L: [20, 1, 80, 0, 0],  M: [18, 2, 32, 0, 0], Q: [26, 2, 24, 0, 0], H: [16, 4, 9, 0, 0] },
++  { L: [26, 1, 108, 0, 0], M: [24, 2, 43, 0, 0], Q: [18, 2, 15, 2, 16], H: [22, 2, 11, 2, 12] },
++  { L: [18, 2, 68, 0, 0],  M: [16, 4, 27, 0, 0], Q: [24, 4, 19, 0, 0], H: [28, 4, 15, 0, 0] },
++  { L: [20, 2, 78, 0, 0],  M: [18, 4, 31, 0, 0], Q: [18, 2, 14, 4, 15], H: [26, 4, 13, 1, 14] },
++  { L: [24, 2, 97, 0, 0],  M: [22, 2, 38, 2, 39], Q: [22, 4, 18, 2, 19], H: [26, 4, 14, 2, 15] },
++  { L: [30, 2, 116, 0, 0], M: [22, 3, 36, 2, 37], Q: [20, 4, 16, 4, 17], H: [24, 4, 12, 4, 13] },
++  { L: [18, 2, 68, 2, 69], M: [26, 4, 43, 1, 44], Q: [24, 6, 19, 2, 20], H: [28, 6, 15, 2, 16] }
++];
++const MAX_VERSION = EC_TABLE.length - 1;
++
++// Coordenadas (fila/columna) de los centros de los patrones de alineación por versión.
++const ALIGNMENT_POS = [null, [], [6, 18], [6, 22], [6, 26], [6, 30], [6, 34], [6, 22, 38], [6, 24, 42], [6, 26, 46], [6, 28, 50]];
++
++// Indicador de nivel de corrección en la información de formato.
++const EC_BITS = { L: 1, M: 0, Q: 3, H: 2 };
++
++// ───────────────────────────── Aritmética GF(256) ─────────────────────────────
++const GF_EXP = new Uint8Array(512);
++const GF_LOG = new Uint8Array(256);
++(function initGaloisField() {
++  let x = 1;
++  for (let i = 0; i < 255; i++) {
++    GF_EXP[i] = x;
++    GF_LOG[x] = i;
++    x <<= 1;
++    if (x & 0x100) x ^= 0x11d;
++  }
++  for (let i = 255; i < 512; i++) GF_EXP[i] = GF_EXP[i - 255];
++})();
++
++function gfMul(a, b) {
++  if (a === 0 || b === 0) return 0;
++  return GF_EXP[GF_LOG[a] + GF_LOG[b]];
++}
++
++/** Polinomio generador RS de grado `degree` (coeficientes de mayor a menor grado, incluye el 1 inicial). */
++function rsGeneratorPoly(degree) {
++  let poly = [1];
++  for (let i = 0; i < degree; i++) {
++    const next = new Array(poly.length + 1).fill(0);
++    for (let j = 0; j < poly.length; j++) {
++      next[j] ^= poly[j];
++      next[j + 1] ^= gfMul(poly[j], GF_EXP[i]);
++    }
++    poly = next;
++  }
++  return poly;
++}
++
++/** Codewords de corrección de errores (resto de la división polinómica) para un bloque de datos. */
++function rsEncodeBlock(data, ecCount) {
++  const gen = rsGeneratorPoly(ecCount);
++  const remainder = new Uint8Array(ecCount);
++  for (let k = 0; k < data.length; k++) {
++    const factor = data[k] ^ remainder[0];
++    remainder.copyWithin(0, 1);
++    remainder[ecCount - 1] = 0;
++    if (factor !== 0) {
++      for (let j = 0; j < ecCount; j++) {
++        remainder[j] ^= gfMul(gen[j + 1], factor);
++      }
++    }
++  }
++  return remainder;
++}
++
++// ───────────────────────────── Codificación de datos ─────────────────────────────
++function textToUtf8Bytes(text) {
++  if (typeof TextEncoder !== 'undefined') return new TextEncoder().encode(text);
++  // Fallback para entornos sin TextEncoder
++  const raw = unescape(encodeURIComponent(text));
++  const out = new Uint8Array(raw.length);
++  for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i) & 0xff;
++  return out;
++}
++
++function totalDataCodewords(version, ecLevel) {
++  const [, g1n, g1d, g2n, g2d] = EC_TABLE[version][ecLevel];
++  return g1n * g1d + g2n * g2d;
++}
++
++/** Bits del indicador de recuento de caracteres en modo Byte (8 bits en v1–9, 16 bits en v10–26). */
++function charCountBits(version) {
++  return version <= 9 ? 8 : 16;
++}
++
++function chooseVersion(byteLength, ecLevel) {
++  for (let v = 1; v <= MAX_VERSION; v++) {
++    const needed = 4 + charCountBits(v) + byteLength * 8;
++    if (needed <= totalDataCodewords(v, ecLevel) * 8) return v;
++  }
++  return -1;
++}
++
++/** Construye los codewords de datos (modo Byte + terminador + relleno 0xEC/0x11). */
++function buildDataCodewords(bytes, version, ecLevel) {
++  const capacityBits = totalDataCodewords(version, ecLevel) * 8;
++  const bits = [];
++  const pushBits = (value, length) => {
++    for (let i = length - 1; i >= 0; i--) bits.push((value >>> i) & 1);
++  };
++
++  pushBits(0b0100, 4);                       // indicador de modo Byte
++  pushBits(bytes.length, charCountBits(version));
++  for (let i = 0; i < bytes.length; i++) pushBits(bytes[i], 8);
++
++  pushBits(0, Math.min(4, capacityBits - bits.length)); // terminador
++  while (bits.length % 8 !== 0) bits.push(0);            // alineación a byte
++  const padBytes = [0xec, 0x11];
++  for (let p = 0; bits.length < capacityBits; p++) pushBits(padBytes[p & 1], 8);
++
++  const data = new Uint8Array(capacityBits / 8);
++  for (let i = 0; i < data.length; i++) {
++    let v = 0;
++    for (let j = 0; j < 8; j++) v = (v << 1) | bits[i * 8 + j];
++    data[i] = v;
++  }
++  return data;
++}
++
++/** Divide en bloques, calcula EC por bloque e intercala datos y EC según la norma. */
++function buildFinalCodewords(data, version, ecLevel) {
++  const [ecPerBlock, g1n, g1d, g2n, g2d] = EC_TABLE[version][ecLevel];
++  const dataBlocks = [];
++  const ecBlocks = [];
++  let offset = 0;
++  for (let i = 0; i < g1n + g2n; i++) {
++    const len = i < g1n ? g1d : g2d;
++    const block = data.subarray(offset, offset + len);
++    offset += len;
++    dataBlocks.push(block);
++    ecBlocks.push(rsEncodeBlock(block, ecPerBlock));
++  }
++
++  const out = [];
++  const maxDataLen = Math.max(g1d, g2d);
++  for (let i = 0; i < maxDataLen; i++) {
++    for (const block of dataBlocks) if (i < block.length) out.push(block[i]);
++  }
++  for (let i = 0; i < ecPerBlock; i++) {
++    for (const block of ecBlocks) out.push(block[i]);
++  }
++  return out;
++}
++
++// ───────────────────────────── Matriz de módulos ─────────────────────────────
++function createGrid(size, fill) {
++  const grid = new Array(size);
++  for (let i = 0; i < size; i++) grid[i] = new Array(size).fill(fill);
++  return grid;
++}
++
++function bit(value, i) {
++  return ((value >>> i) & 1) !== 0;
++}
++
++class QRMatrix {
++  constructor(version, ecLevel) {
++    this.version = version;
++    this.ecLevel = ecLevel;
++    this.size = version * 4 + 17;
++    this.modules = createGrid(this.size, false);     // true = módulo oscuro
++    this.isFunction = createGrid(this.size, false);  // true = patrón de función / reservado
++    this.mask = -1;
++  }
++
++  setFunction(x, y, dark) {
++    this.modules[y][x] = dark;
++    this.isFunction[y][x] = true;
++  }
++
++  drawFunctionPatterns() {
++    const n = this.size;
++    // Patrones de temporización
++    for (let i = 0; i < n; i++) {
++      this.setFunction(6, i, i % 2 === 0);
++      this.setFunction(i, 6, i % 2 === 0);
++    }
++    // Localizadores (con separador) en tres esquinas
++    this.drawFinder(3, 3);
++    this.drawFinder(n - 4, 3);
++    this.drawFinder(3, n - 4);
++    // Patrones de alineación (omitiendo los que solapan localizadores)
++    const pos = ALIGNMENT_POS[this.version];
++    const last = pos.length - 1;
++    for (let i = 0; i < pos.length; i++) {
++      for (let j = 0; j < pos.length; j++) {
++        const overlapsFinder = (i === 0 && j === 0) || (i === 0 && j === last) || (i === last && j === 0);
++        if (!overlapsFinder) this.drawAlignment(pos[i], pos[j]);
++      }
++    }
++    // Reserva de información de formato (se sobrescribe con la máscara definitiva) y de versión
++    this.drawFormatBits(0);
++    this.drawVersionBits();
++  }
++
++  drawFinder(cx, cy) {
++    for (let dy = -4; dy <= 4; dy++) {
++      for (let dx = -4; dx <= 4; dx++) {
++        const x = cx + dx;
++        const y = cy + dy;
++        if (x < 0 || y < 0 || x >= this.size || y >= this.size) continue;
++        const dist = Math.max(Math.abs(dx), Math.abs(dy));
++        this.setFunction(x, y, dist !== 2 && dist !== 4);
++      }
++    }
++  }
++
++  drawAlignment(cx, cy) {
++    for (let dy = -2; dy <= 2; dy++) {
++      for (let dx = -2; dx <= 2; dx++) {
++        this.setFunction(cx + dx, cy + dy, Math.max(Math.abs(dx), Math.abs(dy)) !== 1);
++      }
++    }
++  }
++
++  /** Información de formato: 5 bits (nivel EC + máscara) + 10 bits BCH, enmascarados con 0x5412. */
++  drawFormatBits(mask) {
++    const data = (EC_BITS[this.ecLevel] << 3) | mask;
++    let rem = data;
++    for (let i = 0; i < 10; i++) rem = (rem << 1) ^ ((rem >>> 9) * 0x537);
++    const bits = ((data << 10) | rem) ^ 0x5412;
++    const n = this.size;
++
++    // Primera copia (alrededor del localizador superior izquierdo)
++    for (let i = 0; i <= 5; i++) this.setFunction(8, i, bit(bits, i));
++    this.setFunction(8, 7, bit(bits, 6));
++    this.setFunction(8, 8, bit(bits, 7));
++    this.setFunction(7, 8, bit(bits, 8));
++    for (let i = 9; i < 15; i++) this.setFunction(14 - i, 8, bit(bits, i));
++
++    // Segunda copia (junto a los otros dos localizadores)
++    for (let i = 0; i < 8; i++) this.setFunction(n - 1 - i, 8, bit(bits, i));
++    for (let i = 8; i < 15; i++) this.setFunction(8, n - 15 + i, bit(bits, i));
++    this.setFunction(8, n - 8, true); // módulo oscuro fijo
++  }
++
++  /** Información de versión (solo v7+): 6 bits de versión + 12 bits BCH. */
++  drawVersionBits() {
++    if (this.version < 7) return;
++    let rem = this.version;
++    for (let i = 0; i < 12; i++) rem = (rem << 1) ^ ((rem >>> 11) * 0x1f25);
++    const bits = (this.version << 12) | rem;
++    const n = this.size;
++    for (let i = 0; i < 18; i++) {
++      const b = bit(bits, i);
++      const a = n - 11 + (i % 3);
++      const c = Math.floor(i / 3);
++      this.setFunction(a, c, b);
++      this.setFunction(c, a, b);
++    }
++  }
++
++  /** Coloca los codewords en zigzag de derecha a izquierda, saltando la columna de temporización. */
++  drawCodewords(codewords) {
++    const n = this.size;
++    let i = 0;
++    const totalBits = codewords.length * 8;
++    for (let right = n - 1; right >= 1; right -= 2) {
++      if (right === 6) right = 5;
++      for (let vert = 0; vert < n; vert++) {
++        for (let j = 0; j < 2; j++) {
++          const x = right - j;
++          const upward = ((right + 1) & 2) === 0;
++          const y = upward ? n - 1 - vert : vert;
++          if (!this.isFunction[y][x] && i < totalBits) {
++            this.modules[y][x] = bit(codewords[i >>> 3], 7 - (i & 7));
++            i++;
++          }
++        }
++      }
++    }
++  }
++
++  /** Aplica (o revierte, por ser XOR) la máscara indicada sobre los módulos de datos. */
++  applyMask(mask) {
++    const n = this.size;
++    for (let y = 0; y < n; y++) {
++      for (let x = 0; x < n; x++) {
++        if (this.isFunction[y][x]) continue;
++        let invert = false;
++        switch (mask) {
++          case 0: invert = (x + y) % 2 === 0; break;
++          case 1: invert = y % 2 === 0; break;
++          case 2: invert = x % 3 === 0; break;
++          case 3: invert = (x + y) % 3 === 0; break;
++          case 4: invert = (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0; break;
++          case 5: invert = ((x * y) % 2) + ((x * y) % 3) === 0; break;
++          case 6: invert = (((x * y) % 2) + ((x * y) % 3)) % 2 === 0; break;
++          case 7: invert = (((x + y) % 2) + ((x * y) % 3)) % 2 === 0; break;
++          default: invert = false;
++        }
++        if (invert) this.modules[y][x] = !this.modules[y][x];
++      }
++    }
++  }
++
++  /** Puntuación de penalización (reglas 1–4 de la norma). Cuanto menor, mejor máscara. */
++  penaltyScore() {
++    const n = this.size;
++    const m = this.modules;
++    let score = 0;
++    const FINDER_A = [true, false, true, true, true, false, true, false, false, false, false];
++    const FINDER_B = [false, false, false, false, true, false, true, true, true, false, true];
++
++    const scanLine = (getter) => {
++      // Regla 1: rachas de ≥5 módulos iguales
++      let run = 1;
++      for (let i = 1; i < n; i++) {
++        if (getter(i) === getter(i - 1)) {
++          run++;
++          if (run === 5) score += 3;
++          else if (run > 5) score += 1;
++        } else {
++          run = 1;
++        }
++      }
++      // Regla 3: patrones similares al localizador (1011101 + 0000 a un lado)
++      for (let i = 0; i + 11 <= n; i++) {
++        let matchA = true;
++        let matchB = true;
++        for (let k = 0; k < 11; k++) {
++          const v = getter(i + k);
++          if (v !== FINDER_A[k]) matchA = false;
++          if (v !== FINDER_B[k]) matchB = false;
++          if (!matchA && !matchB) break;
++        }
++        if (matchA) score += 40;
++        if (matchB) score += 40;
++      }
++    };
++
++    for (let y = 0; y < n; y++) scanLine((i) => m[y][i]);
++    for (let x = 0; x < n; x++) scanLine((i) => m[i][x]);
++
++    // Regla 2: bloques 2×2 del mismo color
++    for (let y = 0; y < n - 1; y++) {
++      for (let x = 0; x < n - 1; x++) {
++        const c = m[y][x];
++        if (c === m[y][x + 1] && c === m[y + 1][x] && c === m[y + 1][x + 1]) score += 3;
++      }
++    }
++
++    // Regla 4: desviación de la proporción de módulos oscuros respecto al 50 %
++    let dark = 0;
++    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (m[y][x]) dark++;
++    const total = n * n;
++    const k = Math.ceil(Math.abs(dark * 20 - total * 10) / total) - 1;
++    score += Math.max(0, k) * 10;
++    return score;
++  }
++
++  selectAndApplyBestMask() {
++    let bestMask = 0;
++    let bestScore = Infinity;
++    for (let mask = 0; mask < 8; mask++) {
++      this.applyMask(mask);
++      this.drawFormatBits(mask);
++      const score = this.penaltyScore();
++      if (score < bestScore) {
++        bestScore = score;
++        bestMask = mask;
++      }
++      this.applyMask(mask); // revierte (XOR)
++    }
++    this.applyMask(bestMask);
++    this.drawFormatBits(bestMask);
++    this.mask = bestMask;
++  }
++}
++
++// ───────────────────────────── API pública ─────────────────────────────
++
++/**
++ * Codifica `text` en una matriz QR.
++ * @param {string} text Texto/URL a codificar (UTF-8).
++ * @param {{ ecLevel?: 'L'|'M'|'Q'|'H', mask?: number }} options `mask` fuerza una máscara (0–7); por defecto se elige la mejor.
++ * @returns {{ version: number, size: number, ecLevel: string, mask: number, modules: boolean[][] }}
++ */
++export function encodeQR(text, options = {}) {
++  const ecLevel = EC_BITS[options.ecLevel] !== undefined ? options.ecLevel : 'M';
++  const bytes = textToUtf8Bytes(String(text ?? ''));
++  const version = chooseVersion(bytes.length, ecLevel);
++  if (version < 0) {
++    const maxBytes = Math.floor((totalDataCodewords(MAX_VERSION, ecLevel) * 8 - 4 - charCountBits(MAX_VERSION)) / 8);
++    throw new Error(`Texto demasiado largo para un QR local (máx. ${maxBytes} bytes en nivel ${ecLevel}).`);
++  }
++
++  const data = buildDataCodewords(bytes, version, ecLevel);
++  const codewords = buildFinalCodewords(data, version, ecLevel);
++
++  const matrix = new QRMatrix(version, ecLevel);
++  matrix.drawFunctionPatterns();
++  matrix.drawCodewords(codewords);
++  if (Number.isInteger(options.mask) && options.mask >= 0 && options.mask <= 7) {
++    matrix.applyMask(options.mask);
++    matrix.drawFormatBits(options.mask);
++    matrix.mask = options.mask;
++  } else {
++    matrix.selectAndApplyBestMask();
++  }
++
++  return { version, size: matrix.size, ecLevel, mask: matrix.mask, modules: matrix.modules };
++}
++
++/**
++ * Dibuja el QR de `text` en un <canvas> (usa todo el ancho/alto del canvas, centrado, con zona de silencio).
++ * @param {HTMLCanvasElement} canvas
++ * @param {string} text
++ * @param {{ dark?: string, light?: string, quietZone?: number, ecLevel?: 'L'|'M'|'Q'|'H' }} options
++ */
++export function drawQRToCanvas(canvas, text, options = {}) {
++  const { dark = '#000000', light = '#ffffff', quietZone = 4, ecLevel = 'M' } = options;
++  const qr = encodeQR(text, { ecLevel });
++  const ctx = canvas.getContext('2d');
++  if (!ctx) throw new Error('Canvas 2D no disponible');
++
++  const width = canvas.width;
++  const height = canvas.height;
++  const cells = qr.size + quietZone * 2;
++  const scale = Math.max(1, Math.floor(Math.min(width, height) / cells));
++  const offsetX = Math.floor((width - scale * qr.size) / 2);
++  const offsetY = Math.floor((height - scale * qr.size) / 2);
++
++  ctx.fillStyle = light;
++  ctx.fillRect(0, 0, width, height);
++  ctx.fillStyle = dark;
++  for (let y = 0; y < qr.size; y++) {
++    for (let x = 0; x < qr.size; x++) {
++      if (qr.modules[y][x]) ctx.fillRect(offsetX + x * scale, offsetY + y * scale, scale, scale);
++    }
++  }
++  return qr;
++}
+diff --git a/scripts/compact_memory_docs.py b/scripts/compact_memory_docs.py
+new file mode 100755
+index 00000000..07b75549
+--- /dev/null
++++ b/scripts/compact_memory_docs.py
+@@ -0,0 +1,75 @@
++#!/usr/bin/env python3
++"""
++compact_memory_docs.py — Compacta el memory root de Astraura (Adenda 153).
++
++Los motores automáticos (imaginación, enrutamiento de medios, sueños, enjambre)
++llenaron `memory_docs.json` con decenas de miles de documentos sintéticos
++(24 MB) que se reescribían enteros en cada alta y bloqueaban la sincronización.
++
++Este script:
++  · separa los documentos AUTOGENERADOS (categorías «Almacenamiento Enrutado»,
++    «Exocórtex Autorizado/Sincronizado», «Imaginación…», «Sueño…») de los
++    documentos humanos/semilla;
++  · conserva los N más recientes por categoría (--keep, defecto 150);
++  · archiva el resto comprimido en `starseed_memory_root/archive/` (nada se pierde);
++  · escribe el memory root compacto.
++
++Uso: python3 scripts/compact_memory_docs.py [--apply] [--keep 150] [--root data/starseed_memory_root]
++Sin --apply solo informa (dry-run).
++"""
++import argparse
++import gzip
++import json
++import re
++import time
++from collections import defaultdict
++from pathlib import Path
++
++ROOT = Path(__file__).resolve().parent.parent
++AUTOGEN = re.compile(r"^(Almacenamiento Enrutado|Exoc[oó]rtex (Autorizado|Sincronizado)|Imaginaci[oó]n|Sue[ñn]o)", re.I)
++
++
++def main() -> None:
++    ap = argparse.ArgumentParser()
++    ap.add_argument("--apply", action="store_true")
++    ap.add_argument("--keep", type=int, default=150)
++    ap.add_argument("--root", default=None)
++    a = ap.parse_args()
++    candidates = [Path(a.root)] if a.root else [ROOT / "data" / "starseed_memory_root", ROOT / "backend" / "data" / "starseed_memory_root"]
++    root = next((c for c in candidates if (c / "memory_docs.json").exists()), None)
++    if not root:
++        print("No se encontró memory_docs.json en", [str(c) for c in candidates]); return
++    f = root / "memory_docs.json"
++    docs = json.loads(f.read_text(encoding="utf-8"))
++    if not isinstance(docs, list):
++        print("Formato inesperado (no es lista)."); return
++    by_cat = defaultdict(list)
++    human = []
++    for d in docs:
++        cat = str(d.get("category") or "")
++        (by_cat[cat] if AUTOGEN.match(cat) else human).append(d)
++    keep, archive = [], []
++    for cat, items in by_cat.items():
++        items.sort(key=lambda d: float(d.get("created_at") or 0), reverse=True)
++        keep.extend(items[: a.keep]); archive.extend(items[a.keep:])
++    compact = human + keep
++    size_mb = f.stat().st_size / 1e6
++    print(f"Memory root: {f}\n  total {len(docs)} docs · {size_mb:.1f} MB\n  humanos/semilla {len(human)} · autogenerados {sum(len(v) for v in by_cat.values())} en {len(by_cat)} categorías\n  → conservar {len(compact)} · archivar {len(archive)}")
++    for cat, items in sorted(by_cat.items(), key=lambda kv: -len(kv[1])):
++        print(f"    {len(items):6d}  {cat}")
++    if not a.apply:
++        print("\n(dry-run) Añade --apply para compactar."); return
++    arch_dir = root / "archive"; arch_dir.mkdir(exist_ok=True)
++    stamp = time.strftime("%Y%m%d-%H%M%S")
++    backup = arch_dir / f"memory_docs_full_{stamp}.json.gz"
++    with gzip.open(backup, "wt", encoding="utf-8") as g:
++        json.dump(docs, g, ensure_ascii=False)
++    if archive:
++        with gzip.open(arch_dir / f"memory_docs_autogen_{stamp}.json.gz", "wt", encoding="utf-8") as g:
++            json.dump(archive, g, ensure_ascii=False)
++    f.write_text(json.dumps(compact, indent=2, ensure_ascii=False), encoding="utf-8")
++    print(f"\n✓ compactado: {len(compact)} docs · copia completa en {backup.name} · {f.stat().st_size/1e6:.1f} MB")
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/scripts/purge_secrets_from_repo.sh b/scripts/purge_secrets_from_repo.sh
+new file mode 100755
+index 00000000..5587fab7
+--- /dev/null
++++ b/scripts/purge_secrets_from_repo.sh
+@@ -0,0 +1,14 @@
++#!/usr/bin/env bash
++# purge_secrets_from_repo.sh — saca del ÍNDICE de git los archivos con claves (Adenda 153).
++# No reescribe el historial: para eso (recomendado tras rotar), usa git filter-repo:
++#   pip install git-filter-repo && git filter-repo --invert-paths \
++#     --path data/personality_apis.json --path data/agent_apis.json \
++#     --path backend/data/personality_apis.json --path backend/data/agent_apis.json
++set -euo pipefail
++cd "$(dirname "$0")/.."
++for f in data/personality_apis.json data/agent_apis.json backend/data/personality_apis.json backend/data/agent_apis.json data/sensorium/sensorium_location.json; do
++  if git ls-files --error-unmatch "$f" >/dev/null 2>&1; then
++    git rm --cached -q "$f" && echo "  ✓ quitado del índice: $f"
++  fi
++done
++echo "Ahora: git commit -m 'security: claves y ubicación fuera del repo (Adenda 153)'"
+diff --git a/scripts/rotate_keys.py b/scripts/rotate_keys.py
+new file mode 100755
+index 00000000..72d42393
+--- /dev/null
++++ b/scripts/rotate_keys.py
+@@ -0,0 +1,57 @@
++#!/usr/bin/env python3
++"""
++rotate_keys.py — Rota TODAS las claves de API de personalidades y agentes (Adenda 153).
++
++Las claves antiguas vivían en `data/*_apis.json` y `backend/data/*_apis.json`
++(commiteadas en git → comprometidas). Ahora viven en `~/.astraura/keys/`
++(o `ASTRAURA_KEYS_DIR`). Este script:
++  1. revoca y regenera cada clave activa con los engines oficiales;
++  2. imprime las claves NUEVAS UNA sola vez (guárdalas en tu gestor);
++  3. sobrescribe las copias antiguas del repo con un placeholder vacío.
++
++Uso:  cd backend && python3 ../scripts/rotate_keys.py [--dry-run]
++"""
++import json
++import os
++import sys
++from pathlib import Path
++
++HERE = Path(__file__).resolve().parent
++ROOT = HERE.parent
++BACKEND = ROOT / "backend"
++sys.path.insert(0, str(BACKEND))
++os.chdir(BACKEND)
++
++dry = "--dry-run" in sys.argv
++
++from app.core.personality_api_engine import personality_api_engine  # noqa: E402
++from app.core.agent_vault_engine import agent_vault_engine  # noqa: E402
++
++rotated = []
++for pid in list(personality_api_engine.api_records.keys()):
++    if dry:
++        rotated.append(("personalidad", pid, "(dry-run)"))
++        continue
++    res = personality_api_engine.regenerate_api_key(pid)
++    key = (res.get("new_api_key") or res.get("api_key") or "?")
++    rotated.append(("personalidad", pid, key))
++
++for aid in list(agent_vault_engine.api_records.keys()):
++    if dry:
++        rotated.append(("agente", aid, "(dry-run)"))
++        continue
++    res = agent_vault_engine.regenerate_agent_api_key(aid)
++    key = (res.get("new_api_key") or res.get("api_key") or "?")
++    rotated.append(("agente", aid, key))
++
++print("\n🔐 Claves rotadas (cópialas AHORA; no se vuelven a mostrar completas):")
++for kind, ident, key in rotated:
++    print(f"  {kind:12s} {ident:28s} {key}")
++
++legacy = [ROOT / "data" / "personality_apis.json", ROOT / "data" / "agent_apis.json",
++          BACKEND / "data" / "personality_apis.json", BACKEND / "data" / "agent_apis.json"]
++for f in legacy:
++    if f.exists() and not dry:
++        f.write_text(json.dumps({"_note": "claves movidas a ~/.astraura/keys (Adenda 153); este archivo ya no contiene secretos"}, indent=2), encoding="utf-8")
++        print(f"  🧹 placeholder escrito en {f}")
++print("\nSiguiente paso: bash scripts/purge_secrets_from_repo.sh  (quita los archivos del índice de git)")

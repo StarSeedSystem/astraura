@@ -318,7 +318,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (Resume en 2 a 4 viñetas breves, en ...)",
       "strength": 1.0,
-      "updated_at": 1788331498.212904
+      "updated_at": 1788380911.449435
     },
     "Access": {
       "id": "Access",
@@ -1078,7 +1078,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (busca en internet qué es browser-us...)",
       "strength": 1.0,
-      "updated_at": 1788331498.176203
+      "updated_at": 1788380911.3892312
     },
     "Browser": {
       "id": "Browser",
@@ -2846,7 +2846,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (usando las herramientas y accesos d...)",
       "strength": 1.0,
-      "updated_at": 1788324050.314664
+      "updated_at": 1788376473.499277
     },
     "Class": {
       "id": "Class",
@@ -2934,7 +2934,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (Resume en 2 a 4 viñetas breves, en ...)",
       "strength": 1.0,
-      "updated_at": 1788331498.195775
+      "updated_at": 1788380911.4080791
     },
     "Cambio": {
       "id": "Cambio",
@@ -2942,7 +2942,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (Resume en 2 a 4 viñetas breves, en ...)",
       "strength": 1.0,
-      "updated_at": 1788331498.228308
+      "updated_at": 1788380911.4225569
     },
     "Reciente": {
       "id": "Reciente",
@@ -2950,7 +2950,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (Resume en 2 a 4 viñetas breves, en ...)",
       "strength": 1.0,
-      "updated_at": 1788331498.240949
+      "updated_at": 1788380911.439455
     },
     "Config": {
       "id": "Config",
@@ -2974,7 +2974,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (Resume en 2 a 4 viñetas breves, en ...)",
       "strength": 1.0,
-      "updated_at": 1788331498.254006
+      "updated_at": 1788380911.459743
     },
     "Sync": {
       "id": "Sync",
@@ -2990,7 +2990,7 @@
       "category": "Learned Concept",
       "description": "Concepto destilado de interacción (Resume en 2 a 4 viñetas breves, en ...)",
       "strength": 1.0,
-      "updated_at": 1788247506.79036
+      "updated_at": 1788380771.797614
     },
     "Rounded": {
       "id": "Rounded",
@@ -8958,7 +8958,7 @@
       "source": "Text",
       "target": "Usuario",
       "relation": "asociado_con",
-      "weight": 0.75
+      "weight": 0.85
     },
     {
       "source": "Usuario",

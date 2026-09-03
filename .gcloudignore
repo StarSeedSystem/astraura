@@ -1,0 +1,7 @@
+# Contexto mínimo para gcloud run deploy --source: SOLO backend.
+# Excluye datos masivos, frontend y artefactos para no llenar el disco al empaquetar.
+*
+!backend/
+!backend/**
+!Dockerfile
+!requirements.txt
