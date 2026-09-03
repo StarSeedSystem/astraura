@@ -37,3 +37,6 @@ sleep 2
 # Relanzar monitor en background (desatado de la sesión)
 nohup bash "$PROJECT_DIR/tunnel_monitor.sh" >/dev/null 2>&1 &
 echo "[$(date)] Monitor relanzado (pid $!)" >> "$LOG"
+
+# (2026-09-03) Anunciar el túnel en la nube StarSeed para que el OS lo encuentre.
+bash "$(dirname "$0")/deploy/nube/anunciar-tunel.sh" >/dev/null 2>&1 || true

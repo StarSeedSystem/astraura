@@ -1,6 +1,14 @@
-# Poner Astraura en línea gratis (sin tarjeta)
+# Astraura en línea, gratis y sin tarjeta
 
-## Opción A — Hugging Face Spaces (recomendada: 2 vCPU, 16 GB RAM, gratis)
+## YA DESPLEGADO · https://astraura-nube.vercel.app  (Vercel, siempre encendido)
+Código en `deploy/nube/vercel/` (main.py + pyproject.toml). Es el **punto de
+encuentro público**: dice quién está vivo y dónde, y nunca deja al usuario sin
+IA (`/api/fuentes`). Redespliegue: `cd deploy/nube/vercel && vercel deploy --prod`.
+Endpoints: `/api/status` · `/api/neurona` (túnel anunciado y su salud) · `/api/fuentes`.
+
+## Para el backend COMPLETO (inferencia, enjambre, memorias)
+
+## Opción A — Hugging Face Spaces  ⚠️ los Spaces Docker YA NO son gratis (piden PRO, 9 $/mes; los gratuitos son solo estáticos)
 1. Crea una cuenta en https://huggingface.co (gratis, sin tarjeta).
 2. New Space → nombre `astraura-nube` → **SDK: Docker** → Public.
 3. En el Space: Settings → **Variables and secrets** → añade SUPABASE_URL,
