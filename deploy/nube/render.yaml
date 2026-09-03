@@ -1,0 +1,15 @@
+# Alternativa gratuita sin tarjeta (512 MB, se duerme a los 15 min de inactividad).
+services:
+  - type: web
+    name: astraura-nube
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./deploy/nube/Dockerfile.hf
+    dockerContext: .
+    healthCheckPath: /api/status
+    envVars:
+      - key: ASTRAURA_MODE
+        value: nube
+      - key: PORT
+        value: "7860"

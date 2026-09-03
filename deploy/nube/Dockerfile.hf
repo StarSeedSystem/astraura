@@ -1,0 +1,27 @@
+# ==========================================================================
+# ASTRAURA 1.58-BIT · edición NUBE (Hugging Face Spaces · Docker · CPU free)
+# 2 vCPU · 16 GB RAM · sin tarjeta. El Space escucha SIEMPRE en el puerto 7860.
+# Secretos (Supabase, R2, claves de IA) se ponen en Settings → Variables and
+# secrets del Space; NUNCA en este archivo.
+# ==========================================================================
+FROM python:3.11-slim
+
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 PIP_NO_CACHE_DIR=1 \
+    ASTRAURA_MODE=nube PORT=7860 HOME=/home/user
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential gcc g++ libxml2-dev libxslt-dev libjpeg-dev zlib1g-dev curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Usuario sin privilegios (requisito de HF Spaces)
+RUN useradd -m -u 1000 user
+USER user
+WORKDIR $HOME/app
+
+COPY --chown=user backend/requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir -r requirements.txt
+
+COPY --chown=user backend ./backend
+EXPOSE 7860
+HEALTHCHECK --interval=60s --timeout=5s --start-period=40s \
+  CMD curl -fsS http://127.0.0.1:7860/api/status || exit 1
+CMD ["python", "-m", "uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "7860"]
