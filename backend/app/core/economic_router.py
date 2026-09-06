@@ -8,6 +8,14 @@ con síntesis determinista LOCAL (sin gastar un LLM extra en resumir).
 Principios:
   · Local primero: bitnet-158-local (coste 0, soberano) es el predeterminado,
     igual que ENRUTADO_POR_DEFECTO de agent_genesis_engine.
+  · Subagente local = BitNet nativo (2026-09-06): en la Mac de Alex (8 GB RAM)
+    cada corrida de run_synced_subagents recargaba qwen2.5:1.5b (1,16 GB) en
+    Ollama y dejaba sin memoria a la voz neuronal (~900 MB) y al oído VibeASR
+    (~1,7 GB), mientras el llama-server BitNet propio (b1.58, perfil
+    `background`) ya estaba cargado y ocioso. Por eso el subagente local habla
+    con el BitNet nativo vía bitnet_cpp_manager (endpoint OpenAI-compatible
+    `POST {base}/v1/chat/completions`); Ollama queda SOLO como respaldo
+    explícito (variable de entorno ASTRAURA_OLLAMA_RESPALDO=1).
   · Remoto gratis solo como fallback (OpenRouter :free), nunca pago salvo que
     el usuario autorice EXPLÍCITAMENTE la capa REMOTO_PAGO (default OFF).
   · La clasificación de tareas es heurística local pura — ninguna llamada a
@@ -25,12 +33,21 @@ import os
 import re
 import time
 import uuid
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 try:
     import httpx
 except Exception:  # pragma: no cover — degradación honesta si falta httpx
     httpx = None
+
+# BitNet nativo (llama-server de engine/bitnet_cpp_manager.py). Importado con
+# protección para que este router siga siendo importable en la nube, donde no
+# existe el gestor de BitNet: en ese caso todo lo local cae al respaldo Ollama
+# (si está activado) o a degradado honesto.
+try:
+    from ..engine.bitnet_cpp_manager import bitnet_cpp_manager
+except Exception:  # pragma: no cover — nube sin BitNet
+    bitnet_cpp_manager = None
 
 # ─────────────────────────────────────────────────────────────────────────
 # Catálogo de modelos clasificados por coste/capacidad
@@ -99,22 +116,47 @@ def _openrouter_key() -> Optional[str]:
     return clave or None
 
 
+def _respaldo_ollama_activado() -> bool:
+    """Ollama es SOLO respaldo explícito: requiere ASTRAURA_OLLAMA_RESPALDO=1."""
+    return (os.environ.get("ASTRAURA_OLLAMA_RESPALDO") or "").strip() == "1"
+
+
+def _bitnet_nativo_vivo() -> bool:
+    """¿Está vivo (o levantable) el llama-server BitNet nativo? Vivo si algún
+    perfil responde `listo`/`cargando`, o si hay GGUF en disco
+    (models_available → ensure_server podrá levantarlo)."""
+    global bitnet_cpp_manager
+    if bitnet_cpp_manager is None:
+        return False
+    try:
+        for perfil in ("background", "interactive"):
+            probe = bitnet_cpp_manager.probe_port(perfil, force=False)
+            if (probe or {}).get("state") in ("listo", "cargando"):
+                return True
+        status = bitnet_cpp_manager.check_status() or {}
+        return bool(status.get("models_available"))
+    except Exception:
+        return False
+
+
 def _modelo_disponible_localmente(modelo: Dict[str, Any]) -> bool:
-    """¿Está vivo el motor local? Sondeo barato a Ollama (1s máx), con cache
-    corta para no sondear en cada prompt."""
-    if modelo["proveedor"] != "bitnet-158-local" or httpx is None:
-        return True  # remotos no dependen de Ollama
+    """¿Está vivo el motor local? BitNet nativo primero; Ollama SOLO si el
+    respaldo está activado (ASTRAURA_OLLAMA_RESPALDO=1). Caché corta de 15 s
+    para no sondear en cada prompt."""
+    if modelo["proveedor"] != "bitnet-158-local":
+        return True  # remotos no dependen del motor local
     ahora = time.time()
     cache = EconomicRouter._cache_local
     if cache["at"] and (ahora - cache["at"]) < 15.0:
         return bool(cache["vivo"])
-    url = (os.environ.get("ASTRAURA_OLLAMA_URL") or "http://127.0.0.1:11434").rstrip("/")
-    vivo = False
-    try:
-        resp = httpx.get(f"{url}/api/tags", timeout=1.5)
-        vivo = resp.status_code == 200
-    except Exception:
-        vivo = False
+    vivo = _bitnet_nativo_vivo()
+    if not vivo and _respaldo_ollama_activado() and httpx is not None:
+        url = (os.environ.get("ASTRAURA_OLLAMA_URL") or "http://127.0.0.1:11434").rstrip("/")
+        try:
+            resp = httpx.get(f"{url}/api/tags", timeout=1.5)
+            vivo = resp.status_code == 200
+        except Exception:
+            vivo = False
     cache["at"] = ahora
     cache["vivo"] = vivo
     return vivo
@@ -347,8 +389,7 @@ class EconomicRouter:
         t0 = time.perf_counter()
         try:
             if modelo["proveedor"] == "bitnet-158-local":
-                texto = await self._generar_local(prompt)
-                origen = "ollama-local"
+                texto, origen = await self._generar_local(prompt)
             else:
                 texto = await self._generar_openrouter(modelo["id"], prompt)
                 origen = "openrouter"
@@ -360,9 +401,50 @@ class EconomicRouter:
             return {"ok": False, "subagente": sub_id, "modelo": modelo["id"],
                     "error": str(e)}
 
-    async def _generar_local(self, prompt: str) -> str:
-        """Llama a Ollama directamente (el chat usará bitnet_engine; aquí solo
-        necesitamos una respuesta cruda y barata para el subagente local)."""
+    async def _generar_local(self, prompt: str) -> Tuple[str, str]:
+        """Genera con el motor local. PRIMERO el BitNet nativo (llama-server
+        OpenAI-compatible gestionado por bitnet_cpp_manager, perfil
+        `background`, que no carga otro LLM en RAM porque ya está residente);
+        SOLO si falla y está activado el respaldo explícito
+        (ASTRAURA_OLLAMA_RESPALDO=1) cae a Ollama.
+
+        Devuelve (texto, origen) con origen "bitnet-nativo" u "ollama-local".
+        """
+        if httpx is None:
+            raise RuntimeError("httpx no disponible")
+        motivo_fallo = ""
+        if bitnet_cpp_manager is not None:
+            try:
+                base = await asyncio.to_thread(
+                    bitnet_cpp_manager.ensure_server, 20.0, "background")
+                if base:
+                    async with httpx.AsyncClient(timeout=_TIMEOUT_LLAMADA_S) as c:
+                        r = await c.post(
+                            f"{base.rstrip('/')}/v1/chat/completions",
+                            json={"model": "bitnet-158",
+                                  "messages": [{"role": "user", "content": prompt}],
+                                  "max_tokens": 512, "temperature": 0.7,
+                                  "stream": False})
+                        r.raise_for_status()
+                        datos = r.json() or {}
+                        texto = ((datos.get("choices") or [{}])[0].get("message") or {}).get("content") or ""
+                    if texto.strip():
+                        return texto.strip(), "bitnet-nativo"
+                    motivo_fallo = "BitNet nativo respondió vacío"
+                else:
+                    motivo_fallo = "BitNet nativo no disponible (ensure_server devolvió vacío)"
+            except Exception as e:
+                motivo_fallo = f"BitNet nativo falló: {e}"
+            if not _respaldo_ollama_activado():
+                raise RuntimeError(f"{motivo_fallo} y respaldo Ollama desactivado")
+        elif not _respaldo_ollama_activado():
+            raise RuntimeError("BitNet nativo no disponible y respaldo Ollama desactivado")
+        return await self._generar_ollama(prompt), "ollama-local"
+
+    async def _generar_ollama(self, prompt: str) -> str:
+        """Respaldo explícito vía Ollama (solo si ASTRAURA_OLLAMA_RESPALDO=1).
+        Recargar qwen2.5:1.5b (~1,16 GB) en la Mac de 8 GB compite con la voz
+        neuronal y el oído VibeASR, por eso no es el camino por defecto."""
         if httpx is None:
             raise RuntimeError("httpx no disponible")
         url = (os.environ.get("ASTRAURA_OLLAMA_URL") or "http://127.0.0.1:11434").rstrip("/")
@@ -414,6 +496,11 @@ class EconomicRouter:
             "autorizacion_pago": self.autorizar_pago,
             "openrouter_configurado": bool(_openrouter_key()),
             "local_vivo": _modelo_disponible_localmente(CATALOGO_MODELOS[0]),
+            "motor_local": ("bitnet-nativo" if _bitnet_nativo_vivo()
+                            else ("ollama" if (_respaldo_ollama_activado()
+                                               and _modelo_disponible_localmente(CATALOGO_MODELOS[0]))
+                                  else "ninguno")),
+            "respaldo_ollama": _respaldo_ollama_activado(),
             "catalogo": CATALOGO_MODELOS, "estadisticas": dict(self._stats),
         }
 
