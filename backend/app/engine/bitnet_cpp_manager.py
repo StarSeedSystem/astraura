@@ -84,7 +84,8 @@ class BitNetCppManager:
                 else:
                     perfiles = ("interactive",)  # shared: un solo server
                 for perfil in perfiles:
-                    st = self._servers.get(perfil, {})
+                    # (Ola 256) Clave compartida: ambos perfiles miran la misma entrada.
+                    st = self._servers.get(self._clave_servidor(perfil), {})
                     proc = st.get("proc")
                     # ¿El proc existe y está vivo?
                     vivo = proc is not None and proc.poll() is None
@@ -296,6 +297,26 @@ class BitNetCppManager:
         except Exception:
             return True  # sin poder medir, preferimos COMPARTIR (no dos servers OOM)
 
+    def _clave_servidor(self, profile: str) -> str:
+        """Clave de `self._servers` para un perfil.
+
+        (Ola 256 · 2026-09-06) En modo compartido (Mac de 8 GB) los dos perfiles
+        deben leer y escribir LA MISMA entrada de servidor: mismo `proc`, mismo
+        flag `_launching`, misma `base`. Antes `_port_for()` ya devolvía el mismo
+        puerto para ambos, pero `self._servers` seguía teniendo UNA ENTRADA POR
+        PERFIL, así que el flag `_launching` (que evita el doble lanzamiento) y
+        el `proc` del perfil interactive eran invisibles para el background y
+        viceversa. Resultado medido en vivo en el Mac de Alex (log
+        /tmp/astraura_launchd.log): «llama-server nativo (background) lanzado
+        (pid 23834, puerto 8790)» y «llama-server nativo (interactive) lanzado
+        (pid 23837, puerto 8790)» — DOS procesos sobre el MISMO puerto; el
+        segundo bind() falla y muere, y mientras tanto las peticiones recibían
+        «RemoteProtocolError: Server disconnected» y el motor caía a Ollama.
+        """
+        if self._servidor_compartido():
+            return "interactive"
+        return profile
+
     def _port_for(self, profile: str) -> int:
         if self._servidor_compartido():
             return self.server_port
@@ -334,7 +355,9 @@ class BitNetCppManager:
         base = f"http://127.0.0.1:{port}"
         now = time.time()
         if not force:
-            cached = self._probe_cache.get(profile)
+            # (Ola 256) Caché por clave compartida: en modo compartido ambos
+            # perfiles consultan el MISMO puerto, misma sonda y misma caché.
+            cached = self._probe_cache.get(self._clave_servidor(profile))
             if cached and (now - float(cached.get("at", 0.0))) < self.PROBE_TTL:
                 return cached["result"]
         result: Dict[str, Any]
@@ -362,7 +385,7 @@ class BitNetCppManager:
         except Exception as exc:
             # Connection refused / timeout / DNS-lo-que-sea: nada real ahí.
             result = {"state": "apagado", "base": None, "error": f"{type(exc).__name__}"}
-        self._probe_cache[profile] = {"at": now, "result": result}
+        self._probe_cache[self._clave_servidor(profile)] = {"at": now, "result": result}
         return result
 
     def _alive(self, profile: str, timeout: float = 1.5) -> bool:
@@ -478,11 +501,15 @@ class BitNetCppManager:
         if profile not in ("interactive", "background"):
             profile = "interactive"
         with self._server_lock:
-            st = self._servers.get(profile) or {}
+            # (Ola 256) Clave compartida: en modo compartido ambos perfiles
+            # leen/escriben LA MISMA entrada (mismo proc, mismo _launching),
+            # así el segundo perfil ve el lanzamiento en curso del primero.
+            clave = self._clave_servidor(profile)
+            st = self._servers.get(clave) or {}
             proc = st.get("proc")
             if proc is not None and proc.poll() is not None:
                 st = {}
-                self._servers[profile] = st
+                self._servers[clave] = st
 
             probe = self.probe_port(profile, force=True)
             port = self._port_for(profile)
@@ -492,7 +519,7 @@ class BitNetCppManager:
                 # Vivo YA — lo hayamos lanzado nosotros o no. Adoptar y salir.
                 if not st.get("base"):
                     print(f"[BitNetCppManager] llama-server ({profile}, puerto {port}) ya estaba vivo — adoptado, no se lanza otro.")
-                self._servers[profile] = {**st, "base": base, "port": port, "model": st.get("model") or "(externo, adoptado)"}
+                self._servers[clave] = {**st, "base": base, "port": port, "model": st.get("model") or "(externo, adoptado)"}
                 return base
 
             if probe["state"] == "respondiendo_sin_modelo":
@@ -507,8 +534,8 @@ class BitNetCppManager:
                 # o ajeno (otro proceso ganó la carrera de arranque): en ambos
                 # casos ya hay UN bind en curso. No lanzamos un segundo; solo
                 # anotamos su base_url y esperamos más abajo.
-                self._servers[profile] = {**st, "base": base, "port": port}
-                st = self._servers[profile]
+                self._servers[clave] = {**st, "base": base, "port": port}
+                st = self._servers[clave]
 
             elif probe["state"] == "apagado":
                 # (Verificación 1.58 · Adenda 169 · RACE FIX) Si YA hay un lanzamiento
@@ -519,8 +546,8 @@ class BitNetCppManager:
                 # justo antes del Popen y se limpia al registrar el proc o al fallar.
                 if st.get("_launching"):
                     # Ya se está lanzando: esperar a que esté listo abajo.
-                    self._servers[profile] = {**st, "base": base, "port": port}
-                    st = self._servers[profile]
+                    self._servers[clave] = {**st, "base": base, "port": port}
+                    st = self._servers[clave]
                 elif not st.get("proc") or (st.get("proc") and st["proc"].poll() is not None):
                     # Nada vivo en el puerto ni proc nuestro sano: aquí sí lanzar.
                     binary = self.server_binary()
@@ -588,19 +615,19 @@ class BitNetCppManager:
                             except Exception:
                                 pass
                     # Flag de lanzamiento en curso (evita race de doble-bind).
-                    self._servers[profile] = {**st, "_launching": True}
+                    self._servers[clave] = {**st, "_launching": True}
                     proc = subprocess.Popen(cmd, stdout=log, stderr=log, cwd=str(self.repo_dir), preexec_fn=preexec)
-                    self._servers[profile] = {"proc": proc, "base": base, "model": model_path, "port": port, "_launching": False}
+                    self._servers[clave] = {"proc": proc, "base": base, "model": model_path, "port": port, "_launching": False}
                     print(f"[BitNetCppManager] llama-server nativo ({profile}) lanzado (pid {proc.pid}, puerto {port}, modelo {Path(model_path).name})")
                 except Exception as e:
                     print(f"[BitNetCppManager] no se pudo lanzar llama-server ({profile}): {e}")
-                    self._servers[profile] = {}
+                    self._servers[clave] = {}
                     return None
         deadline = time.time() + max(0.0, wait_seconds)
         while time.time() < deadline:
             if self._alive(profile):
-                return self._servers[profile]["base"]
-            proc = (self._servers.get(profile) or {}).get("proc")
+                return self._servers[clave]["base"]
+            proc = (self._servers.get(clave) or {}).get("proc")
             if proc is not None and proc.poll() is not None:
                 # Nuestro intento de bind pudo perder una carrera contra OTRO
                 # proceso lanzando el mismo perfil casi a la vez (dos backends
@@ -610,15 +637,15 @@ class BitNetCppManager:
                 # real cargando justo al lado.
                 probe = self.probe_port(profile, force=True)
                 if probe["state"] in ("listo", "arrancando"):
-                    self._servers[profile] = {"base": probe["base"], "port": self._port_for(profile), "model": (self._servers.get(profile) or {}).get("model")}
+                    self._servers[clave] = {"base": probe["base"], "port": self._port_for(profile), "model": (self._servers.get(clave) or {}).get("model")}
                     if probe["state"] == "listo":
                         return probe["base"]
                     time.sleep(1.0)
                     continue
-                self._servers[profile] = {}
+                self._servers[clave] = {}
                 return None
             time.sleep(1.0)
-        st = self._servers.get(profile) or {}
+        st = self._servers.get(clave) or {}
         return st.get("base") if (wait_seconds == 0 or self._alive(profile)) else None
 
     def server_ready(self, profile: str = "interactive") -> bool:
@@ -643,7 +670,8 @@ class BitNetCppManager:
         }
         for profile in ("interactive", "background"):
             probe = self.probe_port(profile)
-            st = self._servers.get(profile) or {}
+            # (Ola 256) En modo compartido ambos perfiles miran la MISMA entrada.
+            st = self._servers.get(self._clave_servidor(profile)) or {}
             proc = st.get("proc")
             local_running = proc is not None and proc.poll() is None
             state = probe["state"]
@@ -662,6 +690,16 @@ class BitNetCppManager:
                 "managed_locally": local_running,
             }
         inter = out["profiles"].get("interactive") or {}
+        if self._servidor_compartido():
+            # (Ola 256) Modo compartido: hay UN solo llama-server, así que el
+            # perfil background refleja EXACTAMENTE el estado de interactive
+            # (mismo proc, mismos slots) y lo declara con "compartido": true.
+            # Antes cada perfil miraba su propia entrada y background podía
+            # aparecer "apagado" con el server compartido vivo — lo que animaba
+            # a lanzar un segundo bind sobre el mismo puerto (ver _clave_servidor).
+            out["profiles"]["background"] = {**inter, "compartido": True}
+            out["profiles"]["interactive"]["compartido"] = True
+        out["compartido"] = self._servidor_compartido()
         out["running"] = bool(inter.get("running"))
         out["ready"] = bool(inter.get("ready"))
         out["base_url"] = inter.get("base_url")

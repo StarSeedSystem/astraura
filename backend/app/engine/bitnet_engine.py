@@ -234,6 +234,11 @@ class BitNetUnifiedEngine:
             este bloque, solo reestructurado en una funcion para poder invertir
             el orden de intento por perfil (ver mas abajo)."""
             nonlocal ollama_failed
+            # (Ola 256 · 2026-09-06) Diagnóstico inmediato: si llegamos aquí es
+            # porque BitNet nativo cedió el turno. Lo dejamos escrito en el log
+            # con su motivo, para no tener que reconstruir la causa a posteriori.
+            if bitnet_failed:
+                print(f"[BitNetUnifiedEngine] BitNet nativo cedió el turno, intentando Ollama como respaldo — motivo: {bitnet_failed}")
             # 1. Try streaming from local high-performance neural engine (Ollama)
             ollama_models = await self.get_available_ollama_models()
             if ollama_models:
@@ -308,7 +313,13 @@ class BitNetUnifiedEngine:
                                 "prompt": prompt,
                                 "system": effective_system_prompt,
                                 "stream": True,
-                                "keep_alive": "30m",
+                                # (Ola 256 · 2026-09-06) En una Mac de 8 GB Ollama es
+                                # SOLO el respaldo de BitNet: si se queda 30 min
+                                # residente (qwen2.5:1.5b ≈ 1,16 GB) roba la memoria
+                                # de la voz neuronal y del oído 1.58 y deja el sistema
+                                # sin aire. Por eso el keep_alive por defecto baja a
+                                # 2 min; configurable con ASTRAURA_OLLAMA_KEEP_ALIVE.
+                                "keep_alive": os.environ.get("ASTRAURA_OLLAMA_KEEP_ALIVE") or "2m",
                                 "options": {
                                     "temperature": max(0.2, min(0.85, temperature)),
                                     "num_predict": max_tokens,
