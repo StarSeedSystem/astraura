@@ -38,6 +38,23 @@ class BitNetCppManager:
         self._servers: Dict[str, Dict[str, Any]] = {}
         self._server_log = Path(os.environ.get("ASTRAURA_BITNET_LOG") or (self.repo_dir.parent / "bitnet-server.log"))
         self.server_port = int(os.environ.get("ASTRAURA_BITNET_PORT") or 8790)
+        # (Ola 256 · 2026-09-06 · SIGSEGV EN BLAS) Micro-lote físico del server.
+        # CAUSA RAÍZ verificada en la Mac de Alex (Apple Silicon, 8 GB): el
+        # llama-server nativo se caía con SIGSEGV en `dequantize_row_i2_s`,
+        # llamado desde `ggml_backend_blas_mul_mat` — 25 informes idénticos ese
+        # día en ~/Library/Logs/DiagnosticReports/llama-server-*.ips — cada vez
+        # que procesaba un prompt real de ≥ 32 tokens. El backend BLAS
+        # (Accelerate) de ggml solo se usa para lotes de ≥ 32 tokens, y su ruta
+        # dequantiza el tensor i2_s con una función que NO soporta ese formato;
+        # el decode token a token (lotes de 1) va por los kernels CPU de BitNet
+        # y funciona (17 tok/s medidos). Con los valores por defecto
+        # (-b 2048 / -ub 512) todo prompt de chat entraba en BLAS y el server
+        # moría, el manager lo relanzaba (68 relanzamientos) y el motor caía a
+        # Ollama. Fijando -ub/-b en 24 (< 32) el lote físico NUNCA alcanza el
+        # umbral BLAS: un prompt de 400 tokens se procesa en ~17 microlotes por
+        # los kernels i2_s de CPU, que sí funcionan. Se puede subir con
+        # ASTRAURA_BITNET_UBATCH si algún día se compila BitNet sin BLAS.
+        self.server_ubatch = int(os.environ.get("ASTRAURA_BITNET_UBATCH") or 24)
         # Contexto AJUSTADO A LA RAM DE LA MÁQUINA, no una constante.
         #
         # Por qué: este Mac tiene 8 GB y ya corre Ollama residente (~1 GB) más
@@ -233,6 +250,9 @@ class BitNetCppManager:
             "is_compiled": is_compiled,
             "repo_path": str(self.repo_dir),
             "models_available": found_models,
+            # (Ola 256) Micro-lote del server (-ub/-b): bajo el umbral BLAS de
+            # 32 tokens que segfaulteaba en `dequantize_row_i2_s`.
+            "ubatch": self.server_ubatch,
             "recommended_models": [
                 {
                     "name": "BitNet-b1.58-2B-4T (i2_s)",
@@ -452,6 +472,31 @@ class BitNetCppManager:
             elif len(uniq) <= 1:
                 verdict = {"ok": False, "reason": f"salida degenerada (un solo caracter repetido: {txt.strip()[:12]!r}) — bitnet.cpp no tiene kernel i2_s vectorial para ARM", "sample": txt, "tps": tps}
             else:
+                # (Ola 256 · 2026-09-06) Sonda de PROMPT LARGO (≥64 tokens):
+                # el server podía pasar la sonda corta y MORIR al primer prompt
+                # real (SIGSEGV en `dequantize_row_i2_s` ← `ggml_backend_blas_mul_mat`,
+                # 25 crashes el 2026-09-06: el backend BLAS solo entra con lotes
+                # ≥32 tokens). Un server que solo sirve prompts cortos NO es sano:
+                # si esta petición se desconecta o no responde 200, la excepción
+                # cae en el `except` de abajo y la sonda se declara fallida.
+                prompt_largo = (
+                    "El motor BitNet local responde en español con coherencia y detalle. " * 8
+                ).strip()
+                req_largo = urllib.request.Request(
+                    f"{base}/completion",
+                    json.dumps({"prompt": prompt_largo, "n_predict": 8, "temperature": 0.1}).encode(),
+                    {"Content-Type": "application/json"},
+                )
+                # Techo propio y corto (≤15 s): el presupuesto grande de arriba
+                # era para el primer decode tras cargar el modelo; este prefill
+                # largo va por CPU y en un server sano no tarda nada así.
+                _largo_timeout = float(os.environ.get("ASTRAURA_BITNET_SANITY_LARGO_TIMEOUT") or 15.0)
+                with urllib.request.urlopen(req_largo, timeout=_largo_timeout) as res_largo:
+                    if res_largo.status != 200:
+                        raise RuntimeError(f"prompt largo: HTTP {res_largo.status}")
+                    data_largo = json.loads(res_largo.read().decode())
+                if not str(data_largo.get("content") or "").strip():
+                    raise RuntimeError("prompt largo: el server no devolvió texto")
                 lento = bool(tps and tps < 1.0)
                 motivo = (
                     f"correcto ({tps:.2f} tok/s)" if not lento
@@ -476,6 +521,65 @@ class BitNetCppManager:
         self._sanity = verdict
         print(f"[BitNetCppManager] sonda del motor nativo: {'OK' if verdict['ok'] else 'NO USABLE'} — {verdict['reason']}")
         return verdict
+
+    def _argumentos_servidor(self, binary: Path, model_path: str, port: int, threads: int) -> List[str]:
+        """Lista de argumentos del llama-server nativo, extraída de
+        `ensure_server` para poder comprobarla en tests sin lanzar procesos.
+
+        (Ola 256 · 2026-09-06) Incluye `-ub`/`-b` = `self.server_ubatch` (24 por
+        defecto): ver el comentario de `self.server_ubatch` en `__init__` —
+        SIGSEGV en `dequantize_row_i2_s` ← `ggml_backend_blas_mul_mat` con
+        lotes ≥ 32 tokens; 24 mantiene todo prefill por los kernels CPU i2_s.
+        """
+        return [
+            str(binary), "-m", model_path,
+            "--host", "127.0.0.1", "--port", str(port),
+            "-t", str(threads), "-c", str(self.server_ctx),
+            "--parallel", str(self.server_parallel),
+            # (Ola 256 · 2026-09-06) -ub (microlote físico) y -b (lote lógico)
+            # por debajo del umbral de 32 tokens que activa el backend BLAS
+            # (Accelerate), cuya ruta `dequantize_row_i2_s` hace segfault con el
+            # GGUF i2_s. 24 < 32: todo prompt largo se trocea en microlotes que
+            # van por los kernels CPU de BitNet, que sí funcionan.
+            "-ub", str(self.server_ubatch),
+            "-b", str(self.server_ubatch),
+            # (Adenda 173 · 2026-08-28 · CORRECCIÓN FINAL) El GGUF tensor-only
+            # NO trae plantilla de chat embebida; el tokenizer_config.json que
+            # acompaña al GGUF declara pre_tokenizer=null / model type=None, así
+            # que --jinja SOLO usaba un placeholder roto y el modelo REGURGITABA
+            # datos de entrenamiento ("Question: In the context of a presidential
+            # election...").  VERIFICADO EN VIVO: pasar explícitamente la
+            # plantilla Llama-3 Instruct oficial (llama3_chat_template.jinja, al
+            # lado del repo) devuelve "¡Hola! Estoy aquí para ayudarte. ¿En qué
+            # puedo ayudarte?" — coherente y siguiendo el system prompt. Por eso
+            # se FUERZA --chat-template-file con la plantilla Llama-3 correcta.
+            "--jinja", "--chat-template-file",
+            str(self.repo_dir.parent / "llama3_chat_template.jinja"),
+            # (Adenda 173 · 2026-08-28) El GGUF tensor-only NO declara
+            # pre-tokenizer (log del server: "missing pre-tokenizer type,
+            # using: 'default' -> GENERATION QUALITY WILL BE DEGRADED").
+            # BitNet-b1.58-2B-4T es arquitectura Llama-3, así que fijamos
+            # explícitamente el pre-tokenizer llama-bpe (igual que el build
+            # oficial de bitnet.cpp). Sin esto el vocab se tokeniza mal y el
+            # modelo emite basura ("嗯", bucles). El tokenizer.json al lado del
+            # GGUF aporta el vocabulario correcto; este override aporta el
+            # pre-tokenizer que el GGUF no trae.
+            "--override-kv", "tokenizer.ggml.pre=str:llama-bpe",
+            # (Adenda 160) CPU PURA, obligatorio. El backend Metal NO
+            # implementa el tipo i2_s (ggml-metal-device.cpp: "not
+            # implemented" → "Asserting on type 36" → SIGABRT): con
+            # descarga a GPU, llama-server se estrella al primer decode.
+            # Ademas es lo correcto: el kernel ternario de BitNet es de
+            # CPU (ARM NEON / AVX2); la GPU no aporta nada aqui.
+            "-ngl", "0",
+            # (Adenda 169 · OOM en ctx largo) El KV-cache en f16 reserva
+            # RAM anonima que escala con el contexto y produce OOM-kill
+            # en 8 GB durante inferencias largas. Cuantizar KV a q8_0
+            # (~la mitad de RAM que f16) da gran margen sin perder
+            # coherencia: BitNet-b1.58-2B-4T es robusto a q8_0 en KV.
+            "-ctk", "q8_0",
+            "-ctv", "q8_0",
+        ]
 
     def ensure_server(self, wait_seconds: float = 0.0, profile: str = "interactive") -> Optional[str]:
         """Arranca (si hace falta) el llama-server nativo del PERFIL pedido con el GGUF
@@ -564,48 +668,7 @@ class BitNetCppManager:
                     # footprint de RAM de inferencia ~4x vs 8, evitando el OOM que
                     # mataba el server durante la generación larga de chat.
                     threads = max(1, min(2, cpu))
-                    cmd = [
-                        str(binary), "-m", model_path,
-                        "--host", "127.0.0.1", "--port", str(port),
-                        "-t", str(threads), "-c", str(self.server_ctx),
-                        "--parallel", str(self.server_parallel),
-                        # (Adenda 173 · 2026-08-28 · CORRECCIÓN FINAL) El GGUF tensor-only
-                        # NO trae plantilla de chat embebida; el tokenizer_config.json que
-                        # acompaña al GGUF declara pre_tokenizer=null / model type=None, así
-                        # que --jinja SOLO usaba un placeholder roto y el modelo REGURGITABA
-                        # datos de entrenamiento ("Question: In the context of a presidential
-                        # election...").  VERIFICADO EN VIVO: pasar explícitamente la
-                        # plantilla Llama-3 Instruct oficial (llama3_chat_template.jinja, al
-                        # lado del repo) devuelve "¡Hola! Estoy aquí para ayudarte. ¿En qué
-                        # puedo ayudarte?" — coherente y siguiendo el system prompt. Por eso
-                        # se FUERZA --chat-template-file con la plantilla Llama-3 correcta.
-                        "--jinja", "--chat-template-file",
-                        str(self.repo_dir.parent / "llama3_chat_template.jinja"),
-                        # (Adenda 173 · 2026-08-28) El GGUF tensor-only NO declara
-                        # pre-tokenizer (log del server: "missing pre-tokenizer type,
-                        # using: 'default' -> GENERATION QUALITY WILL BE DEGRADED").
-                        # BitNet-b1.58-2B-4T es arquitectura Llama-3, así que fijamos
-                        # explícitamente el pre-tokenizer llama-bpe (igual que el build
-                        # oficial de bitnet.cpp). Sin esto el vocab se tokeniza mal y el
-                        # modelo emite basura ("嗯", bucles). El tokenizer.json al lado del
-                        # GGUF aporta el vocabulario correcto; este override aporta el
-                        # pre-tokenizer que el GGUF no trae.
-                        "--override-kv", "tokenizer.ggml.pre=str:llama-bpe",
-                        # (Adenda 160) CPU PURA, obligatorio. El backend Metal NO
-                        # implementa el tipo i2_s (ggml-metal-device.cpp: "not
-                        # implemented" → "Asserting on type 36" → SIGABRT): con
-                        # descarga a GPU, llama-server se estrella al primer decode.
-                        # Ademas es lo correcto: el kernel ternario de BitNet es de
-                        # CPU (ARM NEON / AVX2); la GPU no aporta nada aqui.
-                        "-ngl", "0",
-                        # (Adenda 169 · OOM en ctx largo) El KV-cache en f16 reserva
-                        # RAM anonima que escala con el contexto y produce OOM-kill
-                        # en 8 GB durante inferencias largas. Cuantizar KV a q8_0
-                        # (~la mitad de RAM que f16) da gran margen sin perder
-                        # coherencia: BitNet-b1.58-2B-4T es robusto a q8_0 en KV.
-                        "-ctk", "q8_0",
-                        "-ctv", "q8_0",
-                    ]
+                    cmd = self._argumentos_servidor(binary, model_path, port, threads)
                     log = open(self._server_log, "ab")
                     preexec = None
                     if profile == "background" and hasattr(os, "nice"):
@@ -665,6 +728,7 @@ class BitNetCppManager:
             "port": self.server_port,
             "ctx": self.server_ctx,
             "parallel": self.server_parallel,
+            "ubatch": self.server_ubatch,
             "log": str(self._server_log),
             "profiles": {},
         }

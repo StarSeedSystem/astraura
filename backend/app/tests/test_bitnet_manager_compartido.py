@@ -70,3 +70,42 @@ def test_modo_separado_puertos_distintos() -> None:
     puerto_bg = BitNetCppManager._port_for(obj, "background")
     assert puerto_it == 8790
     assert puerto_bg == puerto_it + 1
+
+
+# ── (Ola 256 · 2026-09-06) -ub/-b contra el SIGSEGV de BLAS ──────────────────
+# En la Mac de Alex el llama-server nativo moría con SIGSEGV en
+# `dequantize_row_i2_s` ← `ggml_backend_blas_mul_mat` (25 crashes ese día) con
+# cualquier prompt de ≥ 32 tokens, porque el backend BLAS solo se activa con
+# lotes ≥ 32 y no soporta dequantizar i2_s. El manager debe lanzar el server
+# con `-ub`/`-b` = 24 (< 32) por defecto, configurable con ASTRAURA_BITNET_UBATCH.
+
+
+def test_ubatch_por_defecto_es_24(monkeypatch: Any) -> None:
+    """Sin variable de entorno, el micro-lote físico queda en 24 (< 32, bajo el
+    umbral del backend BLAS que segfaulteaba)."""
+    monkeypatch.delenv("ASTRAURA_BITNET_UBATCH", raising=False)
+    mgr = BitNetCppManager()
+    assert mgr.server_ubatch == 24
+
+
+def test_ubatch_respeta_variable_de_entorno(monkeypatch: Any) -> None:
+    """ASTRAURA_BITNET_UBATCH tiene prioridad (por si algún día se compila
+    BitNet sin BLAS y se puede volver al lote grande)."""
+    monkeypatch.setenv("ASTRAURA_BITNET_UBATCH", "48")
+    mgr = BitNetCppManager()
+    assert mgr.server_ubatch == 48
+
+
+def test_argumentos_servidor_llevan_ub_y_b(monkeypatch: Any) -> None:
+    """La lista de argumentos que alimenta el Popen de `ensure_server` debe
+    incluir `-ub 24` y `-b 24` (o el valor del entorno), para que ningún lote
+    físico alcance el umbral BLAS de 32 tokens. No lanza procesos."""
+    monkeypatch.delenv("ASTRAURA_BITNET_UBATCH", raising=False)
+    mgr = BitNetCppManager()
+    cmd = BitNetCppManager._argumentos_servidor(
+        mgr, binary=Path("llama-server"), model_path="modelo.gguf", port=8790, threads=2
+    )
+    assert "-ub" in cmd and "-b" in cmd
+    valor = str(mgr.server_ubatch)
+    assert cmd[cmd.index("-ub") + 1] == valor
+    assert cmd[cmd.index("-b") + 1] == valor
