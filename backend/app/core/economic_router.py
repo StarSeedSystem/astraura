@@ -101,6 +101,16 @@ CATALOGO_MODELOS: List[Dict[str, Any]] = [
 _OPENROUTER_CHAT_URL = "https://openrouter.ai/api/v1/chat/completions"
 _TIMEOUT_LLAMADA_S = 45.0
 
+# Presupuesto PROPIO del subagente local BitNet nativo (2026-09-06, Ola 256):
+# en la Mac de Alex (CPU, modelo 1.58-bit) el llama-server mide ~9 tokens/s,
+# así que los 45 s pensados para la nube y los 512 tokens del ensayo anterior
+# hacen que SIEMPRE salte httpx.ReadTimeout (512 tok ≈ 57 s). El subagente
+# local es una OPINIÓN BREVE, no un ensayo: 256 tokens máx. y 150 s dan holgura
+# sin colgar la corrida. Son overrideables por entorno para calibrar sin tocar
+# código. La llamada a Ollama y a OpenRouter siguen con _TIMEOUT_LLAMADA_S.
+_TIMEOUT_BITNET_S = float(os.environ.get("ASTRAURA_BITNET_SUBAGENTE_TIMEOUT_S") or 150.0)
+_MAX_TOKENS_BITNET = int(os.environ.get("ASTRAURA_BITNET_SUBAGENTE_MAX_TOKENS") or 256)
+
 
 def _openrouter_key() -> Optional[str]:
     """Mismo patrón que agent_genesis_engine._openrouter_key(). Sin credenciales
@@ -418,12 +428,17 @@ class EconomicRouter:
                 base = await asyncio.to_thread(
                     bitnet_cpp_manager.ensure_server, 20.0, "background")
                 if base:
-                    async with httpx.AsyncClient(timeout=_TIMEOUT_LLAMADA_S) as c:
+                    # Presupuesto propio del subagente local: no el de la nube
+                    # (_TIMEOUT_LLAMADA_S), porque a ~9 tok/s en CPU el BitNet
+                    # necesita más margen; y _MAX_TOKENS_BITNET para no pedirle
+                    # un ensayo que nunca terminará.
+                    async with httpx.AsyncClient(
+                            timeout=httpx.Timeout(_TIMEOUT_BITNET_S, connect=10.0)) as c:
                         r = await c.post(
                             f"{base.rstrip('/')}/v1/chat/completions",
                             json={"model": "bitnet-158",
                                   "messages": [{"role": "user", "content": prompt}],
-                                  "max_tokens": 512, "temperature": 0.7,
+                                  "max_tokens": _MAX_TOKENS_BITNET, "temperature": 0.7,
                                   "stream": False})
                         r.raise_for_status()
                         datos = r.json() or {}
@@ -434,7 +449,10 @@ class EconomicRouter:
                 else:
                     motivo_fallo = "BitNet nativo no disponible (ensure_server devolvió vacío)"
             except Exception as e:
-                motivo_fallo = f"BitNet nativo falló: {e}"
+                # str(ReadTimeout("")) es cadena vacía y dejaba el motivo en
+                # blanco; nombrar el TIPO hace el fallo diagnosticable (mismo
+                # arreglo que ya se aplicó en bitnet_engine.py).
+                motivo_fallo = f"BitNet nativo falló: {type(e).__name__}: {e}".rstrip(": ")
             if not _respaldo_ollama_activado():
                 raise RuntimeError(f"{motivo_fallo} y respaldo Ollama desactivado")
         elif not _respaldo_ollama_activado():
@@ -501,6 +519,8 @@ class EconomicRouter:
                                                and _modelo_disponible_localmente(CATALOGO_MODELOS[0]))
                                   else "ninguno")),
             "respaldo_ollama": _respaldo_ollama_activado(),
+            "subagente_local": {"timeout_s": _TIMEOUT_BITNET_S,
+                                "max_tokens": _MAX_TOKENS_BITNET},
             "catalogo": CATALOGO_MODELOS, "estadisticas": dict(self._stats),
         }
 
