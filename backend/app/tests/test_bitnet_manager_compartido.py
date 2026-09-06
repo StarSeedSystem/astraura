@@ -109,3 +109,61 @@ def test_argumentos_servidor_llevan_ub_y_b(monkeypatch: Any) -> None:
     valor = str(mgr.server_ubatch)
     assert cmd[cmd.index("-ub") + 1] == valor
     assert cmd[cmd.index("-b") + 1] == valor
+
+
+# ── (Ola 256 · 2026-09-06) BitNet que DUERME por inactividad ─────────────────
+# El llama-server nativo ocupaba ~1,2 GB residentes las 24 h en la Mac de 8 GB
+# de Alex aunque nadie hablara con Astraura; con la voz neuronal y el oído el
+# sistema quedaba al límite (3,8 GB de swap). Ahora el manager lo duerme tras
+# ASTRAURA_BITNET_SUENO_MIN minutos sin uso (0 = nunca) y la siguiente petición
+# lo despierta. Estas pruebas ejercitan `_dormir_si_toca` SIN hilos, puertos
+# ni procesos: parchean `stop_server` y usan un `proc` falso.
+
+
+import time as _time
+
+
+class _ProcFalso:
+    """Subproceso falso: `poll()` devuelve None (sigue vivo)."""
+
+    def poll(self) -> Any:
+        return None
+
+
+def test_sueno_cero_nunca_duerme(monkeypatch: Any) -> None:
+    """Con ASTRAURA_BITNET_SUENO_MIN=0 el manager NUNCA marca dormido, aunque el
+    ultimo uso sea del año pasado y haya un server nuestro vivo."""
+    monkeypatch.setenv("ASTRAURA_BITNET_SUENO_MIN", "0")
+    mgr = BitNetCppManager()
+    mgr._ultimo_uso = _time.time() - 999999
+    mgr._servers = {"interactive": {"proc": _ProcFalso()}}
+    assert mgr.sueno_min == 0
+    assert mgr._dormir_si_toca() is False
+    assert mgr._dormido is False
+
+
+def test_dormir_si_toca_duerme_y_llama_a_stop_server(monkeypatch: Any) -> None:
+    """Con un sueño corto y el ultimo uso en el pasado, UNA llamada a
+    `_dormir_si_toca` devuelve True, apaga via `stop_server` y marca _dormido."""
+    monkeypatch.setenv("ASTRAURA_BITNET_SUENO_MIN", "0.001")  # ~60 ms
+    mgr = BitNetCppManager()
+    llamadas: list = []
+    monkeypatch.setattr(mgr, "stop_server", lambda: llamadas.append("stop"))
+    mgr._servers = {"interactive": {"proc": _ProcFalso()}}
+    mgr._ultimo_uso = _time.time() - 3600  # hace una hora
+    assert mgr._dormir_si_toca() is True
+    assert mgr._dormido is True
+    assert llamadas == ["stop"]
+
+
+def test_marcar_uso_despierta_el_motor(monkeypatch: Any) -> None:
+    """`marcar_uso()` (que llama `ensure_server` al entrar) limpia `_dormido` y
+    refresca el sello de ultimo uso: es el DESPERTAR del motor."""
+    monkeypatch.setenv("ASTRAURA_BITNET_SUENO_MIN", "10")
+    mgr = BitNetCppManager()
+    mgr._dormido = True
+    mgr._ultimo_uso = _time.time() - 3600
+    mgr.marcar_uso()
+    assert mgr._dormido is False
+    assert _time.time() - mgr._ultimo_uso < 5
+

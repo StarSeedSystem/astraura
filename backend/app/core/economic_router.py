@@ -110,6 +110,12 @@ _TIMEOUT_LLAMADA_S = 45.0
 # código. La llamada a Ollama y a OpenRouter siguen con _TIMEOUT_LLAMADA_S.
 _TIMEOUT_BITNET_S = float(os.environ.get("ASTRAURA_BITNET_SUBAGENTE_TIMEOUT_S") or 150.0)
 _MAX_TOKENS_BITNET = int(os.environ.get("ASTRAURA_BITNET_SUBAGENTE_MAX_TOKENS") or 256)
+# (Ola 256 · 2026-09-06 · BITNET QUE DUERME) Espera del subagente al lanzar/
+# despertar el llama-server nativo. Antes era 20 s fijos: desde que el server
+# duerme por inactividad (ASTRAURA_BITNET_SUENO_MIN), al despertar el GGUF
+# tarda 10-40 s en cargar en la Mac de Alex, y con 20 s el subagente declaraba
+# el motor caído con la carga aún en marcha. Ajustable por entorno.
+_DESPERTAR_BITNET_S = float(os.environ.get("ASTRAURA_BITNET_DESPERTAR_S") or 60.0)
 
 
 def _openrouter_key() -> Optional[str]:
@@ -426,7 +432,7 @@ class EconomicRouter:
         if bitnet_cpp_manager is not None:
             try:
                 base = await asyncio.to_thread(
-                    bitnet_cpp_manager.ensure_server, 20.0, "background")
+                    bitnet_cpp_manager.ensure_server, _DESPERTAR_BITNET_S, "background")
                 if base:
                     # Presupuesto propio del subagente local: no el de la nube
                     # (_TIMEOUT_LLAMADA_S), porque a ~9 tok/s en CPU el BitNet
@@ -520,7 +526,12 @@ class EconomicRouter:
                                   else "ninguno")),
             "respaldo_ollama": _respaldo_ollama_activado(),
             "subagente_local": {"timeout_s": _TIMEOUT_BITNET_S,
+                                "despertar_s": _DESPERTAR_BITNET_S,
                                 "max_tokens": _MAX_TOKENS_BITNET},
+            # (Ola 256 · BITNET QUE DUERME) El motor nativo auto-suspendido por
+            # inactividad NO está caído: despierta con la siguiente petición.
+            "motor_dormido": bool(getattr(bitnet_cpp_manager, "_dormido", False))
+                             if bitnet_cpp_manager is not None else False,
             "catalogo": CATALOGO_MODELOS, "estadisticas": dict(self._stats),
         }
 

@@ -81,6 +81,19 @@ class BitNetCppManager:
         self.server_parallel = max(1, int(os.environ.get("ASTRAURA_BITNET_PAR") or self._parallel_segun_hardware()))
         self._server_lock = threading.Lock()  # un solo spawn aunque llamen N corrutinas a la vez
 
+        # (Ola 256 · 2026-09-06 · BITNET QUE DUERME) Auto-suspensión por
+        # inactividad, igual que el demonio de voz (auto-sleep a los 10 min).
+        # Por qué: el llama-server nativo ocupa ~1,2 GB residentes las 24 h
+        # aunque nadie hable con Astraura; con la voz neuronal (900 MB) y el
+        # oído VibeASR (1,7 GB) la Mac de 8 GB de Alex quedaba con 15-60 MB
+        # libres y 3,8 GB de swap, y el oído tardaba 4× más. Con el sueño
+        # activo, tras N minutos sin uso el supervisor apaga el server y la
+        # RAM vuelve; la siguiente petición lo despierta (ensure_server).
+        # 0 = nunca duerme (ASTRAURA_BITNET_SUENO_MIN).
+        self.sueno_min = float(os.environ.get("ASTRAURA_BITNET_SUENO_MIN") or 10)
+        self._ultimo_uso = time.time()  # el arranque del backend cuenta como uso
+        self._dormido = False  # True = server apagado por inactividad (no por fallo)
+
         # (Adenda 169 · SUPERVISOR KEEP-ALIVE) En 8 GB el llama-server BitNet nativo
         # muere tras servir 1-2 inferencias (bug "cleaning up before exit" de
         # bitnet.cpp en ARM). Para que el motor nativo esté casi siempre listo
@@ -92,45 +105,89 @@ class BitNetCppManager:
         )
         self._supervisor_thread.start()
 
+    def marcar_uso(self) -> None:
+        """Registra actividad real del motor (cada petición de generación pasa
+        por `ensure_server`) y, si estaba dormido, lo marca como despierto.
+
+        (Ola 256 · 2026-09-06) Limpia `_dormido` aquí — no en el supervisor —
+        porque el despertar lo causa SIEMPRE una petición entrante: el estado
+        refleja la intención lo antes posible y el supervisor deja de saltarse
+        el relanzamiento en el mismo ciclo."""
+        self._ultimo_uso = time.time()
+        self._dormido = False
+
+    def _dormir_si_toca(self) -> bool:
+        """Apaga el llama-server propio si lleva más de `sueno_min` sin uso.
+
+        Devuelve True si acaba de dormirlo. Extraído del bucle supervisor para
+        probarlo sin hilos ni procesos reales. Reglas deliberadas:
+          · `sueno_min == 0` desactiva el sueño por completo.
+          · Solo duerme servers NUESTROS (con `proc` vivo): un server adoptado
+            (lanzado a mano por Alex) no tiene `proc` y NO se apaga nunca.
+          · Si hay un lanzamiento en curso (`_launching`) no se duerme: matar
+            el server a mitad de carga del GGUF lo dejaría en estado inválido.
+        """
+        if self._dormido:
+            return False
+        if self.sueno_min <= 0:
+            return False
+        if (time.time() - self._ultimo_uso) <= self.sueno_min * 60:
+            return False
+        for st in list(self._servers.values()):
+            proc = st.get("proc")
+            if proc is not None and proc.poll() is None:
+                if st.get("_launching"):
+                    return False
+                self.stop_server()
+                self._dormido = True
+                print(f"[BitNetCppManager] llama-server dormido tras {self.sueno_min:g} min sin uso "
+                      f"(libera ~1,2 GB); despierta con la siguiente petición")
+                return True
+        return False
+
     def _supervisor_loop(self) -> None:
         """Relanza servers nativos muertos cada pocos segundos (keep-alive)."""
         while not self._supervisor_stop.is_set():
             try:
-                if not self._servidor_compartido():
-                    perfiles = ("interactive", "background")
-                else:
-                    perfiles = ("interactive",)  # shared: un solo server
-                for perfil in perfiles:
-                    # (Ola 256) Clave compartida: ambos perfiles miran la misma entrada.
-                    st = self._servers.get(self._clave_servidor(perfil), {})
-                    proc = st.get("proc")
-                    # ¿El proc existe y está vivo?
-                    vivo = proc is not None and proc.poll() is None
-                    if vivo:
-                        # Sondee rápido: si el server responde 200, OK. Si responde
-                        # 503 ("Loading model") el server ESTÁ vivo pero cargando el
-                        # GGUF (tarda 30-60 s en M1 8 GB) -> NO relanzar, se está
-                        # inicializando. Solo relanzar si el puerto NO responde NADA
-                        # (connection refused / timeout = proceso muerto de verdad).
-                        try:
-                            with urllib.request.urlopen(
-                                f"http://127.0.0.1:{self._port_for(perfil)}/health", timeout=2
-                            ) as r:
-                                # 200 = sano; 503 = cargando (dejarlo vivo).
-                                if r.status in (200, 503):
-                                    continue  # vivo (sano o cargando), no tocar
-                        except urllib.error.HTTPError:
-                            # Cualquier otro código HTTP: el server está raro pero
-                            # vivo; no relanzar para evitar el bucle de doble-bind.
-                            continue
-                        except Exception:
-                            pass  # no responde -> relanzar abajo
-                    # Muerto o colgado -> relanzar (sin bloquear el chat: _launching protege)
-                    if not st.get("_launching"):
-                        try:
-                            self.ensure_server(30.0, perfil)
-                        except Exception:
-                            pass
+                # (Ola 256 · BITNET QUE DUERME) ANTES de relanzar nada: si toca
+                # dormir, se apaga; y mientras `_dormido` sea True el
+                # supervisor NO relanza (el despertar lo hace ensure_server).
+                if not self._dormido and not self._dormir_si_toca():
+                    if not self._servidor_compartido():
+                        perfiles = ("interactive", "background")
+                    else:
+                        perfiles = ("interactive",)  # shared: un solo server
+                    for perfil in perfiles:
+                        # (Ola 256) Clave compartida: ambos perfiles miran la misma entrada.
+                        st = self._servers.get(self._clave_servidor(perfil), {})
+                        proc = st.get("proc")
+                        # ¿El proc existe y está vivo?
+                        vivo = proc is not None and proc.poll() is None
+                        if vivo:
+                            # Sondee rápido: si el server responde 200, OK. Si responde
+                            # 503 ("Loading model") el server ESTÁ vivo pero cargando el
+                            # GGUF (tarda 30-60 s en M1 8 GB) -> NO relanzar, se está
+                            # inicializando. Solo relanzar si el puerto NO responde NADA
+                            # (connection refused / timeout = proceso muerto de verdad).
+                            try:
+                                with urllib.request.urlopen(
+                                    f"http://127.0.0.1:{self._port_for(perfil)}/health", timeout=2
+                                ) as r:
+                                    # 200 = sano; 503 = cargando (dejarlo vivo).
+                                    if r.status in (200, 503):
+                                        continue  # vivo (sano o cargando), no tocar
+                            except urllib.error.HTTPError:
+                                # Cualquier otro código HTTP: el server está raro pero
+                                # vivo; no relanzar para evitar el bucle de doble-bind.
+                                continue
+                            except Exception:
+                                pass  # no responde -> relanzar abajo
+                        # Muerto o colgado -> relanzar (sin bloquear el chat: _launching protege)
+                        if not st.get("_launching"):
+                            try:
+                                self.ensure_server(30.0, perfil)
+                            except Exception:
+                                pass
             except Exception:
                 pass
             # Espera corta entre ciclos (no saturar la CPU)
@@ -253,6 +310,11 @@ class BitNetCppManager:
             # (Ola 256) Micro-lote del server (-ub/-b): bajo el umbral BLAS de
             # 32 tokens que segfaulteaba en `dequantize_row_i2_s`.
             "ubatch": self.server_ubatch,
+            # (Ola 256 · BITNET QUE DUERME) Estado del auto-sueño por
+            # inactividad (ASTRAURA_BITNET_SUENO_MIN, 0 = nunca duerme).
+            "dormido": self._dormido,
+            "sueno_min": self.sueno_min,
+            "ultimo_uso_hace_s": int(time.time() - self._ultimo_uso),
             "recommended_models": [
                 {
                     "name": "BitNet-b1.58-2B-4T (i2_s)",
@@ -604,6 +666,9 @@ class BitNetCppManager:
         """
         if profile not in ("interactive", "background"):
             profile = "interactive"
+        # (Ola 256 · BITNET QUE DUERME) Toda generación real pasa por aquí:
+        # registrarla como uso y despertar el motor antes de sondear/lanzar.
+        self.marcar_uso()
         with self._server_lock:
             # (Ola 256) Clave compartida: en modo compartido ambos perfiles
             # leen/escriben LA MISMA entrada (mismo proc, mismo _launching),
@@ -729,6 +794,12 @@ class BitNetCppManager:
             "ctx": self.server_ctx,
             "parallel": self.server_parallel,
             "ubatch": self.server_ubatch,
+            # (Ola 256 · BITNET QUE DUERME) Estado del auto-sueño por
+            # inactividad: visible para la UI y para la Oficina sin sondear
+            # procesos del sistema.
+            "dormido": self._dormido,
+            "sueno_min": self.sueno_min,
+            "ultimo_uso_hace_s": int(time.time() - self._ultimo_uso),
             "log": str(self._server_log),
             "profiles": {},
         }
@@ -752,6 +823,11 @@ class BitNetCppManager:
                 # 8791, y el runner de Ollama en otro puerto) se distinguen
                 # exactamente por este campo.
                 "managed_locally": local_running,
+                # (Ola 256 · BITNET QUE DUERME) Estado del sueño por perfil;
+                # en modo compartido background hereda el de interactive.
+                "dormido": self._dormido,
+                "sueno_min": self.sueno_min,
+                "ultimo_uso_hace_s": int(time.time() - self._ultimo_uso),
             }
         inter = out["profiles"].get("interactive") or {}
         if self._servidor_compartido():
