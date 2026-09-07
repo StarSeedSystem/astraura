@@ -92,6 +92,23 @@ class BitNetCppManager:
         # 0 = nunca duerme (ASTRAURA_BITNET_SUENO_MIN).
         self.sueno_min = float(os.environ.get("ASTRAURA_BITNET_SUENO_MIN") or 10)
         self._ultimo_uso = time.time()  # el arranque del backend cuenta como uso
+        # (Ola 262 · 2026-09-07 · TURNO DE MEMORIA vs FONDO) Dos relojes distintos:
+        # `_ultimo_uso` recoge CUALQUIER uso (también el fondo) y sirve para
+        # `estado_turno`; `_ultimo_uso_interactivo` solo se refresca con uso del
+        # usuario (chat/orbe) y es el que decide `dormir_a_peticion`. Verificado en
+        # la Mac de Alex (2026-09-07): `cognition.py` llama a
+        # `ensure_server(…, "background")` cada pocos segundos (imaginación, sueños,
+        # enjambre, Director, cronista), así que `_ultimo_uso` estaba SIEMPRE a 4 s
+        # y ni el auto-sueño (B5) ni el turno a petición (T1) actuaban jamás; el
+        # oído de voz (1,7 GB) seguía sin memoria. None = nunca hubo uso real del
+        # usuario (se trata como «antiguo»: dormir no sacrifica nada).
+        self._ultimo_uso_interactivo: Optional[float] = None
+        # Ventana «cedido» tras `dormir_a_peticion`: mientras
+        # `time.time() < _cedido_hasta` el fondo NO despierta al BitNet
+        # (`ensure_server(..., "background")` devuelve None sin lanzar nada), el
+        # supervisor no relanza y el auto-sueño no actúa; el chat interactivo y
+        # `despertar()` sí limpian la ventana y despiertan como siempre.
+        self._cedido_hasta: float = 0.0
         self._dormido = False  # True = server apagado por inactividad (no por fallo)
 
         # (Adenda 169 · SUPERVISOR KEEP-ALIVE) En 8 GB el llama-server BitNet nativo
@@ -105,16 +122,34 @@ class BitNetCppManager:
         )
         self._supervisor_thread.start()
 
-    def marcar_uso(self) -> None:
+    def marcar_uso(self, perfil: str = "interactive") -> None:
         """Registra actividad real del motor (cada petición de generación pasa
         por `ensure_server`) y, si estaba dormido, lo marca como despierto.
 
         (Ola 256 · 2026-09-06) Limpia `_dormido` aquí — no en el supervisor —
         porque el despertar lo causa SIEMPRE una petición entrante: el estado
         refleja la intención lo antes posible y el supervisor deja de saltarse
-        el relanzamiento en el mismo ciclo."""
+        el relanzamiento en el mismo ciclo.
+
+        (Ola 262 · 2026-09-07) Distingue el PERFIL: `_ultimo_uso` se refresca
+        siempre (el turno lo respeta igual), pero `_ultimo_uso_interactivo`
+        SOLO se refresca con uso del usuario (chat/orbe). Sin esta distinción
+        el fondo (imaginación, sueños, enjambre…) refrescaba el reloj cada
+        pocos segundos y el turno de memoria de la voz nunca podía dormir el
+        BitNet."""
         self._ultimo_uso = time.time()
+        if perfil == "interactive":
+            self._ultimo_uso_interactivo = self._ultimo_uso
         self._dormido = False
+
+    def _cedido_activo(self) -> bool:
+        """¿Está abierta la ventana «cedido» del turno de memoria?
+
+        (Ola 262 · 2026-09-07) Mientras sea True el fondo debe esperar: ni se
+        relanza el server, ni el auto-sueño actúa, ni el fondo despierta al
+        BitNet. La ventana la abre `dormir_a_peticion` y la cierran el chat
+        interactivo (`ensure_server(..., "interactive")`) y `despertar()`."""
+        return time.time() < self._cedido_hasta
 
     def _dormir_si_toca(self) -> bool:
         """Apaga el llama-server propio si lleva más de `sueno_min` sin uso.
@@ -128,6 +163,10 @@ class BitNetCppManager:
             el server a mitad de carga del GGUF lo dejaría en estado inválido.
         """
         if self._dormido:
+            return False
+        # (Ola 262 · 2026-09-07) Ventana «cedido»: el turno ya se le dio a la
+        # voz; el auto-sueño no tiene nada que hacer hasta que cierre.
+        if self._cedido_activo():
             return False
         if self.sueno_min <= 0:
             return False
@@ -152,7 +191,11 @@ class BitNetCppManager:
                 # (Ola 256 · BITNET QUE DUERME) ANTES de relanzar nada: si toca
                 # dormir, se apaga; y mientras `_dormido` sea True el
                 # supervisor NO relanza (el despertar lo hace ensure_server).
-                if not self._dormido and not self._dormir_si_toca():
+                # (Ola 262 · 2026-09-07) Ventana «cedido» activa: la voz tiene
+                # el turno de memoria, así que el supervisor NO relanza nada
+                # aunque `_dormido` no esté marcado (p.ej. si el server ya
+                # estaba apagado al ceder).
+                if not self._dormido and not self._cedido_activo() and not self._dormir_si_toca():
                     if not self._servidor_compartido():
                         perfiles = ("interactive", "background")
                     else:
@@ -666,9 +709,25 @@ class BitNetCppManager:
         """
         if profile not in ("interactive", "background"):
             profile = "interactive"
+        # (Ola 262 · 2026-09-07 · TURNO DE MEMORIA vs FONDO) Ventana «cedido»:
+        # si la voz pidió la memoria recientemente, el FONDO (imaginación,
+        # sueños, enjambre, Director, cronista) espera — devuelve None sin
+        # lanzar nada y SIN marcar uso, para no refrescar el reloj ni reabrir
+        # la pelea por la RAM. `cognition.generate` tolera el None y cae al
+        # fallback (verificado: `bitnet_engine.generate_stream` trata
+        # `base = None` como motor no disponible y sigue con el siguiente
+        # motor; el aviso de degradación ya lo documenta). El chat interactivo,
+        # en cambio, CIERRA la ventana y despierta como siempre: el usuario
+        # manda sobre la voz.
+        if self._cedido_activo():
+            if profile == "background":
+                return None
+            self._cedido_hasta = 0.0
         # (Ola 256 · BITNET QUE DUERME) Toda generación real pasa por aquí:
         # registrarla como uso y despertar el motor antes de sondear/lanzar.
-        self.marcar_uso()
+        # (Ola 262) Se registra CON su perfil para que el reloj interactivo
+        # solo lo refresque el usuario, no el fondo.
+        self.marcar_uso(profile)
         with self._server_lock:
             # (Ola 256) Clave compartida: en modo compartido ambos perfiles
             # leen/escriben LA MISMA entrada (mismo proc, mismo _launching),
@@ -884,21 +943,34 @@ class BitNetCppManager:
         except Exception:
             return 1200
 
-    def dormir_a_peticion(self, min_inactivo_s: float = 30.0) -> Dict[str, Any]:
+    def dormir_a_peticion(self, min_inactivo_s: float = 30.0, cedido_s: float = 600.0) -> Dict[str, Any]:
         """Duerme el llama-server propio SI OTRO proceso pide su turno de memoria.
 
         Defensas deliberadas (misma filosofía que `_dormir_si_toca`):
           · `sueno_min <= 0` → el sueño está desactivado: nadie lo duerme.
-          · Uso RECIENTE (< `min_inactivo_s`) → no dormir: una petición a mitad
-            de vuelo no se sacrifica por el turno.
+          · Uso INTERACTIVO RECIENTE (< `min_inactivo_s`) → no dormir: una
+            petición del usuario a mitad de vuelo no se sacrifica por el turno.
+            (Ola 262 · 2026-09-07) El reloj que manda aquí es
+            `_ultimo_uso_interactivo`, NO el general: el fondo (imaginación,
+            sueños, enjambre…) refresca `_ultimo_uso` cada pocos segundos y, si
+            se mirara ese, este turno jamás actuaría (bug verificado en la Mac
+            de Alex: `dormir` respondía "en uso hace 4 s" en bucle). Nunca
+            hubo uso interactivo → se trata como antiguo.
           · `_launching` → el GGUF está cargando: matarlo ahora lo dejaría en
             estado inválido; se cede el turno la próxima vez.
           · Sin server PROPIO vivo → ya está dormido / nunca fue nuestro
             (adoptado no se toca): se confirma sin hacer nada.
-        """
+
+        Al dormir abre la ventana «cedido» (`cedido_s` segundos, tope 1800):
+        durante ese tiempo el fondo NO despierta al BitNet
+        (`ensure_server(..., "background")` devuelve None sin lanzar nada), el
+        supervisor no relanza y el auto-sueño no actúa; la voz se queda con la
+        RAM sin pelea. El chat interactivo y `despertar()` cierran la ventana
+        y despiertan al motor como siempre."""
         if self.sueno_min <= 0:
             return {"dormido": False, "motivo": "sueño desactivado"}
-        desde_uso = time.time() - self._ultimo_uso
+        inter = self._ultimo_uso_interactivo
+        desde_uso = float("inf") if inter is None else time.time() - inter
         if desde_uso < min_inactivo_s:
             return {"dormido": False, "motivo": f"en uso hace {int(desde_uso)} s"}
         for st in list(self._servers.values()):
@@ -910,15 +982,28 @@ class BitNetCppManager:
                 mb = self._rss_mb(proc)
                 self.stop_server()
                 self._dormido = True
-                print(f"[BitNetCppManager] dormido a petición (turno de memoria): libera ~{mb} MB")
-                return {"dormido": True, "mb_estimados": mb}
-        return {"dormido": True, "ya_estaba": True}
+                # Ventana «cedido» (tope 1800 s): el fondo no despierta al
+                # BitNet hasta que la voz haya podido cargar en paz.
+                cedido = max(0.0, min(float(cedido_s), 1800.0))
+                self._cedido_hasta = time.time() + cedido
+                print(f"[BitNetCppManager] dormido a petición (turno de memoria): libera ~{mb} MB; "
+                      f"cedido {int(cedido)} s")
+                return {"dormido": True, "mb_estimados": mb, "cedido_s": int(cedido)}
+        # Sin server PROPIO vivo aún se abre la ventana: aunque nada que apagar
+        # ahora, el fondo no debe RELANZAR el motor durante el turno de la voz.
+        cedido = max(0.0, min(float(cedido_s), 1800.0))
+        self._cedido_hasta = time.time() + cedido
+        return {"dormido": True, "ya_estaba": True, "cedido_s": int(cedido)}
 
     def despertar(self) -> Dict[str, Any]:
         """Despierta el motor tras ceder su turno: marca uso (limpia `_dormido`)
         y lanza `ensure_server` SIN bloquear (0,0 s): la carga del GGUF es lenta
-        y el que pide el despertar (voz/UI) no debe quedarse esperando."""
-        self.marcar_uso()
+        y el que pide el despertar (voz/UI) no debe quedarse esperando.
+
+        (Ola 262 · 2026-09-07) También cierra la ventana «cedido»: el despertar
+        explícito manda sobre el turno cedido a la voz."""
+        self._cedido_hasta = 0.0
+        self.marcar_uso("interactive")
         base = self.ensure_server(0.0, "interactive")
         return {"despertando": True, "base": base}
 
@@ -926,10 +1011,17 @@ class BitNetCppManager:
         """Foto rápida del turno de memoria para el demonio de voz y la UI:
         dormido o no, política de sueño, inactividad y si ALGÚN server (propio
         o adoptado) responde /health en el puerto base."""
+        now = time.time()
+        inter = self._ultimo_uso_interactivo
         return {
             "dormido": self._dormido,
             "sueno_min": self.sueno_min,
-            "ultimo_uso_hace_s": int(time.time() - self._ultimo_uso),
+            "ultimo_uso_hace_s": int(now - self._ultimo_uso),
+            # (Ola 262 · 2026-09-07) Inactividad del USUARIO (no del fondo):
+            # None si nunca hubo uso interactivo en este proceso.
+            "ultimo_uso_interactivo_hace_s": None if inter is None else int(now - inter),
+            # Segundos que quedan de ventana «cedido» (0 si cerrada).
+            "cedido_hasta_s": max(0, int(self._cedido_hasta - now)),
             "vivo": self._alive("interactive"),
             "puerto": self.server_port,
         }
