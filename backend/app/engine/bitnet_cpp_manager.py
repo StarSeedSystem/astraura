@@ -984,32 +984,43 @@ class BitNetCppManager:
         escucha en el puerto (lsof, con pgrep de respaldo), se comprueba que
         DE VERDAD es llama-server (un proceso ajeno NO se mata) y se le envía
         SIGTERM (y SIGKILL si sigue vivo a los 2 s). Devuelve el pid o None."""
-        pid = None
+        # (2026-09-07 · Ola 270 · AP7C) `lsof -ti tcp:<puerto>` devuelve TAMBIÉN
+        # el pid del backend conectado como CLIENTE (uvicorn), y tomar `[0]`
+        # caía en ese → ps decía que no era llama-server y el adoptado quedaba
+        # vivo. Con `-sTCP:LISTEN` se filtra al que ESCUCHA, pero por robustez
+        # se recorren TODOS los pids (lsof y pgrep de respaldo) y se elige el
+        # PRIMERO cuya línea de `ps` contiene `llama-server`; si ninguno, None.
+        candidatos: List[int] = []
         try:
-            # lsof devuelve el pid que escucha en tcp:<puerto> (macOS y Linux).
             out = subprocess.run(
-                ["lsof", "-ti", f"tcp:{puerto}"], capture_output=True, text=True, timeout=3
+                ["lsof", "-ti", f"tcp:{puerto}", "-sTCP:LISTEN"],
+                capture_output=True, text=True, timeout=3,
             )
-            pid = int(out.stdout.strip().splitlines()[0])
+            candidatos += [int(p) for p in out.stdout.split() if p.isdigit()]
         except Exception:
-            # lsof falta o falló: respaldo con pgrep por línea de comando.
-            try:
-                out = subprocess.run(
-                    ["pgrep", "-f", f"llama-server.*{puerto}"],
-                    capture_output=True, text=True, timeout=3,
-                )
-                pid = int(out.stdout.strip().splitlines()[0])
-            except Exception:
-                return None
-        # Comprobar que el proceso ES un llama-server antes de matarlo: un
-        # proceso ajeno ocupando el puerto no es nuestro para parar.
+            pass
         try:
-            cmd = subprocess.check_output(
-                ["ps", "-o", "command=", "-p", str(pid)], timeout=3
-            ).decode().strip()
+            out = subprocess.run(
+                ["pgrep", "-f", f"llama-server.*{puerto}"],
+                capture_output=True, text=True, timeout=3,
+            )
+            candidatos += [int(p) for p in out.stdout.split() if p.isdigit()]
         except Exception:
-            return None
-        if "llama-server" not in cmd:
+            pass
+        # Un proceso ajeno ocupando el puerto NO es nuestro para parar: solo
+        # se mata un pid que `ps` confirme que es llama-server.
+        pid: Optional[int] = None
+        for cand in candidatos:
+            try:
+                cmd = subprocess.check_output(
+                    ["ps", "-o", "command=", "-p", str(cand)], timeout=3
+                ).decode().strip()
+            except Exception:
+                continue
+            if "llama-server" in cmd:
+                pid = cand
+                break
+        if pid is None:
             return None
         try:
             os.kill(pid, signal.SIGTERM)

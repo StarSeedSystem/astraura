@@ -484,3 +484,55 @@ def test_dormir_no_mata_proceso_ajeno(monkeypatch: Any) -> None:
     res = mgr.dormir_a_peticion(min_inactivo_s=30.0)
     assert res["ya_estaba"] is True
     assert kills == []  # os.kill jamás se llamó
+
+
+# ---------------------------------------------------------------------------
+# (2026-09-07 · Ola 270 · AP7C) `_apagar_adoptado` elige el pid correcto.
+# `lsof -ti tcp:8790` devuelve DOS pids —62876 (el backend uvicorn, conectado
+# como CLIENTE) y 63022 (el llama-server que ESCUCHA)—; el código debe quedarse
+# con el PRIMERO que `ps` confirme como llama-server, no con el primero de la
+# lista (antes tomaba `[0]` = el cliente y respondía «ya_estaba» con el server
+# vivo).
+# ---------------------------------------------------------------------------
+
+
+def test_apagar_adoptado_elige_llama_server_no_el_cliente(monkeypatch: Any) -> None:
+    """(Ola 270 · AP7C) Aunque lsof devuelva el pid del backend-cliente antes
+    que el del llama-server, `_apagar_adoptado(8790)` devuelve 63022 y `os.kill`
+    (espía) se llama SOLO con ese pid: el cliente jamás se mata."""
+    mgr = BitNetCppManager()
+    mgr._servers = {}
+
+    kills: list = []
+    monkeypatch.setattr(_os, "kill", lambda pid, sig: kills.append((pid, sig)))
+    monkeypatch.setattr(_signal, "SIGTERM", 15)
+
+    def _run_falso(cmd, *a, **k):
+        if cmd and cmd[0] == "lsof":
+            # lsof devuelve los dos pids; el primero (62876) es el cliente.
+            return _subprocess.CompletedProcess(cmd, 0, stdout="62876\n63022\n", stderr="")
+        if cmd and cmd[0] == "pgrep":
+            return _subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
+        raise AssertionError(f"comando inesperado: {cmd}")
+
+    monkeypatch.setattr(_subprocess, "run", _run_falso)
+
+    def _ps(cmd, *a, **k):
+        pid = str(cmd[-1])
+        if pid == "62876":
+            return b"python -m uvicorn starseed_backend --port 8790"
+        if pid == "63022":
+            return b"llama-server -m gguf-1.58b --port 8790"
+        raise AssertionError(f"ps inesperado para pid {pid}")
+
+    monkeypatch.setattr(_subprocess, "check_output", _ps)
+
+    # /health falla tras el kill: SIGTERM bastó y se devuelve el pid matado.
+    def _urlopen_falla(*a, **k):
+        raise Exception("connection refused")
+
+    monkeypatch.setattr(urllib.request, "urlopen", _urlopen_falla)
+
+    pid = mgr._apagar_adoptado(8790)
+    assert pid == 63022
+    assert kills == [(63022, 15)]  # os.kill solo con el llama-server
