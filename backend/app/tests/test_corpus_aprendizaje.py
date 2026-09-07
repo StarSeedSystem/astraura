@@ -2,8 +2,12 @@
 privacidad, valoraciones, estado y exportación train para LoRA."""
 
 import json
+import sys
+from pathlib import Path
 
 import pytest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from app.core.aprendizaje.corpus import CorpusVivo
 

@@ -187,6 +187,12 @@ class BitNetCppManager:
     def _supervisor_loop(self) -> None:
         """Relanza servers nativos muertos cada pocos segundos (keep-alive)."""
         while not self._supervisor_stop.is_set():
+            # Espera ANTES de cada ciclo (también del primero): el manager se
+            # acaba de construir y su servidor de haberlo, acaba de lanzarse; un
+            # barrido inmediato solo añade ruido (y en tests podía cruzarse con
+            # las aserciones marcando usos espurios). 5 s después, a vigilar.
+            if self._supervisor_stop.wait(5.0):
+                break
             try:
                 # (Ola 256 · BITNET QUE DUERME) ANTES de relanzar nada: si toca
                 # dormir, se apaga; y mientras `_dormido` sea True el
@@ -233,8 +239,6 @@ class BitNetCppManager:
                                 pass
             except Exception:
                 pass
-            # Espera corta entre ciclos (no saturar la CPU)
-            self._supervisor_stop.wait(5.0)
         
     def _ctx_segun_ram(self) -> int:
         """

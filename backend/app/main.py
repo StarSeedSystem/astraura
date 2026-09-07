@@ -202,6 +202,17 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"⚠️ No se pudo iniciar el túnel automático: {e}")
         
+    # 7. Agentes de aprendizaje 1.58 (Ola 270, 2026-09-07): Curador, Evaluador,
+    # Cronista, Entrenador y Desplegador sobre el corpus vivo. El Evaluador
+    # respeta el turno de memoria del BitNet (jamás lo despierta). Se
+    # desactivan por completo con ASTRAURA_AGENTES_158=0.
+    try:
+        from .core.aprendizaje.agentes import planificador_agentes
+        asyncio.create_task(planificador_agentes.iniciar())
+        print("🤖 Planificador de Agentes de Aprendizaje 1.58 (5 roles): ACTIVO")
+    except Exception as e:
+        print(f"⚠️ No se pudo iniciar el planificador de agentes 1.58: {e}")
+
     print("🧠 Worker de aprendizaje continuo en segundo plano: ACTIVO")
     print("🌌 Worker de Imaginación Intuitiva Unificada (Always-On 1.58b): ACTIVO")
     print("⚡ Worker de Enjambre Multiagéntico & Reactivaciones Programadas: ACTIVO")
@@ -3346,6 +3357,55 @@ async def corpus_exportar(req: ExportarCorpusRequest, request: Request):
     # Junto al corpus (data/aprendizaje/export), sin depender del cwd del proceso.
     salida = corpus_vivo.raiz.parent / "export" / f"{personalidad}-train.jsonl"
     return corpus_vivo.exportar_train(personalidad, salida)
+
+# ========= Agentes de aprendizaje 1.58 (Ola 270, 2026-09-07) — SOLO LOCAL =========
+
+def _planificador_agentes():
+    """Import perezoso: si el módulo faltara, las rutas devuelven 503 y no
+    se rompe el arranque (misma protección que `_bitnet_turno_manager`)."""
+    try:
+        from .core.aprendizaje.agentes import planificador_agentes
+        return planificador_agentes
+    except Exception as e:
+        raise HTTPException(status_code=503,
+                            detail={"success": False, "error": f"agentes 1.58 no disponibles: {e}"})
+
+@app.get("/api/aprendizaje/agentes")
+async def aprendizaje_agentes(request: Request):
+    """Estado de los cinco agentes 1.58, del turno del BitNet y del corpus."""
+    _solo_local(request)
+    return {"success": True, **_planificador_agentes().estado()}
+
+@app.get("/api/aprendizaje/procesos")
+async def aprendizaje_procesos(request: Request):
+    """Procesos de fondo (imaginación, sueños, enjambre, Director, cronista,
+    learner, cognition) y su actividad, para el Puente de Mando."""
+    _solo_local(request)
+    return {"success": True, "procesos": _planificador_agentes().procesos()}
+
+@app.post("/api/aprendizaje/agentes/{agente_id}/pausar")
+async def aprendizaje_agente_pausar(agente_id: str, request: Request):
+    _solo_local(request)
+    ok = _planificador_agentes().pausar(agente_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail={"success": False, "error": "agente no encontrado"})
+    return {"success": True}
+
+@app.post("/api/aprendizaje/agentes/{agente_id}/reanudar")
+async def aprendizaje_agente_reanudar(agente_id: str, request: Request):
+    _solo_local(request)
+    ok = _planificador_agentes().reanudar(agente_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail={"success": False, "error": "agente no encontrado"})
+    return {"success": True}
+
+@app.post("/api/aprendizaje/agentes/{agente_id}/ejecutar")
+async def aprendizaje_agente_ejecutar(agente_id: str, request: Request):
+    _solo_local(request)
+    resultado = await _planificador_agentes().ejecutar_ahora(agente_id)
+    if resultado is None:
+        raise HTTPException(status_code=404, detail={"success": False, "error": "agente no encontrado"})
+    return {"success": True, "resultado": resultado}
 
 @app.websocket("/ws/chat")
 async def websocket_chat(websocket: WebSocket):
