@@ -236,3 +236,116 @@ def test_cedido_s_tiene_tope(monkeypatch: Any) -> None:
     res = mgr.dormir_a_peticion(cedido_s=99999)
     assert res["cedido_s"] == 1800
     assert mgr._cedido_hasta <= _time.time() + 1801
+
+
+# ---------------------------------------------------------------------------
+# (2026-09-07 · Ola 270 · AP6) El fondo respeta el turno de memoria de verdad:
+# con el BitNet dormido/cedido, los procesos de fondo NO caen a Ollama (medido:
+# cargaba qwen2.5 1,1 GB y anulaba el alivio). Sin red ni procesos: se
+# parchean ensure_server/estado_turno/check_status y el listado de Ollama.
+# ---------------------------------------------------------------------------
+
+import asyncio
+
+from app.engine.bitnet_engine import BitNetUnifiedEngine
+from app.engine import bitnet_engine as _motor_mod
+
+_CEDIDO = {"dormido": False, "cedido_hasta_s": 300, "vivo": True}
+_SIN_TURNO = {"dormido": False, "cedido_hasta_s": 0, "vivo": True}
+_CON_GGUF = {"models_available": [{"path": "/tmp/bitnet-i2_s.gguf"}]}
+
+
+def _drenar(engine: Any, priority: str, meta: dict) -> list:
+    async def _run() -> list:
+        out: list = []
+        async for tok in engine.generate_stream("hola", meta=meta, priority=priority):
+            out.append(tok)
+        return out
+    return asyncio.run(_run())
+
+
+def _parchear_ollama(monkeypatch: Any, engine: Any) -> list:
+    """Espía de `get_available_ollama_models`: si se llama, el motor intentó
+    caer a Ollama. Devuelve [] para no lanzar HTTP de verdad."""
+    llamadas: list = []
+
+    async def _falso() -> list:
+        llamadas.append(1)
+        return []
+
+    monkeypatch.setattr(engine, "get_available_ollama_models", _falso)
+    return llamadas
+
+
+def test_fondo_con_ventana_cedida_no_cae_a_ollama(monkeypatch: Any) -> None:
+    """Con la ventana «cedido» abierta y perfil background, el generador se
+    omite con motivo: Ollama NO se llama, ensure_server tampoco (nada despierta
+    al BitNet) y `meta` dice la verdad."""
+    engine = BitNetUnifiedEngine()
+    mgr = _motor_mod.bitnet_cpp_manager
+
+    def _prohibido(*a: Any, **k: Any) -> None:
+        raise AssertionError("el fondo no debe despertar al BitNet durante el turno de memoria")
+
+    monkeypatch.setattr(mgr, "ensure_server", _prohibido)
+    monkeypatch.setattr(mgr, "estado_turno", lambda: dict(_CEDIDO))
+    ollama = _parchear_ollama(monkeypatch, engine)
+
+    meta: dict = {}
+    tokens = _drenar(engine, "background", meta)
+    assert ollama == []  # Ollama jamás se llamó
+    assert meta.get("omitido") == "turno de memoria"
+    assert meta.get("source") == "ninguno"
+    assert tokens == []  # termina sin yield: cognition marcará real=False
+
+
+def test_fondo_con_respaldo_explicito_si_usa_ollama(monkeypatch: Any) -> None:
+    """Con ASTRAURA_OLLAMA_RESPALDO=1 y BitNet caído DE VERDAD (sin turno de
+    memoria: ventana a 0 y ensure_server que lanza), el fondo SÍ puede caer a
+    Ollama. Sin la variable, no."""
+    monkeypatch.setenv("ASTRAURA_OLLAMA_RESPALDO", "1")
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    monkeypatch.delenv("OPENROUTER_SHARED_KEY", raising=False)
+    engine = BitNetUnifiedEngine()
+    mgr = _motor_mod.bitnet_cpp_manager
+
+    def _cae(*a: Any, **k: Any) -> None:
+        raise RuntimeError("binario roto")  # caído de verdad, no cedido
+
+    monkeypatch.setattr(mgr, "ensure_server", _cae)
+    monkeypatch.setattr(mgr, "estado_turno", lambda: dict(_SIN_TURNO))
+    monkeypatch.setattr(mgr, "check_status", lambda: dict(_CON_GGUF))
+    ollama = _parchear_ollama(monkeypatch, engine)
+
+    meta: dict = {}
+    _drenar(engine, "background", meta)
+    assert ollama == [1]  # el respaldo explícito sí entró
+    assert "omitido" not in meta
+
+    # Y sin la variable, el fondo NO cae a Ollama aunque el nativo esté caído.
+    monkeypatch.delenv("ASTRAURA_OLLAMA_RESPALDO")
+    ollama.clear()
+    meta2: dict = {}
+    _drenar(engine, "background", meta2)
+    assert ollama == []
+
+
+def test_interactivo_con_ventana_cedida_intenta_el_nativo(monkeypatch: Any) -> None:
+    """Con la ventana cedida, el CHAT cierra la ventana e intenta el nativo
+    (ensure_server se llama, y el manager real cerraría «cedido»); nunca se
+    omite por turno de memoria: el usuario manda sobre la voz."""
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    monkeypatch.delenv("OPENROUTER_SHARED_KEY", raising=False)
+    engine = BitNetUnifiedEngine()
+    mgr = _motor_mod.bitnet_cpp_manager
+    nativos: list = []
+
+    monkeypatch.setattr(mgr, "ensure_server", lambda *a, **k: (nativos.append(1) or None)[1])
+    monkeypatch.setattr(mgr, "estado_turno", lambda: dict(_CEDIDO))
+    monkeypatch.setattr(mgr, "check_status", lambda: dict(_CON_GGUF))
+    _parchear_ollama(monkeypatch, engine)  # devuelve []: sin red
+
+    meta: dict = {}
+    _drenar(engine, "interactive", meta)
+    assert nativos == [1]  # el nativo fue el primer intento, ventana abierta o no
+    assert "omitido" not in meta

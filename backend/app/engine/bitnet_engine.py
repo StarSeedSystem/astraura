@@ -415,7 +415,14 @@ class BitNetUnifiedEngine:
                 _has_model = bool(_bn.get("models_available"))
             except Exception:
                 _has_model = False
-            base = await asyncio.to_thread(bitnet_cpp_manager.ensure_server, 120.0, profile) if _has_model else None
+            # (2026-09-07 · Ola 270 · AP6) ensure_server no debe poder tumbar el
+            # stream entero: si estalla, se anota el motivo y se sigue al respaldo.
+            try:
+                base = await asyncio.to_thread(bitnet_cpp_manager.ensure_server, 120.0, profile) if _has_model else None
+            except Exception as _e:
+                base = None
+                if not bitnet_failed:
+                    bitnet_failed = f"ensure_server falló ({type(_e).__name__})"
             if not _has_model:
                 print("[BitNetUnifiedEngine] BitNet nativo omitido: no hay modelo GGUF instalado.")
             # (Adenda 160) Aunque el servidor levante, el motor nativo solo se USA si
@@ -601,7 +608,36 @@ class BitNetUnifiedEngine:
         # como fallback) → OpenRouter :free (nube, sin crédito) → reasoner.
         # Así el motor 1.58-bit responde el 100% de las veces que está vivo,
         # y Ollama/OpenRouter entran SOLO si el nativo falla de verdad.
-        attempts = (_attempt_bitnet_native, _attempt_ollama)
+        # (2026-09-07 · Ola 270 · AP6) El fondo RESPETA el turno de memoria:
+        # con el BitNet dormido o la ventana «cedido» abierta, los procesos de
+        # fondo (imaginación, sueños, enjambre, Director, cronista, evaluador)
+        # NO caen a Ollama — medido en la Mac: Ollama cargaba qwen2.5 (1,1 GB)
+        # y anulaba el alivio de memoria que el turno acababa de conseguir.
+        # Se omite la generación con motivo honesto y el generador termina sin
+        # yield (cognition.generate ya tolera texto vacío → real: False).
+        # Además, para el fondo Ollama solo entra con ASTRAURA_OLLAMA_RESPALDO=1
+        # (misma regla que el router económico). El perfil interactive no toca
+        # NADA: el usuario manda, el nativo despierta y Ollama sigue de respaldo.
+        _es_fondo = profile == "background"
+        if _es_fondo:
+            _turno_memoria = False
+            try:
+                _est = bitnet_cpp_manager.estado_turno()
+                _turno_memoria = bool(_est.get("dormido")) or float(_est.get("cedido_hasta_s") or 0) > 0
+            except Exception:
+                _turno_memoria = False
+            if _turno_memoria:
+                meta["source"] = "ninguno"
+                meta["omitido"] = "turno de memoria"
+                self._last_source = "ninguno"
+                print("[BitNetUnifiedEngine] fondo omitido: turno de memoria (BitNet dormido/cedido), sin Ollama")
+                return
+        if _es_fondo and os.environ.get("ASTRAURA_OLLAMA_RESPALDO") != "1":
+            # Sin respaldo explícito, el fondo solo prueba el nativo; si no hay
+            # motor, termina vacío en vez de cargar Ollama en una Mac de 8 GB.
+            attempts = (_attempt_bitnet_native,)
+        else:
+            attempts = (_attempt_bitnet_native, _attempt_ollama)
         for _attempt in attempts:
             _yielded = False
             async for _tok in _attempt():
