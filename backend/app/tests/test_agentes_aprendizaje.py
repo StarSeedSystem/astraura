@@ -8,6 +8,7 @@ Sin red: `cognition.generate` se sustituye por una corrutina falsa y el
 
 import json
 import sys
+import time
 from pathlib import Path
 
 import pytest
@@ -88,6 +89,67 @@ def test_evaluador_sonda_con_bitnet_vivo(tmp_path, monkeypatch):
     assert 0 <= r["puntuacion"] <= 100
     assert r["latencia_ms"] >= 0
     assert "omitido" not in r
+
+
+def test_curador_sin_duplicados_no_reescribe(tmp_path):
+    """Sin duplicados el mes queda intacto: ni .bak ni escritura (AP5)."""
+    plan = _planificador(tmp_path)
+    plan.corpus.registrar("astra", "chat", [
+        {"role": "user", "content": "una pregunta única"},
+        {"role": "assistant", "content": "una respuesta única"},
+    ])
+    mes = time.strftime("%Y-%m")
+    archivo = tmp_path / "corpus" / "astra" / f"{mes}.jsonl"
+    antes = archivo.read_bytes()
+    import asyncio
+    r = asyncio.get_event_loop().run_until_complete(plan._curador())
+    assert r["duplicados"] == 0
+    assert "reintentar" not in r
+    assert archivo.read_bytes() == antes
+    assert not list(archivo.parent.glob("*.bak"))
+    assert not list(archivo.parent.glob("*.tmp"))
+
+
+def test_curador_con_duplicados_reescribe_con_bak(tmp_path):
+    """Con duplicados: se reescribe, queda .bak con el original y sin .tmp."""
+    plan = _planificador(tmp_path)
+    _registrar_dos_iguales(plan)
+    mes = time.strftime("%Y-%m")
+    archivo = tmp_path / "corpus" / "astra" / f"{mes}.jsonl"
+    original = archivo.read_bytes()
+    import asyncio
+    r = asyncio.get_event_loop().run_until_complete(plan._curador())
+    assert r["duplicados"] == 1
+    bak = tmp_path / "corpus" / "astra" / f"{mes}.jsonl.bak"
+    assert bak.read_bytes() == original
+    assert not list(archivo.parent.glob("*.tmp"))
+    assert len(archivo.read_text(encoding="utf-8").strip().splitlines()) == 1
+
+
+def test_reescribir_mes_rechaza_si_cambio(tmp_path):
+    """Huella distinta (un `registrar` de por medio) → False y nada se toca."""
+    corpus = CorpusVivo(raiz=tmp_path / "corpus")
+    corpus.registrar("astra", "chat", [{"role": "user", "content": "primero"},
+                                       {"role": "assistant", "content": "uno"}])
+    mes = time.strftime("%Y-%m")
+    lineas, huella = corpus.leer_mes("astra", mes)
+    # Llega un turno nuevo entre la lectura y la escritura (race original).
+    corpus.registrar("astra", "chat", [{"role": "user", "content": "segundo"},
+                                       {"role": "assistant", "content": "dos"}])
+    assert corpus.reescribir_mes("astra", mes, lineas, huella) is False
+    actuales, _ = corpus.leer_mes("astra", mes)
+    assert len(actuales) == 2  # el turno nuevo sigue ahí: cero pérdidas
+    assert not list((tmp_path / "corpus" / "astra").glob("*.bak"))
+
+
+def test_rotacion_de_log_al_superar_2mb(tmp_path):
+    """logs.md > 2 MB se rota a logs-AAAA-MM.md y se empieza uno nuevo."""
+    logs = tmp_path / "logs.md"
+    logs.write_bytes(b"x" * (PlanificadorAgentes._MAX_BYTES_LOG + 1))
+    PlanificadorAgentes._anexar_con_rotacion(logs, "entrada nueva\n")
+    rotado = tmp_path / f"logs-{time.strftime('%Y-%m')}.md"
+    assert rotado.exists()
+    assert logs.read_text(encoding="utf-8") == "entrada nueva\n"
 
 
 def test_pausar_y_reanudar_cambian_activo(tmp_path):

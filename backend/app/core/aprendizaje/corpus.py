@@ -11,10 +11,12 @@ None, porque el corpus es un efecto secundario y JAMÁS debe romper una
 respuesta en curso.
 """
 
+import hashlib
 import json
 import logging
 import os
 import re
+import shutil
 import threading
 import time
 import uuid
@@ -238,6 +240,58 @@ class CorpusVivo:
         except Exception:
             pass
         return vals
+
+    # --------------------------------------- Reescritura segura de un mes
+
+    def leer_mes(self, personalidad: str, mes: str) -> "tuple[List[str], str]":
+        """Lee el JSONL del mes bajo el cerrojo y devuelve (líneas, huella).
+
+        La huella es el sha256 del contenido leído: sirve a `reescribir_mes`
+        para detectar si el archivo cambió entre la lectura y la escritura
+        (Ola 270 · AP5, 2026-09-07: el Curador curaba sin cerrojo y cualquier
+        `registrar` concurrente perdía el turno).
+        """
+        personalidad = self._valida_personalidad(personalidad)
+        archivo = self.raiz / personalidad / f"{mes}.jsonl"
+        with self._lock:
+            try:
+                datos = archivo.read_bytes()
+            except FileNotFoundError:
+                return [], ""
+            return (datos.decode("utf-8", errors="replace").splitlines(),
+                    hashlib.sha256(datos).hexdigest())
+
+    def reescribir_mes(self, personalidad: str, mes: str, lineas: List[str],
+                       huella_previa: str) -> bool:
+        """Reescribe el mes de forma ATÓMICA, bajo el cerrojo y sin pérdidas.
+
+        (2026-09-07, Ola 270 · AP5) Si la huella del contenido actual no
+        coincide con `huella_previa` (alguien añadió turnos desde la lectura),
+        devuelve False SIN tocar nada: el llamador reintenta en otra pasada.
+        Si coincide: copia el archivo a `<archivo>.bak` (sobrescribe la copia
+        anterior), escribe en `<archivo>.tmp` y hace `os.replace`, de modo que
+        un corte a media escritura nunca deja el mes truncado.
+        """
+        try:
+            personalidad = self._valida_personalidad(personalidad)
+            archivo = self.raiz / personalidad / f"{mes}.jsonl"
+            with self._lock:
+                actual = archivo.read_bytes()
+                if hashlib.sha256(actual).hexdigest() != huella_previa:
+                    log.info("corpus: %s/%s cambió desde la lectura; no se reescribe",
+                             personalidad, mes)
+                    return False
+                shutil.copy2(archivo, archivo.with_suffix(archivo.suffix + ".bak"))
+                tmp = archivo.with_suffix(archivo.suffix + ".tmp")
+                with open(tmp, "w", encoding="utf-8") as f:
+                    for linea in lineas:
+                        f.write(linea.rstrip("\n") + "\n")
+                os.replace(tmp, archivo)  # atómico en el mismo sistema de ficheros
+            self._cache_estado = None  # el mes cambió: invalida la caché
+            return True
+        except Exception as e:
+            log.warning("corpus: error reescribiendo %s/%s: %s", personalidad, mes, e)
+            return False
 
     # ---------------------------------------------------------------- Estado
 

@@ -168,6 +168,7 @@ class PlanificadorAgentes:
         mes = time.strftime("%Y-%m")
         valoraciones = self.corpus._cargar_valoraciones()
         personalidades: Dict[str, int] = {}
+        reintentar: Dict[str, bool] = {}
         duplicados = 0
         sin_valorar = 0
         listos: Dict[str, int] = {}
@@ -175,44 +176,52 @@ class PlanificadorAgentes:
             for carpeta in sorted(raiz_corpus.iterdir()):
                 if not carpeta.is_dir():
                     continue
-                archivo = carpeta / f"{mes}.jsonl"
-                if not archivo.exists():
-                    continue
                 # Solo el mes en curso: reescribir meses pasados es riesgo gratis.
+                # Lectura BAJO EL CERROJO del corpus (AP5, 2026-09-07): sin él un
+                # `registrar` concurrente se perdía entre la lectura y la escritura.
+                lineas_mes, huella = self.corpus.leer_mes(carpeta.name, mes)
+                if not lineas_mes:
+                    continue
                 vistos = set()
                 conservados: List[str] = []
+                duplicados_mes = 0
                 n_mes = 0
                 n_train = 0
-                with open(archivo, "r", encoding="utf-8") as f:
-                    for linea in f:
-                        linea = linea.rstrip("\n")
-                        if not linea.strip():
-                            continue
-                        try:
-                            r = json.loads(linea)
-                        except Exception:
-                            conservados.append(linea)  # línea ilegible: se conserva
-                            continue
-                        huella = self._huella(r)
-                        if huella in vistos:
-                            duplicados += 1
-                            continue  # copia exacta posterior: fuera
-                        vistos.add(huella)
-                        conservados.append(linea)
-                        n_mes += 1
-                        val = valoraciones.get(str(r.get("id")))
-                        if val is None:
-                            val = r.get("meta", {}).get("valoracion")
-                        if val is None:
-                            sin_valorar += 1
-                        if r.get("split") == "train" and not (isinstance(val, int) and val < 0):
-                            n_train += 1
+                for linea in lineas_mes:
+                    if not linea.strip():
+                        continue
+                    try:
+                        r = json.loads(linea)
+                    except Exception:
+                        conservados.append(linea)  # línea ilegible: se conserva
+                        continue
+                    huella_turno = self._huella(r)
+                    if huella_turno in vistos:
+                        duplicados_mes += 1
+                        continue  # copia exacta posterior: fuera
+                    vistos.add(huella_turno)
+                    conservados.append(linea)
+                    n_mes += 1
+                    val = valoraciones.get(str(r.get("id")))
+                    if val is None:
+                        val = r.get("meta", {}).get("valoracion")
+                    if val is None:
+                        sin_valorar += 1
+                    if r.get("split") == "train" and not (isinstance(val, int) and val < 0):
+                        n_train += 1
+                duplicados += duplicados_mes
                 if n_mes:
                     personalidades[carpeta.name] = n_mes
                     listos[carpeta.name] = n_train
-                    with open(archivo, "w", encoding="utf-8") as f:
-                        for linea in conservados:
-                            f.write(linea + "\n")
+                # Solo se reescribe cuando HAY duplicados: tocar un mes íntegro
+                # cada 30 min gasta disco y arriesga el corpus para nada.
+                if duplicados_mes > 0:
+                    ok = self.corpus.reescribir_mes(
+                        carpeta.name, mes, conservados, huella)
+                    if not ok:
+                        # El mes cambió desde la lectura: se deja íntegro y se
+                        # reintenta en la próxima pasada. Cero pérdidas.
+                        reintentar[carpeta.name] = True
         informe = {
             "t": _ahora_iso(),
             "personalidades": personalidades,
@@ -220,6 +229,8 @@ class PlanificadorAgentes:
             "sin_valorar": sin_valorar,
             "listos_para_entrenar": listos,
         }
+        if reintentar:
+            informe["reintentar"] = True
         self._escribir_json("curacion.json", informe)
         return informe
 
@@ -323,17 +334,29 @@ class PlanificadorAgentes:
                       + (", ".join(activos) if activos else "ninguno detectado"))
         bloque = "\n".join(lineas) + "\n\n"
         self.raiz.mkdir(parents=True, exist_ok=True)
-        with open(self.raiz / "cronica.md", "a", encoding="utf-8") as f:
-            f.write(bloque)
+        self._anexar_con_rotacion(self.raiz / "cronica.md", bloque)
         # Espejo en la memoria raíz del StarSeed si existe (memoria compartida).
         logs = Path(__file__).resolve().parents[4] / "data" / "starseed_memory_root" / "logs.md"
         if logs.exists():
-            try:
-                with open(logs, "a", encoding="utf-8") as f:
-                    f.write(bloque)
-            except Exception as e:
-                log.warning("cronista: no se pudo anexar a logs.md: %s", e)
+            self._anexar_con_rotacion(logs, bloque)
         return {"t": _ahora_iso(), "lineas": len(lineas)}
+
+    # Tope de 2 MB por log (AP5, 2026-09-07): sin techo crecerían para siempre.
+    _MAX_BYTES_LOG = 2 * 1024 * 1024
+
+    @classmethod
+    def _anexar_con_rotacion(cls, ruta: Path, bloque: str) -> None:
+        """Anexa al log; si ya supera 2 MB, primero lo rota a
+        `<log>-AAAA-MM<ext>` (rename) y empieza de nuevo. Nunca lanza."""
+        try:
+            if ruta.exists() and ruta.stat().st_size >= cls._MAX_BYTES_LOG:
+                rotado = ruta.with_name(
+                    f"{ruta.stem}-{time.strftime('%Y-%m')}{ruta.suffix}")
+                os.replace(ruta, rotado)
+            with open(ruta, "a", encoding="utf-8") as f:
+                f.write(bloque)
+        except Exception as e:
+            log.warning("cronista: no se pudo anexar a %s: %s", ruta.name, e)
 
     def _evaluacion_media_ultima_hora(self) -> Any:
         """Media de `puntuacion` de las evaluaciones de la última hora."""
