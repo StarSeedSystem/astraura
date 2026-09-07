@@ -860,6 +860,80 @@ class BitNetCppManager:
                         pass
             self._servers[profile] = {}
 
+    # ───── (Ola 262 · 2026-09-06) Turno de memoria: dormir/despertar a petición ─────
+    # CONTEXTO (Mac de Alex, 8 GB): el demonio de voz de StarSeed OS carga el
+    # oído VibeASR (1,7 GB) y el tts-server (0,9 GB); este llama-server ocupa
+    # ~1,2 GB. Cuando el oído va a cargar y no hay memoria, OTRO proceso (el
+    # demonio de voz, vía el endpoint local `/api/bitnet/dormir`) pide aquí el
+    # turno: el BitNet duerme un rato y el chat lo despierta solo con la
+    # siguiente petición (`ensure_server` → `marcar_uso`).
+
+    def _rss_mb(self, proc: Any) -> int:
+        """RSS del proceso en MB leído con `ps -o rss= -p <pid>` (macOS/Linux).
+        Si no se puede leer (proceso falso en tests, pid perdido, ps no
+        disponible), devuelve la estimación histórica del llama-server: 1200 MB."""
+        pid = getattr(proc, "pid", None)
+        if pid is None:
+            return 1200
+        try:
+            out = subprocess.check_output(
+                ["ps", "-o", "rss=", "-p", str(pid)], timeout=3
+            )
+            kb = int(out.decode().strip())
+            return max(0, kb // 1024)
+        except Exception:
+            return 1200
+
+    def dormir_a_peticion(self, min_inactivo_s: float = 30.0) -> Dict[str, Any]:
+        """Duerme el llama-server propio SI OTRO proceso pide su turno de memoria.
+
+        Defensas deliberadas (misma filosofía que `_dormir_si_toca`):
+          · `sueno_min <= 0` → el sueño está desactivado: nadie lo duerme.
+          · Uso RECIENTE (< `min_inactivo_s`) → no dormir: una petición a mitad
+            de vuelo no se sacrifica por el turno.
+          · `_launching` → el GGUF está cargando: matarlo ahora lo dejaría en
+            estado inválido; se cede el turno la próxima vez.
+          · Sin server PROPIO vivo → ya está dormido / nunca fue nuestro
+            (adoptado no se toca): se confirma sin hacer nada.
+        """
+        if self.sueno_min <= 0:
+            return {"dormido": False, "motivo": "sueño desactivado"}
+        desde_uso = time.time() - self._ultimo_uso
+        if desde_uso < min_inactivo_s:
+            return {"dormido": False, "motivo": f"en uso hace {int(desde_uso)} s"}
+        for st in list(self._servers.values()):
+            proc = st.get("proc")
+            if proc is not None and proc.poll() is None:
+                if st.get("_launching"):
+                    return {"dormido": False, "motivo": "cargando"}
+                # Leer el RSS ANTES de parar: tras `terminate` el pid ya no da datos.
+                mb = self._rss_mb(proc)
+                self.stop_server()
+                self._dormido = True
+                print(f"[BitNetCppManager] dormido a petición (turno de memoria): libera ~{mb} MB")
+                return {"dormido": True, "mb_estimados": mb}
+        return {"dormido": True, "ya_estaba": True}
+
+    def despertar(self) -> Dict[str, Any]:
+        """Despierta el motor tras ceder su turno: marca uso (limpia `_dormido`)
+        y lanza `ensure_server` SIN bloquear (0,0 s): la carga del GGUF es lenta
+        y el que pide el despertar (voz/UI) no debe quedarse esperando."""
+        self.marcar_uso()
+        base = self.ensure_server(0.0, "interactive")
+        return {"despertando": True, "base": base}
+
+    def estado_turno(self) -> Dict[str, Any]:
+        """Foto rápida del turno de memoria para el demonio de voz y la UI:
+        dormido o no, política de sueño, inactividad y si ALGÚN server (propio
+        o adoptado) responde /health en el puerto base."""
+        return {
+            "dormido": self._dormido,
+            "sueno_min": self.sueno_min,
+            "ultimo_uso_hace_s": int(time.time() - self._ultimo_uso),
+            "vivo": self._alive("interactive"),
+            "puerto": self.server_port,
+        }
+
 
     # ───────────── Aceleradores alternativos de cuantización (Adenda 157) ─────────────
 

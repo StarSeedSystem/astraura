@@ -4129,6 +4129,79 @@ async def api_router_subagents(req: Optional[RouterRequest] = None):
         return {"success": False, "error": str(e)}
 
 
+# ---------------------------------------------------------------------------
+# Turno de memoria del BitNet (Ola 262 · 2026-09-06): el demonio de voz local
+# pide dormir al llama-server cuando necesita la RAM para el oído VibeASR.
+# Estas rutas son SOLO para procesos de ESTA máquina (localhost).
+# ---------------------------------------------------------------------------
+try:
+    from .engine.bitnet_cpp_manager import bitnet_cpp_manager as _bitnet_turno
+except Exception:
+    _bitnet_turno = None
+
+_HOSTS_LOCALES = ("127.0.0.1", "::1", "localhost")
+
+
+def _prohibir_si_no_local(request: Request) -> None:
+    """Las rutas del turno de memoria solo responden a procesos locales:
+    dormir el motor de un equipo remoto sería un apagón del habla a distancia."""
+    host = (request.client.host if request.client else "") or ""
+    if host not in _HOSTS_LOCALES:
+        raise HTTPException(status_code=403, detail={"success": False, "error": "solo local"})
+
+
+def _bitnet_turno_manager():
+    """503 si el manager del BitNet no pudo importarse (misma protección que
+    `economic_router.py`: el módulo nunca debe tumbar el backend entero)."""
+    if _bitnet_turno is None:
+        raise HTTPException(status_code=503, detail={"success": False, "error": "bitnet manager no disponible"})
+    return _bitnet_turno
+
+
+class DormirBitnetRequest(BaseModel):
+    min_inactivo_s: Optional[float] = 30.0
+
+
+@app.get("/api/bitnet/estado")
+async def bitnet_turno_estado(request: Request):
+    """Foto del turno de memoria: dormido, sueño configurado, inactividad y
+    si algún server (propio o adoptado) responde /health."""
+    try:
+        _prohibir_si_no_local(request)
+        return {"success": True, **_bitnet_turno_manager().estado_turno()}
+    except HTTPException:
+        raise
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+@app.post("/api/bitnet/dormir")
+async def bitnet_turno_dormir(request: Request, req: Optional[DormirBitnetRequest] = None):
+    """Duerme el llama-server si lleva ≥ `min_inactivo_s` sin uso y devuelve
+    los MB liberados. Nunca lanza: el demonio de voz decide con la respuesta."""
+    try:
+        _prohibir_si_no_local(request)
+        segundos = 30.0 if req is None or req.min_inactivo_s is None else float(req.min_inactivo_s)
+        return {"success": True, **_bitnet_turno_manager().dormir_a_peticion(segundos)}
+    except HTTPException:
+        raise
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+@app.post("/api/bitnet/despertar")
+async def bitnet_turno_despertar(request: Request):
+    """Despierta el motor tras ceder el turno (arranque sin bloquear: la carga
+    del GGUF tarda; quien llama sonda después `/api/bitnet/estado`)."""
+    try:
+        _prohibir_si_no_local(request)
+        return {"success": True, **_bitnet_turno_manager().despertar()}
+    except HTTPException:
+        raise
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
 frontend_dist = settings.workspace_path / "frontend" / "dist"
 if frontend_dist.exists():
     app.mount("/", StaticFiles(directory=str(frontend_dist), html=True), name="frontend")
