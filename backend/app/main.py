@@ -295,8 +295,20 @@ storage_routing_engine.register_callback(lambda evt: asyncio.create_task(manager
 
 # ================= Status & Profiling APIs =================
 
-@app.get("/api/status")
-async def get_status():
+# (Ola 278 · AS1 · 2026-09-07) Caché en memoria del estado completo: el OS sondea
+# /api/status con un tope de 5 s para decidir si Astraura local está lista, así
+# que un cálculo lento (psutil, glob de modelos, sonda Ollama) bloqueaba el bucle
+# y el chat caía a otros modelos. La foto se cachea 5 s y se recalcula en un hilo
+# para no tapar el event loop. `t` se guarda al MACERAR la caché (no al leerla).
+_STATUS_CACHE: Dict[str, Any] = {"t": 0.0, "valor": None}
+_STATUS_TTL = 5.0  # (Ola 278 · AS1) Vida de la caché en segundos.
+
+
+def _status_sync() -> dict:
+    """Cálculo síncrono y lento del estado completo. Se ejecuta en un hilo
+    (`asyncio.to_thread`) para no bloquear el bucle del event loop: contiene
+    globs de modelos, sondas HTTP a Ollama y `psutil.cpu_percent(interval=...)`.
+    (Ola 278 · AS1 · 2026-09-07)"""
     return {
         "status": "online",
         "app_name": settings.app_name,
@@ -318,6 +330,41 @@ async def get_status():
         # (Adenda 153) Estado honesto de seguridad y del puente con StarSeed OS.
         "security": security_status(),
         "starseed_bridge": STARSEED_BRIDGE_VERSION  # (OS · Ola 3) versión real del puente
+    }
+
+
+@app.get("/api/status")
+async def get_status(fresco: int = Query(0)):
+    # (Ola 278 · AS1) Sirve la foto cacheada si no expiró; `?fresco=1` fuerza el
+    # recálculo (se usa tras un cambio de motor para ver el estado al momento).
+    ahora = time.time()
+    if not fresco and _STATUS_CACHE["valor"] is not None and (ahora - _STATUS_CACHE["t"]) < _STATUS_TTL:
+        return _STATUS_CACHE["valor"]
+    valor = await asyncio.to_thread(_status_sync)
+    # Actualizar `t` con el reloj del hilo principal evita que el hilo de cálculo
+    # (que puede tardar >5 s bajo carga) eternice la caché recién rellenada.
+    _STATUS_CACHE["t"] = time.time()
+    _STATUS_CACHE["valor"] = valor
+    return valor
+
+
+@app.get("/api/ping")
+async def get_ping():
+    # (Ola 278 · AS1 · 2026-09-07) Latido ultraligero (<5 ms, SIN I/O de red ni
+    # psutil/glob): el OS lo usa para decidir la disponibilidad del motor sin
+    # pagar el coste del /api/status completo. `motor_local` proviene del rastro
+    # `_last_source` del motor (honesto, ya cacheado); el resto, de
+    # `estado_turno()`, que es barato (solo el puerto ya cacheado).
+    turno = bitnet_cpp_manager.estado_turno()
+    fuente = getattr(bitnet_engine, "_last_source", None) or "ninguno"
+    return {
+        "ok": True,
+        "motor_local": fuente,  # "bitnet-nativo" | "ollama" | "ninguno" (u otro rastro)
+        "dormido": bool(turno.get("dormido", False)),
+        "cedido_hasta_s": int(turno.get("cedido_hasta_s", 0)),
+        "vivo": bool(turno.get("vivo", False)),
+        "version": STARSEED_BRIDGE_VERSION,
+        "t": time.time(),
     }
 
 # (Adenda 153) La ruta /active_tunnel.json única es la DINÁMICA de más abajo
