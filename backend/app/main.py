@@ -52,6 +52,7 @@ from .core.universal_device_access import universal_device_access
 from .memory.mem0_engine import mem0_engine
 from .agents.layered_quantum_orchestrator import layered_quantum_orchestrator
 from .core.privacy_manager import privacy_manager
+from .core.aprendizaje import corpus_vivo  # (Ola 268) Corpus vivo del aprendizaje continuo
 from .creations.creations_manager import creations_manager
 from .core.os_manager import starseed_os_manager
 from .core.audio_cpp_engine import audio_cpp_engine
@@ -3242,12 +3243,41 @@ class ChatRequest(BaseModel):
     system_prompt: Optional[str] = ""
     preferences: Optional[Dict[str, Any]] = None
 
+def _personalidad_activa() -> str:
+    """Nombre de la personalidad activa para el corpus (fallback «default»)."""
+    try:
+        p = personality_engine.get_active_persona()
+        if isinstance(p, dict):
+            return str(p.get("id") or p.get("nombre") or "default")
+    except Exception:
+        pass
+    return "default"
+
+def _registrar_chat_en_corpus(prompt: str, system: str, respuesta: str,
+                              tool_executions: Any, ms: float) -> None:
+    """(Ola 268, 2026-09-07) Captura el turno en el corpus vivo. Nunca lanza:
+    el aprendizaje es un efecto secundario y jamás rompe la respuesta al usuario."""
+    try:
+        herramientas = [str(t.get("tool") or t.get("name") or "") for t in (tool_executions or []) if isinstance(t, dict)]
+        corpus_vivo.registrar(
+            _personalidad_activa(), "chat",
+            [
+                {"role": "system", "content": system or ""},
+                {"role": "user", "content": prompt or ""},
+                {"role": "assistant", "content": respuesta or ""},
+            ],
+            {"modelo": "orchestrator", "ms": int(ms), "herramientas": herramientas},
+        )
+    except Exception:
+        pass
+
 @app.post("/api/chat")
 async def chat_endpoint(req: ChatRequest):
     tokens = []
     agent_traces = []
     tool_executions = []
     branching_plan = None
+    _t0 = time.time()
     async for event in orchestrator.generate_response_stream(req.prompt, req.system_prompt, preferences=req.preferences):
         if event["type"] == "branching_plan":
             branching_plan = event.get("plan")
@@ -3256,19 +3286,66 @@ async def chat_endpoint(req: ChatRequest):
             tool_executions = event.get("tool_executions", [])
         elif event["type"] == "token":
             tokens.append(event["token"])
+    respuesta = "".join(tokens)
+    _registrar_chat_en_corpus(req.prompt, req.system_prompt, respuesta, tool_executions,
+                              (time.time() - _t0) * 1000.0)
     return {
         "branching_plan": branching_plan,
         "agent_traces": agent_traces,
         "tool_executions": tool_executions,
-        "response": "".join(tokens)
+        "response": respuesta
     }
 
 @app.post("/api/chat/stream")
 async def chat_stream_endpoint(req: ChatRequest):
     async def sse_generator():
+        _tokens = []
+        _herramientas = []
+        _t0 = time.time()
         async for event in orchestrator.generate_response_stream(req.prompt, req.system_prompt, preferences=req.preferences):
+            if event.get("type") == "token":
+                _tokens.append(event.get("token", ""))
+            elif event.get("type") == "agent_traces":
+                _herramientas = event.get("tool_executions", [])
             yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
+        _registrar_chat_en_corpus(req.prompt, req.system_prompt, "".join(_tokens),
+                                  _herramientas, (time.time() - _t0) * 1000.0)
     return StreamingResponse(sse_generator(), media_type="text/event-stream")
+
+# ================= Aprendizaje continuo: corpus vivo (Ola 268) =================
+
+def _solo_local(request: Request) -> None:
+    """Rutas de aprendizaje solo desde localhost (como `/api/bitnet/*`)."""
+    host = (request.client.host if request.client else "") or ""
+    if host not in ("127.0.0.1", "::1", "localhost"):
+        raise HTTPException(status_code=403, detail="Solo acceso local")
+
+@app.get("/api/aprendizaje/corpus/estado")
+async def corpus_estado(request: Request):
+    _solo_local(request)
+    return corpus_vivo.estado()
+
+class ValorarCorpusRequest(BaseModel):
+    id: str
+    valoracion: int
+    nota: Optional[str] = ""
+
+@app.post("/api/aprendizaje/corpus/valorar")
+async def corpus_valorar(req: ValorarCorpusRequest, request: Request):
+    _solo_local(request)
+    ok = corpus_vivo.valorar(req.id, req.valoracion, req.nota or "")
+    return {"success": ok}
+
+class ExportarCorpusRequest(BaseModel):
+    personalidad: str
+
+@app.post("/api/aprendizaje/corpus/exportar")
+async def corpus_exportar(req: ExportarCorpusRequest, request: Request):
+    _solo_local(request)
+    personalidad = str(req.personalidad or "default")
+    # Junto al corpus (data/aprendizaje/export), sin depender del cwd del proceso.
+    salida = corpus_vivo.raiz.parent / "export" / f"{personalidad}-train.jsonl"
+    return corpus_vivo.exportar_train(personalidad, salida)
 
 @app.websocket("/ws/chat")
 async def websocket_chat(websocket: WebSocket):

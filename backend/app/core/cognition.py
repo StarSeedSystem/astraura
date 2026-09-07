@@ -406,6 +406,21 @@ async def generate(
         _stats["last_real_at"] = time.time()
     except Exception:
         pass
+    # (Ola 268, 2026-09-07) Corpus vivo: toda generación REAL de cognition alimenta
+    # el aprendizaje continuo. Nunca lanza: aquí solo se captura, no se decide.
+    try:
+        from .aprendizaje import corpus_vivo as _corpus
+        _corpus.registrar(
+            str(meta.get("personalidad") or "cognition"), "cognition",
+            [
+                {"role": "system", "content": system or ""},
+                {"role": "user", "content": prompt or ""},
+                {"role": "assistant", "content": text},
+            ],
+            {"modo": meta.get("source") or mode, "ms": ms},
+        )
+    except Exception:
+        pass
     return {"text": text, "real": True, "mode": meta.get("source") or mode, "ms": ms}
 
 
