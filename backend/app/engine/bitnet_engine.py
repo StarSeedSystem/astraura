@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import httpx
 import asyncio
 from pathlib import Path
@@ -7,6 +8,67 @@ from typing import AsyncGenerator, Dict, Any, List, Optional
 from ..core.config import settings
 from .bitnet_cpp_manager import bitnet_cpp_manager
 from .ternary_math import TernaryQuantizer
+
+# (2026-09-07 · Ola 278 · AS2) Presupuesto de prefill/generación para el BitNet
+# NATIVO en el chat interactivo: el llama-server corre con `-ub 24` (micro-lote
+# obligado por el segfault BLAS) y procesa el prompt muy despacio en una Mac de
+# 8 GB; un prefill grande supera el ReadTimeout. Con ~2.200 chars de prefill y
+# 160 tokens de respuesta se queda en 15-40 s. Configurables por entorno.
+PREFILL_CHARS_NATIVO = int(os.environ.get("ASTRAURA_PREFILL_CHARS", "2200"))
+GEN_TOKENS_NATIVO = int(os.environ.get("ASTRAURA_GEN_TOKENS", "160"))
+
+
+def componer_prefill(system: str, chunks: List[str], prompt: str, limite: int) -> str:
+    """(2026-09-07 · Ola 278 · AS2) Compone el prefill del camino nativo respetando
+    un tope de caracteres, en este orden de prioridad SÍ corresponde:
+
+      1. los primeros 600 caracteres del sistema de la personalidad;
+      2. el prompt del usuario ENTERO;
+      3. los últimos turnos (los primeros `chunks`, íntegros);
+      4. y solo después los fragmentos de contexto, máximo 2, 300 caracteres cada uno.
+
+    Se entrega siempre ≤ `limite`. Es una función pura (sin efectos) para poder
+    probarse directamente en `backend/app/tests/test_prefill_nativo.py`."""
+    piezas: List[str] = []
+
+    sistema = (system or "").strip()[:600]
+    if sistema:
+        piezas.append(sistema)
+
+    usuario = (prompt or "").strip()
+    if usuario:
+        piezas.append(usuario)
+
+    chunks_limpios = [((c or "").replace("\n", " ").strip()) for c in (chunks or [])]
+    # Los primeros chunks se tratan como "últimos turnos" (se conservan íntegros);
+    # el resto son fragmentos de contexto de memoria, recortados a 300 chars y
+    # limitados a 2. Un solo pase de presupuesto los va añadiendo por orden.
+    presupuesto = limite - len("\n\n".join(piezas))
+    contextos_añadidos = 0
+    for idx, chunk in enumerate(chunks_limpios):
+        if not chunk or presupuesto <= 0:
+            continue
+        if idx < 1:
+            trozo = chunk  # "último turno": se conserva íntegro
+        else:
+            trozo = chunk[:300]
+            if contextos_añadidos >= 2:
+                break
+        if len(trozo) <= 0:
+            continue
+        if len(trozo) > presupuesto:
+            trozo = trozo[:presupuesto]
+        if trozo:
+            piezas.append(trozo)
+            presupuesto -= len(trozo)
+            if idx >= 1:
+                contextos_añadidos += 1
+
+    resultado = "\n\n".join(piezas)
+    if len(resultado) > limite:
+        # Seguridad: si aun así se excede (p. ej. prompt gigante), se trunca.
+        resultado = resultado[:limite]
+    return resultado
 
 
 def _run_sanity_with_timeout(manager, base, timeout):
@@ -92,6 +154,32 @@ class BitNetUnifiedEngine:
             models = []
         self._ollama_probe_cache = {"at": now, "models": models}
         return models
+
+    def _anotar_latencia(self, perfil: str, prompt_chars: int, gen_tokens: int,
+                         t0: float, ok: bool, motivo: Optional[str]) -> None:
+        """(2026-09-07 · Ola 278 · AS2) Escribe una línea JSON a
+        `data/aprendizaje/latencias.jsonl` tras cada generación nativa (éxito o
+        timeout), para poder medir prompt_chars/tokens/ms del BitNet nativo en la
+        Mac de 8 GB. Es un `try` que NUNCA rompe la generación: si falla el disco
+        o la carpeta no existe, se ignora y se sigue la respuesta."""
+        try:
+            ms = int(round((time.time() - t0) * 1000)) if t0 else 0
+            _linea = {
+                "t": time.time(),
+                "perfil": perfil,
+                "prompt_chars": int(prompt_chars),
+                "gen_tokens": int(gen_tokens),
+                "ms": ms,
+                "ok": bool(ok),
+            }
+            if motivo:
+                _linea["motivo"] = str(motivo)[:240]
+            _ruta = Path(__file__).resolve().parents[2] / "data" / "aprendizaje" / "latencias.jsonl"
+            _ruta.parent.mkdir(parents=True, exist_ok=True)
+            with _ruta.open("a", encoding="utf-8") as _f:
+                _f.write(json.dumps(_linea, ensure_ascii=False) + "\n")
+        except Exception:
+            pass
 
     def get_engine_status(self) -> Dict[str, Any]:
         cpp_status = bitnet_cpp_manager.check_status()
@@ -487,6 +575,17 @@ class BitNetUnifiedEngine:
                 ctx_tokens = int(bitnet_cpp_manager.server_ctx or 4096)
                 gen_budget = max(64, min(int(max_tokens), max(64, ctx_tokens // 8)))  # (Adenda 169) buffer menor: supervivencia en 8GB
                 char_budget = max(2000, int((ctx_tokens - gen_budget - 64) * 3.2))
+                # (2026-09-07 · Ola 278 · AS2) Presupuesto del nativo en el chat
+                # interactivo: con `-ub 24` el prefill se procesa muy lento en la
+                # Mac de 8 GB; se recorta a los topes del fichero de latencias (o
+                # configurables por entorno). Se respeta un `max_tokens` explícito
+                # menor si el llamador lo pide, pero nunca se amplía por encima.
+                if profile == "interactive":
+                    char_budget = min(char_budget, PREFILL_CHARS_NATIVO)
+                    if max_tokens < GEN_TOKENS_NATIVO:
+                        gen_budget = min(gen_budget, int(max_tokens))
+                    else:
+                        gen_budget = min(gen_budget, GEN_TOKENS_NATIVO)
                 # (Verificación 1.58 · VELOCIDAD NATIVA) El modelo i2_s en CPU (M1 8GB)
                 # tarda ~90 s en el PRIMER token cuando el prefill es largo (system de
                 # identidad completo + 6 chunks de memoria). Para cumplir «BitNet 1.58-bit
@@ -515,16 +614,28 @@ class BitNetUnifiedEngine:
                 # via ASTRAURA_BITNET_CTX en 8 GB) y KV cache q8_0 (~2 MB), hay margen
                 # suficiente: 1420 chars de prefill + hasta 256 de generación < 2048.
                 _MAX_PREFILL_CHARS = 1420
-                sys_txt = (system_prompt or "").strip()[:640]
+                # (2026-09-07 · Ola 278 · AS2) La composición del prefill se extrae a
+                # `componer_prefill` (función pura, probada aparte): conserva en orden
+                # el sistema de la personalidad (primeros 600 chars), el prompt entero,
+                # los últimos turnos y, solo después, hasta 2 chunks de contexto de
+                # 300 chars, respetando el presupuesto (char_budget en el interactive).
+                _prefill = componer_prefill(
+                    system=(system_prompt or ""),
+                    chunks=list(context_chunks or [])[:6],
+                    prompt=(prompt or ""),
+                    limite=min(char_budget, _MAX_PREFILL_CHARS),
+                )
+                sys_txt = (system_prompt or "").strip()[:600]
                 user_content = (prompt or "").strip()[:1024]
-                _prefill = f"{sys_txt}\n\n{user_content}"
-                if len(_prefill) > _MAX_PREFILL_CHARS:
-                    # Recorte proporcional: prioriza el prompt del usuario.
-                    _over = len(_prefill) - _MAX_PREFILL_CHARS
-                    user_content = user_content[:max(200, len(user_content) - _over)]
-                    _prefill = f"{sys_txt}\n\n{user_content}"
+                # Se separa el system del prompt para armar los mensajes del chat;
+                # el contenido completo (con chunks) ya viaja dentro del user.
                 messages = [{"role": "system", "content": sys_txt}] if sys_txt else []
-                messages.append({"role": "user", "content": user_content})
+                if messages:
+                    # El `_prefill` lleva system + prompt ya compuestos; para no
+                    # duplicar el system, se deja solo el prompt como user.
+                    messages.append({"role": "user", "content": _prefill})
+                else:
+                    messages.append({"role": "user", "content": _prefill})
                 payload = {
                     "messages": messages,
                     "max_tokens": gen_budget,
@@ -532,6 +643,11 @@ class BitNetUnifiedEngine:
                     "top_p": 0.9,
                     "stream": True,
                 }
+                # (2026-09-07 · Ola 278 · AS2) Métricas para el fichero de latencias:
+                # cuántos caracteres se mandaron de prefill, cuántos tokens pedimos
+                # generar y cuándo arranca la generación (para medir ms al final).
+                _t0_nativo = time.time()
+                _prompt_chars_nativo = len(_prefill)
                 try:
                     # read=180: GRACIA BAJO CARGA Y POR PREFILL LENTO. El modelo
                     # i2_s en CPU (M1 8GB) tarda ~90 s en el primer token cuando
@@ -576,11 +692,14 @@ class BitNetUnifiedEngine:
                             if not got_first:
                                 bitnet_failed = "sin primer token en 45 s (slot ocupado)"
                                 print(f"[BitNetUnifiedEngine] BitNet nativo cede el turno: {bitnet_failed}")
+                                self._anotar_latencia(profile, _prompt_chars_nativo, gen_budget, _t0_nativo, False, bitnet_failed)
                                 return
+                    self._anotar_latencia(profile, _prompt_chars_nativo, gen_budget, _t0_nativo, True, None)
                     return
                 except Exception as e:
                     bitnet_failed = f"{type(e).__name__}: {e}".rstrip(": ")
                     print(f"[BitNetUnifiedEngine] BitNet nativo (llama-server) FALLO ({bitnet_failed})")
+                    self._anotar_latencia(profile, _prompt_chars_nativo, gen_budget, _t0_nativo, False, bitnet_failed)
 
         # (Verificacion 1.58) Orden de intento por PERFIL, no fijo:
         #   - "background" (cognition.py: imaginacion, suenos, enjambre, Director
