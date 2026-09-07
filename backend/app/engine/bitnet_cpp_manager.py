@@ -1,5 +1,6 @@
 import os
 import json
+import signal
 import subprocess
 import shutil
 import threading
@@ -973,6 +974,62 @@ class BitNetCppManager:
         except Exception:
             return 1200
 
+    def _apagar_adoptado(self, puerto: int) -> Optional[int]:
+        """Mata un llama-server ADOPTADO (sin proc propio) que escucha en `puerto`.
+
+        (2026-09-07 · Ola 270 · AP7B) Tras un reinicio del backend, el proceso
+        propio es None: `_servers` está vacío pero el llama-server lanzado por el
+        backend ANTERIOR sigue vivo (1,3 GB en la Mac) y `dormir_a_peticion`
+        respondía «ya_estaba» sin liberar RAM. Aquí se localiza el pid que
+        escucha en el puerto (lsof, con pgrep de respaldo), se comprueba que
+        DE VERDAD es llama-server (un proceso ajeno NO se mata) y se le envía
+        SIGTERM (y SIGKILL si sigue vivo a los 2 s). Devuelve el pid o None."""
+        pid = None
+        try:
+            # lsof devuelve el pid que escucha en tcp:<puerto> (macOS y Linux).
+            out = subprocess.run(
+                ["lsof", "-ti", f"tcp:{puerto}"], capture_output=True, text=True, timeout=3
+            )
+            pid = int(out.stdout.strip().splitlines()[0])
+        except Exception:
+            # lsof falta o falló: respaldo con pgrep por línea de comando.
+            try:
+                out = subprocess.run(
+                    ["pgrep", "-f", f"llama-server.*{puerto}"],
+                    capture_output=True, text=True, timeout=3,
+                )
+                pid = int(out.stdout.strip().splitlines()[0])
+            except Exception:
+                return None
+        # Comprobar que el proceso ES un llama-server antes de matarlo: un
+        # proceso ajeno ocupando el puerto no es nuestro para parar.
+        try:
+            cmd = subprocess.check_output(
+                ["ps", "-o", "command=", "-p", str(pid)], timeout=3
+            ).decode().strip()
+        except Exception:
+            return None
+        if "llama-server" not in cmd:
+            return None
+        try:
+            os.kill(pid, signal.SIGTERM)
+        except Exception:
+            return None
+        base = f"http://127.0.0.1:{puerto}"
+        deadline = time.time() + 2.0
+        while time.time() < deadline:
+            try:
+                urllib.request.urlopen(f"{base}/health", timeout=0.5)
+            except Exception:
+                return pid  # el puerto dejó de responder: murió con SIGTERM
+            time.sleep(0.2)
+        # Sigue respondiendo a /health tras 2 s: SIGKILL sin piedad.
+        try:
+            os.kill(pid, signal.SIGKILL)
+        except Exception:
+            pass
+        return pid
+
     def dormir_a_peticion(self, min_inactivo_s: float = 30.0, cedido_s: float = 600.0) -> Dict[str, Any]:
         """Duerme el llama-server propio SI OTRO proceso pide su turno de memoria.
 
@@ -1019,8 +1076,20 @@ class BitNetCppManager:
                 print(f"[BitNetCppManager] dormido a petición (turno de memoria): libera ~{mb} MB; "
                       f"cedido {int(cedido)} s")
                 return {"dormido": True, "mb_estimados": mb, "cedido_s": int(cedido)}
-        # Sin server PROPIO vivo aún se abre la ventana: aunque nada que apagar
-        # ahora, el fondo no debe RELANZAR el motor durante el turno de la voz.
+        # (2026-09-07 · Ola 270 · AP7B) Sin proc propio vivo, puede haber un
+        # llama-server ADOPTADO (lo lanzó el backend anterior y este lo adoptó):
+        # se intenta apagarlo para que «Aliviar memoria» libere RAM de verdad.
+        puerto = self._port_for("interactive")
+        adoptado = self._apagar_adoptado(puerto)
+        if adoptado is not None:
+            self._dormido = True
+            cedido = max(0.0, min(float(cedido_s), 1800.0))
+            self._cedido_hasta = time.time() + cedido
+            print(f"[BitNetCppManager] dormido a petición (adoptado, pid {adoptado}): "
+                  f"cedido {int(cedido)} s")
+            return {"dormido": True, "adoptado": True, "pid": adoptado, "cedido_s": int(cedido)}
+        # Sin server PROPIO vivo ni adoptado aún se abre la ventana: aunque nada
+        # que apagar ahora, el fondo no debe RELANZAR el motor durante el turno.
         cedido = max(0.0, min(float(cedido_s), 1800.0))
         self._cedido_hasta = time.time() + cedido
         return {"dormido": True, "ya_estaba": True, "cedido_s": int(cedido)}

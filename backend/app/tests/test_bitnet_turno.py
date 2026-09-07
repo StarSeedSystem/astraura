@@ -405,3 +405,82 @@ def test_ensure_server_marcar_false_no_cierra_la_ventana(monkeypatch: Any) -> No
     assert res is None
     assert mgr._cedido_hasta > _time.time()  # la ventana sigue abierta
     assert mgr._dormido is True  # no se limpió: marcar_uso no se llamó
+
+
+# ---------------------------------------------------------------------------
+# (2026-09-07 · Ola 270 · AP7B) dormir_a_peticion también apaga un llama-server
+# ADOPTADO (sin proc propio): libera RAM de verdad tras un reinicio del backend,
+# cuando el proceso fue lanzado por el proceso anterior y `proc` es None.
+# ---------------------------------------------------------------------------
+
+import os as _os
+import signal as _signal
+import subprocess as _subprocess
+
+
+def test_dormir_apaga_llama_server_adoptado(monkeypatch: Any) -> None:
+    """(Ola 270 · AP7B) Con proc None pero un llama-server adoptado escuchando en
+    el puerto, `dormir_a_peticion` localiza el pid, comprueba que es llama-server,
+    lo mata con SIGTERM (y `/health` ya no responde) y devuelve `adoptado: True`."""
+    monkeypatch.setenv("ASTRAURA_BITNET_SUENO_MIN", "10")
+    mgr = BitNetCppManager()
+    mgr._servers = {}
+    mgr._ultimo_uso = _time.time() - 3600
+
+    kills: list = []
+    monkeypatch.setattr(_os, "kill", lambda pid, sig: kills.append((pid, sig)))
+    monkeypatch.setattr(_signal, "SIGTERM", 15)
+
+    def _run_falso(cmd, *a, **k):
+        if cmd and cmd[0] == "lsof":
+            sr = _subprocess.CompletedProcess(cmd, 0, stdout="4242\n", stderr="")
+            return sr
+        raise AssertionError(f"comando inesperado: {cmd}")
+
+    monkeypatch.setattr(_subprocess, "run", _run_falso)
+    monkeypatch.setattr(
+        _subprocess,
+        "check_output",
+        lambda cmd, *a, **k: b"llama-server -m gguf --port 8790",
+    )
+
+    # /health falla tras el kill: el puerto dejó de responder → SIGTERM bastó.
+    def _urlopen_falla(*a, **k):
+        raise Exception("connection refused")
+
+    monkeypatch.setattr(urllib.request, "urlopen", _urlopen_falla)
+
+    res = mgr.dormir_a_peticion(min_inactivo_s=30.0)
+    assert res["adoptado"] is True
+    assert res["pid"] == 4242
+    assert mgr._dormido is True
+    assert kills and kills[0][1] == 15  # os.kill llamado con SIGTERM
+
+
+def test_dormir_no_mata_proceso_ajeno(monkeypatch: Any) -> None:
+    """(Ola 270 · AP7B) Si el pid escuchando en el puerto NO es un llama-server
+    (ps dice otra cosa), `_apagar_adoptado` NO lo mata y la respuesta vuelve a
+    ser `ya_estaba`: un proceso ajeno ocupando el puerto no es nuestro."""
+    monkeypatch.setenv("ASTRAURA_BITNET_SUENO_MIN", "10")
+    mgr = BitNetCppManager()
+    mgr._servers = {}
+    mgr._ultimo_uso = _time.time() - 3600
+
+    kills: list = []
+    monkeypatch.setattr(_os, "kill", lambda pid, sig: kills.append((pid, sig)))
+
+    def _run_falso(cmd, *a, **k):
+        if cmd and cmd[0] == "lsof":
+            return _subprocess.CompletedProcess(cmd, 0, stdout="4242\n", stderr="")
+        raise AssertionError(f"comando inesperado: {cmd}")
+
+    monkeypatch.setattr(_subprocess, "run", _run_falso)
+    monkeypatch.setattr(
+        _subprocess,
+        "check_output",
+        lambda cmd, *a, **k: b"python otra-cosa",
+    )
+
+    res = mgr.dormir_a_peticion(min_inactivo_s=30.0)
+    assert res["ya_estaba"] is True
+    assert kills == []  # os.kill jamás se llamó
