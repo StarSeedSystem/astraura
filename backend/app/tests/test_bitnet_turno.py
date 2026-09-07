@@ -9,6 +9,7 @@
 # `_alive` y se usa un `proc` falso.
 
 import sys
+import urllib.request
 from pathlib import Path
 from typing import Any
 
@@ -349,3 +350,58 @@ def test_interactivo_con_ventana_cedida_intenta_el_nativo(monkeypatch: Any) -> N
     _drenar(engine, "interactive", meta)
     assert nativos == [1]  # el nativo fue el primer intento, ventana abierta o no
     assert "omitido" not in meta
+
+
+# ---------------------------------------------------------------------------
+# (2026-09-07 · Ola 270 · AP7A) Supervisor del BitNet: un llama-server ADOPTADO
+# (proc None pero /health responde) cuenta como vivo y NO se relanza cada 5 s;
+# y el relanzamiento del supervisor (marcar=False) no cuenta como uso
+# interactivo, no cierra la ventana «cedido» ni limpia `_dormido`.
+# ---------------------------------------------------------------------------
+
+
+def test_supervisor_no_relanza_server_adoptado(monkeypatch: Any) -> None:
+    """(Ola 270 · AP7A) Un llama-server ADOPTADO (proc None: lo lanzó OTRO
+    proceso, log «ya estaba vivo — adoptado») que responde /health 200 cuenta
+    como VIVO: una pasada de `_supervisar_una_vez` NO llama a ensure_server y
+    NO toca el reloj interactivo. Antes `proc is None` se trataba como muerto
+    y el supervisor relanzaba el BitNet cada 5 s, anulando el «dormir»."""
+    monkeypatch.setenv("ASTRAURA_BITNET_SUENO_MIN", "10")
+    monkeypatch.setenv("ASTRAURA_BITNET_SERVIDORES", "1")  # modo compartido: un perfil
+    mgr = BitNetCppManager()
+    mgr._servers = {"interactive": {"proc": None}}  # adoptado: sin proc propio
+    congelado = _time.time() - 123
+    mgr._ultimo_uso_interactivo = congelado
+
+    espia: list = []
+    monkeypatch.setattr(mgr, "ensure_server", lambda *a, **k: espia.append(a))
+
+    class _Resp:
+        status = 200  # /health responde: el server está vivo
+
+        def __enter__(self) -> "_Resp":
+            return self
+
+        def __exit__(self, *a: Any) -> None:
+            return None
+
+    monkeypatch.setattr(urllib.request, "urlopen", lambda *a, **k: _Resp())
+
+    mgr._supervisar_una_vez()
+    assert espia == []  # no relanzó el adoptado
+    assert mgr._ultimo_uso_interactivo == congelado  # el reloj interactivo intacto
+
+
+def test_ensure_server_marcar_false_no_cierra_la_ventana(monkeypatch: Any) -> None:
+    """(Ola 270 · AP7A) `ensure_server(..., marcar=False)` (relanzamiento del
+    supervisor) NO cierra la ventana «cedido» ni marca uso: devuelve None y
+    `_cedido_hasta` sigue en el futuro. El keep-alive no debe anular el turno
+    de memoria que la voz pidió al dormir."""
+    monkeypatch.setenv("ASTRAURA_BITNET_SUENO_MIN", "10")
+    mgr = BitNetCppManager()
+    mgr._cedido_hasta = _time.time() + 300
+    mgr._dormido = True
+    res = mgr.ensure_server(0.0, "interactive", marcar=False)
+    assert res is None
+    assert mgr._cedido_hasta > _time.time()  # la ventana sigue abierta
+    assert mgr._dormido is True  # no se limpió: marcar_uso no se llamó

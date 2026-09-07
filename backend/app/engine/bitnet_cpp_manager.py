@@ -194,51 +194,68 @@ class BitNetCppManager:
             if self._supervisor_stop.wait(5.0):
                 break
             try:
-                # (Ola 256 · BITNET QUE DUERME) ANTES de relanzar nada: si toca
-                # dormir, se apaga; y mientras `_dormido` sea True el
-                # supervisor NO relanza (el despertar lo hace ensure_server).
-                # (Ola 262 · 2026-09-07) Ventana «cedido» activa: la voz tiene
-                # el turno de memoria, así que el supervisor NO relanza nada
-                # aunque `_dormido` no esté marcado (p.ej. si el server ya
-                # estaba apagado al ceder).
-                if not self._dormido and not self._cedido_activo() and not self._dormir_si_toca():
-                    if not self._servidor_compartido():
-                        perfiles = ("interactive", "background")
-                    else:
-                        perfiles = ("interactive",)  # shared: un solo server
-                    for perfil in perfiles:
-                        # (Ola 256) Clave compartida: ambos perfiles miran la misma entrada.
-                        st = self._servers.get(self._clave_servidor(perfil), {})
-                        proc = st.get("proc")
-                        # ¿El proc existe y está vivo?
-                        vivo = proc is not None and proc.poll() is None
-                        if vivo:
-                            # Sondee rápido: si el server responde 200, OK. Si responde
-                            # 503 ("Loading model") el server ESTÁ vivo pero cargando el
-                            # GGUF (tarda 30-60 s en M1 8 GB) -> NO relanzar, se está
-                            # inicializando. Solo relanzar si el puerto NO responde NADA
-                            # (connection refused / timeout = proceso muerto de verdad).
-                            try:
-                                with urllib.request.urlopen(
-                                    f"http://127.0.0.1:{self._port_for(perfil)}/health", timeout=2
-                                ) as r:
-                                    # 200 = sano; 503 = cargando (dejarlo vivo).
-                                    if r.status in (200, 503):
-                                        continue  # vivo (sano o cargando), no tocar
-                            except urllib.error.HTTPError:
-                                # Cualquier otro código HTTP: el server está raro pero
-                                # vivo; no relanzar para evitar el bucle de doble-bind.
-                                continue
-                            except Exception:
-                                pass  # no responde -> relanzar abajo
-                        # Muerto o colgado -> relanzar (sin bloquear el chat: _launching protege)
-                        if not st.get("_launching"):
-                            try:
-                                self.ensure_server(30.0, perfil)
-                            except Exception:
-                                pass
+                self._supervisar_una_vez()
             except Exception:
                 pass
+
+    def _supervisar_una_vez(self) -> None:
+        """(Ola 270 · AP7A) Un barrido del keep-alive, extraído del bucle para
+        poder probarlo sin hilos ni procesos reales. Relanza SOLO los servers
+        que están muertos de verdad (ver `_proceso_vivo`)."""
+        # (Ola 256 · BITNET QUE DUERME) ANTES de relanzar nada: si toca
+        # dormir, se apaga; y mientras `_dormido` sea True el supervisor NO
+        # relanza (el despertar lo hace ensure_server).
+        # (Ola 262 · 2026-09-07) Ventana «cedido» activa: la voz tiene el
+        # turno de memoria, así que el supervisor NO relanza nada aunque
+        # `_dormido` no esté marcado (p.ej. si el server ya estaba apagado al
+        # ceder).
+        if self._dormido or self._cedido_activo() or self._dormir_si_toca():
+            return
+        if not self._servidor_compartido():
+            perfiles = ("interactive", "background")
+        else:
+            perfiles = ("interactive",)  # shared: un solo server
+        for perfil in perfiles:
+            # (Ola 256) Clave compartida: ambos perfiles miran la misma entrada.
+            st = self._servers.get(self._clave_servidor(perfil), {})
+            proc = st.get("proc")
+            if self._proceso_vivo(perfil, proc):
+                continue  # vivo (propio o adoptado): no tocar
+            # Muerto o colgado -> relanzar (sin bloquear el chat: _launching protege).
+            # (Ola 270 · AP7A) marcar=False: el keep-alive no cuenta como uso
+            # interactivo, no cierra la ventana «cedido» ni limpia `_dormido`
+            # (antes, a los 5 s, anulaba el «dormir» pedido por la voz).
+            if not st.get("_launching"):
+                try:
+                    self.ensure_server(30.0, perfil, marcar=False)
+                except Exception:
+                    pass
+
+    def _proceso_vivo(self, perfil: str, proc: Any) -> bool:
+        """¿El server del perfil está vivo de verdad?
+
+        (Ola 270 · AP7A) Con un proc PROPIO vivo cuenta como vivo; un server
+        ADOPTADO (proc None: lo lanzó OTRO proceso, p.ej. el backend recargado
+        o Alex a mano) no tiene poll() que consultar, así que decide el PUERTO:
+        si `/health` responde 200/503 (sano o cargando el GGUF) está vivo y NO
+        se relanza. Antes `proc is None` se trataba como muerto y el supervisor
+        relanzaba el BitNet adoptado cada 5 s (PID fantasma cambiando)."""
+        if proc is not None and proc.poll() is not None:
+            return False  # proc propio, poll() acabado -> muerto
+        # Sondeo rápido: 200 = sano; 503 ("Loading model") = vivo pero cargando
+        # el GGUF (tarda 30-60 s en M1 8 GB) -> NO relanzar, se está inicializando.
+        # Solo muerto si el puerto NO responde NADA (connection refused / timeout).
+        try:
+            with urllib.request.urlopen(
+                f"http://127.0.0.1:{self._port_for(perfil)}/health", timeout=2
+            ) as r:
+                return r.status in (200, 503)
+        except urllib.error.HTTPError:
+            # Cualquier otro código HTTP: el server está raro pero vivo; no
+            # relanzar para evitar el bucle de doble-bind.
+            return True
+        except Exception:
+            return False  # no responde -> muerto/colgado, relanzar abajo
         
     def _ctx_segun_ram(self) -> int:
         """
@@ -690,7 +707,9 @@ class BitNetCppManager:
             "-ctv", "q8_0",
         ]
 
-    def ensure_server(self, wait_seconds: float = 0.0, profile: str = "interactive") -> Optional[str]:
+    def ensure_server(
+        self, wait_seconds: float = 0.0, profile: str = "interactive", marcar: bool = True
+    ) -> Optional[str]:
         """Arranca (si hace falta) el llama-server nativo del PERFIL pedido con el GGUF
         i2_s y devuelve su base URL, o None si no hay binario/modelo. `wait_seconds` > 0
         espera a que el modelo cargue (health ok); 0 = arranque sin bloquear.
@@ -723,15 +742,22 @@ class BitNetCppManager:
         # motor; el aviso de degradación ya lo documenta). El chat interactivo,
         # en cambio, CIERRA la ventana y despierta como siempre: el usuario
         # manda sobre la voz.
+        # (Ola 270 · AP7A) Con `marcar=False` (relanzamiento del supervisor)
+        # la ventana NO se cierra ni se toca: un keep-alive no es una petición
+        # del usuario y no debe anular el turno cedido a la voz.
         if self._cedido_activo():
-            if profile == "background":
+            if profile == "background" or not marcar:
                 return None
             self._cedido_hasta = 0.0
         # (Ola 256 · BITNET QUE DUERME) Toda generación real pasa por aquí:
         # registrarla como uso y despertar el motor antes de sondear/lanzar.
         # (Ola 262) Se registra CON su perfil para que el reloj interactivo
         # solo lo refresque el usuario, no el fondo.
-        self.marcar_uso(profile)
+        # (Ola 270 · AP7A) `marcar=False` evita marcar_uso (y con ello limpiar
+        # `_dormido` y refrescar el reloj interactivo): relanzar el server
+        # adoptado no despierta lo dormido por el turno de memoria.
+        if marcar:
+            self.marcar_uso(profile)
         with self._server_lock:
             # (Ola 256) Clave compartida: en modo compartido ambos perfiles
             # leen/escriben LA MISMA entrada (mismo proc, mismo _launching),
