@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 import psutil
 import numpy as np
+import app.engine.bitnet_cpp_manager
 
 # (StarSeed OS · Adenda 153) Rutas PORTABLES: el workspace se deriva de core/config.py
 # (raíz del repo) y el home del usuario; antes eran rutas /Users/alex/... fijas.
@@ -641,9 +642,11 @@ class AdaptiveMultiAreaSwarmEngine:
             "Escribe el ENTREGABLE de esta tarea: 1) hallazgos, 2) cambios o propuestas concretas (con fragmentos "
             "de código o pasos si aplica), 3) cómo verificarlo. Máximo ~250 palabras."
         )
+        # 2026-09-08, Ola 284 · AS3 - Ajuste de tokens para fondo en servidor compartido
+        max_tokens = int(os.environ.get("ASTRAURA_FONDO_TOKENS") or (160 if self._servidor_compartido() else 400))
         # (Adenda 181) El fondo tiene PACIENCIA real: a ~3 tok/s en 8 GB, 400 tokens
         # tardan ~130 s; con 90 s el timeout fallaba tareas que SÍ iban a completar.
-        res = await cognition.generate(prompt, system=system, max_tokens=400, temperature=0.45, timeout=240.0)
+        res = await cognition.generate(prompt, system=system, max_tokens=max_tokens, temperature=0.45, timeout=240.0)
         if not res.get("real"):
             return None
         text = res["text"].strip()
@@ -768,6 +771,53 @@ class AdaptiveMultiAreaSwarmEngine:
     KEEP_COMPLETED = 12
     STUCK_SECONDS = 600  # running sin completar > 10 min = atascada por contención
 
+    def _servidor_compartido(self) -> bool:
+        """2026-09-08, Ola 284 · AS3 - Determina si el servidor es compartido (un solo slot)"""
+        try:
+            import app.engine.bitnet_cpp_manager
+            return app.engine.bitnet_cpp_manager._servidor_compartido()
+        except Exception:
+            # Si falla, usar límite basado en memoria
+            try:
+                gb = psutil.virtual_memory().total / (1024 ** 3)
+                return gb <= 8.5
+            except Exception:
+                return True  # Valor por defecto seguro
+
+    def _fondo_proactivo_permitido(self) -> bool:
+        """2026-09-08, Ola 284 · AS3 - Verifica si el despacho proactivo de fondo está permitido"""
+        env_valor = os.environ.get('ASTRAURA_FONDO_PROACTIVO', '').lower()
+        if env_valor in ['1', 'true', 'si']:
+            return True
+        elif env_valor in ['0', 'false', 'no']:
+            return False
+        else:
+            # Por defecto, si es servidor compartido, no se permite el despacho proactivo
+            return not self._servidor_compartido()
+
+    def _chat_tiene_el_turno(self, now: float) -> bool:
+        """2026-09-08, Ola 284 · AS3 - Verifica si el chat interactivo tiene el turno del motor"""
+        try:
+            idle_threshold = int(os.environ.get('ASTRAURA_FONDO_IDLE_S', 300))  # 5 minutos por defecto
+        except ValueError:
+            idle_threshold = 300
+            
+        # Verificar última actividad del usuario
+        if now - self.last_user_activity_time < idle_threshold:
+            return True
+            
+        # Verificar último uso interactivo del motor
+        try:
+            import app.engine.bitnet_cpp_manager
+            ultimo_uso_interactivo = getattr(app.engine.bitnet_cpp_manager, '_ultimo_uso_interactivo', None)
+            if ultimo_uso_interactivo is not None:
+                if now - ultimo_uso_interactivo < idle_threshold:
+                    return True
+        except Exception:
+            pass  # No hacer nada si no se puede acceder al atributo
+            
+        return False
+
     def _limite_fondo(self) -> int:
         """(Adenda 181) Tareas de fondo SIMULTÁNEAS honestas para este hardware:
         en ≤8.5 GB el motor 1.58 solo puede servir UNA generación real a la vez
@@ -833,6 +883,168 @@ class AdaptiveMultiAreaSwarmEngine:
             try: self.save_state()
             except Exception: pass
         return removed
+    def _barrido(self, now: float):
+        """2026-09-08, Ola 284 · AS3 - Función que realiza una pasada del bucle de planificación"""
+        # (Adenda 178) Poda de la cola ANTES de avanzar: mantiene active_tasks
+        # acotada (running vivas + N completadas), libera atascadas y evita el
+        # pile-up que satura la cognición (el visor mostró 504 tareas).
+        self._prune_active_tasks(now)
+        self._throttle_running(now)
+
+        # Check user interaction cooldown
+        if now - self.last_user_activity_time > 20:
+            self.is_user_interactive = False
+
+        # 1. Update running tasks progress through real physical execution phases
+        running_tasks = [t for t in self.active_tasks if t["status"] == "running"]
+        
+        # (Adenda 181 · 100% REAL) Máquina de estados por HITOS REALES:
+        # fase 1 = escaneo real de archivos · fase 2 = la GENERACIÓN del
+        # motor 1.58 ocurre AQUÍ (no después de «completed») · fase 3 =
+        # entregable real listo · fase 4 = auditoría. Sin temporizadores
+        # decorativos, sin np.dot de adorno, sin plantillas de relleno:
+        # si el motor no sirve respuesta real, la tarea FALLA con motivo.
+        for t in running_tasks:
+            proc = psutil.Process()
+            t["real_memory_mb"] = round(proc.memory_info().rss / (1024 * 1024), 1)
+            t["real_cpu_usage"] = psutil.cpu_percent(interval=None)
+            stage = t.get("real_stage") or "scan"
+
+            if stage == "scan":
+                target_path = Path(t.get("target_folder_path", f"{WORKSPACE}/backend/app"))
+                target_path.mkdir(parents=True, exist_ok=True)
+                real_files = [f.name for f in target_path.glob("*.*") if not f.name.startswith(".")][:8] if target_path.exists() else []
+                t["real_files_scanned_count"] = len(real_files)
+                total_bytes = sum(f.stat().st_size for f in target_path.glob("*.*") if f.is_file()) if target_path.exists() else 0
+                t.setdefault("logs", []).append(f"Inspeccionados {len(real_files)} archivos reales ({round(total_bytes/1024, 1)} KB) en {target_path.name}.")
+                t["progress"] = 25
+                t["execution_phase"] = "phase_1_inspection"
+                t["phase_label"] = "Fase 1/4: Inspección REAL de archivos y telemetría"
+                t["real_stage"] = "generate"
+            elif stage == "generate":
+                if not t.get("_gen_launched"):
+                    # 2026-09-08, Ola 284 · AS3 - Verificar si el chat tiene el turno
+                    if self._chat_tiene_el_turno(now):
+                        # No iniciar la generación si el chat tiene el turno
+                        t["phase_label"] = "Esperando: el chat tiene el turno del motor 1.58"
+                        t["started_at"] = now  # Para que _prune_active_tasks no la mate como atascada mientras espera
+                        continue  # Pasar a la siguiente tarea
+                        
+                    t["_gen_launched"] = True
+                    t["generation_started_at"] = now
+                    t["progress"] = 30
+                    t["execution_phase"] = "phase_2_inference"
+                    t["phase_label"] = "Fase 2/4: Generación REAL lanzada al motor 1.58"
+                    try:
+                        asyncio.create_task(self._generate_real(t))
+                    except Exception as e:
+                        t["fail_reason"] = f"No se pudo lanzar la generación: {str(e)[:100]}"
+                        t["real_stage"] = "failed"
+                else:
+                    el = int(now - t.get("generation_started_at", now))
+                    t["progress"] = min(88, 30 + el // 3)
+                    t["phase_label"] = f"Fase 2/4: Generación REAL en curso · {el}s del motor 1.58"
+            elif stage == "synthesize":
+                t["progress"] = 92
+                t["execution_phase"] = "phase_3_synthesis"
+                t["phase_label"] = f"Fase 3/4: Entregable REAL listo ({t.get('deliverable_ms', 0)} ms del motor)"
+                t["real_stage"] = "finish"
+            elif stage == "finish":
+                t["progress"] = 100
+                t["status"] = "completed"
+                t["execution_phase"] = "phase_4_verification"
+                t["phase_label"] = "Fase 4/4: Auditoría Técnica del Director & Enrutamiento"
+                t["completed_at"] = now
+                t["logs"].append("✅ Entregable REAL producido por el motor; pasa a auditoría.")
+                if t["agent_id"] in self.agents:
+                    self.agents[t["agent_id"]]["completed_tasks"] += 1
+                try:
+                    asyncio.create_task(self._finalize_completed_task(t))
+                except Exception as e:
+                    print(f"⚠️ Error lanzando la finalización de la tarea {t.get('id')}: {e}")
+            elif stage == "failed":
+                t["status"] = "failed"
+                t["phase_label"] = t.get("fail_reason", "El motor 1.58 no sirvió respuesta real (sin plantilla de relleno)")
+                t.setdefault("logs", []).append(f"❌ {t['phase_label']}")
+
+        # 2. Autonomous Proactive Swarm Dispatcher (Maintains continuous intelligent pipeline)
+        # 2026-09-08, Ola 284 · AS3 - Solo ejecutar si fondo proactivo permitido y chat no tiene turno
+        if (len(running_tasks) < self._limite_fondo() and 
+            self._fondo_proactivo_permitido() and 
+            not self._chat_tiene_el_turno(now)):
+            pool = [
+                ("area_engineering", "hephaestus", "Optimización de Microkernel Vectorial NEON en 1.58b", "Refactorizar bucles SIMD para Apple Silicon M1.", f"{WORKSPACE}/backend/app"),
+                ("area_web_intel", "hermes", "Rastreo de Preprints arXiv sobre Modelos Ternarios", "Extracción y análisis de papers sobre cuantización ternaria.", f"{WORKSPACE}/data/research"),
+                ("area_creative_synthesis", "oneiros", "Síntesis de Shader Procedural WebGL Reactivo", "Generación de geometría sagrada y shaders de baja entropía.", f"{WORKSPACE}/frontend/src/components"),
+                ("area_synaptic_memory", "mnemosyne", "Consolidación de Grafo de Memoria StarSeed", "Extracción de axiomas y compactación de memoria a largo plazo.", f"{WORKSPACE}/data/vault/memories"),
+                ("area_sentinel_privacy", "athena", "Auditoría de Sensores Físicos & Privacidad 360°", "Comprobación de aislamiento y telemetría de silicio M1.", f"{WORKSPACE}/data/telemetry"),
+                ("area_project_management", "daedalus", "Sincronización de Topología & Versiones de Proyecto", "Evaluación de métricas de salud en Bóveda de Proyectos.", f"{WORKSPACE}/data/vault/projects")
+            ]
+            # Select least recently dispatched area
+            dispatched_areas = [t["area_id"] for t in self.active_tasks]
+            available = [p for p in pool if p[0] not in dispatched_areas]
+            chosen = available[0] if available else pool[0]
+            self.dispatch_task(
+                area_id=chosen[0],
+                title=chosen[2],
+                prompt=chosen[3],
+                agent_id=chosen[1],
+                target_folder_path=chosen[4],
+                target_project_id="proj_astraura_core"
+            )
+
+        # 3. Check and trigger scheduled reactivations
+        for s in self.schedules:
+            if s.get("is_enabled", True) and now >= s.get("next_run_timestamp", 0):
+                # 2026-09-08, Ola 284 · AS3 - Si el chat tiene el turno, posponer la reactivación
+                if self._chat_tiene_el_turno(now):
+                    # Actualizar el timestamp para dentro de 60 segundos
+                    s["next_run_timestamp"] = now + 60
+                    # Registrar en last_result que se ha pospuesto
+                    current_time = time.strftime('%H:%M:%S')
+                    s["last_result"] = f"aplazado {current_time}: el chat tiene el turno del motor 1.58"
+                    
+                    # Mostrar mensaje de aviso máximo cada 5 minutos
+                    if not hasattr(self, '_ultimo_aviso_aplazado'):
+                        self._ultimo_aviso_aplazado = 0
+                    if now - self._ultimo_aviso_aplazado > 300:  # 5 minutos
+                        print(f"⏰ [SwarmScheduler] Reactivación pospuesta: '{s['title']}' en {s['area_id']} - el chat tiene el turno del motor 1.58")
+                        self._ultimo_aviso_aplazado = now
+                else:
+                    print(f"⏰ [SwarmScheduler] Despertador activado: '{s['title']}' en {s['area_id']}...")
+                    s["last_run_timestamp"] = now
+                    s["next_run_timestamp"] = now + (s.get("frequency_minutes", 15) * 60)
+                    
+                    # Dispatch real task for the scheduled agent
+                    self.dispatch_task(
+                        area_id=s["area_id"],
+                        title=f"Auto-Reactivación: {s['title']}",
+                        prompt=s.get("prompt", "Ejecución autónoma programada"),
+                        agent_id=s["assigned_agent"]
+                    )
+                    s["last_result"] = f"Ciclo ejecutado a las {time.strftime('%H:%M:%S')}. Todo nominal."
+                    self._save_state()
+
+        # 4. Auto-Orquestación de Autorizaciones en 2do plano (siempre activa)
+        try:
+            from app.agents.intelligent_authorization_orchestrator import intelligent_authorization_orchestrator
+            tick = intelligent_authorization_orchestrator.tick_auto_mode()
+            if tick.get("ran"):
+                print(f"🤖 [AuthOrchestrator] Auto-tick procesó {tick.get('dispatched')} notificaciones en 2do plano.")
+        except Exception as e:
+            print(f"⚠️ [AuthOrchestrator] Error en auto-tick del scheduler: {e}")
+
+        # 5. Agente de Enrutamiento, Almacenamiento & Sincronización Universal
+        try:
+            from app.agents.routing_storage_agent import routing_storage_agent
+            if routing_storage_agent.config.get("enabled", True) and not routing_storage_agent.is_busy:
+                threading.Thread(target=lambda: asyncio.run(routing_storage_agent.run_sync_cycle()), daemon=True).start()
+
+        except Exception as e:
+            print(f"⚠️ [RoutingStorageAgent] Error en auto-tick del scheduler: {e}")
+
+        # Save updated tasks
+        self._save_state()
 
     async def start_scheduler_loop(self):
         """
@@ -844,141 +1056,9 @@ class AdaptiveMultiAreaSwarmEngine:
             try:
                 await asyncio.sleep(5)
                 now = time.time()
-
-                # (Adenda 178) Poda de la cola ANTES de avanzar: mantiene active_tasks
-                # acotada (running vivas + N completadas), libera atascadas y evita el
-                # pile-up que satura la cognición (el visor mostró 504 tareas).
-                self._prune_active_tasks(now)
-                self._throttle_running(now)
-
-                # Check user interaction cooldown
-                if now - self.last_user_activity_time > 20:
-                    self.is_user_interactive = False
-
-                # 1. Update running tasks progress through real physical execution phases
-                running_tasks = [t for t in self.active_tasks if t["status"] == "running"]
                 
-                # (Adenda 181 · 100% REAL) Máquina de estados por HITOS REALES:
-                # fase 1 = escaneo real de archivos · fase 2 = la GENERACIÓN del
-                # motor 1.58 ocurre AQUÍ (no después de «completed») · fase 3 =
-                # entregable real listo · fase 4 = auditoría. Sin temporizadores
-                # decorativos, sin np.dot de adorno, sin plantillas de relleno:
-                # si el motor no sirve respuesta real, la tarea FALLA con motivo.
-                for t in running_tasks:
-                    proc = psutil.Process()
-                    t["real_memory_mb"] = round(proc.memory_info().rss / (1024 * 1024), 1)
-                    t["real_cpu_usage"] = psutil.cpu_percent(interval=None)
-                    stage = t.get("real_stage") or "scan"
-
-                    if stage == "scan":
-                        target_path = Path(t.get("target_folder_path", f"{WORKSPACE}/backend/app"))
-                        target_path.mkdir(parents=True, exist_ok=True)
-                        real_files = [f.name for f in target_path.glob("*.*") if not f.name.startswith(".")][:8] if target_path.exists() else []
-                        t["real_files_scanned_count"] = len(real_files)
-                        total_bytes = sum(f.stat().st_size for f in target_path.glob("*.*") if f.is_file()) if target_path.exists() else 0
-                        t.setdefault("logs", []).append(f"Inspeccionados {len(real_files)} archivos reales ({round(total_bytes/1024, 1)} KB) en {target_path.name}.")
-                        t["progress"] = 25
-                        t["execution_phase"] = "phase_1_inspection"
-                        t["phase_label"] = "Fase 1/4: Inspección REAL de archivos y telemetría"
-                        t["real_stage"] = "generate"
-                    elif stage == "generate":
-                        if not t.get("_gen_launched"):
-                            t["_gen_launched"] = True
-                            t["generation_started_at"] = now
-                            t["progress"] = 30
-                            t["execution_phase"] = "phase_2_inference"
-                            t["phase_label"] = "Fase 2/4: Generación REAL lanzada al motor 1.58"
-                            try:
-                                asyncio.create_task(self._generate_real(t))
-                            except Exception as e:
-                                t["fail_reason"] = f"No se pudo lanzar la generación: {str(e)[:100]}"
-                                t["real_stage"] = "failed"
-                        else:
-                            el = int(now - t.get("generation_started_at", now))
-                            t["progress"] = min(88, 30 + el // 3)
-                            t["phase_label"] = f"Fase 2/4: Generación REAL en curso · {el}s del motor 1.58"
-                    elif stage == "synthesize":
-                        t["progress"] = 92
-                        t["execution_phase"] = "phase_3_synthesis"
-                        t["phase_label"] = f"Fase 3/4: Entregable REAL listo ({t.get('deliverable_ms', 0)} ms del motor)"
-                        t["real_stage"] = "finish"
-                    elif stage == "finish":
-                        t["progress"] = 100
-                        t["status"] = "completed"
-                        t["execution_phase"] = "phase_4_verification"
-                        t["phase_label"] = "Fase 4/4: Auditoría Técnica del Director & Enrutamiento"
-                        t["completed_at"] = now
-                        t["logs"].append("✅ Entregable REAL producido por el motor; pasa a auditoría.")
-                        if t["agent_id"] in self.agents:
-                            self.agents[t["agent_id"]]["completed_tasks"] += 1
-                        try:
-                            asyncio.create_task(self._finalize_completed_task(t))
-                        except Exception as e:
-                            print(f"⚠️ Error lanzando la finalización de la tarea {t.get('id')}: {e}")
-                    elif stage == "failed":
-                        t["status"] = "failed"
-                        t["phase_label"] = t.get("fail_reason", "El motor 1.58 no sirvió respuesta real (sin plantilla de relleno)")
-                        t.setdefault("logs", []).append(f"❌ {t['phase_label']}")
-
-                # 2. Autonomous Proactive Swarm Dispatcher (Maintains continuous intelligent pipeline)
-                if len(running_tasks) < self._limite_fondo():
-                    pool = [
-                        ("area_engineering", "hephaestus", "Optimización de Microkernel Vectorial NEON en 1.58b", "Refactorizar bucles SIMD para Apple Silicon M1.", f"{WORKSPACE}/backend/app"),
-                        ("area_web_intel", "hermes", "Rastreo de Preprints arXiv sobre Modelos Ternarios", "Extracción y análisis de papers sobre cuantización ternaria.", f"{WORKSPACE}/data/research"),
-                        ("area_creative_synthesis", "oneiros", "Síntesis de Shader Procedural WebGL Reactivo", "Generación de geometría sagrada y shaders de baja entropía.", f"{WORKSPACE}/frontend/src/components"),
-                        ("area_synaptic_memory", "mnemosyne", "Consolidación de Grafo de Memoria StarSeed", "Extracción de axiomas y compactación de memoria a largo plazo.", f"{WORKSPACE}/data/vault/memories"),
-                        ("area_sentinel_privacy", "athena", "Auditoría de Sensores Físicos & Privacidad 360°", "Comprobación de aislamiento y telemetría de silicio M1.", f"{WORKSPACE}/data/telemetry"),
-                        ("area_project_management", "daedalus", "Sincronización de Topología & Versiones de Proyecto", "Evaluación de métricas de salud en Bóveda de Proyectos.", f"{WORKSPACE}/data/vault/projects")
-                    ]
-                    # Select least recently dispatched area
-                    dispatched_areas = [t["area_id"] for t in self.active_tasks]
-                    available = [p for p in pool if p[0] not in dispatched_areas]
-                    chosen = available[0] if available else pool[0]
-                    self.dispatch_task(
-                        area_id=chosen[0],
-                        title=chosen[2],
-                        prompt=chosen[3],
-                        agent_id=chosen[1],
-                        target_folder_path=chosen[4],
-                        target_project_id="proj_astraura_core"
-                    )
-
-                # 3. Check and trigger scheduled reactivations
-                for s in self.schedules:
-                    if s.get("is_enabled", True) and now >= s.get("next_run_timestamp", 0):
-                        print(f"⏰ [SwarmScheduler] Despertador activado: '{s['title']}' en {s['area_id']}...")
-                        s["last_run_timestamp"] = now
-                        s["next_run_timestamp"] = now + (s.get("frequency_minutes", 15) * 60)
-                        
-                        # Dispatch real task for the scheduled agent
-                        self.dispatch_task(
-                            area_id=s["area_id"],
-                            title=f"Auto-Reactivación: {s['title']}",
-                            prompt=s.get("prompt", "Ejecución autónoma programada"),
-                            agent_id=s["assigned_agent"]
-                        )
-                        s["last_result"] = f"Ciclo ejecutado a las {time.strftime('%H:%M:%S')}. Todo nominal."
-                        self._save_state()
-
-                # 4. Auto-Orquestación de Autorizaciones en 2do plano (siempre activa)
-                try:
-                    from app.agents.intelligent_authorization_orchestrator import intelligent_authorization_orchestrator
-                    tick = intelligent_authorization_orchestrator.tick_auto_mode()
-                    if tick.get("ran"):
-                        print(f"🤖 [AuthOrchestrator] Auto-tick procesó {tick.get('dispatched')} notificaciones en 2do plano.")
-                except Exception as e:
-                    print(f"⚠️ [AuthOrchestrator] Error en auto-tick del scheduler: {e}")
-
-                # 5. Agente de Enrutamiento, Almacenamiento & Sincronización Universal
-                try:
-                    from app.agents.routing_storage_agent import routing_storage_agent
-                    if routing_storage_agent.config.get("enabled", True) and not routing_storage_agent.is_busy:
-                        threading.Thread(target=lambda: asyncio.run(routing_storage_agent.run_sync_cycle()), daemon=True).start()
-                except Exception as e:
-                    print(f"⚠️ [RoutingStorageAgent] Error en auto-tick del scheduler: {e}")
-
-                # Save updated tasks
-                self._save_state()
+                # Llamar a la función de barrido que contiene la lógica principal
+                self._barrido(now)
 
             except Exception as e:
                 print(f"⚠️ Error en bucle del Swarm Scheduler: {e}")
@@ -986,6 +1066,7 @@ class AdaptiveMultiAreaSwarmEngine:
 
     def get_status(self) -> Dict[str, Any]:
         alloc = self.calculate_adaptive_allocation()
+        now = time.time()
         return {
             "capacity_governor": alloc,
             "areas": SWARM_AREAS,
@@ -993,7 +1074,14 @@ class AdaptiveMultiAreaSwarmEngine:
             "active_tasks": self.active_tasks,
             "schedules": self.schedules,
             "total_active_agents": len([a for a in self.agents.values() if a["status"] == "active"]),
-            "total_completed_tasks": sum(a.get("completed_tasks", 0) for a in self.agents.values())
+            "total_completed_tasks": sum(a.get("completed_tasks", 0) for a in self.agents.values()),
+            "fondo": {
+                "proactivo": self._fondo_proactivo_permitido(),
+                "compartido": self._servidor_compartido(),
+                "chat_tiene_turno": self._chat_tiene_el_turno(now),
+                "idle_s": int(os.environ.get('ASTRAURA_FONDO_IDLE_S', 300)),
+                "tokens_fondo": int(os.environ.get("ASTRAURA_FONDO_TOKENS") or (160 if self._servidor_compartido() else 400))
+            }
         }
 
     def get_swarm_status(self) -> Dict[str, Any]:
