@@ -1,6 +1,7 @@
 import re
 import os
 import json
+import unicodedata
 from pathlib import Path
 from typing import Dict, Any, List
 
@@ -22,12 +23,70 @@ from typing import Dict, Any, List
 # de mas.
 MAX_CHARS_PLANTILLA = 200
 
+# (Ola 284 · AS8 · 2026-09-08) El limite de cobertura: para que una plantilla
+# se dispare, la frase candidata tiene que cubrir al menos el 60 % de las
+# palabras que quedan tras normalizar. Asi, «quién eres» dentro de «quién eres
+# y qué motor te sirve» NO secuestra la respuesta: la pregunta no ES esa.
+COBERTURA_MINIMA = 0.6
+
+# (Ola 284 · AS8) Saludos e invocacion del nombre que se descartan si abren la
+# frase: no aportan nada a la pregunta real y ensuciaban el conteo de palabras.
+_SALUDOS_INICIALES = {"hola", "hey", "oye", "buenas", "astraura"}
+
+
+def normalizar_prompt(p: str) -> str:
+    """Normaliza un prompt para compararlo sin ruido: minusculas, sin tildes,
+    sin signos «¿?¡!.,;:» y sin saludos iniciales ni el nombre «astraura»
+    cuando abren la frase. Devuelve el texto listo para cobertura. (Ola 284 ·
+    AS8 · 2026-09-08)"""
+    if not p:
+        return ""
+    s = p.lower()
+    # Quita las tildes con descomposicion NFD y descartando los diacriticos.
+    s = "".join(c for c in unicodedata.normalize("NFD", s)
+                if unicodedata.category(c) != "Mn")
+    # Quita los signos de puntuacion y el punto listados en la tarea.
+    s = re.sub(r"[¿?¡!.,;:]", "", s).strip()
+    # Descarta saludos e «astraura» solo cuando abren la frase, una y otra vez.
+    while True:
+        partes = s.split()
+        if partes and partes[0] in _SALUDOS_INICIALES:
+            s = " ".join(partes[1:]).strip()
+        else:
+            break
+    return s.strip()
+
+
+def cobertura_frase(p_norm: str, frase: str) -> float:
+    """Cobertura = palabras de la frase normalizada / palabras del prompt
+    normalizado. Devuelve 0.0 si el prompt o la frase quedan vacios. (Ola 284
+    · AS8 · 2026-09-08)"""
+    palabras_prompt = p_norm.split()
+    if not palabras_prompt:
+        return 0.0
+    palabras_frase = normalizar_prompt(frase).split()
+    if not palabras_frase:
+        return 0.0
+    return len(palabras_frase) / len(palabras_prompt)
+
 
 def dispara_plantilla(p_lower: str, frases) -> bool:
-    """True solo si el prompt es una pregunta corta que contiene una de `frases`."""
-    if not p_lower or len(p_lower) > MAX_CHARS_PLANTILLA:
+    """True solo si el prompt normalizado es una pregunta corta que (a) sigue
+    por debajo de `MAX_CHARS_PLANTILLA`, (b) contiene una de `frases` y (c) esa
+    frase cubre al menos `COBERTURA_MINIMA` de las palabras del prompt. De este
+    modo una pregunta es ESA pregunta y no una parte de otra: «quien eres» ya
+    no secuestra el chat cuando el usuario pide ademas otra cosa. (Ola 284 ·
+    AS8 · 2026-09-08)"""
+    p_norm = normalizar_prompt(p_lower)
+    # (a) Prompt normalizado demasiado largo: nunca es una plantilla.
+    if not p_norm or len(p_norm) > MAX_CHARS_PLANTILLA:
         return False
-    return any(f in p_lower for f in frases)
+    for frase in frases:
+        f_norm = normalizar_prompt(frase)
+        # (b) y (c): la frase esta presente y cubre al menos el 60 % de palabras.
+        if f_norm and f_norm in p_norm and cobertura_frase(p_norm, frase) >= COBERTURA_MINIMA:
+            return True
+    return False
 
 class LogicalReasoner:
     """
