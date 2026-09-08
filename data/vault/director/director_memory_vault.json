@@ -15,11 +15,37 @@
     "default_master_directive": "Supervisión continua, balance de hardware M1 y enrutamiento inteligente de activos a proyectos.",
     "retention_logs_count": 50
   },
-  "tasks_supervised_count": 16241,
+  "tasks_supervised_count": 16242,
   "verifications_completed_count": 55396,
   "routings_performed_count": 55394,
-  "active_directive": "Consolidar 30 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
+  "active_directive": "Consolidar 1 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
   "executive_memories": [
+    {
+      "id": "mem_dir_1788840533_38",
+      "title": "Autorizaciones orquestadas: 1 tareas críticas",
+      "content": "Consolidar 1 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
+      "category": "authorization_priority",
+      "importance": "high",
+      "timestamp": 1788840533.0035698,
+      "tags": [
+        "orquestacion",
+        "prioridad_critica",
+        "autorizacion"
+      ]
+    },
+    {
+      "id": "mem_dir_1788840532_74",
+      "title": "Directiva Aplicada: Consolidar 1 tareas de autorización...",
+      "content": "Se emitió la directriz 'Consolidar 1 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.' enrutando tareas hacia daedalus con asignación al proyecto 'proj_astraura_core'.",
+      "category": "directive_history",
+      "importance": "medium",
+      "timestamp": 1788840532.9977534,
+      "tags": [
+        "directiva_usuario",
+        "delegación",
+        "proj_astraura_core"
+      ]
+    },
     {
       "id": "mem_dir_1788403365_13",
       "title": "Autorizaciones orquestadas: 30 tareas críticas",
@@ -650,36 +676,26 @@
         "delegación",
         "proj_astraura_core"
       ]
-    },
-    {
-      "id": "mem_dir_1788376093_93",
-      "title": "Modo Drenaje de Autorizaciones: 24 pendientes",
-      "content": "MODO DRENAJE ACTIVADO: 24 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 24 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.",
-      "category": "authorization_drainage",
-      "importance": "critical",
-      "timestamp": 1788376093.9105039,
-      "tags": [
-        "drenaje",
-        "prioridad",
-        "autorizacion",
-        "coordinacion"
-      ]
-    },
-    {
-      "id": "mem_dir_1788376093_39",
-      "title": "Directiva Aplicada: MODO DRENAJE ACTIVADO: 24 solicitud...",
-      "content": "Se emitió la directriz 'MODO DRENAJE ACTIVADO: 24 solicitudes pendientes superan el umbral de equilibrio (20). Priorizar el uso de los agentes (hephaestus/oneiros/mnemosyne/hermes/athena/architectus/daedalus) para COMPLETAR estas 24 tareas críticas ENVIADAS AHORA antes que cualquier proceso imaginativo. Pausar 'imaginación libre' hasta drenar la cola a un nivel balanceado; luego reanudar imaginación normal.' enrutando tareas hacia oneiros con asignación al proyecto 'proj_astraura_core'.",
-      "category": "directive_history",
-      "importance": "medium",
-      "timestamp": 1788376093.899746,
-      "tags": [
-        "directiva_usuario",
-        "delegación",
-        "proj_astraura_core"
-      ]
     }
   ],
   "decision_history": [
+    {
+      "id": "dec_1788840532_356",
+      "timestamp": 1788840532.9935038,
+      "action": "Emisión de Directiva: 'Consolidar 1 tareas de autorización recién concedi...'",
+      "directive": "Consolidar 1 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
+      "dispatched_count": 1,
+      "dispatched_actions": [
+        {
+          "agent": "daedalus",
+          "task_title": "Orquestación General: Consolidar 1 tareas de autorización recién co...",
+          "area": "area_project_management"
+        }
+      ],
+      "target_project": "proj_astraura_core",
+      "reasoning": "El Director Metis descompuso la directriz y activó 1 agentes del enjambre con prioridades calibradas.",
+      "status": "in_progress"
+    },
     {
       "id": "route_1788404994_581",
       "timestamp": 1788404994.6724439,
@@ -1197,23 +1213,6 @@
       "reasoning": "Tarea anterior 'Auto-Reactivación: Auditoría de Código & Archivos Locales' auditada (98%). El motor no sirvió una formulación real; no se despacha tarea inventada.",
       "generated_by": "ninguno",
       "status": "skipped"
-    },
-    {
-      "id": "dec_1788399146_106",
-      "timestamp": 1788399146.169657,
-      "action": "Emisión de Directiva: 'Consolidar 25 tareas de autorización recién conced...'",
-      "directive": "Consolidar 25 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.",
-      "dispatched_count": 1,
-      "dispatched_actions": [
-        {
-          "agent": "daedalus",
-          "task_title": "Orquestación General: Consolidar 25 tareas de autorización recién c...",
-          "area": "area_project_management"
-        }
-      ],
-      "target_project": "proj_astraura_core",
-      "reasoning": "El Director Metis descompuso la directriz y activó 1 agentes del enjambre con prioridades calibradas.",
-      "status": "in_progress"
     }
   ],
   "audit_log": [
@@ -2118,5 +2117,5 @@
       "status": "verified"
     }
   ],
-  "updated_at": 1788404994.6849432
+  "updated_at": 1788840533.0035834
 }

@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import time
 import httpx
@@ -14,8 +15,112 @@ from .ternary_math import TernaryQuantizer
 # obligado por el segfault BLAS) y procesa el prompt muy despacio en una Mac de
 # 8 GB; un prefill grande supera el ReadTimeout. Con ~2.200 chars de prefill y
 # 160 tokens de respuesta se queda en 15-40 s. Configurables por entorno.
-PREFILL_CHARS_NATIVO = int(os.environ.get("ASTRAURA_PREFILL_CHARS", "2200"))
-GEN_TOKENS_NATIVO = int(os.environ.get("ASTRAURA_GEN_TOKENS", "160"))
+# (2026-09-08 · Ola 284 · AS7) Recorte del presupuesto del nativo en el chat:
+# el modelo i2_s (2B) en CPU con `-ub 24` procesa el prefill a ~8-10 tok/s y la
+# generación a ~2 tok/s en una Mac de 8 GB. Con 900 chars de prefill (≈250-280
+# tokens) y 120 tokens de respuesta se responde en ~15-40 s sin que el modelo
+# eco-repita el contexto. Siguen configurables por entorno (el env manda).
+PREFILL_CHARS_NATIVO = int(os.environ.get("ASTRAURA_PREFILL_CHARS", "900"))
+GEN_TOKENS_NATIVO = int(os.environ.get("ASTRAURA_GEN_TOKENS", "120"))
+
+
+# (2026-09-08 · Ola 284 · AS7) Etiqueta de contexto tipo `[CONCEPTO]`, `[RECUERDO]`,
+# `[MEMORIA]`: el 2B las eco-repetía en vez de contestar cuando quedaban pegadas
+# dentro del turno del usuario. Se usan para limpiar fragmentos y para detectar
+# respuestas que empiezan repitiendo contexto.
+_ETIQUETA_RE = re.compile(r"^\[[A-ZÁÉÍÓÚ_ ]{3,20}\]\s*")
+
+
+def _quitar_etiquetas(texto: str) -> str:
+    """(2026-09-08 · Ola 284 · AS7) Quita de un fragmento la etiqueta de contexto
+    inicial (`[CONCEPTO] …`, `[RECUERDO] …`, `[MEMORIA] …`) y su espacio siguiente.
+    Devuelve el texto sin esa etiqueta; si no hay etiqueta, el texto sin cambios."""
+    return _ETIQUETA_RE.sub("", texto or "", count=1)
+
+
+def componer_mensajes(system: str, chunks: List[str], prompt: str, limite: int) -> List[dict]:
+    """(2026-09-08 · Ola 284 · AS7) Compone los mensajes del camino NATIVO sin
+    duplicar el sistema y sin meter los recuerdos en el turno del usuario:
+
+      - `user` es SOLO el prompt del usuario.
+      - `system` lleva la persona (primeros 600 chars) una única vez y, tras un
+        encabezado «Contexto útil (no lo repitas ni lo cites…)», el último turno
+        íntegro como «Último intercambio:» y hasta 2 fragmentos de contexto de
+        ≤ 300 chars con su etiqueta inicial (`[RECUERDO]`, `[CONCEPTO]`…) quitada.
+
+    Prioridad de presupuesto dentro de `limite` (system + user): persona > prompt
+    > último turno > fragmentos. Función pura, probada aparte."""
+    persona = (system or "").strip()[:600]
+    usuario = (prompt or "").strip()
+    presupuesto = max(0, limite - len(persona) - len(usuario))
+
+    chunks_limpios = [_quitar_etiquetas((c or "").strip()) for c in (chunks or [])]
+    lineas: List[str] = []
+
+    # Último turno (primer chunk) íntegro, sin su etiqueta de contexto inicial.
+    if chunks_limpios and presupuesto > 0:
+        pre = "Último intercambio: "
+        trozo = pre + chunks_limpios[0].replace("\n", " ")
+        if len(trozo) > presupuesto:
+            trozo = trozo[:presupuesto]
+        if len(trozo) > len(pre):
+            lineas.append(trozo)
+            presupuesto -= len(trozo)
+
+    # Hasta 2 fragmentos de contexto, ≤ 300 chars cada uno.
+    añadidos = 0
+    for chunk in chunks_limpios[1:]:
+        if añadidos >= 2 or presupuesto <= 0:
+            break
+        limpio = chunk.replace("\n", " ").strip()
+        if not limpio:
+            continue
+        trozo = limpio[:300]
+        linea = "- " + trozo
+        if len(linea) > presupuesto:
+            trozo = trozo[:max(0, presupuesto - 2)]
+            linea = "- " + trozo
+        if len(linea) > 2 and len(linea) <= presupuesto:
+            lineas.append(linea)
+            presupuesto -= len(linea)
+            añadidos += 1
+
+    cuerpo = ""
+    if lineas:
+        cuerpo = ("\n\nContexto útil (no lo repitas ni lo cites; "
+                  "úsalo solo si ayuda a responder):\n" + "\n".join(lineas))
+    system_content = persona + cuerpo
+
+    # Tope duro: system + user nunca supera `limite`.
+    sistema_max = max(0, limite - len(usuario))
+    if len(system_content) > sistema_max:
+        system_content = system_content[:sistema_max]
+
+    return [
+        {"role": "system", "content": system_content},
+        {"role": "user", "content": usuario},
+    ]
+
+
+def limpiar_eco(texto: str) -> str:
+    """(2026-09-08 · Ola 284 · AS7) Si la respuesta empieza por una o más líneas
+    que son solo una etiqueta de contexto (`[CONCEPTO] …`, `[RECUERDO] …`…), las
+    elimina hasta la primera línea sin etiqueta. Si TODO era eco (todas las líneas
+    eran etiquetas), devuelve el texto original sin las etiquetas iniciales."""
+    if not texto:
+        return texto
+    lineas = texto.split("\n")
+    idx = 0
+    while idx < len(lineas):
+        linea = lineas[idx].strip()
+        if not linea or not _ETIQUETA_RE.match(linea):
+            break
+        idx += 1
+    restantes = lineas[idx:]
+    if not restantes:
+        # Todo era eco: se devuelve el texto sin las etiquetas iniciales.
+        return "\n".join(_ETIQUETA_RE.sub("", l, count=1) for l in lineas)
+    return "\n".join(restantes)
 
 
 def componer_prefill(system: str, chunks: List[str], prompt: str, limite: int) -> str:
@@ -156,12 +261,15 @@ class BitNetUnifiedEngine:
         return models
 
     def _anotar_latencia(self, perfil: str, prompt_chars: int, gen_tokens: int,
-                         t0: float, ok: bool, motivo: Optional[str]) -> None:
+                         t0: float, ok: bool, motivo: Optional[str],
+                         primer_token_ms: Optional[int] = None) -> None:
         """(2026-09-07 · Ola 278 · AS2) Escribe una línea JSON a
         `data/aprendizaje/latencias.jsonl` tras cada generación nativa (éxito o
         timeout), para poder medir prompt_chars/tokens/ms del BitNet nativo en la
         Mac de 8 GB. Es un `try` que NUNCA rompe la generación: si falla el disco
-        o la carpeta no existe, se ignora y se sigue la respuesta."""
+        o la carpeta no existe, se ignora y se sigue la respuesta.
+        (2026-09-08 · Ola 284 · AS7) `primer_token_ms` opcional: milisegundos
+        hasta el primer token de la respuesta (tiempo real de prefill + sondas)."""
         try:
             ms = int(round((time.time() - t0) * 1000)) if t0 else 0
             _linea = {
@@ -172,6 +280,8 @@ class BitNetUnifiedEngine:
                 "ms": ms,
                 "ok": bool(ok),
             }
+            if primer_token_ms is not None:
+                _linea["primer_token_ms"] = int(primer_token_ms)
             if motivo:
                 _linea["motivo"] = str(motivo)[:240]
             _ruta = Path(__file__).resolve().parents[2] / "data" / "aprendizaje" / "latencias.jsonl"
@@ -613,41 +723,40 @@ class BitNetUnifiedEngine:
                 # de Astraura y permite prompts largos. Con contexto de 2048 (forzado
                 # via ASTRAURA_BITNET_CTX en 8 GB) y KV cache q8_0 (~2 MB), hay margen
                 # suficiente: 1420 chars de prefill + hasta 256 de generación < 2048.
-                _MAX_PREFILL_CHARS = 1420
-                # (2026-09-07 · Ola 278 · AS2) La composición del prefill se extrae a
-                # `componer_prefill` (función pura, probada aparte): conserva en orden
-                # el sistema de la personalidad (primeros 600 chars), el prompt entero,
-                # los últimos turnos y, solo después, hasta 2 chunks de contexto de
-                # 300 chars, respetando el presupuesto (char_budget en el interactive).
-                _prefill = componer_prefill(
+                # (2026-09-08 · Ola 284 · AS7) El chat nativo ya NO duplica el
+                # sistema ni mete los recuerdos en el turno del usuario: la persona
+                # viaja una única vez en el mensaje `system` (con los últimos turnos
+                # y fragmentos como «Contexto útil», sin sus etiquetas [CONCEPTO]/
+                # [RECUERDO]) y el `user` lleva SOLO el prompt. Antes se juntaba
+                # persona + prompt + turnos + fragmentos en un único `user` mientras
+                # el sistema repetía la persona, y el 2B eco-repetía las etiquetas.
+                # `limite = min(char_budget, PREFILL_CHARS_NATIVO)` en lugar del
+                # `_MAX_PREFILL_CHARS = 1420` fijo que ignoraba la variable de entorno.
+                _limite_nativo = min(char_budget, PREFILL_CHARS_NATIVO)
+                messages = componer_mensajes(
                     system=(system_prompt or ""),
                     chunks=list(context_chunks or [])[:6],
                     prompt=(prompt or ""),
-                    limite=min(char_budget, _MAX_PREFILL_CHARS),
+                    limite=_limite_nativo,
                 )
-                sys_txt = (system_prompt or "").strip()[:600]
-                user_content = (prompt or "").strip()[:1024]
-                # Se separa el system del prompt para armar los mensajes del chat;
-                # el contenido completo (con chunks) ya viaja dentro del user.
-                messages = [{"role": "system", "content": sys_txt}] if sys_txt else []
-                if messages:
-                    # El `_prefill` lleva system + prompt ya compuestos; para no
-                    # duplicar el system, se deja solo el prompt como user.
-                    messages.append({"role": "user", "content": _prefill})
-                else:
-                    messages.append({"role": "user", "content": _prefill})
                 payload = {
                     "messages": messages,
-                    "max_tokens": gen_budget,
+                    # (AS7) La generación también se recorta al tope nativo
+                    # (env `ASTRAURA_GEN_TOKENS`); `repeat_penalty` 1.15 disuade
+                    # de repetir el contexto que acaba de leer.
+                    "max_tokens": min(gen_budget, GEN_TOKENS_NATIVO),
                     "temperature": float(temperature),
                     "top_p": 0.9,
+                    "repeat_penalty": 1.15,
                     "stream": True,
                 }
                 # (2026-09-07 · Ola 278 · AS2) Métricas para el fichero de latencias:
                 # cuántos caracteres se mandaron de prefill, cuántos tokens pedimos
                 # generar y cuándo arranca la generación (para medir ms al final).
                 _t0_nativo = time.time()
-                _prompt_chars_nativo = len(_prefill)
+                _t_primer_nativo = None
+                _primer_ms_nativo = None
+                _prompt_chars_nativo = sum(len(m.get("content") or "") for m in messages)
                 try:
                     # read=180: GRACIA BAJO CARGA Y POR PREFILL LENTO. El modelo
                     # i2_s en CPU (M1 8GB) tarda ~90 s en el primer token cuando
@@ -686,20 +795,24 @@ class BitNetUnifiedEngine:
                                     continue
                                 token = delta.get("content")
                                 if token:
+                                    if not got_first:
+                                        _t_primer_nativo = time.time()
                                     self.stats["tokens_generated"] += 1
                                     yield token
                                     got_first = True
+                            if _t_primer_nativo:
+                                _primer_ms_nativo = int(round((_t_primer_nativo - _t0_nativo) * 1000))
                             if not got_first:
                                 bitnet_failed = "sin primer token en 45 s (slot ocupado)"
                                 print(f"[BitNetUnifiedEngine] BitNet nativo cede el turno: {bitnet_failed}")
-                                self._anotar_latencia(profile, _prompt_chars_nativo, gen_budget, _t0_nativo, False, bitnet_failed)
+                                self._anotar_latencia(profile, _prompt_chars_nativo, gen_budget, _t0_nativo, False, bitnet_failed, _primer_ms_nativo)
                                 return
-                    self._anotar_latencia(profile, _prompt_chars_nativo, gen_budget, _t0_nativo, True, None)
+                    self._anotar_latencia(profile, _prompt_chars_nativo, gen_budget, _t0_nativo, True, None, _primer_ms_nativo)
                     return
                 except Exception as e:
                     bitnet_failed = f"{type(e).__name__}: {e}".rstrip(": ")
                     print(f"[BitNetUnifiedEngine] BitNet nativo (llama-server) FALLO ({bitnet_failed})")
-                    self._anotar_latencia(profile, _prompt_chars_nativo, gen_budget, _t0_nativo, False, bitnet_failed)
+                    self._anotar_latencia(profile, _prompt_chars_nativo, gen_budget, _t0_nativo, False, bitnet_failed, _primer_ms_nativo)
 
         # (Verificacion 1.58) Orden de intento por PERFIL, no fijo:
         #   - "background" (cognition.py: imaginacion, suenos, enjambre, Director

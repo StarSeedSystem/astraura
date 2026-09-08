@@ -66,6 +66,33 @@
   ],
   "active_tasks": [
     {
+      "id": "task_1788840532_84",
+      "title": "Orquestación General: Consolidar 1 tareas de autorización recién co...",
+      "prompt": "Directiva del Director Metis: Consolidar 1 tareas de autorización recién concedidas (prioridad crítica 10) antes que los procesos imaginativos en segundo plano. Agentes involucrados: system.. Alineación general de proyectos.",
+      "area_id": "area_project_management",
+      "area_name": "🏗️ Daedalus, Arquitectura & Enrutamiento de Proyectos",
+      "agent_id": "daedalus",
+      "agent_name": "Daedalus (Arquitecto de Proyectos)",
+      "status": "running",
+      "progress": 15,
+      "execution_phase": "phase_1_inspection",
+      "phase_label": "Fase 1/4: Inspección de Archivos Locales & Telemetría M1",
+      "allocated_cpu_percent": 5,
+      "real_memory_mb": 255.4,
+      "real_cpu_usage": 0.0,
+      "real_pid": 6347,
+      "target_folder_path": "/home/claude/astraura-wt/AS7/data/vault/projects",
+      "target_project_id": "proj_astraura_core",
+      "priority_level": 5,
+      "origin": "user",
+      "started_at": 1788840532.9956152,
+      "logs": [
+        "Iniciando tarea real en 🏗️ Daedalus, Arquitectura & Enrutamiento de Proyectos...",
+        "Asignado a Daedalus (Arquitecto de Proyectos) • PID 6347 • RAM 255.4 MB.",
+        "Inspeccionando directorio local: /home/claude/astraura-wt/AS7/data/vault/projects"
+      ]
+    },
+    {
       "id": "task_1788404988_36",
       "title": "Auto-Reactivacion GLSL",
       "prompt": "(Generar) Shaders Auto-reactivos en modificación realista",

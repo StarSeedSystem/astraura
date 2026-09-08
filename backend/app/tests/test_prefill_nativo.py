@@ -13,7 +13,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from app.engine.bitnet_engine import PREFILL_CHARS_NATIVO, componer_prefill
+from app.engine.bitnet_engine import (
+    PREFILL_CHARS_NATIVO,
+    componer_mensajes,
+    componer_prefill,
+    limpiar_eco,
+)
 
 
 def test_prefill_respeta_tope_y_conserva_prompt() -> None:
@@ -77,3 +82,84 @@ def test_componer_prefill_solo_contextos_recortados() -> None:
     assert "B" * 500 not in resultado
     # Y como hay 3 contextos posibles, a lo sumo se cuela la versión recortada.
     assert len(resultado) <= 2200
+
+
+# (2026-09-08 · Ola 284 · AS7) Pruebas del nuevo camino nativo: los mensajes del
+# chat ya NO duplican el sistema ni meten los recuerdos etiquetados en el turno
+# del usuario, y se limpia el eco inicial de etiquetas de contexto.
+
+
+def test_componer_mensajes_devuelve_system_y_user_solo_prompt() -> None:
+    """El chat nativo compone exactamente 2 mensajes: el `system` con la persona
+    y el «Contexto útil», y el `user` con SOLO el prompt (sin sistema ni recuerdos).
+    El total system + user cabe en `limite`. (Ola 284 · AS7)"""
+    sistema = "P" * 3000
+    chunks = ["TURNO: hola", "[RECUERDO] un recuerdo", "[CONCEPTO] un concepto"]
+    prompt = "¿Quién eres?"
+
+    mensajes = componer_mensajes(sistema, chunks, prompt, limite=2200)
+
+    assert len(mensajes) == 2, f"se esperaban 2 mensajes, llegaron {len(mensajes)}"
+    assert mensajes[0]["role"] == "system"
+    assert mensajes[1]["role"] == "user"
+    # La persona está en el system (recortada a 600 chars).
+    assert mensajes[0]["content"].startswith("P" * 600)
+    # El encabezado de contexto útil aparece en el system.
+    assert "Contexto útil" in mensajes[0]["content"]
+    # El user es SOLO el prompt.
+    assert mensajes[1]["content"] == prompt
+    # El total respeta el tope.
+    total = len(mensajes[0]["content"]) + len(mensajes[1]["content"])
+    assert total <= 2200, f"system + user superan el tope: {total} > 2200"
+
+
+def test_componer_mensajes_sin_etiquetas_de_contexto() -> None:
+    """Las etiquetas `[RECUERDO]`/`[CONCEPTO]` no deben aparecer ni en el system
+    ni en el user (se quitan al limpiar los fragmentos). (Ola 284 · AS7)"""
+    sistema = "Sistema de Astraura"
+    chunks = [
+        "[CONCEPTO] El motor es bitnet",
+        "[RECUERDO] El usuario pidió fluidez",
+        "[MEMORIA] Contexto antiguo",
+    ]
+    prompt = "Cuéntame"
+
+    mensajes = componer_mensajes(sistema, chunks, prompt, limite=2200)
+    contenido = mensajes[0]["content"] + mensajes[1]["content"]
+
+    assert "[RECUERDO]" not in contenido
+    assert "[CONCEPTO]" not in contenido
+    assert "[MEMORIA]" not in contenido
+    # El contenido real de los fragmentos sí está presente.
+    assert "El usuario pidió fluidez" in mensajes[0]["content"]
+
+
+def test_limpiar_eco_quita_etiquetas_iniciales() -> None:
+    """Si la respuesta empieza repitiendo etiquetas de contexto, se eliminan esas
+    líneas hasta la primera sin etiqueta. (Ola 284 · AS7)"""
+    texto = "[CONCEPTO] a\n[RECUERDO] b\nHola, soy Astraura."
+    assert limpiar_eco(texto) == "Hola, soy Astraura."
+
+
+def test_limpiar_eco_sin_eco_devuelve_igual() -> None:
+    """Una respuesta normal (sin etiquetas iniciales) se devuelve intacta.
+    (Ola 284 · AS7)"""
+    assert limpiar_eco("Hola") == "Hola"
+
+
+def test_componer_mensajes_con_ultimo_turno_y_fragmentos() -> None:
+    """El primer chunk entra íntegro como «Último intercambio:» y los demás como
+    fragmentos de ≤ 300 chars, sin etiquetas. (Ola 284 · AS7)"""
+    sistema = "S" * 100
+    chunks = ["Último turno del usuario"] + ["A" * 500, "B" * 500]
+    prompt = "P" * 50
+
+    mensajes = componer_mensajes(sistema, chunks, prompt, limite=2200)
+    system_content = mensajes[0]["content"]
+
+    assert "Último intercambio: Último turno del usuario" in system_content
+    # Los fragmentos de contexto se recortan a 300 chars (nunca 500 seguidos).
+    assert "A" * 500 not in system_content
+    assert "B" * 500 not in system_content
+    total = len(mensajes[0]["content"]) + len(mensajes[1]["content"])
+    assert total <= 2200

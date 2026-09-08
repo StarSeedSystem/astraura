@@ -6,7 +6,7 @@
   "max_swarm_global_percent": 45,
   "allocated_cores": 2,
   "quantum_entropy_level": 0.75,
-  "requests_embargoed": true,
+  "requests_embargoed": false,
   "max_kb_per_minute": 45,
   "max_mb_per_hour": 2.5,
   "storage_target": "local_vault",
@@ -2157,6 +2157,40 @@
     }
   },
   "branches": [
+    {
+      "id": "bgauth_1788840532_athena",
+      "parent_branch_id": "notif_1788403627",
+      "theme": "⚡ [AUTORIZADO] ✨ Auto-Mejora Aplicada: Sueño Lúcido Ciberdélico (UI, Arte & 3D)",
+      "hypothesis": "Ejecución de solicitud autorizada por el Agente de Orquestación Inteligente → athena @ Génesis.",
+      "insights": "Personalidad: Astraura Prime (Zenith) • Cerebro: Génesis • Prioridad crítica 10.",
+      "process_type": "system_action",
+      "process_name": "Sueño REM Cognitivo (Consolidación Sináptica)",
+      "importance_level": "high",
+      "requires_user_approval": false,
+      "status": "running",
+      "origin": "authorization_orchestrator",
+      "agent_id": "athena",
+      "agent_area": "area_sentinel_privacy",
+      "brain_id": null,
+      "brain_name": "Cerebro Génesis",
+      "personality_id": "astraura_prime",
+      "personality_name": "Astraura Prime (Zenith)",
+      "priority_level": 10,
+      "timestamp": 1788840532.9839392,
+      "formatted_time": "08/09/2026 04:08:52",
+      "step_logs": [
+        "[04:08:52] 🤖 Solicitud autorizada trasladada a procesos en segundo plano...",
+        "[04:08:52] 🧠 Agente athena (area_sentinel_privacy) activado con prioridad crítica 10.",
+        "[04:08:52] 💠 Personalidad 'Astraura Prime (Zenith)' @ Cerebro 'Génesis' enlazada.",
+        "[04:08:52] ⚡ Ejecutando flujo 8 fases del sistema 1.58-bit..."
+      ],
+      "verification": {
+        "is_verified": true,
+        "score": 0.98,
+        "checked_by": "AuthOrchestrator-1.58b",
+        "tested_at": "08/09/2026 04:08:52"
+      }
+    },
     {
       "id": "bgauth_1788836901_athena",
       "parent_branch_id": "notif_1788403749",
@@ -4376,94 +4410,6 @@
       "timestamp": 1788402176.2657542,
       "formatted_time": "02/09/2026 20:22:56",
       "generated_by": "llm",
-      "responsible_agent": {
-        "id": "hermes",
-        "name": "Hermes (Web Intel & Prospectiva)"
-      },
-      "personality": {
-        "id": "hermes",
-        "name": "Hermes (Web Intel & Navegación)",
-        "role": "Ojo Navegante & Gateway Web",
-        "enabled": true,
-        "connected_servers": [
-          {
-            "name": "Puente Local Astraura (StarSeed OS)",
-            "server_type": "local_bridge",
-            "sync_scopes": [
-              "memories",
-              "documents",
-              "hardware_telemetry"
-            ],
-            "is_enabled": true
-          },
-          {
-            "name": "StarSeed Nexus Sovereign Gateway",
-            "server_type": "remote_nexus",
-            "sync_scopes": [
-              "memories",
-              "agent_tasks"
-            ],
-            "is_enabled": true
-          }
-        ]
-      },
-      "agents": [
-        {
-          "id": "hermes",
-          "name": "Hermes · Inteligencia Web",
-          "enabled": true,
-          "is_busy": false
-        },
-        {
-          "id": "mnemosyne",
-          "name": "Mnemosyne · Memoria Sináptica",
-          "enabled": true,
-          "is_busy": false
-        }
-      ],
-      "memory_items": [
-        {
-          "source": "document",
-          "title": "🌌 [Auto-Mejora Imaginación Contrafáctica / Cuántica] Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ",
-          "text": "session- on 1 10 1 (Special) (1 (1 (2)) terms refering to the actual questions) or (1 1 ( 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 \"1 1 1 1 1 1 1 1 1 1 1 1 1 \" \" 1 \" 1 1 \" \" 1 1 1 \" 1 1 1 \" 1 \" 1 \" 1 \" 1 \" 1 | Forjando axiomas bajo entropía cuántica de 0.75 con optimización de 1.58 bits.",
-          "score": 0.4182,
-          "brain": null,
-          "server": null,
-          "line": "[DOCUMENTO: 🌌 [Auto-Mejora Imaginación Contrafáctica / Cuántica] Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ] session- on 1 10 1 (Special) (1 (1 (2)) terms refering to the actual questions) or (1 1 ( 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 \"1 1 1 1 1 1 1 1 1 1 1 1 1 \" \" 1 \" 1 1 \" \" 1 1 1 \" 1 1 1 \" 1 \" 1 \" 1 \" 1 \" 1 | Forjando axiomas bajo entropía cuántica de 0.75 con optimización de 1.58 bits."
-        },
-        {
-          "source": "document",
-          "title": "🌌 [Auto-Mejora Imaginación Contrafáctica / Cuántica] Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ",
-          "text": "Inlining PRESSFTA as (idermalsisks may haveus, 200d 1} 0 have have 0 0 can 0 can 1 0 2 0 0 have can 0 have can 0 will 0 will 0 can have can 0 will 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0…",
-          "score": 0.4119,
-          "brain": null,
-          "server": null,
-          "line": "[DOCUMENTO: 🌌 [Auto-Mejora Imaginación Contrafáctica / Cuántica] Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ] Inlining PRESSFTA as (idermalsisks may haveus, 200d 1} 0 have have 0 0 can 0 can 1 0 2 0 0 have can 0 have can 0 will 0 will 0 can have can 0 will 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0…"
-        }
-      ],
-      "memory_retrieval_available": true,
-      "context_snapshot": {
-        "location": "Cuernavaca, México",
-        "weather": "24.5°C, Parcialmente Nublado",
-        "entropy": 0.75,
-        "allocated_cores": 2
-      }
-    },
-    {
-      "id": "branch_1788401765",
-      "theme": "Exploración Intuitiva: Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ",
-      "hypothesis": "Integrando la semilla 'Ingesta Automática de Almacenamiento Externo / SSD USB (/Volumes): ' con la memoria sináptica y el entorno físico en Cuernavaca, México (24.5°C, Parcialmente Nublado).",
-      "insights": "Forjando axiomas bajo entropía cuántica de 0.75 con optimización de 1.58 bits.",
-      "process_type": "counterfactual_quantum_imagination",
-      "process_name": "Imaginación Contrafáctica / Cuántica",
-      "importance_level": "low",
-      "requires_user_approval": false,
-      "permission_policy_applied": "auto_apply_safe",
-      "status": "pending_execution",
-      "applied_by": "auth_orchestrator_embargo",
-      "timestamp": 1788401765.026413,
-      "formatted_time": "02/09/2026 20:16:05",
-      "generated_by": "template",
       "responsible_agent": {
         "id": "hermes",
         "name": "Hermes (Web Intel & Prospectiva)"
