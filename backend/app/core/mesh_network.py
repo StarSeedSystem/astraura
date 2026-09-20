@@ -52,6 +52,24 @@ NODE_ID_FILE = MESH_DIR / "node_id.txt"
 FED_DELTAS_FILE = MESH_DIR / "federated_deltas.json"
 
 HEARTBEAT_INTERVAL_S = 30
+
+
+def cabeceras_malla() -> Dict[str, str]:
+    """Cabeceras con las que este nodo habla a sus pares (2026-09-20).
+
+    Un nodo PÚBLICO (nube, VPS, Oracle) corre con `ASTRAURA_AUTH_MODE=key` y
+    exige `X-Astraura-Key` en todo `/api/*`. Los pares le mandan la clave de
+    malla compartida `ASTRAURA_MESH_KEY` (la guarda Alex en `~/.starseed/env`
+    de cada medio; nunca viaja por chat ni por el repo). Sin la variable, las
+    llamadas siguen como antes (LAN abierta, local-only).
+    """
+    h = {"Content-Type": "application/json"}
+    k = (os.environ.get("ASTRAURA_MESH_KEY") or "").strip()
+    if k:
+        h["X-Astraura-Key"] = k
+    return h
+
+
 STALE_AFTER_S = 90
 DEAD_AFTER_S = 300
 LAN_PING_TIMEOUT_S = 0.35
@@ -512,8 +530,8 @@ class MeshNetwork:
                 "shard_id": shard["shard_id"],
             }).encode("utf-8")
             req = urllib.request.Request(
-                f"{node['url_local'].rstrip('/')}/api/mesh/infer_shard",
-                data=body, headers={"Content-Type": "application/json"})
+                f"{(node.get('url_local') or node.get('url_publica') or '').rstrip('/')}/api/mesh/infer_shard",
+                data=body, headers=cabeceras_malla())
             loop = asyncio.get_running_loop()
 
             def do_post():
@@ -718,7 +736,7 @@ class MeshNetwork:
 
                         def beat(u=url.rstrip("/"), b=body):
                             req = urllib.request.Request(f"{u}/api/mesh/heartbeat",
-                                                         data=b, headers={"Content-Type": "application/json"})
+                                                         data=b, headers=cabeceras_malla())
                             return urllib.request.urlopen(req, timeout=5).read()
 
                         await asyncio.get_running_loop().run_in_executor(None, beat)

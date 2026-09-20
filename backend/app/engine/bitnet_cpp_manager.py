@@ -293,6 +293,34 @@ class BitNetCppManager:
             return 1536
         return 4096
 
+    def _hilos_segun_hardware(self, cpu: int) -> int:
+        """Hilos del llama-server según RAM y núcleos (2026-09-20, Alex: «BitNet
+        debe vivir en cualquier medio adaptándose al hardware»).
+
+        · ASTRAURA_BITNET_HILOS fuerza el valor.
+        · RAM ≤ 8,5 GB → 2 (Adenda 169: el búfer de activaciones escala con los
+          hilos; con 2 el server sobrevive a la generación larga en 8 GB).
+        · RAM ≤ 16,5 GB → mitad de los núcleos, tope 4.
+        · más → mitad de los núcleos, tope 6 (BitNet en CPU no escala lineal).
+        Nunca menos de 1 ni más que los núcleos. Medido: 2 hilos = 9 tok/s en
+        M1 8 GB y 13 tok/s en 2 vCPU x86 AVX-512; 4 hilos libres ≈ 15–20 tok/s.
+        """
+        forzado = os.environ.get("ASTRAURA_BITNET_HILOS")
+        if forzado and str(forzado).isdigit():
+            return max(1, min(int(forzado), max(1, cpu)))
+        try:
+            import psutil
+            gb = psutil.virtual_memory().total / (1024 ** 3)
+        except Exception:
+            gb = 8.0
+        if gb <= 8.5:
+            hilos = 2
+        elif gb <= 16.5:
+            hilos = min(4, cpu // 2)
+        else:
+            hilos = min(6, cpu // 2)
+        return max(1, min(hilos, max(1, cpu)))
+
     def _parallel_segun_hardware(self) -> int:
         """Número de slots del llama-server adaptado al hardware de la máquina.
 
@@ -822,7 +850,9 @@ class BitNetCppManager:
                     # (cada thread mantiene su estado de capa). 2 threads reducen el
                     # footprint de RAM de inferencia ~4x vs 8, evitando el OOM que
                     # mataba el server durante la generación larga de chat.
-                    threads = max(1, min(2, cpu))
+                    # (2026-09-20, Alex: «adaptarse a cualquier hardware») Con más
+                    # RAM sí escalamos hilos: ver `_hilos_segun_hardware`.
+                    threads = self._hilos_segun_hardware(cpu)
                     cmd = self._argumentos_servidor(binary, model_path, port, threads)
                     log = open(self._server_log, "ab")
                     preexec = None
