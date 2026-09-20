@@ -58,6 +58,7 @@ from .core.os_manager import starseed_os_manager
 from .core.audio_cpp_engine import audio_cpp_engine
 from .core.continuous_voice_daemon import continuous_voice_daemon
 from .core.needle_engine import needle_engine
+from .core.needle3_engine import needle3_engine
 from .core.personality_api_engine import personality_api_engine
 from .core.agent_vault_engine import agent_vault_engine
 from .core.synthesis_reporter_engine import synthesis_reporter_engine
@@ -3236,7 +3237,27 @@ async def toggle_skill(req: ToggleSkillRequest):
 
 @app.get("/api/needle/status")
 async def get_needle_status():
-    return needle_engine.get_engine_status()
+    estado = needle_engine.get_engine_status()
+    try:
+        estado["needle3"] = needle3_engine.status()
+    except Exception as e:  # el motor nuevo nunca tumba el estado del viejo
+        estado["needle3"] = {"motor": "needle3", "disponible": False, "error": str(e)}
+    return estado
+
+
+class DecidirNeedle3Request(BaseModel):
+    consulta: str
+    herramientas: List[Dict[str, Any]]
+    sistema: Optional[str] = None
+    max_pasos: Optional[int] = 4
+
+
+@app.post("/api/needle/decidir")
+async def decidir_needle3(req: DecidirNeedle3Request):
+    """(2026-09-20) Needle 3: decide qué herramienta llamar y con qué argumentos, con
+    confianza calibrada, SIN ejecutar nada. Quien ejecuta es el OS. Medido en esta Mac:
+    0,12–0,3 s por decisión, 127 MB de RAM pico."""
+    return needle3_engine.decidir(req.consulta, req.herramientas, req.sistema, req.max_pasos or 4)
 
 @app.get("/api/needle/tools")
 async def get_needle_tools():

@@ -92,3 +92,7 @@ data/sensorium/sensorium_location.json
 
 # (Adenda 175) Artefactos runtime del enjambre: NUNCA al repo
 data/vault/artifacts/
+
+# (2026-09-20) pesos de Needle 3: 35 MB, se descargan con `needle download needle3` y los renueva scripts/renovar-needle.sh
+data/needle/needle3.cact
+data/needle/needle3.cact.bak
