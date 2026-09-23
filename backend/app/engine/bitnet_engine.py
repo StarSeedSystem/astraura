@@ -394,6 +394,18 @@ class BitNetUnifiedEngine:
         """
         if meta is None:
             meta = {}
+        # (Astraura en vivo · 2026-09-23) Mientras Alex habla con Astraura, el único
+        # hueco de BitNet (--parallel 1) es de la conversación en vivo, que va directa
+        # a :8790 y no pasa por aquí. Todo lo que pida el backend en esa ventana —
+        # también lo que se marca «interactive» sin ser el usuario (tareas del
+        # AuthOrchestrator, peticiones de la malla…)— es fondo: se omite sin Ollama.
+        # Medido: un prompt de 660 tokens del backend ocupaba BitNet ~40 s y la
+        # respuesta hablada caía siempre a la nube.
+        try:
+            if bitnet_cpp_manager._conversacion_en_vivo():
+                priority = "background"
+        except Exception:
+            pass
         if priority != "background":
             self._interactive_busy += 1
         try:
@@ -858,6 +870,17 @@ class BitNetUnifiedEngine:
                 _turno_memoria = bool(_est.get("dormido")) or float(_est.get("cedido_hasta_s") or 0) > 0
             except Exception:
                 _turno_memoria = False
+            _en_vivo = False
+            try:
+                _en_vivo = bool(bitnet_cpp_manager._conversacion_en_vivo())
+            except Exception:
+                _en_vivo = False
+            if _en_vivo:
+                meta["source"] = "ninguno"
+                meta["omitido"] = "conversación en vivo"
+                self._last_source = "ninguno"
+                print("[BitNetUnifiedEngine] fondo omitido: conversación en vivo (BitNet es de la voz), sin Ollama")
+                return
             if _turno_memoria:
                 meta["source"] = "ninguno"
                 meta["omitido"] = "turno de memoria"

@@ -20,6 +20,16 @@ from app.engine.bitnet_cpp_manager import BitNetCppManager
 import time as _time
 
 
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def _sin_conversacion_real(monkeypatch: Any, tmp_path: Path) -> None:
+    """Las pruebas no leen la concesión REAL de la Mac (~/.starseed/conversacion.json):
+    si Alex está hablando con Astraura mientras corren, el resultado no puede cambiar."""
+    monkeypatch.setenv("STARSEED_CONVERSACION", str(tmp_path / "sin-conversacion.json"))
+
+
 class _ProcFalso:
     """Subproceso falso: `poll()` devuelve None (sigue vivo) y `pid` 0 para
     que `_rss_mb` caiga a la estimación (no puede leerse con `ps`)."""
@@ -573,3 +583,23 @@ def test_en_conversacion_nadie_duerme_al_motor(monkeypatch: Any, tmp_path: Path)
     res = mgr.dormir_a_peticion(min_inactivo_s=30.0)
     assert res == {"dormido": False, "motivo": "conversación en vivo"}
     assert llamadas == []
+
+
+def test_en_conversacion_todo_lo_del_backend_espera(monkeypatch: Any, tmp_path: Path) -> None:
+    """(Astraura en vivo · 2026-09-23) Con la concesión activa, incluso lo que llega
+    marcado «interactive» (tareas del AuthOrchestrator, malla) se omite: ni BitNet
+    ni Ollama, y `meta` dice por qué."""
+    engine = BitNetUnifiedEngine()
+    mgr = _motor_mod.bitnet_cpp_manager
+
+    def _prohibido(*a: Any, **k: Any) -> None:
+        raise AssertionError("en plena conversación el backend no ocupa BitNet")
+
+    monkeypatch.setattr(mgr, "ensure_server", _prohibido)
+    monkeypatch.setattr(mgr, "estado_turno", lambda: dict(_SIN_TURNO))
+    _concesion(tmp_path, monkeypatch, 60)
+    ollama = _parchear_ollama(monkeypatch, engine)
+    meta: dict = {}
+    tokens = _drenar(engine, "interactive", meta)
+    assert tokens == [] and ollama == []
+    assert meta.get("omitido") == "conversación en vivo"
