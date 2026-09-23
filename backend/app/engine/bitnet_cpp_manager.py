@@ -143,6 +143,26 @@ class BitNetCppManager:
             self._ultimo_uso_interactivo = self._ultimo_uso
         self._dormido = False
 
+    def _conversacion_en_vivo(self) -> bool:
+        """(Astraura en vivo · 2026-09-23) ¿Hay una conversación hablada ahora?
+
+        La concesión la escribe el servicio de voz en tiempo real
+        (native/astraura-voice/conversacion/voz_rt.py) en
+        `~/.starseed/conversacion.json` con `hasta` = último turno + 90 s.
+        Mientras esté activa, el único hueco del llama-server (--parallel 1)
+        es de la conversación: el fondo (imaginación, sueños, enjambre,
+        Director) no lo ocupa, el auto-sueño no apaga el motor y nadie lo
+        duerme a petición. Si el archivo no existe o está roto → False."""
+        ruta = os.path.expanduser(
+            os.environ.get("STARSEED_CONVERSACION", "~/.starseed/conversacion.json")
+        )
+        try:
+            with open(ruta, encoding="utf-8") as f:
+                hasta = float((json.load(f) or {}).get("hasta") or 0)
+        except (OSError, ValueError, TypeError, AttributeError):
+            return False
+        return hasta > time.time()
+
     def _cedido_activo(self) -> bool:
         """¿Está abierta la ventana «cedido» del turno de memoria?
 
@@ -168,6 +188,9 @@ class BitNetCppManager:
         # (Ola 262 · 2026-09-07) Ventana «cedido»: el turno ya se le dio a la
         # voz; el auto-sueño no tiene nada que hacer hasta que cierre.
         if self._cedido_activo():
+            return False
+        # (Astraura en vivo) En plena conversación el motor no se duerme.
+        if self._conversacion_en_vivo():
             return False
         if self.sueno_min <= 0:
             return False
@@ -778,6 +801,11 @@ class BitNetCppManager:
             if profile == "background" or not marcar:
                 return None
             self._cedido_hasta = 0.0
+        # (Astraura en vivo · 2026-09-23) Con Alex hablando, el fondo espera:
+        # devuelve None sin marcar uso (cognition cae a su fallback) para que
+        # la respuesta hablada no haga cola detrás de un prompt de fondo.
+        if profile == "background" and self._conversacion_en_vivo():
+            return None
         # (Ola 256 · BITNET QUE DUERME) Toda generación real pasa por aquí:
         # registrarla como uso y despertar el motor antes de sondear/lanzar.
         # (Ola 262) Se registra CON su perfil para que el reloj interactivo
@@ -1097,6 +1125,8 @@ class BitNetCppManager:
         y despiertan al motor como siempre."""
         if self.sueno_min <= 0:
             return {"dormido": False, "motivo": "sueño desactivado"}
+        if self._conversacion_en_vivo():
+            return {"dormido": False, "motivo": "conversación en vivo"}
         inter = self._ultimo_uso_interactivo
         desde_uso = float("inf") if inter is None else time.time() - inter
         if desde_uso < min_inactivo_s:

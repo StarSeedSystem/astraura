@@ -536,3 +536,40 @@ def test_apagar_adoptado_elige_llama_server_no_el_cliente(monkeypatch: Any) -> N
     pid = mgr._apagar_adoptado(8790)
     assert pid == 63022
     assert kills == [(63022, 15)]  # os.kill solo con el llama-server
+
+
+def _concesion(tmp_path: Path, monkeypatch: Any, segundos: float) -> None:
+    import json as _json
+    ruta = tmp_path / "conversacion.json"
+    ruta.write_text(_json.dumps({"desde": _time.time(), "hasta": _time.time() + segundos}))
+    monkeypatch.setenv("STARSEED_CONVERSACION", str(ruta))
+
+
+def test_en_conversacion_el_fondo_no_ocupa_bitnet(monkeypatch: Any, tmp_path: Path) -> None:
+    """(Astraura en vivo · 2026-09-23) Con la concesión activa el fondo recibe
+    None sin marcar uso; al caducar vuelve a su camino normal."""
+    monkeypatch.setenv("ASTRAURA_BITNET_SUENO_MIN", "10")
+    mgr = BitNetCppManager()
+    _concesion(tmp_path, monkeypatch, 60)
+    antes = mgr._ultimo_uso
+    assert mgr._conversacion_en_vivo() is True
+    assert mgr.ensure_server(0.0, "background") is None
+    assert mgr._ultimo_uso == antes
+    _concesion(tmp_path, monkeypatch, -5)
+    assert mgr._conversacion_en_vivo() is False
+
+
+def test_en_conversacion_nadie_duerme_al_motor(monkeypatch: Any, tmp_path: Path) -> None:
+    """Ni el auto-sueño ni el turno de memoria apagan BitNet en plena charla."""
+    monkeypatch.setenv("ASTRAURA_BITNET_SUENO_MIN", "10")
+    mgr = BitNetCppManager()
+    llamadas: list = []
+    monkeypatch.setattr(mgr, "stop_server", lambda: llamadas.append("stop"))
+    mgr._servers = {"interactive": {"proc": _ProcFalso()}}
+    mgr._ultimo_uso = _time.time() - 3600
+    mgr._ultimo_uso_interactivo = _time.time() - 3600
+    _concesion(tmp_path, monkeypatch, 60)
+    assert mgr._dormir_si_toca() is False
+    res = mgr.dormir_a_peticion(min_inactivo_s=30.0)
+    assert res == {"dormido": False, "motivo": "conversación en vivo"}
+    assert llamadas == []
