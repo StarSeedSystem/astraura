@@ -125,6 +125,11 @@ def test_ya_estaba_sin_server_propio(monkeypatch: Any) -> None:
     mgr = BitNetCppManager()
     llamadas: list = []
     monkeypatch.setattr(mgr, "stop_server", lambda: llamadas.append("stop"))
+    # (2026-09-24) Sin este parche la prueba MATABA el llama-server real de la
+    # Mac: `_apagar_adoptado(8790)` encontraba el de producción escuchando y le
+    # mandaba SIGTERM/SIGKILL en cada ejecución de pytest.
+    monkeypatch.setattr(mgr, "_apagar_adoptado", lambda puerto: None)
+    monkeypatch.setattr(mgr, "_conversacion_en_vivo", lambda: False)
     mgr._servers = {}
     mgr._ultimo_uso = _time.time() - 3600
     mgr._dormido = True

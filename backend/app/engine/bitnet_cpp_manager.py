@@ -56,6 +56,9 @@ class BitNetCppManager:
         # los kernels i2_s de CPU, que sí funcionan. Se puede subir con
         # ASTRAURA_BITNET_UBATCH si algún día se compila BitNet sin BLAS.
         self.server_ubatch = int(os.environ.get("ASTRAURA_BITNET_UBATCH") or 24)
+        # (2026-09-24) Caché de prompts en RAM del anfitrión, en MiB (ver
+        # `_argumentos_servidor`): 8192 por defecto en llama-server → 8,7 GB.
+        self.server_cache_ram = int(os.environ.get("ASTRAURA_BITNET_CACHE_RAM") or 512)
         # Contexto AJUSTADO A LA RAM DE LA MÁQUINA, no una constante.
         #
         # Por qué: este Mac tiene 8 GB y ya corre Ollama residente (~1 GB) más
@@ -721,6 +724,15 @@ class BitNetCppManager:
             # van por los kernels CPU de BitNet, que sí funcionan.
             "-ub", str(self.server_ubatch),
             "-b", str(self.server_ubatch),
+            # (2026-09-24) Tope de la caché de prompts en RAM del anfitrión.
+            # Por defecto llama-server guarda hasta 8192 MiB de estados de
+            # prompt: tras 18 h el proceso pesaba 8,7 GB en una Mac de 8 GB,
+            # el swap llegó a 12,8 GB y el disco bajó a 1,4 GB libres. La
+            # conversación en vivo no la necesita (con --parallel 1 el hueco
+            # conserva su KV y `cache_prompt` reutiliza el prefijo); basta
+            # con sitio para un estado completo. Ajustable con
+            # ASTRAURA_BITNET_CACHE_RAM (MiB).
+            "--cache-ram", str(self.server_cache_ram),
             # (Adenda 173 · 2026-08-28 · CORRECCIÓN FINAL) El GGUF tensor-only
             # NO trae plantilla de chat embebida; el tokenizer_config.json que
             # acompaña al GGUF declara pre_tokenizer=null / model type=None, así

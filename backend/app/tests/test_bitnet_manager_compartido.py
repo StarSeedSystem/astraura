@@ -111,6 +111,27 @@ def test_argumentos_servidor_llevan_ub_y_b(monkeypatch: Any) -> None:
     assert cmd[cmd.index("-b") + 1] == valor
 
 
+# (2026-09-24) Sin tope, llama-server guarda hasta 8192 MiB de estados de
+# prompt en RAM: tras 18 h pesaba 8,7 GB en la Mac de 8 GB (swap 12,8 GB).
+
+
+def test_argumentos_servidor_topan_la_cache_de_prompts(monkeypatch: Any) -> None:
+    """`--cache-ram` va siempre, 512 MiB por defecto, y respeta
+    ASTRAURA_BITNET_CACHE_RAM."""
+    monkeypatch.delenv("ASTRAURA_BITNET_CACHE_RAM", raising=False)
+    mgr = BitNetCppManager()
+    cmd = BitNetCppManager._argumentos_servidor(
+        mgr, binary=Path("llama-server"), model_path="modelo.gguf", port=8790, threads=2
+    )
+    assert cmd[cmd.index("--cache-ram") + 1] == "512"
+    monkeypatch.setenv("ASTRAURA_BITNET_CACHE_RAM", "256")
+    mgr = BitNetCppManager()
+    cmd = BitNetCppManager._argumentos_servidor(
+        mgr, binary=Path("llama-server"), model_path="modelo.gguf", port=8790, threads=2
+    )
+    assert cmd[cmd.index("--cache-ram") + 1] == "256"
+
+
 # ── (Ola 256 · 2026-09-06) BitNet que DUERME por inactividad ─────────────────
 # El llama-server nativo ocupaba ~1,2 GB residentes las 24 h en la Mac de 8 GB
 # de Alex aunque nadie hablara con Astraura; con la voz neuronal y el oído el
