@@ -59,6 +59,16 @@ class BitNetCppManager:
         # (2026-09-24) Caché de prompts en RAM del anfitrión, en MiB (ver
         # `_argumentos_servidor`): 8192 por defecto en llama-server → 8,7 GB.
         self.server_cache_ram = int(os.environ.get("ASTRAURA_BITNET_CACHE_RAM") or 512)
+        # (2026-09-25, MEDIDO) Modelo FIJADO en RAM (`--mlock`). El GGUF va por mmap:
+        # son páginas de archivo «limpias», las PRIMERAS que macOS tira cuando otro
+        # proceso pide memoria. Con una build de Next en marcha el servidor quedó con
+        # 4 MB residentes de 1,19 GB y cada token volvía a leerse del disco: 11 → 0,07
+        # tok/s, y Astraura dejó de responder en todos los medios (web, app, orbe).
+        # Fijado, lo que se va al swap es lo demás, nunca la voz de Astraura. Al dormir
+        # (auto-sueño) el proceso sale y la memoria se libera. ASTRAURA_BITNET_MLOCK=0
+        # lo desactiva.
+        self.server_mlock = (os.environ.get("ASTRAURA_BITNET_MLOCK") or "1").strip().lower() not in (
+            "0", "false", "no", "off")
         # Contexto AJUSTADO A LA RAM DE LA MÁQUINA, no una constante.
         #
         # Por qué: este Mac tiene 8 GB y ya corre Ollama residente (~1 GB) más
@@ -606,8 +616,40 @@ class BitNetCppManager:
     # proceso: si la salida es degenerada, el motor nativo queda MARCADO como
     # inservible con su motivo y el enrutador se queda en Ollama.
     _sanity: Optional[Dict[str, Any]] = None
+    _cerrojo_sonda = threading.Lock()
 
     def native_sanity(self, base: str) -> Dict[str, Any]:
+        """UNA sola sonda a la vez (2026-09-25, MEDIDO).
+
+        Cada petición del chat lanzaba su sonda en un hilo que seguía viva tras el
+        corte de 15 s del motor (hasta 240 s esperando): con el servidor lento, cada
+        mensaje dejaba 3 sondas más en la cola del ÚNICO hueco del llama-server
+        (`--parallel 1`), delante de la respuesta real. El chat esperaba a sondas que
+        nadie iba a leer y Astraura dejaba de responder en todos los medios. Si ya hay
+        una sonda en curso, se contesta «transitorio» sin encolar otra.
+        """
+        if self._sanity is not None:
+            return self._sanity
+        if not self._cerrojo_sonda.acquire(blocking=False):
+            return {"ok": False, "reason": "ya hay una sonda en curso", "sample": "", "transitorio": True}
+        try:
+            return self._native_sanity_una(base)
+        finally:
+            self._cerrojo_sonda.release()
+
+    def marcar_sano_por_uso(self, texto: str) -> bool:
+        """Una respuesta REAL del motor con texto no degenerado vale como sonda superada
+        (2026-09-25): el único criterio de descalificación es la salida degenerada (un
+        solo carácter repetido, Adenda 160), y una respuesta real ya lo descarta. Así
+        no se vuelve a sondear en cada mensaje mientras el servidor va lento."""
+        limpio = (texto or "").strip()
+        if not limpio or len(set(limpio)) <= 1:
+            return False
+        if self._sanity is None or not self._sanity.get("ok"):
+            self._sanity = {"ok": True, "reason": "respuesta real coherente", "sample": limpio[:40]}
+        return True
+
+    def _native_sanity_una(self, base: str) -> Dict[str, Any]:
         """Genera 8 tokens y comprueba que no sean degenerados (mismo caracter
         repetido). Cachea el veredicto — una vez por proceso.
 
@@ -769,7 +811,7 @@ class BitNetCppManager:
             # coherencia: BitNet-b1.58-2B-4T es robusto a q8_0 en KV.
             "-ctk", "q8_0",
             "-ctv", "q8_0",
-        ]
+        ] + (["--mlock"] if getattr(self, "server_mlock", False) else [])
 
     def ensure_server(
         self, wait_seconds: float = 0.0, profile: str = "interactive", marcar: bool = True

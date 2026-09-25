@@ -795,6 +795,7 @@ class BitNetUnifiedEngine:
                             # httpx provocaba que el segundo terminara vacío y solo se
                             # emitiera el primer token → respuestas de 1 palabra).
                             got_first = False
+                            _texto_nativo: List[str] = []
                             async for line in res.aiter_lines():
                                 if not line or not line.startswith("data:"):
                                     continue
@@ -810,6 +811,7 @@ class BitNetUnifiedEngine:
                                     if not got_first:
                                         _t_primer_nativo = time.time()
                                     self.stats["tokens_generated"] += 1
+                                    _texto_nativo.append(token)
                                     yield token
                                     got_first = True
                             if _t_primer_nativo:
@@ -820,6 +822,9 @@ class BitNetUnifiedEngine:
                                 self._anotar_latencia(profile, _prompt_chars_nativo, gen_budget, _t0_nativo, False, bitnet_failed, _primer_ms_nativo)
                                 return
                     self._anotar_latencia(profile, _prompt_chars_nativo, gen_budget, _t0_nativo, True, None, _primer_ms_nativo)
+                    # (2026-09-25) Respuesta real y coherente = sonda superada: se deja
+                    # de sondear en cada mensaje (las sondas ocupaban el único hueco).
+                    bitnet_cpp_manager.marcar_sano_por_uso("".join(_texto_nativo))
                     return
                 except Exception as e:
                     bitnet_failed = f"{type(e).__name__}: {e}".rstrip(": ")

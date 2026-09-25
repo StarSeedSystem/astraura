@@ -132,6 +132,56 @@ def test_argumentos_servidor_topan_la_cache_de_prompts(monkeypatch: Any) -> None
     assert cmd[cmd.index("--cache-ram") + 1] == "256"
 
 
+# (2026-09-25) Con una build en marcha macOS echó el modelo (mmap) de la RAM y
+# BitNet pasó de 11 a 0,07 tok/s: Astraura no respondía en ningún medio.
+
+
+def test_argumentos_servidor_fijan_el_modelo_en_ram(monkeypatch: Any) -> None:
+    """`--mlock` va por defecto y ASTRAURA_BITNET_MLOCK=0 lo quita."""
+    monkeypatch.delenv("ASTRAURA_BITNET_MLOCK", raising=False)
+    mgr = BitNetCppManager()
+    cmd = BitNetCppManager._argumentos_servidor(
+        mgr, binary=Path("llama-server"), model_path="modelo.gguf", port=8790, threads=2
+    )
+    assert "--mlock" in cmd
+    monkeypatch.setenv("ASTRAURA_BITNET_MLOCK", "0")
+    mgr = BitNetCppManager()
+    cmd = BitNetCppManager._argumentos_servidor(
+        mgr, binary=Path("llama-server"), model_path="modelo.gguf", port=8790, threads=2
+    )
+    assert "--mlock" not in cmd
+
+
+# (2026-09-25) Las sondas se amontonaban en el único hueco del server, delante de
+# la respuesta real. Una sola a la vez, y una respuesta real vale como sonda.
+
+
+def test_una_respuesta_real_coherente_vale_como_sonda() -> None:
+    mgr = BitNetCppManager()
+    mgr._sanity = None
+    assert mgr.marcar_sano_por_uso("Hola, estoy aquí.") is True
+    assert mgr._sanity and mgr._sanity["ok"] is True
+    otro = BitNetCppManager()
+    otro._sanity = None
+    assert otro.marcar_sano_por_uso("aaaaaaa") is False
+    assert otro._sanity is None
+
+
+def test_no_se_encola_una_segunda_sonda(monkeypatch: Any) -> None:
+    mgr = BitNetCppManager()
+    mgr._sanity = None
+    llamadas = []
+    monkeypatch.setattr(mgr, "_native_sanity_una", lambda base: llamadas.append(base) or {"ok": True})
+    assert BitNetCppManager._cerrojo_sonda.acquire(blocking=False)
+    try:
+        r = mgr.native_sanity("http://127.0.0.1:1")
+    finally:
+        BitNetCppManager._cerrojo_sonda.release()
+    assert r["transitorio"] is True and llamadas == []
+    assert mgr.native_sanity("http://127.0.0.1:1") == {"ok": True}
+    assert llamadas == ["http://127.0.0.1:1"]
+
+
 # ── (Ola 256 · 2026-09-06) BitNet que DUERME por inactividad ─────────────────
 # El llama-server nativo ocupaba ~1,2 GB residentes las 24 h en la Mac de 8 GB
 # de Alex aunque nadie hablara con Astraura; con la voz neuronal y el oído el
