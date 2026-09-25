@@ -64,8 +64,10 @@ def _headers(creds, extra=None):
         "-H", f"apikey: {creds['service_role_key']}",
         "-H", f"Authorization: Bearer {creds['service_role_key']}",
         "-H", "Content-Type: application/json",
-        "-H", "Prefer: return=representation",
     ]
+    # (2026-09-25) Sin «Prefer: return=representation» por defecto: cada escritura devolvía
+    # la sección entera (hasta ~570 KB) y ese eco contaba como tráfico de salida de Supabase,
+    # cuya cuota agotada dejó el OS sin inicio de sesión. Quien necesite la fila la pide.
     if extra:
         h += extra
     return h
@@ -103,7 +105,7 @@ def push_state(key: str, data: dict) -> bool:
     tmp.write(payload)
     tmp.close()
     cmd = [_curl_bin(), "-sS", "-m", "30", "--tlsv1.2", "-X", "POST", url,
-           "-w", "\n%{http_code}"] + _headers(creds, ["-H", "Prefer: resolution=merge-duplicates,return=representation"])
+           "-w", "\n%{http_code}"] + _headers(creds, ["-H", "Prefer: resolution=merge-duplicates,return=minimal"])
     cmd += ["--data-binary", f"@{tmp.name}"]
     try:
         proc = subprocess.run(cmd, capture_output=True, text=True, timeout=40)
