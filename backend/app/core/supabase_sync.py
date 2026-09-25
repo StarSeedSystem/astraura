@@ -124,13 +124,33 @@ def push_state(key: str, data: dict) -> bool:
             pass
 
 
+#: (2026-09-25) Dieta de tráfico: {key: (updated_at, data)}. `astraura_cerebros_merged_v1`
+#: (358 KB) se bajaba entero 17 veces por hora sin haber cambiado desde el 12-09: ~4 GB al
+#: mes, casi toda la cuota gratuita de salida de Supabase. Ahora se pregunta primero SOLO la
+#: fecha (unos bytes) y el dato se baja comprimido y solo si cambió.
+_CACHE_PULL = {}
+
+
+def _fecha_remota(creds, key):
+    url = _rest_url(creds, f"astraura_state?key=eq.{key}&select=updated_at")
+    cmd = [_curl_bin(), "-sS", "-m", "15", "--tlsv1.2", "-X", "GET", url] + _headers(creds)
+    try:
+        rows = json.loads(subprocess.run(cmd, capture_output=True, text=True, timeout=20).stdout or "[]")
+        return rows[0].get("updated_at") if isinstance(rows, list) and rows else None
+    except Exception:
+        return None
+
+
 def pull_state(key: str):
-    """Descarga una sección de estado desde Supabase."""
+    """Descarga una sección de estado desde Supabase (solo si cambió, y comprimida)."""
     creds = _load_creds()
     if not creds:
         return None
+    fecha = _fecha_remota(creds, key)
+    if fecha and key in _CACHE_PULL and _CACHE_PULL[key][0] == fecha:
+        return _CACHE_PULL[key][1]
     url = _rest_url(creds, f"astraura_state?key=eq.{key}")
-    cmd = [_curl_bin(), "-sS", "-m", "30", "--tlsv1.2", "-X", "GET", url,
+    cmd = [_curl_bin(), "-sS", "--compressed", "-m", "30", "--tlsv1.2", "-X", "GET", url,
            "-w", "\n%{http_code}"] + _headers(creds)
     try:
         proc = subprocess.run(cmd, capture_output=True, text=True, timeout=40)
@@ -142,6 +162,8 @@ def pull_state(key: str):
             try:
                 rows = json.loads(body)
                 if rows:
+                    if fecha:
+                        _CACHE_PULL[key] = (fecha, rows[0].get("data"))
                     return rows[0].get("data")
             except Exception:
                 return None
@@ -157,7 +179,7 @@ def pull_all():
     if not creds:
         return {}
     url = _rest_url(creds, "astraura_state?select=key,data")
-    cmd = [_curl_bin(), "-sS", "-m", "30", "--tlsv1.2", "-X", "GET", url,
+    cmd = [_curl_bin(), "-sS", "--compressed", "-m", "30", "--tlsv1.2", "-X", "GET", url,
            "-w", "\n%{http_code}"] + _headers(creds)
     try:
         proc = subprocess.run(cmd, capture_output=True, text=True, timeout=40)
