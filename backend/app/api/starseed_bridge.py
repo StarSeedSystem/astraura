@@ -204,16 +204,28 @@ async def starseed_chat(req: BridgeChatRequest):
     if not built["prompt"].strip():
         return {"error": "messages sin mensaje de usuario"}
 
+    # (2026-09-26 · Ola 365) Capa colectiva apagada en el OS → este turno no entra en el corpus.
+    from ..core.aprendizaje import APRENDIZAJE_COLECTIVO, aprendizaje_de
+    colectivo = aprendizaje_de(prefs)
+
     if req.stream is False:
         full = ""
-        async for event in orchestrator.generate_response_stream(built["prompt"], built["system_prompt"], preferences=prefs):
-            if event.get("type") == "token":
-                full += event.get("token", "")
-            elif event.get("type") == "done" and not full:
-                full = event.get("full_text", "")
+        marca = APRENDIZAJE_COLECTIVO.set(colectivo)
+        try:
+            async for event in orchestrator.generate_response_stream(built["prompt"], built["system_prompt"], preferences=prefs):
+                if event.get("type") == "token":
+                    full += event.get("token", "")
+                elif event.get("type") == "done" and not full:
+                    full = event.get("full_text", "")
+        finally:
+            try:
+                APRENDIZAJE_COLECTIVO.reset(marca)
+            except ValueError:
+                pass
         return {"response": full, "persona_id": req.persona_id, "bridge": BRIDGE_VERSION}
 
     async def sse_generator():
+        APRENDIZAJE_COLECTIVO.set(colectivo)
         async for event in orchestrator.generate_response_stream(built["prompt"], built["system_prompt"], preferences=prefs):
             yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
 

@@ -3357,6 +3357,8 @@ async def chat_endpoint(req: ChatRequest):
     tool_executions = []
     branching_plan = None
     _t0 = time.time()
+    from app.core.aprendizaje import APRENDIZAJE_COLECTIVO, aprendizaje_de
+    APRENDIZAJE_COLECTIVO.set(aprendizaje_de(req.preferences))
     async for event in orchestrator.generate_response_stream(req.prompt, req.system_prompt, preferences=req.preferences):
         if event["type"] == "branching_plan":
             branching_plan = event.get("plan")
@@ -3381,6 +3383,8 @@ async def chat_stream_endpoint(req: ChatRequest):
         _tokens = []
         _herramientas = []
         _t0 = time.time()
+        from app.core.aprendizaje import APRENDIZAJE_COLECTIVO, aprendizaje_de
+        APRENDIZAJE_COLECTIVO.set(aprendizaje_de(req.preferences))
         async for event in orchestrator.generate_response_stream(req.prompt, req.system_prompt, preferences=req.preferences):
             if event.get("type") == "token":
                 _tokens.append(event.get("token", ""))
@@ -3503,6 +3507,8 @@ async def websocket_chat(websocket: WebSocket):
                 preferences = data.get("preferences", {})
                 
                 if prompt.strip():
+                    from app.core.aprendizaje import APRENDIZAJE_COLECTIVO, aprendizaje_de
+                    APRENDIZAJE_COLECTIVO.set(aprendizaje_de(preferences))
                     async for event in orchestrator.generate_response_stream(prompt, sys_prompt, preferences=preferences):
                         await websocket.send_json(event)
                         

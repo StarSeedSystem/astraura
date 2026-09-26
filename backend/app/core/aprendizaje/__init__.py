@@ -5,6 +5,6 @@ personalidad en JSONL mensual, con limpieza estilo Falcon, filtro de
 privacidad, valoraciones y exportación de un train.jsonl listo para LoRA.
 """
 
-from .corpus import CorpusVivo, corpus_vivo
+from .corpus import APRENDIZAJE_COLECTIVO, CorpusVivo, aprendizaje_de, corpus_vivo
 
-__all__ = ["CorpusVivo", "corpus_vivo"]
+__all__ = ["APRENDIZAJE_COLECTIVO", "CorpusVivo", "aprendizaje_de", "corpus_vivo"]

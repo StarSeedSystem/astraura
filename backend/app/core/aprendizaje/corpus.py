@@ -11,6 +11,7 @@ None, porque el corpus es un efecto secundario y JAMÁS debe romper una
 respuesta en curso.
 """
 
+import contextvars
 import hashlib
 import json
 import logging
@@ -23,6 +24,22 @@ import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from zlib import crc32
+
+#: (2026-09-26 · Ola 365) Capa «colectiva» de las capas de conciencia del OS. El OS manda
+#: `preferences.aprendizaje_colectivo` en cada turno; con `false` (capa apagada o modo 1.58
+#: apagado) ese turno —y lo que el motor genere para responderlo— NO entra en el corpus.
+#: Es una variable de contexto: vale solo para la petición que la fija.
+APRENDIZAJE_COLECTIVO: "contextvars.ContextVar[bool]" = contextvars.ContextVar(
+    "astraura_aprendizaje_colectivo", default=True
+)
+
+
+def aprendizaje_de(preferencias: Any) -> bool:
+    """PURA: ¿estas preferencias dejan aprender del turno? Solo `False` explícito lo apaga."""
+    try:
+        return not (isinstance(preferencias, dict) and preferencias.get("aprendizaje_colectivo") is False)
+    except Exception:
+        return True
 
 log = logging.getLogger("aprendizaje.corpus")
 
@@ -88,6 +105,8 @@ class CorpusVivo:
         """Añade UN turno limpio al JSONL del mes. Devuelve el id o None."""
         try:
             if not self.activo:
+                return None
+            if not APRENDIZAJE_COLECTIVO.get():
                 return None
             if origen not in ORIGENES:
                 log.warning("corpus: origen no válido %r", origen)
