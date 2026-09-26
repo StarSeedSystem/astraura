@@ -219,3 +219,27 @@ def test_reactivaciones_se_aplazan_sin_presupuesto(tmp_path, monkeypatch):
         motor._barrido(ahora)
     assert despachadas == []
     assert all(s["next_run_timestamp"] >= motor._ultimo_fondo + 900 - 1 for s in motor.schedules)
+
+
+def test_sync_universal_cada_dos_minutos_y_no_en_cada_tick(tmp_path, monkeypatch):
+    """(2026-09-26) El ciclo universal (cerebros, memorias, malla, medios) iba cada 5 s."""
+    motor = AdaptiveMultiAreaSwarmEngine(data_dir=tmp_path)
+    monkeypatch.delenv("ASTRAURA_SYNC_UNIVERSAL_S", raising=False)
+    motor._ultimo_sync_universal = 0.0
+    assert motor._sync_universal_toca(1_000.0) is True
+    motor._ultimo_sync_universal = 1_000.0
+    assert motor._sync_universal_toca(1_005.0) is False
+    assert motor._sync_universal_toca(1_120.0) is True
+    monkeypatch.setenv("ASTRAURA_SYNC_UNIVERSAL_S", "0")
+    assert motor._sync_universal_toca(1_000.0) is True
+
+
+def test_los_rescaneos_automaticos_no_repiten_medios_ya_conectados():
+    """El bucle del 2026-09-26: auto-tick → re-escaneo forzado → «Medio Detectado» →
+    auto-tick. Solo la acción explícita del usuario (/api/storage/scan_now) fuerza."""
+    raiz = Path(__file__).resolve().parents[1]
+    for rel in ("agents/intelligent_authorization_orchestrator.py", "agents/routing_storage_agent.py"):
+        fuente = (raiz / rel).read_text(encoding="utf-8")
+        assert "scan_and_execute_rules(force_all=False)" in fuente, rel
+        assert "scan_and_execute_rules(force_all=True)" not in fuente, rel
+        assert "force_all=self.config" not in fuente, rel

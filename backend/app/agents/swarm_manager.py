@@ -89,6 +89,7 @@ class AdaptiveMultiAreaSwarmEngine:
         # (2026-09-26) Última vez que el FONDO (reactivación programada, despacho proactivo o
         # renovación del Director) puso a generar al motor 1.58. Ver `_hueco_fondo_s`.
         self._ultimo_fondo = 0.0
+        self._ultimo_sync_universal = 0.0
         
         # Agents Definition
         self.agents: Dict[str, Dict[str, Any]] = {
@@ -833,6 +834,16 @@ class AdaptiveMultiAreaSwarmEngine:
             
         return False
 
+    def _sync_universal_toca(self, now: float) -> bool:
+        """(2026-09-26) El ciclo de sincronización universal (cerebros, memorias, malla y
+        medios) iba en CADA tick de 5 s: 720 veces por hora listando miles de documentos.
+        Ahora cada `ASTRAURA_SYNC_UNIVERSAL_S` (120 s por defecto)."""
+        try:
+            hueco = float(os.environ.get("ASTRAURA_SYNC_UNIVERSAL_S", "120"))
+        except ValueError:
+            hueco = 120.0
+        return now - float(getattr(self, "_ultimo_sync_universal", 0.0) or 0.0) >= max(0.0, hueco)
+
     def _hueco_fondo_s(self) -> int:
         """(2026-09-26) Segundos mínimos entre dos arranques de trabajo de FONDO en un servidor
         compartido. Medido en la Mac de 8 GB: cinco reactivaciones programadas (cada 5-30 min)
@@ -1080,7 +1091,9 @@ class AdaptiveMultiAreaSwarmEngine:
         # 5. Agente de Enrutamiento, Almacenamiento & Sincronización Universal
         try:
             from app.agents.routing_storage_agent import routing_storage_agent
-            if routing_storage_agent.config.get("enabled", True) and not routing_storage_agent.is_busy:
+            if (routing_storage_agent.config.get("enabled", True) and not routing_storage_agent.is_busy
+                    and self._sync_universal_toca(time.time())):
+                self._ultimo_sync_universal = time.time()
                 threading.Thread(target=lambda: asyncio.run(routing_storage_agent.run_sync_cycle()), daemon=True).start()
 
         except Exception as e:

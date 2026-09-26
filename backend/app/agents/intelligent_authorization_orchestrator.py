@@ -749,10 +749,17 @@ class IntelligentAuthorizationOrchestrator:
             #     Organizador de Notificaciones, procesos imaginativos, memorias)
             sync_report = self._sync_with_ecosystem(processed, failed)
 
-            # 5. Re-escaneo de TODOS los medios
+            # 5. Re-escaneo de medios: solo los RECIÉN conectados.
+            # (2026-09-26) Con force_all=True esto era un bucle que se alimentaba solo:
+            # cada medio ya conectado volvía a disparar su automatización (nodo de
+            # memoria + ciclo de imaginación con BitNet + notificación «Medio
+            # Detectado»), esa notificación entraba en el siguiente auto-tick (5 s), y
+            # el auto-tick volvía a re-escanear. Medido en la Mac de Alex: el mismo
+            # prompt de ingesta llegaba al llama-server una y otra vez y el chat iba a
+            # ~1 tok/s. Re-escanear TODO sigue disponible a mano: POST /api/storage/scan_now.
             scan_events = []
             try:
-                scan_events = await _storage.scan_and_execute_rules(force_all=True)
+                scan_events = await _storage.scan_and_execute_rules(force_all=False)
             except Exception as e:
                 print(f"⚠️ [AuthOrchestrator] Error re-escaneando medios: {e}")
 

@@ -248,7 +248,11 @@ class RoutingStorageAgent:
             # 5. Re-escaneo de medios (storage routing) si existe
             if _storage and hasattr(_storage, "scan_and_execute_rules"):
                 try:
-                    await _storage.scan_and_execute_rules(force_all=self.config.get("realtime_mesh", True))
+                    # (2026-09-26) Solo medios recién conectados: con force_all cada ciclo
+                    # (el enjambre lo lanza cada pocos segundos) volvía a disparar la
+                    # automatización de TODOS los medios ya conectados —memoria,
+                    # imaginación con BitNet y notificación— en bucle.
+                    await _storage.scan_and_execute_rules(force_all=False)
                     report["details"].append("🗂️ Re-escaneo de medios ejecutado (storage routing).")
                 except Exception as e:
                     report["details"].append(f"⚠️ Storage routing: {e}")
