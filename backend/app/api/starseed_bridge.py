@@ -41,9 +41,11 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Response
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
+
+from ..core import turnero
 
 router = APIRouter(prefix="/api/starseed", tags=["StarSeed OS bridge"])
 
@@ -190,7 +192,11 @@ async def starseed_manifest():
 
 
 @router.post("/chat")
-async def starseed_chat(req: BridgeChatRequest):
+async def starseed_chat(req: BridgeChatRequest, response: Response = None):
+    # `response` es opcional en la firma (con default) para que llamar a esta
+    # función DIRECTAMENTE desde un test (sin pasar por FastAPI) siga
+    # funcionando: FastAPI igual inyecta el Response real por la anotación de
+    # tipo cuando la ruta se sirve de verdad.
     from ..agents.orchestrator import orchestrator
 
     built = build_prompt(req.messages, req.system_prompt)
@@ -210,26 +216,49 @@ async def starseed_chat(req: BridgeChatRequest):
 
     if req.stream is False:
         full = ""
-        marca = APRENDIZAJE_COLECTIVO.set(colectivo)
+        # (Turnero) El OS trata a este backend como sistema primario: el mismo
+        # hueco único del BitNet, la misma admisión que /api/chat.
         try:
-            async for event in orchestrator.generate_response_stream(built["prompt"], built["system_prompt"], preferences=prefs):
-                if event.get("type") == "token":
-                    full += event.get("token", "")
-                elif event.get("type") == "done" and not full:
-                    full = event.get("full_text", "")
-        finally:
-            try:
-                APRENDIZAJE_COLECTIVO.reset(marca)
-            except ValueError:
-                pass
+            async with turnero.turno(tipo="chat"):
+                marca = APRENDIZAJE_COLECTIVO.set(colectivo)
+                try:
+                    async for event in orchestrator.generate_response_stream(built["prompt"], built["system_prompt"], preferences=prefs):
+                        if event.get("type") == "token":
+                            full += event.get("token", "")
+                        elif event.get("type") == "done" and not full:
+                            full = event.get("full_text", "")
+                finally:
+                    try:
+                        APRENDIZAJE_COLECTIVO.reset(marca)
+                    except ValueError:
+                        pass
+        except turnero.Ocupado as oc:
+            return turnero.respuesta_ocupada(oc)
+        if response is not None:
+            response.headers["X-Astraura-Cola"] = str(turnero.estado().get("en_cola", 0))
         return {"response": full, "persona_id": req.persona_id, "bridge": BRIDGE_VERSION}
 
-    async def sse_generator():
-        APRENDIZAJE_COLECTIVO.set(colectivo)
-        async for event in orchestrator.generate_response_stream(built["prompt"], built["system_prompt"], preferences=prefs):
-            yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
+    # (Turnero) SSE: se adquiere el turno ANTES de devolver el StreamingResponse
+    # (un 503 real si está ocupado) y se mantiene abierto DENTRO del generador
+    # hasta que termine o el cliente se desconecte (mismo patrón que
+    # `main.chat_stream_endpoint`).
+    cm = turnero.turno(tipo="chat")
+    try:
+        await cm.__aenter__()
+    except turnero.Ocupado as oc:
+        return turnero.respuesta_ocupada(oc)
 
-    return StreamingResponse(sse_generator(), media_type="text/event-stream")
+    async def sse_generator():
+        try:
+            APRENDIZAJE_COLECTIVO.set(colectivo)
+            async for event in orchestrator.generate_response_stream(built["prompt"], built["system_prompt"], preferences=prefs):
+                yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
+        finally:
+            await cm.__aexit__(None, None, None)
+
+    resp = StreamingResponse(sse_generator(), media_type="text/event-stream")
+    resp.headers["X-Astraura-Cola"] = str(turnero.estado().get("en_cola", 0))
+    return resp
 
 
 # ======================= (OS · Ola 3) Eventos, acks y procesos =======================
@@ -687,6 +716,8 @@ async def starseed_processes():
         "privacy": {"air_gap": _safe(is_air_gapped, False)},
         "sync": _safe(sync_engine.get_sync_status, {"last_push_sections": [], "supabase_available": False, "r2_available": False}),
         "cognition": _safe(cognition.stats, {}),
+        # (Turnero) Admisión/cola del BitNet compartido: el OS la pinta junto al resto.
+        "cola": _safe(turnero.estado, {}),
     }
 
     # Lista NORMALIZADA para el OS ({id, name, status, running, detail, counters});

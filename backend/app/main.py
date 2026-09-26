@@ -65,6 +65,9 @@ from .core.synthesis_reporter_engine import synthesis_reporter_engine
 from .api.voice_studio import router as voice_studio_router
 # Puente oficial con StarSeed OS (sistema primario · Adenda 153 del OS).
 from .api.starseed_bridge import router as starseed_bridge_router, BRIDGE_VERSION as STARSEED_BRIDGE_VERSION  # (OS · Ola 3)
+# Turnero del BitNet compartido (admisión/cola de turnos interactivos) y Jev nativo (n_probs).
+from .core import turnero
+from .api.jev import router as jev_router
 # Génesis de seres: bots/agentes con ADN, soberanía, linaje y comunidades propias.
 from .core.agent_genesis_engine import router as genesis_router
 # Control de acceso (Adenda 153): modos local-only (defecto) · key · open. Ver core/security.py.
@@ -251,6 +254,7 @@ app.add_middleware(
 
 app.include_router(voice_studio_router)
 app.include_router(starseed_bridge_router)
+app.include_router(jev_router)
 app.include_router(genesis_router)
 
 # VibeVoice (Microsoft, fork comunidad): TTS multi-locutor. OPCIONAL — solo se
@@ -3351,25 +3355,34 @@ def _registrar_chat_en_corpus(prompt: str, system: str, respuesta: str,
         pass
 
 @app.post("/api/chat")
-async def chat_endpoint(req: ChatRequest):
+async def chat_endpoint(req: ChatRequest, response: Response = None):
     tokens = []
     agent_traces = []
     tool_executions = []
     branching_plan = None
     _t0 = time.time()
-    from app.core.aprendizaje import APRENDIZAJE_COLECTIVO, aprendizaje_de
-    APRENDIZAJE_COLECTIVO.set(aprendizaje_de(req.preferences))
-    async for event in orchestrator.generate_response_stream(req.prompt, req.system_prompt, preferences=req.preferences):
-        if event["type"] == "branching_plan":
-            branching_plan = event.get("plan")
-        elif event["type"] == "agent_traces":
-            agent_traces = event.get("traces", [])
-            tool_executions = event.get("tool_executions", [])
-        elif event["type"] == "token":
-            tokens.append(event["token"])
+    # (Turnero) Admisión del hueco único del BitNet ANTES de generar: si la Mac
+    # ya tiene el turno ocupado y la cola/RAM no dan margen, 503 honesto en vez
+    # de competir por el mismo llama-server.
+    try:
+        async with turnero.turno(tipo="chat"):
+            from app.core.aprendizaje import APRENDIZAJE_COLECTIVO, aprendizaje_de
+            APRENDIZAJE_COLECTIVO.set(aprendizaje_de(req.preferences))
+            async for event in orchestrator.generate_response_stream(req.prompt, req.system_prompt, preferences=req.preferences):
+                if event["type"] == "branching_plan":
+                    branching_plan = event.get("plan")
+                elif event["type"] == "agent_traces":
+                    agent_traces = event.get("traces", [])
+                    tool_executions = event.get("tool_executions", [])
+                elif event["type"] == "token":
+                    tokens.append(event["token"])
+    except turnero.Ocupado as oc:
+        return turnero.respuesta_ocupada(oc)
     respuesta = "".join(tokens)
     _registrar_chat_en_corpus(req.prompt, req.system_prompt, respuesta, tool_executions,
                               (time.time() - _t0) * 1000.0)
+    if response is not None:
+        response.headers["X-Astraura-Cola"] = str(turnero.estado().get("en_cola", 0))
     return {
         "branching_plan": branching_plan,
         "agent_traces": agent_traces,
@@ -3379,21 +3392,44 @@ async def chat_endpoint(req: ChatRequest):
 
 @app.post("/api/chat/stream")
 async def chat_stream_endpoint(req: ChatRequest):
+    # (Turnero) El turno se adquiere AQUÍ (antes de devolver el StreamingResponse):
+    # si está ocupado, esto lanza `Ocupado` y el llamador recibe un 503 real en
+    # vez de un stream que arranca y se corta. Si se admite, el turno se
+    # mantiene abierto DENTRO del generador (gestión manual de
+    # `__aenter__`/`__aexit__`: un `async with` no puede abarcar el `return`)
+    # hasta que la generación termine o el cliente se desconecte.
+    cm = turnero.turno(tipo="chat")
+    try:
+        await cm.__aenter__()
+    except turnero.Ocupado as oc:
+        return turnero.respuesta_ocupada(oc)
+
     async def sse_generator():
         _tokens = []
         _herramientas = []
         _t0 = time.time()
-        from app.core.aprendizaje import APRENDIZAJE_COLECTIVO, aprendizaje_de
-        APRENDIZAJE_COLECTIVO.set(aprendizaje_de(req.preferences))
-        async for event in orchestrator.generate_response_stream(req.prompt, req.system_prompt, preferences=req.preferences):
-            if event.get("type") == "token":
-                _tokens.append(event.get("token", ""))
-            elif event.get("type") == "agent_traces":
-                _herramientas = event.get("tool_executions", [])
-            yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
-        _registrar_chat_en_corpus(req.prompt, req.system_prompt, "".join(_tokens),
-                                  _herramientas, (time.time() - _t0) * 1000.0)
-    return StreamingResponse(sse_generator(), media_type="text/event-stream")
+        try:
+            from app.core.aprendizaje import APRENDIZAJE_COLECTIVO, aprendizaje_de
+            APRENDIZAJE_COLECTIVO.set(aprendizaje_de(req.preferences))
+            async for event in orchestrator.generate_response_stream(req.prompt, req.system_prompt, preferences=req.preferences):
+                if event.get("type") == "token":
+                    _tokens.append(event.get("token", ""))
+                elif event.get("type") == "agent_traces":
+                    _herramientas = event.get("tool_executions", [])
+                yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
+            _registrar_chat_en_corpus(req.prompt, req.system_prompt, "".join(_tokens),
+                                      _herramientas, (time.time() - _t0) * 1000.0)
+        finally:
+            await cm.__aexit__(None, None, None)
+    resp = StreamingResponse(sse_generator(), media_type="text/event-stream")
+    resp.headers["X-Astraura-Cola"] = str(turnero.estado().get("en_cola", 0))
+    return resp
+
+@app.get("/api/cola")
+async def get_cola_endpoint():
+    """Foto barata del turnero (sin llamar al BitNet): admisión, huecos activos,
+    cola, espera estimada y contadores. Ver `core/turnero.py`."""
+    return turnero.estado()
 
 # ================= Aprendizaje continuo: corpus vivo (Ola 268) =================
 
@@ -3507,10 +3543,18 @@ async def websocket_chat(websocket: WebSocket):
                 preferences = data.get("preferences", {})
                 
                 if prompt.strip():
-                    from app.core.aprendizaje import APRENDIZAJE_COLECTIVO, aprendizaje_de
-                    APRENDIZAJE_COLECTIVO.set(aprendizaje_de(preferences))
-                    async for event in orchestrator.generate_response_stream(prompt, sys_prompt, preferences=preferences):
-                        await websocket.send_json(event)
+                    # (Turnero) Igual que /api/chat/stream, pero sin HTTP: si el
+                    # BitNet está ocupado y la cola/RAM no dan margen, se avisa
+                    # con un mensaje de error en vez de un 503 (no hay respuesta
+                    # HTTP que devolver en un WebSocket ya conectado).
+                    try:
+                        async with turnero.turno(tipo="chat"):
+                            from app.core.aprendizaje import APRENDIZAJE_COLECTIVO, aprendizaje_de
+                            APRENDIZAJE_COLECTIVO.set(aprendizaje_de(preferences))
+                            async for event in orchestrator.generate_response_stream(prompt, sys_prompt, preferences=preferences):
+                                await websocket.send_json(event)
+                    except turnero.Ocupado as oc:
+                        await websocket.send_json({"type": "error", **turnero.cuerpo_ocupado(oc)})
                         
             elif msg_type == "ping":
                 await websocket.send_json({
