@@ -179,3 +179,43 @@ async def test_barrido_funcionalidad(tmp_path):
     assert tarea["phase_label"] == "Esperando: el chat tiene el turno del motor 1.58"
     assert "_gen_launched" not in tarea  # No se debería haber iniciado la generación
     assert tarea.get("started_at") is not None  # Se debe haber actualizado started_at para evitar que se elimine como atascada
+
+
+def test_presupuesto_de_fondo_en_servidor_compartido(tmp_path, monkeypatch):
+    """(2026-09-26) En la Mac de 8 GB el fondo tenía al BitNet generando sin pausa y el chat
+    esperaba detrás: una sola arrancada de fondo por hueco (900 s por defecto)."""
+    motor = AdaptiveMultiAreaSwarmEngine(data_dir=tmp_path)
+    monkeypatch.delenv("ASTRAURA_FONDO_HUECO_S", raising=False)
+    with patch.object(motor, "_servidor_compartido", return_value=True):
+        assert motor._hueco_fondo_s() == 900
+        motor._ultimo_fondo = 0.0
+        assert motor._fondo_admite(10_000.0) is True
+        motor._ultimo_fondo = 10_000.0
+        assert motor._fondo_admite(10_000.0 + 899) is False
+        assert motor._fondo_admite(10_000.0 + 900) is True
+    with patch.object(motor, "_servidor_compartido", return_value=False):
+        assert motor._hueco_fondo_s() == 0
+        assert motor._fondo_admite(motor._ultimo_fondo) is True
+    monkeypatch.setenv("ASTRAURA_FONDO_HUECO_S", "60")
+    assert motor._hueco_fondo_s() == 60
+    monkeypatch.setenv("ASTRAURA_FONDO_HUECO_S", "no-numero")
+    with patch.object(motor, "_servidor_compartido", return_value=True):
+        assert motor._hueco_fondo_s() == 900
+
+
+def test_reactivaciones_se_aplazan_sin_presupuesto(tmp_path, monkeypatch):
+    """Con el hueco cerrado, un despertador vencido no despacha: se aplaza al siguiente hueco."""
+    motor = AdaptiveMultiAreaSwarmEngine(data_dir=tmp_path)
+    monkeypatch.setenv("ASTRAURA_FONDO_HUECO_S", "900")
+    ahora = time.time()
+    motor._ultimo_fondo = ahora - 10
+    for s in motor.schedules:
+        s["is_enabled"] = True
+        s["next_run_timestamp"] = ahora - 1
+    despachadas = []
+    with patch.object(motor, "_chat_tiene_el_turno", return_value=False), \
+            patch.object(motor, "_fondo_proactivo_permitido", return_value=False), \
+            patch.object(motor, "dispatch_task", side_effect=lambda **kw: despachadas.append(kw)):
+        motor._barrido(ahora)
+    assert despachadas == []
+    assert all(s["next_run_timestamp"] >= motor._ultimo_fondo + 900 - 1 for s in motor.schedules)

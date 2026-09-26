@@ -86,6 +86,9 @@ class AdaptiveMultiAreaSwarmEngine:
         self.total_m1_cores = 8
         self.is_user_interactive = False
         self.last_user_activity_time = time.time()
+        # (2026-09-26) Última vez que el FONDO (reactivación programada, despacho proactivo o
+        # renovación del Director) puso a generar al motor 1.58. Ver `_hueco_fondo_s`.
+        self._ultimo_fondo = 0.0
         
         # Agents Definition
         self.agents: Dict[str, Dict[str, Any]] = {
@@ -736,8 +739,20 @@ class AdaptiveMultiAreaSwarmEngine:
             # Trigger Director Orchestrator Verification, Multi-Dimensional Attachment & Intelligent Renewal
             try:
                 from app.agents.director_orchestrator import director_orchestrator
-                next_task = await director_orchestrator.auto_renew_completed_task_async(t)
-                t["logs"].append("👑 Auditado por Director Metis." + (" Siguiente ciclo formulado por el motor." if next_task else " Renovación omitida: sin formulación real (honesto)."))
+                # (2026-09-26) Auditar + formular la siguiente son dos generaciones más del motor, y la
+                # tarea renovada, una tercera: sin presupuesto era una cadena sin fin. Solo se
+                # renueva si el hueco de fondo está abierto; si no, la tarea queda cerrada y el
+                # despertador programado la retomará en su turno.
+                next_task = None
+                auditado = False
+                if not self._fondo_admite(time.time()):
+                    t["logs"].append("👑 Auditoría y renovación del Director aplazadas: presupuesto de fondo (el chat tiene prioridad).")
+                else:
+                    self._ultimo_fondo = time.time()
+                    auditado = True
+                    next_task = await director_orchestrator.auto_renew_completed_task_async(t)
+                if auditado:
+                    t["logs"].append("👑 Auditado por Director Metis." + (" Siguiente ciclo formulado por el motor." if next_task else " Renovación omitida: sin formulación real (honesto)."))
                 if next_task and len([tk for tk in self.active_tasks if tk["status"] == "running"]) < 4:
                     self.dispatch_task(
                         area_id=next_task["area_id"],
@@ -817,6 +832,26 @@ class AdaptiveMultiAreaSwarmEngine:
             pass  # No hacer nada si no se puede acceder al atributo
             
         return False
+
+    def _hueco_fondo_s(self) -> int:
+        """(2026-09-26) Segundos mínimos entre dos arranques de trabajo de FONDO en un servidor
+        compartido. Medido en la Mac de 8 GB: cinco reactivaciones programadas (cada 5-30 min)
+        más la cadena auditar → formular → renovar del Director tenían al BitNet generando sin
+        pausa (tareas de 120 tokens una tras otra, a 1 tok/s con la RAM justa), y cada mensaje del
+        chat esperaba detrás hasta 2 min: «Astraura no responde en ningún medio».
+        `ASTRAURA_FONDO_HUECO_S` lo fija; por defecto 900 s en servidor compartido y 0 (sin tope)
+        en uno dedicado."""
+        env = os.environ.get("ASTRAURA_FONDO_HUECO_S", "").strip()
+        if env:
+            try:
+                return max(0, int(env))
+            except ValueError:
+                pass
+        return 900 if self._servidor_compartido() else 0
+
+    def _fondo_admite(self, now: float) -> bool:
+        """¿Puede arrancar ahora trabajo de fondo sin pasarse del presupuesto?"""
+        return now - float(getattr(self, "_ultimo_fondo", 0.0) or 0.0) >= self._hueco_fondo_s()
 
     def _limite_fondo(self) -> int:
         """(Adenda 181) Tareas de fondo SIMULTÁNEAS honestas para este hardware:
@@ -971,7 +1006,9 @@ class AdaptiveMultiAreaSwarmEngine:
         # 2026-09-08, Ola 284 · AS3 - Solo ejecutar si fondo proactivo permitido y chat no tiene turno
         if (len(running_tasks) < self._limite_fondo() and 
             self._fondo_proactivo_permitido() and 
-            not self._chat_tiene_el_turno(now)):
+            not self._chat_tiene_el_turno(now) and
+            self._fondo_admite(now)):
+            self._ultimo_fondo = now
             pool = [
                 ("area_engineering", "hephaestus", "Optimización de Microkernel Vectorial NEON en 1.58b", "Refactorizar bucles SIMD para Apple Silicon M1.", f"{WORKSPACE}/backend/app"),
                 ("area_web_intel", "hermes", "Rastreo de Preprints arXiv sobre Modelos Ternarios", "Extracción y análisis de papers sobre cuantización ternaria.", f"{WORKSPACE}/data/research"),
@@ -1010,7 +1047,13 @@ class AdaptiveMultiAreaSwarmEngine:
                     if now - self._ultimo_aviso_aplazado > 300:  # 5 minutos
                         print(f"⏰ [SwarmScheduler] Reactivación pospuesta: '{s['title']}' en {s['area_id']} - el chat tiene el turno del motor 1.58")
                         self._ultimo_aviso_aplazado = now
+                elif not self._fondo_admite(now):
+                    # (2026-09-26) Presupuesto de fondo: una reactivación por hueco, no cinco
+                    # seguidas. Se aplaza hasta que se abra el siguiente hueco.
+                    s["next_run_timestamp"] = float(getattr(self, "_ultimo_fondo", 0.0) or 0.0) + self._hueco_fondo_s()
+                    s["last_result"] = f"aplazado {time.strftime('%H:%M:%S')}: presupuesto de fondo (1 cada {self._hueco_fondo_s() // 60} min)"
                 else:
+                    self._ultimo_fondo = now
                     print(f"⏰ [SwarmScheduler] Despertador activado: '{s['title']}' en {s['area_id']}...")
                     s["last_run_timestamp"] = now
                     s["next_run_timestamp"] = now + (s.get("frequency_minutes", 15) * 60)
