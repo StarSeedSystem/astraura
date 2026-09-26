@@ -93,6 +93,12 @@ def _probabilidades(respuesta: Any, letras: List[str]) -> Optional[Dict[str, flo
         primeras = respuesta.get("completion_probabilities")[0]
     except (IndexError, TypeError, KeyError):
         return None
+    # Dos formatos de llama-server: el actual devuelve por posición un dict con
+    # `top_logprobs` ([{token, logprob}]); el antiguo, una lista (o un dict con
+    # `probs`: [{tok_str, prob}]). Se aceptan los dos (medido el 2026-09-26: el
+    # BitNet de la Mac usa el actual y el parseo de lista daba «sin logits»).
+    if isinstance(primeras, dict):
+        primeras = primeras.get("top_logprobs") or primeras.get("probs") or []
     if not isinstance(primeras, list):
         return None
     valores: Dict[str, float] = {}
@@ -100,7 +106,11 @@ def _probabilidades(respuesta: Any, letras: List[str]) -> Optional[Dict[str, flo
         if not isinstance(item, dict):
             continue
         token = item.get("token")
+        if not isinstance(token, str):
+            token = item.get("tok_str")
         logprob = item.get("logprob")
+        if not isinstance(logprob, (int, float)) and isinstance(item.get("prob"), (int, float)):
+            logprob = math.log(max(float(item["prob"]), 1e-12))
         letra = token.strip() if isinstance(token, str) else ""
         if letra not in letras or not isinstance(logprob, (int, float)):
             continue

@@ -227,3 +227,30 @@ def test_estado_del_turnero_tiene_las_claves_del_contrato() -> None:
     for clave in ("activos", "en_cola", "max_cola", "espera_estimada_s", "ram_libre_mb",
                   "admite", "media_s", "rechazadas", "servidas"):
         assert clave in estado
+
+
+def test_parsea_el_formato_actual_de_llama_server_con_top_logprobs() -> None:
+    """Formato medido en el BitNet de la Mac (2026-09-26): por posición, un dict
+    con `top_logprobs`."""
+    from app.api import jev as jev_mod
+    respuesta = {"completion_probabilities": [{
+        "id": 1, "token": " A", "logprob": -0.2,
+        "top_logprobs": [
+            {"id": 1, "token": " A", "logprob": -0.2},
+            {"id": 2, "token": " B", "logprob": -1.9},
+            {"id": 3, "token": " hola", "logprob": -2.5},
+        ],
+    }]}
+    probs = jev_mod._probabilidades(respuesta, ["A", "B", "C"])
+    assert probs is not None and set(probs) == {"A", "B"}
+    assert probs["A"] > probs["B"]
+    assert abs(sum(probs.values()) - 1.0) < 1e-9
+
+
+def test_parsea_el_formato_antiguo_con_probs() -> None:
+    from app.api import jev as jev_mod
+    respuesta = {"completion_probabilities": [{"content": " B", "probs": [
+        {"tok_str": " B", "prob": 0.7}, {"tok_str": " A", "prob": 0.2},
+    ]}]}
+    probs = jev_mod._probabilidades(respuesta, ["A", "B"])
+    assert probs is not None and probs["B"] > probs["A"]
