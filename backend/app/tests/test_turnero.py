@@ -37,6 +37,8 @@ def _turnero_limpio(monkeypatch: Any) -> None:
     turnero._activos["chat"] = 0
     turnero._activos["jev"] = 0
     turnero._cola.clear()
+    turnero._tenencias.clear()
+    turnero._liberadas_por_tiempo = 0
     turnero._media_s = turnero._MEDIA_INICIAL_S
     turnero._rechazadas = 0
     turnero._servidas = 0
@@ -311,3 +313,26 @@ def test_jev_pesa_una_fraccion_de_un_chat_en_la_estimacion() -> None:
     # Un Jev activo (peso 0,1) + un chat nuevo (peso 1) = 1,1 de carga total.
     estimado = _correr(con_jev_activo())
     assert estimado == pytest.approx(1.1 * 10.0, abs=1e-6)
+
+
+def test_un_hueco_retenido_de_mas_se_recupera_para_la_cola(monkeypatch: Any) -> None:
+    """Salvaguarda: un turno que nunca suelta el hueco (p. ej. un StreamingResponse
+    cuyo generador nunca llegó a iterar) no puede dejar el chat rechazado para
+    siempre: pasado ASTRAURA_TURNO_MAX_S, la siguiente admisión lo recupera."""
+    monkeypatch.setenv("ASTRAURA_TURNO_MAX_S", "30")
+
+    async def escenario() -> None:
+        cm = turnero.turno(tipo="chat")
+        await cm.__aenter__()  # hueco tomado y nunca devuelto
+        assert turnero.estado()["activos"] == 1
+        # Se envejece la tenencia más allá del máximo.
+        for clave, (tipo, t0) in list(turnero._tenencias.items()):
+            turnero._tenencias[clave] = (tipo, t0 - 31)
+        async with turnero.turno(tipo="chat"):
+            assert turnero.estado()["activos"] == 1
+        assert turnero.estado()["liberadas_por_tiempo"] == 1
+        # El __aexit__ tardío del primero no resta el hueco de nadie.
+        await cm.__aexit__(None, None, None)
+        assert turnero.estado()["activos"] == 0
+
+    _correr(escenario())

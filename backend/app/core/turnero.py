@@ -66,10 +66,11 @@ class _Espera:
     dejarlo fantasma.
     """
 
-    __slots__ = ("tipo", "evento", "admitido", "ts_encolado")
+    __slots__ = ("tipo", "evento", "admitido", "ts_encolado", "token")
 
-    def __init__(self, tipo: str) -> None:
+    def __init__(self, tipo: str, token: Optional[object] = None) -> None:
         self.tipo = tipo
+        self.token = token if token is not None else object()
         self.evento = asyncio.Event()
         self.admitido = False
         self.ts_encolado = time.monotonic()
@@ -82,6 +83,12 @@ _cola: List[_Espera] = []
 _media_s: float = _MEDIA_INICIAL_S
 _rechazadas = 0
 _servidas = 0
+# (Salvaguarda) Quién tiene un hueco y desde cuándo: id(token) → (tipo, t0). Si un
+# turno se queda con el hueco más de `turno_max_s()` (un StreamingResponse que
+# nunca llegó a iterar su generador, un cliente colgado…), la siguiente admisión
+# lo devuelve: un hueco fantasma dejaría TODO el chat rechazado para siempre.
+_tenencias: Dict[int, tuple] = {}
+_liberadas_por_tiempo = 0
 
 
 # ────────────────────────────────── configuración (env-first) ──────────────────────────────
@@ -142,6 +149,27 @@ def ram_min_mb() -> float:
     return max(0.0, _env_float("ASTRAURA_RAM_MIN_MB", 250.0))
 
 
+def turno_max_s() -> float:
+    """Tiempo máximo que un turno puede retener el hueco antes de que la siguiente
+    admisión lo recupere. Forzable con ASTRAURA_TURNO_MAX_S (900 s por defecto:
+    ninguna respuesta legítima del BitNet de la Mac tarda tanto)."""
+    return max(30.0, _env_float("ASTRAURA_TURNO_MAX_S", 900.0))
+
+
+def _purgar_tenencias_vencidas() -> None:
+    """SIEMPRE con `_lock` tomado. Devuelve los huecos retenidos más de la cuenta."""
+    global _liberadas_por_tiempo
+    ahora = time.monotonic()
+    limite = turno_max_s()
+    for clave, (tipo, t0) in list(_tenencias.items()):
+        if ahora - t0 > limite:
+            _tenencias.pop(clave, None)
+            _activos[tipo] = max(0, _activos.get(tipo, 0) - 1)
+            _liberadas_por_tiempo += 1
+            print(f"⚠️ [Turnero] Hueco «{tipo}» retenido {int(ahora - t0)} s: se recupera para la cola.")
+    _despertar_siguiente()
+
+
 def ram_libre_mb() -> float:
     try:
         return psutil.virtual_memory().available / (1024 ** 2)
@@ -193,6 +221,7 @@ def _despertar_siguiente() -> None:
     if _cola and _activos_n() < max_activos():
         siguiente = _cola.pop(0)
         _activos[siguiente.tipo] = _activos.get(siguiente.tipo, 0) + 1
+        _tenencias[id(siguiente.token)] = (siguiente.tipo, time.monotonic())
         siguiente.admitido = True
         siguiente.evento.set()
 
@@ -233,15 +262,18 @@ async def turno(tipo: str = "chat") -> AsyncIterator[None]:
         raise Ocupado("memoria", _espera_estimada_s(_peso(tipo)), 15.0, en_cola_ahora)
 
     espera: Optional[_Espera] = None
+    token = object()
     async with _lock:
+        _purgar_tenencias_vencidas()
         if _activos_n() < max_activos():
             _activos[tipo] = _activos.get(tipo, 0) + 1
+            _tenencias[id(token)] = (tipo, time.monotonic())
         else:
             estimado = _espera_estimada_s(_peso(tipo))
             if len(_cola) >= max_cola() or estimado > max_espera_s():
                 _rechazadas += 1
                 raise Ocupado("cola", estimado, estimado, len(_cola))
-            espera = _Espera(tipo)
+            espera = _Espera(tipo, token)
             _insertar_en_cola(espera)
 
     if espera is not None:
@@ -257,7 +289,8 @@ async def turno(tipo: str = "chat") -> AsyncIterator[None]:
                     # Ya se le había concedido el hueco justo cuando llegó la
                     # cancelación: se libera para el siguiente en vez de
                     # quedarse ocupado sin nadie generando.
-                    _activos[espera.tipo] = max(0, _activos.get(espera.tipo, 0) - 1)
+                    if _tenencias.pop(id(token), None) is not None:
+                        _activos[espera.tipo] = max(0, _activos.get(espera.tipo, 0) - 1)
                     _despertar_siguiente()
             raise
 
@@ -267,7 +300,10 @@ async def turno(tipo: str = "chat") -> AsyncIterator[None]:
     finally:
         dt = time.monotonic() - t0
         async with _lock:
-            _activos[tipo] = max(0, _activos.get(tipo, 0) - 1)
+            # Solo se devuelve el hueco si sigue siendo nuestro: si la salvaguarda ya
+            # lo recuperó por tiempo, restarlo otra vez se comería el de otro turno.
+            if _tenencias.pop(id(token), None) is not None:
+                _activos[tipo] = max(0, _activos.get(tipo, 0) - 1)
             _servidas += 1
             if tipo == "chat":
                 _actualizar_media(dt)
@@ -291,6 +327,7 @@ def estado() -> Dict[str, Any]:
         "media_s": round(_media_s, 1),
         "rechazadas": _rechazadas,
         "servidas": _servidas,
+        "liberadas_por_tiempo": _liberadas_por_tiempo,
     }
 
 
