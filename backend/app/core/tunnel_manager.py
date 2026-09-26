@@ -106,6 +106,30 @@ class SovereignTunnelManager:
         except Exception:
             pass
 
+        # (2026-09-26) Publicar YA el túnel nuevo para la web y la app (capa nube de
+        # StarSeed): cada arranque del backend abre un túnel rápido con URL nueva y el
+        # publicador del OS solo pasaba cada 5 min, así que tras cada reinicio la nube
+        # quedaba hasta 5 min apuntando a una URL muerta. Se lanza desacoplado y sin
+        # esperar; si el guion no existe (otra máquina), no pasa nada.
+        if is_active and url:
+            self._publicar_tunel_en_segundo_plano()
+
+    def _publicar_tunel_en_segundo_plano(self) -> None:
+        guion = os.environ.get(
+            "ASTRAURA_PUBLICADOR_TUNEL",
+            os.path.expanduser("~/Documents/starseed-os-main/scripts/puente/publicar_tunel_astraura.py"),
+        )
+        if not guion or not os.path.isfile(guion):
+            return
+        try:
+            import subprocess
+            import sys as _sys
+            python = "/opt/homebrew/bin/python3" if os.path.exists("/opt/homebrew/bin/python3") else _sys.executable
+            subprocess.Popen([python, guion], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                             start_new_session=True)
+        except Exception as e:
+            print(f"⚠️ [TunnelManager] No se pudo lanzar el publicador del túnel: {e}")
+
     def start_tunnel_in_background(self) -> bool:
         """Starts cloudflared tunnel in a dedicated monitoring background thread."""
         # (OS · Ola 3) Air-Gap REAL: con el aislamiento activo NO se abre ningún túnel
