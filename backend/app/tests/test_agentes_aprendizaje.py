@@ -6,6 +6,7 @@ Sin red: `cognition.generate` se sustituye por una corrutina falsa y el
 `estado_turno` del manager del BitNet se parchea con monkeypatch.
 """
 
+import asyncio
 import json
 import sys
 import time
@@ -19,6 +20,16 @@ from app.core.aprendizaje.agentes import PlanificadorAgentes
 from app.core.aprendizaje.corpus import CorpusVivo
 from app.engine.bitnet_cpp_manager import bitnet_cpp_manager
 import app.core.cognition as cognition
+
+
+def _correr(coro):
+    """Bucle propio: con pytest-asyncio instalado, los tests async de otros archivos
+    dejan el hilo sin bucle y `get_event_loop()` fallaba según el orden de la sesión."""
+    bucle = asyncio.new_event_loop()
+    try:
+        return bucle.run_until_complete(coro)
+    finally:
+        bucle.close()
 
 
 def _planificador(tmp_path):
@@ -40,7 +51,7 @@ def test_curador_deduplica_y_escribe_curacion(tmp_path):
     plan = _planificador(tmp_path)
     _registrar_dos_iguales(plan)
     import asyncio
-    resultado = asyncio.get_event_loop().run_until_complete(plan._curador())
+    resultado = _correr(plan._curador())
     assert resultado["duplicados"] == 1
     assert resultado["personalidades"]["astra"] == 1
     assert resultado["sin_valorar"] == 1
@@ -66,7 +77,7 @@ def test_evaluador_omite_con_bitnet_cedido(tmp_path, monkeypatch):
 
     monkeypatch.setattr(cognition, "generate", falsa_generate)
     import asyncio
-    r = asyncio.get_event_loop().run_until_complete(plan._evaluador())
+    r = _correr(plan._evaluador())
     assert r["omitido"] == "turno de memoria"
     assert not llamadas  # jamás se generó nada: el BitNet no se despertó
     lineas = (tmp_path / "evaluaciones.jsonl").read_text(encoding="utf-8").strip().splitlines()
@@ -84,7 +95,7 @@ def test_evaluador_sonda_con_bitnet_vivo(tmp_path, monkeypatch):
 
     monkeypatch.setattr(cognition, "generate", falsa_generate)
     import asyncio
-    r = asyncio.get_event_loop().run_until_complete(plan._evaluador())
+    r = _correr(plan._evaluador())
     assert r["json_ok"] is True
     assert 0 <= r["puntuacion"] <= 100
     assert r["latencia_ms"] >= 0
@@ -102,7 +113,7 @@ def test_curador_sin_duplicados_no_reescribe(tmp_path):
     archivo = tmp_path / "corpus" / "astra" / f"{mes}.jsonl"
     antes = archivo.read_bytes()
     import asyncio
-    r = asyncio.get_event_loop().run_until_complete(plan._curador())
+    r = _correr(plan._curador())
     assert r["duplicados"] == 0
     assert "reintentar" not in r
     assert archivo.read_bytes() == antes
@@ -118,7 +129,7 @@ def test_curador_con_duplicados_reescribe_con_bak(tmp_path):
     archivo = tmp_path / "corpus" / "astra" / f"{mes}.jsonl"
     original = archivo.read_bytes()
     import asyncio
-    r = asyncio.get_event_loop().run_until_complete(plan._curador())
+    r = _correr(plan._curador())
     assert r["duplicados"] == 1
     bak = tmp_path / "corpus" / "astra" / f"{mes}.jsonl.bak"
     assert bak.read_bytes() == original
@@ -172,6 +183,6 @@ def test_estado_tiene_las_claves(tmp_path, monkeypatch):
     assert estado["bitnet"]["dormido"] is True
     # Entrenador y Desplegador esperan la fábrica QVAC.
     import asyncio
-    r = asyncio.get_event_loop().run_until_complete(plan.ejecutar_ahora("entrenador"))
+    r = _correr(plan.ejecutar_ahora("entrenador"))
     assert r["motivo"] == "fábrica QVAC no instalada"
     assert plan.ejecutar_ahora

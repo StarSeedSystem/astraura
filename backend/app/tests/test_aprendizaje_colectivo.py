@@ -15,6 +15,16 @@ from app.core.aprendizaje import APRENDIZAJE_COLECTIVO, aprendizaje_de
 from app.core.aprendizaje.corpus import CorpusVivo
 
 
+def _correr(coro):
+    """Bucle propio: `asyncio.run` deja el hilo sin bucle y rompe los tests que usan
+    `get_event_loop()` después en la misma sesión."""
+    bucle = asyncio.new_event_loop()
+    try:
+        return bucle.run_until_complete(coro)
+    finally:
+        bucle.close()
+
+
 def _mensajes():
     return [
         {"role": "user", "content": "¿qué tiempo hace?"},
@@ -55,7 +65,7 @@ def test_la_marca_de_un_turno_no_contagia_a_otro_concurrente(tmp_path):
     async def ambos():
         return await asyncio.gather(turno(False), turno(True))
 
-    apagado, encendido = asyncio.run(ambos())
+    apagado, encendido = _correr(ambos())
     assert apagado is None
     assert encendido
     assert APRENDIZAJE_COLECTIVO.get() is True
@@ -98,7 +108,7 @@ def test_el_puente_del_os_respeta_la_capa_en_los_dos_caminos(monkeypatch):
         await recorrer(await puente.starseed_chat(peticion(False, True)))
         await recorrer(await puente.starseed_chat(peticion(True, True)))
 
-    asyncio.run(todo())
+    _correr(todo())
     assert vistos == [False, True, False, True]
     # Nada queda marcado fuera de las peticiones.
     assert APRENDIZAJE_COLECTIVO.get() is True

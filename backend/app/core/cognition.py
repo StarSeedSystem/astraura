@@ -151,6 +151,105 @@ _status_cache: Dict[str, Any] = {"at": 0.0, "mode": "templates"}
 _stats: Dict[str, Any] = {"calls": 0, "real": 0, "template": 0, "errors": 0, "last_ms": 0, "last_mode": "templates"}
 
 
+# (2026-09-26) PRESUPUESTO DE FONDO sobre el motor compartido. Medido en la Mac de 8 GB
+# de Alex: imaginación, Director, autorizaciones y enjambre pedían por aquí unas 100
+# generaciones por hora de ~60-116 s cada una. El único hueco del llama-server
+# (--parallel 1) quedaba ocupado el 100 % del tiempo y cada mensaje del chat esperaba
+# detrás de una generación de fondo entera. Dos reglas, solo con el servidor compartido:
+#   1) Ciclo de trabajo: el fondo usa como mucho `ASTRAURA_FONDO_CICLO` (0,25) del
+#      tiempo del motor. Tras una generación de d segundos, la siguiente espera
+#      d·(1/ciclo − 1): 60 s de trabajo → 180 s de descanso. Una sola a la vez.
+#   2) Ceder al chat: si llega un turno interactivo (chat, orbe o voz en vivo) con una
+#      generación de fondo a medias, se corta (se cierra el stream y el llama-server
+#      suelta el hueco) y el llamador conserva su plantilla.
+# Sin servidor compartido (máquinas con RAM para dos) el ciclo es 1,0: no cambia nada.
+_fondo_lock = threading.Lock()
+_fondo: Dict[str, Any] = {"en_curso": 0, "libre_desde": 0.0}
+
+
+class _CedidoAlChat(Exception):
+    """Una generación de fondo se cortó porque el chat pidió el motor."""
+
+
+def _ciclo_fondo() -> float:
+    env = (os.environ.get("ASTRAURA_FONDO_CICLO") or "").strip()
+    if env:
+        try:
+            return min(1.0, max(0.02, float(env)))
+        except ValueError:
+            pass
+    try:
+        from ..engine.bitnet_cpp_manager import bitnet_cpp_manager as _m
+        return 0.25 if _m._servidor_compartido() else 1.0
+    except Exception:
+        return 1.0
+
+
+def _reservar_fondo(ahora: float, ciclo: float) -> Optional[str]:
+    """None si el fondo puede usar el motor ya (y queda reservado); si no, el motivo."""
+    if ciclo >= 1.0:
+        return None
+    with _fondo_lock:
+        if _fondo["en_curso"] > 0:
+            return "presupuesto de fondo: ya hay una generación de fondo en el motor compartido"
+        espera = float(_fondo["libre_desde"]) - ahora
+        if espera > 0:
+            return f"presupuesto de fondo: el motor descansa {int(espera) + 1} s más"
+        _fondo["en_curso"] += 1
+    return None
+
+
+def _liberar_fondo(inicio: float, fin: float, ciclo: float) -> None:
+    with _fondo_lock:
+        _fondo["en_curso"] = max(0, int(_fondo["en_curso"]) - 1)
+        descanso = max(0.0, fin - inicio) * (1.0 / max(0.02, ciclo) - 1.0)
+        _fondo["libre_desde"] = max(float(_fondo["libre_desde"]), fin + descanso)
+
+
+def _chat_pide_el_motor() -> bool:
+    """¿Hay un turno interactivo esperando el llama-server (chat, orbe o voz en vivo)?"""
+    try:
+        from ..engine.bitnet_engine import bitnet_engine as _e
+        if int(getattr(_e, "_interactive_busy", 0) or 0) > 0:
+            return True
+    except Exception:
+        pass
+    try:
+        from ..engine.bitnet_cpp_manager import bitnet_cpp_manager as _m
+        return bool(_m._conversacion_en_vivo())
+    except Exception:
+        return False
+
+
+async def _esperar_cediendo(tarea: "asyncio.Future", timeout: float, ceder: bool) -> Any:
+    """Como `wait_for`, pero si `ceder` y el chat pide el motor, corta la tarea."""
+    limite = time.monotonic() + timeout
+    try:
+        while True:
+            restante = limite - time.monotonic()
+            if restante <= 0:
+                raise asyncio.TimeoutError()
+            hechas, _ = await asyncio.wait({tarea}, timeout=min(0.5, restante))
+            if tarea in hechas:
+                return tarea.result()
+            if ceder and _chat_pide_el_motor():
+                raise _CedidoAlChat()
+    finally:
+        if not tarea.done():
+            tarea.cancel()
+            try:
+                await tarea
+            except BaseException:
+                pass
+
+
+def fondo_estado() -> Dict[str, Any]:
+    ciclo = _ciclo_fondo()
+    with _fondo_lock:
+        libre = max(0.0, float(_fondo["libre_desde"]) - time.time())
+        return {"ciclo": ciclo, "en_curso": int(_fondo["en_curso"]), "descansa_s": int(libre)}
+
+
 def _templates_result(mode: str = "templates", error: Optional[str] = None, ms: int = 0) -> Dict[str, Any]:
     out: Dict[str, Any] = {"text": "", "real": False, "mode": mode, "ms": ms}
     if error:
@@ -343,6 +442,14 @@ async def generate(
         _measured = float(_stats.get("measured_tps") or 0.0)
         if 0 < _measured < 14.0:
             timeout = min(max(timeout, 45.0 + (float(max_tokens) / _measured) * 1.7), 480.0)
+    ciclo = _ciclo_fondo() if mode == "bitnet-native" else 1.0
+    motivo = _reservar_fondo(time.time(), ciclo)
+    if motivo:
+        _stats["template"] += 1
+        _stats["aplazadas_presupuesto"] = int(_stats.get("aplazadas_presupuesto") or 0) + 1
+        return _templates_result(mode, motivo, 0)
+    reservado = ciclo < 1.0
+    inicio_motor = time.time()
     try:
         sem = _get_semaphore()
         # (Verificación 1.58, bajo carga) La COLA también tiene presupuesto: antes
@@ -359,12 +466,24 @@ async def generate(
             _stats["last_ms"] = ms
             return _templates_result(mode, "cola saturada (>120s esperando turno)", ms)
         try:
-            raw = await asyncio.wait_for(
-                _consume(prompt, system, context_chunks, tool_data, max_tokens, temperature, meta),
-                timeout=timeout,
+            raw = await _esperar_cediendo(
+                asyncio.ensure_future(
+                    _consume(prompt, system, context_chunks, tool_data, max_tokens, temperature, meta)
+                ),
+                timeout,
+                ceder=reservado,
             )
         finally:
             sem.release()
+            if reservado:
+                reservado = False
+                _liberar_fondo(inicio_motor, time.time(), ciclo)
+    except _CedidoAlChat:
+        ms = int((time.perf_counter() - t0) * 1000)
+        _stats["template"] += 1
+        _stats["cedidas_al_chat"] = int(_stats.get("cedidas_al_chat") or 0) + 1
+        _stats["last_ms"] = ms
+        return _templates_result(mode, "cedido al chat", ms)
     except asyncio.TimeoutError:
         ms = int((time.perf_counter() - t0) * 1000)
         _stats["errors"] += 1
@@ -380,6 +499,11 @@ async def generate(
         _stats["errors"] += 1
         _stats["last_ms"] = ms
         return _templates_result(mode, str(e)[:200], ms)
+    finally:
+        # Cualquier salida que no pasó por el `finally` de dentro (cola saturada,
+        # error antes de generar) devuelve la reserva: nunca se queda el fondo trabado.
+        if reservado:
+            _liberar_fondo(inicio_motor, time.time(), ciclo)
 
     ms = int((time.perf_counter() - t0) * 1000)
     _stats["last_ms"] = ms
@@ -542,4 +666,4 @@ def field(data: Optional[Dict[str, Any]], key: str, max_len: int = 600, min_len:
 def stats() -> Dict[str, Any]:
     """Contadores honestos para /api/starseed/processes."""
     return {**_stats, "mode": engine_mode(), "max_concurrent": max_concurrent_adaptive(),
-            "preference": cognition_preference()}
+            "preference": cognition_preference(), "fondo": fondo_estado()}
