@@ -664,6 +664,13 @@ class BitNetUnifiedEngine:
                         else:
                             print(f"[BitNetUnifiedEngine] sonda transitoria (server listo, intentando inferencia directa): {_sane.get('reason')}")
             if not base and _has_model and not bitnet_failed:
+                try:
+                    from .bitnet_cpp_manager import congelado_por_guardia as _congelado
+                    if _congelado():
+                        bitnet_failed = "BitNet congelado por el guardia de memoria (el enjambre del OS está escribiendo); vuelve solo"
+                except Exception:
+                    pass
+            if not base and _has_model and not bitnet_failed:
                 # (Verificacion 1.58) Habia modelo GGUF pero `ensure_server` no
                 # logro un servidor nativo sano (puerto ocupado por otra cosa,
                 # timeout cargando, o binario ausente): antes esto se colaba en

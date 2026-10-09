@@ -516,6 +516,7 @@ class AstrauraOrchestrator:
         user_prompt: str,
         budget_chars: Optional[int] = None,
         max_items: Optional[int] = None,
+        solo_verificadas: bool = False,
     ) -> List[Dict[str, Any]]:
         """
         (Tarea 1) Motor único de recuperación de contexto — recuerdos Mem0 +
@@ -555,6 +556,13 @@ class AstrauraOrchestrator:
             for m in hits:
                 text = " ".join(str(m.get("memory", "")).split()).strip()
                 if not text:
+                    continue
+                # (2026-10-09) `solo_verificadas`: fuera las respuestas ANTERIORES
+                # del propio modelo («Usuario consultó a … -> Síntesis: …», categoría
+                # chat_episodic). Medido: tras un «La capital de Francia es Madrid»
+                # guardado así, la siguiente pregunta recibía ESE texto como primer
+                # contexto y lo repetía — un bucle que se alimentaba de sus errores.
+                if solo_verificadas and (m.get("category") == "chat_episodic" or "-> Síntesis:" in text):
                     continue
                 score = _relevance_score(query_tokens, text)
                 if score <= 0:
@@ -624,6 +632,11 @@ class AstrauraOrchestrator:
             for n in (sub.get("nodes") or []):
                 label = n.get("label") or n.get("id") or "Concepto"
                 desc = n.get("description") or ""
+                # (2026-10-09) Conceptos sacados automáticamente de esas mismas
+                # respuestas sin verificar («Madrid: Concepto destilado de
+                # interacción (¿Cuál es la capital de Francia?…)»): fuera también.
+                if solo_verificadas and str(desc).startswith("Concepto destilado de interacción"):
+                    continue
                 token_score = _relevance_score(query_tokens, f"{label} {desc}")
                 if token_score <= 0:
                     continue
@@ -704,7 +717,10 @@ class AstrauraOrchestrator:
         tal cual (degradación elegante).
         """
         try:
-            items = AstrauraOrchestrator.gather_context_items(user_prompt)
+            # Lo que RECIBE EL MODELO para responder: sin sus propias respuestas
+            # anteriores sin verificar (ver `solo_verificadas`). La búsqueda de la
+            # UI y la imaginación siguen viéndolo todo.
+            items = AstrauraOrchestrator.gather_context_items(user_prompt, solo_verificadas=True)
         except Exception as e:
             print(f"[Contexto] gather_context_items falló ({e}); sigo sin contexto adicional.")
             items = []
@@ -715,6 +731,11 @@ class AstrauraOrchestrator:
         merged = list(lines)
         for chunk in (context_chunks or []):
             if not chunk:
+                continue
+            # (2026-10-09) Los intercambios que background_learner guarda en el
+            # vector store («Usuario: …\nAstraura: …») son respuestas del propio
+            # modelo sin verificar: no vuelven a entrar como contexto.
+            if str(chunk).lstrip().startswith("Usuario:") and "\nAstraura:" in str(chunk):
                 continue
             sig = _normalize_for_dedup(chunk)
             if sig in seen:
@@ -761,17 +782,27 @@ class AstrauraOrchestrator:
         active_personas = self.detect_requested_personalities(user_prompt, prefs)
         is_multi = len(active_personas) > 1
 
-        # 1. Analyze and Emit Branching Plan Immediately to UI (Zero-Latency Rendering)
+        # 1. Plan previo (solo las ramas que se van a ejecutar, «en cola»). El
+        # tiempo que se publica es el que de verdad tardó en prepararse; antes
+        # se enviaba un 0.02 fijo.
+        _t_plan = time.perf_counter()
         initial_plan = parallel_branching_engine.analyze_query_branches(user_prompt, prefs)
         yield {
             "type": "branching_plan",
             "plan": initial_plan,
-            "elapsed_seconds": 0.02,
+            "elapsed_seconds": round(time.perf_counter() - _t_plan, 4),
             "active_personalities": [p["name"] for p in active_personas]
         }
 
-        # 2. Execute Fast Quantum Multi-Agent Parallel Swarm Cycle
+        # 2. Ejecutar las ramas en paralelo y publicar el plan MEDIDO (estado y
+        # latencia por rama, aceleración real) en cuanto termina.
         cycle = await self.execute_thought_cycle(user_prompt, preferences=prefs)
+        yield {
+            "type": "branching_plan",
+            "plan": cycle.get("branching_plan"),
+            "elapsed_seconds": cycle.get("elapsed_seconds"),
+            "active_personalities": [p["name"] for p in active_personas]
+        }
 
         # (Tarea 1 · Sincronización Total) Contexto real de las tres fuentes
         # (recuerdos + documentos del memory root + conceptos del grafo),

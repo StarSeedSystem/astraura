@@ -43,14 +43,16 @@ export default function ProcessBranchingFullViewModal({
 
   if (!isOpen || (!branchingPlan && agentTraces.length === 0)) return null;
 
+  // (2026-10-09) Sin valores inventados: lo que no viene medido del backend no se pinta.
   const {
-    total_branches = 5,
-    total_agents = 5,
-    total_subagents = 7,
-    max_concurrency_threads = 8,
-    hardware_platform = 'Apple Silicon ARM NEON (8 núcleos)',
-    speedup_factor = '5.4x',
-    branches = []
+    branches = [],
+    total_branches = branches.length,
+    total_agents = null,
+    hardware_platform = '',
+    speedup_factor = null,
+    elapsed_ms = null,
+    completed_branches = null,
+    measured = false
   } = branchingPlan || {};
 
   const handleCopyAnalysis = () => {
@@ -83,16 +85,18 @@ export default function ProcessBranchingFullViewModal({
                 <h3 className="text-base sm:text-lg font-display font-bold text-white tracking-wide">
                   Árbol de Ramificación del Proceso Desarrollado
                 </h3>
-                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold flex items-center gap-1">
-                  <Zap className="w-3 h-3 text-cyan-400" />
-                  {speedup_factor} Aceleración
-                </span>
+                {speedup_factor && (
+                  <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold flex items-center gap-1" title="Aceleración medida: suma de tiempos de rama / tiempo total">
+                    <Zap className="w-3 h-3 text-cyan-400" />
+                    {speedup_factor} medida
+                  </span>
+                )}
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 font-bold hidden sm:inline-block">
                   BitNet 1.58b SIMD
                 </span>
               </div>
               <p className="text-[11px] text-slate-400">
-                {total_branches} Ramas Desarrolladas • {total_agents} Agentes • {total_subagents} Subagentes • {hardware_platform}
+                {total_branches} ramas{total_agents != null ? ` • ${total_agents} agentes` : ''}{measured && elapsed_ms != null ? ` • ${elapsed_ms} ms en total` : ' • aún sin medir'}{hardware_platform ? ` • ${hardware_platform}` : ''}
               </p>
             </div>
           </div>
@@ -215,13 +219,13 @@ export default function ProcessBranchingFullViewModal({
                             <span className="font-bold text-white text-xs">{b.name}</span>
                           </div>
                           <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold">
-                            {b.latency_ms ? `${b.latency_ms}ms` : 'SYNC'}
+                            {b.status || 'en cola'}{b.latency_ms != null ? ` · ${b.latency_ms} ms` : ''}{b.error ? ` · ${b.error}` : ''}
                           </span>
                         </div>
 
                         <div className="flex items-center justify-between text-[11px] text-slate-300">
                           <span className="text-cyan-300 font-bold">{b.agent}</span>
-                          <span className="text-slate-500 text-[10px]">{b.threads_allocated || 2} Hilos SIMD</span>
+                          {b.threads_allocated != null && <span className="text-slate-500 text-[10px]">{b.threads_allocated} hilos</span>}
                         </div>
 
                         <p className="text-[10px] text-slate-400 leading-snug">
@@ -284,9 +288,9 @@ export default function ProcessBranchingFullViewModal({
                     </div>
 
                     <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
-                      <span className="text-[10px] text-slate-400 uppercase">Aceleración SIMD:</span>
+                      <span className="text-[10px] text-slate-400 uppercase">Medición:</span>
                       <div className="text-emerald-300 font-bold text-[11px]">
-                        {selectedBranch.threads_allocated || 2} Hilos Paralelos en Silicio M1
+                        {selectedBranch.status || 'en cola'}{selectedBranch.latency_ms != null ? ` · ${selectedBranch.latency_ms} ms` : ''}{selectedBranch.limit_ms ? ` (límite ${selectedBranch.limit_ms} ms)` : ''}{selectedBranch.error ? ` · ${selectedBranch.error}` : ''}
                       </div>
                     </div>
                   </div>

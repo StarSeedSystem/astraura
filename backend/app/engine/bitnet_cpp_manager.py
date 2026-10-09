@@ -21,6 +21,56 @@ from ..core.config import settings
 # (Llama-3). La constante se elimina: el server gestiona la plantilla solo.
 # (Verificado en vivo: /v1/chat/completions devuelve texto coherente en ES/EN.)
 
+
+# ── (2026-10-09) Congelado por el guardia de memoria ───────────────────────────
+# Mientras el enjambre del OS escribe y queda poca RAM, `guardia-memoria.py`
+# manda SIGSTOP al llama-server y apunta su PID en esta marca. Un proceso
+# parado conserva el puerto pero no contesta: `/health` agota el tiempo, la
+# sonda lo daba por «apagado» y el supervisor lanzaba OTRO llama-server encima
+# cada 5 s (bind fallido → muere → otra vez: 673 lanzamientos medidos en la
+# Mac). Ahora el congelado se reconoce, se informa tal cual y no se relanza:
+# vuelve solo cuando el guardia le manda SIGCONT.
+MARCA_CONGELADO = os.environ.get(
+    "ASTRAURA_MARCA_CONGELADO", "/tmp/starseed-llama-server-congelado-por-el-guardia")
+_CONGELADO_TTL_S = 3.0
+_congelado_cache: Dict[str, Any] = {"at": 0.0, "pids": []}
+
+
+def _estado_proceso(pid: int) -> str:
+    """Columna STAT de `ps` para un PID («T» = parado por SIGSTOP); "" si no existe."""
+    try:
+        out = subprocess.run(["ps", "-o", "stat=", "-p", str(int(pid))],
+                             capture_output=True, text=True, timeout=2)
+        return (out.stdout or "").strip()
+    except Exception:
+        return ""
+
+
+def pids_congelados_por_guardia(marca: Optional[str] = None, estado_fn=None,
+                                usar_cache: bool = True) -> List[int]:
+    """PIDs de llama-server que el guardia tiene parados. Mismo criterio que el
+    guardia: un PID cuenta solo si está en su marca Y su estado contiene «T»
+    (una marca sobrante de un proceso ya reanudado o muerto no cuenta)."""
+    ahora = time.time()
+    if usar_cache and marca is None and estado_fn is None and ahora - _congelado_cache["at"] < _CONGELADO_TTL_S:
+        return list(_congelado_cache["pids"])
+    ruta = marca or MARCA_CONGELADO
+    estado = estado_fn or _estado_proceso
+    try:
+        with open(ruta, encoding="utf-8") as f:
+            pids = [int(x) for x in f.read().split() if x.strip().isdigit()]
+    except (OSError, ValueError):
+        pids = []
+    parados = [p for p in pids if "T" in (estado(p) or "")]
+    if marca is None and estado_fn is None:
+        _congelado_cache.update({"at": ahora, "pids": parados})
+    return parados
+
+
+def congelado_por_guardia(**kw) -> bool:
+    return bool(pids_congelados_por_guardia(**kw))
+
+
 class BitNetCppManager:
     """
     Manages the installation, compilation, model discovery, and native execution 
@@ -247,6 +297,10 @@ class BitNetCppManager:
         # `_dormido` no esté marcado (p.ej. si el server ya estaba apagado al
         # ceder).
         if self._dormido or self._cedido_activo() or self._dormir_si_toca():
+            return
+        # (2026-10-09) Parado por el guardia de memoria: no está muerto, está
+        # en pausa. Relanzar encima era el bucle de 673 lanzamientos.
+        if congelado_por_guardia():
             return
         if not self._servidor_compartido():
             perfiles = ("interactive", "background")
@@ -884,6 +938,18 @@ class BitNetCppManager:
             port = self._port_for(profile)
             base = f"http://127.0.0.1:{port}"
 
+            if probe["state"] == "apagado" and congelado_por_guardia():
+                # (2026-10-09) No está apagado: el guardia de memoria lo tiene en
+                # pausa (SIGSTOP) mientras el enjambre escribe. Lanzar otro encima
+                # fallaría en el bind y repetiría el bucle; se devuelve None y el
+                # llamador cae a su respaldo diciendo el motivo real.
+                ahora = time.time()
+                if ahora - getattr(self, "_aviso_congelado_at", 0.0) > 60:
+                    self._aviso_congelado_at = ahora
+                    print(f"[BitNetCppManager] llama-server congelado por el guardia de memoria "
+                          f"(pids {pids_congelados_por_guardia()}): no se relanza; vuelve con SIGCONT.")
+                return None
+
             if probe["state"] == "listo":
                 # Vivo YA — lo hayamos lanzado nosotros o no. Adoptar y salir.
                 if not st.get("base"):
@@ -1247,6 +1313,9 @@ class BitNetCppManager:
             # Segundos que quedan de ventana «cedido» (0 si cerrada).
             "cedido_hasta_s": max(0, int(self._cedido_hasta - now)),
             "vivo": self._alive("interactive"),
+            # (2026-10-09) Parado por el guardia de memoria (SIGSTOP): conserva el
+            # puerto pero no contesta. La UI lo muestra como «congelado», no «caído».
+            "congelado": congelado_por_guardia(),
             "puerto": self.server_port,
         }
 

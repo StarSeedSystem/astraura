@@ -37,14 +37,16 @@ export default function ParallelAgentBranchingTree({
 
   if (!branchingPlan && !layeredPhases && (!agentTraces || agentTraces.length === 0)) return null;
 
+  // (2026-10-09) Sin valores inventados: lo que no viene medido del backend no se pinta.
   const {
-    total_branches = 5,
-    total_agents = 5,
-    total_subagents = 7,
-    max_concurrency_threads = 8,
-    hardware_platform = 'Apple Silicon ARM NEON (8 núcleos)',
-    speedup_factor = '5.4x',
-    branches = []
+    branches = [],
+    total_branches = branches.length,
+    total_agents = null,
+    hardware_platform = '',
+    speedup_factor = null,
+    elapsed_ms = null,
+    completed_branches = null,
+    measured = false
   } = branchingPlan || {};
 
   return (
@@ -62,14 +64,16 @@ export default function ParallelAgentBranchingTree({
             
             <div className="flex items-center gap-2 flex-wrap min-w-0">
               <span className="font-display font-bold text-white text-[11px] tracking-wide truncate">
-                Ramificación Cuántica & Capas Graduales 1.58b
+                Ramas paralelas 1.58b
               </span>
-              <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-cyan-300 font-bold flex items-center gap-1 shrink-0">
-                <Zap className="w-2.5 h-2.5 text-cyan-400" />
-                {speedup_factor}
-              </span>
+              {speedup_factor && (
+                <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-cyan-300 font-bold flex items-center gap-1 shrink-0" title="Aceleración medida: suma de tiempos de rama / tiempo total">
+                  <Zap className="w-2.5 h-2.5 text-cyan-400" />
+                  {speedup_factor}
+                </span>
+              )}
               <span className="text-[9px] text-slate-400 hidden sm:inline-block">
-                ({total_branches} ramas • 4 fases • {total_agents} agentes)
+                ({total_branches} ramas{total_agents != null ? ` • ${total_agents} agentes` : ''}{completed_branches != null ? ` • ${completed_branches} completadas` : ''})
               </span>
             </div>
           </div>
@@ -108,51 +112,16 @@ export default function ParallelAgentBranchingTree({
         {/* IN-SITU EXPANDED SUMMARY VIEW */}
         {isExpanded && (
           <div className="p-3.5 space-y-3 animate-fade-in bg-black/30 border-t border-white/5">
-            {/* Section A: Multi-Phase Layered Quantum Pipeline (Fases 1 to 4) */}
-            <div className="p-3 rounded-xl bg-gradient-to-r from-[#0c1424] to-[#0e1c1e] border border-cyan-500/30 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] text-cyan-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
-                  <Layers className="w-3.5 h-3.5" />
-                  Pipeline en Capas Graduales Cuánticas (4 Fases):
-                </span>
-                <span className="text-[9px] text-slate-400">
-                  {hardware_platform}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-                <div className="p-2 rounded-lg bg-black/40 border border-cyan-500/20 space-y-1">
-                  <div className="flex items-center justify-between text-[10px]">
-                    <span className="text-cyan-400 font-bold">Fase 1: Scaffolding</span>
-                    <Check className="w-3 h-3 text-emerald-400" />
-                  </div>
-                  <span className="text-[9px] text-slate-300 block">Descomposición y Análisis de Requerimientos</span>
-                </div>
-
-                <div className="p-2 rounded-lg bg-black/40 border border-purple-500/20 space-y-1">
-                  <div className="flex items-center justify-between text-[10px]">
-                    <span className="text-purple-400 font-bold">Fase 2: Recursos Web</span>
-                    <Check className="w-3 h-3 text-emerald-400" />
-                  </div>
-                  <span className="text-[9px] text-slate-300 block">Adquisición y Citas Verificadas (ArXiv/GitHub)</span>
-                </div>
-
-                <div className="p-2 rounded-lg bg-black/40 border border-blue-500/20 space-y-1">
-                  <div className="flex items-center justify-between text-[10px]">
-                    <span className="text-blue-400 font-bold">Fase 3: Forja 1.58b</span>
-                    <Check className="w-3 h-3 text-emerald-400" />
-                  </div>
-                  <span className="text-[9px] text-slate-300 block">Síntesis Paralela con Aritmética Entera i2_s</span>
-                </div>
-
-                <div className="p-2 rounded-lg bg-black/40 border border-emerald-500/20 space-y-1">
-                  <div className="flex items-center justify-between text-[10px]">
-                    <span className="text-emerald-400 font-bold">Fase 4: Auto-Corrección</span>
-                    <Check className="w-3 h-3 text-emerald-400" />
-                  </div>
-                  <span className="text-[9px] text-slate-300 block">Auditoría Cruzada y Refinamiento Final</span>
-                </div>
-              </div>
+            {/* Section A (2026-10-09): resumen MEDIDO del ciclo — antes eran 4 fases fijas
+                con el check verde puesto a mano, se ejecutaran o no. */}
+            <div className="p-2.5 rounded-xl bg-gradient-to-r from-[#0c1424] to-[#0e1c1e] border border-cyan-500/30 flex flex-wrap items-center justify-between gap-2 text-[10px]">
+              <span className="text-cyan-300 font-bold flex items-center gap-1.5">
+                <Layers className="w-3.5 h-3.5" />
+                {measured
+                  ? `Medido: ${completed_branches ?? '?'} de ${total_branches} ramas completadas en ${elapsed_ms ?? '?'} ms`
+                  : 'Plan en cola: todavía sin medir'}
+              </span>
+              {hardware_platform && <span className="text-[9px] text-slate-400">{hardware_platform}</span>}
             </div>
 
             {/* Section B: Verifiable Sources & Citations if available */}
@@ -212,13 +181,13 @@ export default function ParallelAgentBranchingTree({
                         {branch.name}
                       </span>
                       <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold flex items-center gap-0.5">
-                        <Check className="w-2.5 h-2.5" /> {branch.latency_ms ? `${branch.latency_ms}ms` : 'SYNC'}
+                        {branch.status === 'completada' && <Check className="w-2.5 h-2.5" />} {branch.status || 'en cola'}{branch.latency_ms != null ? ` · ${branch.latency_ms} ms` : ''}{branch.error ? ` · ${branch.error}` : ''}
                       </span>
                     </div>
 
                     <div className="text-[10px] text-slate-300 flex items-center justify-between">
                       <span className="text-cyan-300 font-medium truncate max-w-[140px]">{branch.agent}</span>
-                      <span className="text-slate-500 text-[9px]">{branch.threads_allocated || 2} Hilos SIMD</span>
+                      {branch.threads_allocated != null && <span className="text-slate-500 text-[9px]">{branch.threads_allocated} hilos</span>}
                     </div>
 
                     <p className="text-[9px] text-slate-400 line-clamp-2 leading-tight">

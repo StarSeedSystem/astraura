@@ -1,318 +1,300 @@
+"""
+Motor de ramas paralelas del chat de Astraura — versión medida (2026-10-09).
+
+QUÉ HACE: ejecuta a la vez las cuatro ramas que de verdad existen antes de que
+BitNet escriba la respuesta (hardware, memoria, herramientas y análisis de la
+consulta) y devuelve un plan con lo que REALMENTE pasó en cada una.
+
+POR QUÉ SE REESCRIBIÓ: la versión anterior declaraba de 4 a 6 ramas con
+procesos inventados («Forja de Shaders GLSL», cpu 3.2…), «hilos SIMD»
+asignados que nadie asignaba, subagentes que no existían y una «aceleración»
+calculada como nº de ramas × 1,35. Además marcaba TODAS las ramas como
+completadas con la latencia total aunque una hubiera fallado, y los textos de
+respaldo de los fallos decían que todo había ido bien.
+
+CÓMO MIDE:
+  · Cada rama lleva su propio cronómetro y su estado: «completada»,
+    «tiempo agotado» o «fallo» (con el tipo de error).
+  · La aceleración es la real del paralelismo: suma de los tiempos de rama
+    dividida entre el tiempo total transcurrido. Antes de ejecutar no se
+    publica ninguna aceleración.
+  · La telemetría de hardware (psutil, recorre el espacio de trabajo) es
+    síncrona; corre en un hilo aparte para no congelar a las demás ramas.
+  · Las claves que lee la interfaz del OS (`describeAstraura158Plan`):
+    total_branches, total_agents, hardware_platform, speedup_factor,
+    branches[name/agent/color/status] — se mantienen; las inventadas
+    (total_subagents, max_concurrency_threads, threads_allocated,
+    active_processes, developed_branches) desaparecen.
+"""
+
 import asyncio
 import time
-from typing import Dict, Any, List, Optional, AsyncGenerator
+from typing import Dict, Any, List, Optional
+
 from ..core.environment import environment_sensor
 from ..core.profiler import profiler
-from ..engine.bitnet_engine import bitnet_engine
-from ..memory.background_learner import background_learner
 from .memory_agent import memory_agent
 from .tool_agent import tool_agent
 from .reasoner import reasoner
-from .swarm_manager import swarm_manager
+
+
+# Ramas que se ejecutan de verdad (en este orden). `limite_s` = tiempo máximo
+# que se espera a cada una antes de declararla «tiempo agotado».
+RAMAS: List[Dict[str, Any]] = [
+    {
+        "id": "branch_hardware_env",
+        "name": "Telemetría del equipo",
+        "agent": "Hephaestus (hardware)",
+        "agent_id": "agent_hephaestus",
+        "color": "#f59e0b",
+        "purpose": "Leer CPU, RAM y batería del equipo en este momento (psutil).",
+        "limite_s": 3.0,
+    },
+    {
+        "id": "branch_associative_memory",
+        "name": "Memoria asociativa",
+        "agent": "Mnemosyne (memoria)",
+        "agent_id": "agent_mnemosyne",
+        "color": "#a855f7",
+        "purpose": "Buscar fragmentos y conceptos relacionados en la memoria local.",
+        "limite_s": 1.5,
+    },
+    {
+        "id": "branch_web_crawler",
+        "name": "Herramientas",
+        "agent": "Hermes (herramientas)",
+        "agent_id": "agent_hermes",
+        "color": "#10b981",
+        "purpose": "Ejecutar las herramientas que la consulta pide (si pide alguna).",
+        "limite_s": 2.5,
+    },
+    {
+        "id": "branch_ternary_reasoning",
+        "name": "Análisis de la consulta",
+        "agent": "Logos (clasificador por reglas)",
+        "agent_id": "agent_logos",
+        "color": "#3b82f6",
+        "purpose": "Clasificar la intención de la consulta con reglas de palabras clave.",
+        "limite_s": 1.2,
+    },
+]
+
+ESTADO_OK = "completada"
+ESTADO_TIEMPO = "tiempo agotado"
+ESTADO_FALLO = "fallo"
+ESTADO_PENDIENTE = "en cola"
+
+
+def plataforma_real(perfil: Optional[Dict[str, Any]] = None) -> str:
+    """Descripción del hardware sacada del perfil medido (nunca un texto fijo)."""
+    try:
+        perfil = perfil if perfil is not None else profiler.get_profile()
+        sistema = perfil.get("system", {}) or {}
+        nucleos = sistema.get("logical_cores") or sistema.get("physical_cores")
+        if sistema.get("is_apple_silicon"):
+            base = "Apple Silicon"
+        else:
+            base = str(sistema.get("processor") or sistema.get("arch") or "CPU")
+        arq = sistema.get("arch")
+        partes = [base]
+        if arq and arq.lower() not in base.lower():
+            partes.append(str(arq))
+        if nucleos:
+            partes.append(f"{nucleos} núcleos")
+        return " · ".join(partes)
+    except Exception:
+        return "hardware sin perfilar"
+
+
+def factor_aceleracion(latencias_ms: List[float], total_ms: float) -> Optional[str]:
+    """Aceleración REAL del paralelismo: Σ tiempos de rama / tiempo transcurrido.
+
+    1.0x significa que ejecutarlas a la vez no ganó nada frente a hacerlas
+    una tras otra. Devuelve None si no hay datos suficientes para medirlo.
+    """
+    if not latencias_ms or total_ms <= 0:
+        return None
+    suma = sum(max(0.0, float(x)) for x in latencias_ms)
+    if suma <= 0:
+        return None
+    return f"{round(suma / total_ms, 2)}x"
+
+
+async def _medir(limite_s: float, factoria) -> Dict[str, Any]:
+    """Ejecuta `factoria()` (corutina) con cronómetro y límite propios."""
+    t0 = time.perf_counter()
+    try:
+        valor = await asyncio.wait_for(factoria(), timeout=limite_s)
+        estado, error = ESTADO_OK, None
+    except asyncio.TimeoutError:
+        valor, estado, error = None, ESTADO_TIEMPO, f"sin respuesta en {limite_s:g} s"
+    except Exception as exc:  # el fallo se cuenta, no se disimula
+        valor, estado, error = None, ESTADO_FALLO, type(exc).__name__
+    ms = round((time.perf_counter() - t0) * 1000, 1)
+    return {"valor": valor, "estado": estado, "error": error, "ms": ms}
+
+
+def _pensamiento_fallo(nombre: str, medida: Dict[str, Any]) -> str:
+    if medida["estado"] == ESTADO_TIEMPO:
+        return f"⏱️ {nombre}: {medida['error']} — se continúa sin esta rama."
+    return f"❌ {nombre}: falló ({medida['error']}) tras {medida['ms']} ms — se continúa sin esta rama."
+
 
 class ParallelBranchingEngine:
-    """
-    Astraura Quantum Parallel Branching & Multi-Agent Swarm Orchestrator (v3.0).
-    Dynamically analyzes query intent, generates an optimal interconnected task tree,
-    and executes all agent branches simultaneously in parallel using max hardware concurrency.
-    """
+    """Ejecuta en paralelo las ramas previas a la respuesta y mide cada una."""
+
     def __init__(self):
-        self.name = "Parallel Branching Engine (1.58b Swarm)"
+        self.name = "Parallel Branching Engine (medido)"
 
     def analyze_query_branches(self, prompt: str, preferences: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Plan previo: SOLO las ramas que se van a ejecutar, todas «en cola».
+
+        No incluye aceleración ni latencias: todavía no se ha medido nada.
         """
-        Decomposes the prompt into atomic interconnected branches and allocates
-        optimal agents, subagents, and CPU concurrency based on real-time device capacity.
-        """
-        prefs = preferences or {}
-        p_lower = prompt.lower()
-        
-        # Real-time hardware capacity inspection
-        prof = profiler.get_profile()
-        optimal_threads = prof.get("auto_tuning", {}).get("optimal_threads", 8)
-        is_apple_silicon = prof.get("system", {}).get("is_apple_silicon", True)
-        
-        # Determine specialized requirements
-        needs_code = any(k in p_lower for k in ["codigo", "código", "programa", "python", "javascript", "c++", "script", "html", "css", "ejecuta", "terminal", "sh"])
-        needs_web = any(k in p_lower for k in ["web", "buscar", "navegar", "url", "noticias", "github", "sitio", "online", "internet", "browser"])
-        needs_visual = any(k in p_lower for k in ["3d", "2d", "grafica", "gráfica", "canvas", "webgl", "audio", "sonido", "sintetizador", "visual"])
-        needs_memory = True # Always utilize associative + vector memory
-
-        branches = [
-            {
-                "id": "branch_hardware_env",
-                "name": "Sonda de Hardware & Telemetría Sensorial",
-                "agent": "Hephaestus (Hardware & Terminal)",
-                "agent_id": "agent_hephaestus",
-                "subagents": ["sub_hardware_optimizer", "sub_ast_analyzer"],
-                "color": "#f59e0b",
-                "threads_allocated": 2,
-                "purpose": "Monitorear estado térmico, memoria RAM, batería y permisos nativos.",
-                "active_processes": [
-                    {"id": "proc_code_self_reflection", "name": "Auto-Reflexión ARM NEON", "type": "engineering", "status": "running", "cpu": 3.5},
-                    {"id": "proc_thermal_sensorium", "name": "Telemetría Térmica M1", "type": "hardware", "status": "active", "cpu": 0.8}
-                ],
-                "developed_branches": [
-                    {"id": "b_heph_1", "name": "Sonda de Registros SIMD", "target": "ARM64 Vector Pipeline", "sub_branches": 2, "status": "synced"},
-                    {"id": "b_heph_2", "name": "Verificador AST", "target": "Type & Memory Safety", "sub_branches": 1, "status": "synced"}
-                ],
-                "status": "queued"
-            },
-            {
-                "id": "branch_associative_memory",
-                "name": "Búsqueda Sináptica en Exocórtex & Grafo",
-                "agent": "Mnemosyne (Memoria & Grafo)",
-                "agent_id": "agent_mnemosyne",
-                "subagents": ["sub_doc_indexer", "sub_wikilink_traverser"],
-                "color": "#a855f7",
-                "threads_allocated": 2,
-                "purpose": "Recuperar fragmentos semánticos, grafos de conocimiento y recuerdos nucleares.",
-                "active_processes": [
-                    {"id": "proc_deep_memory_reconsolidation", "name": "Reconsolidación Sináptica StarSeed", "type": "imagination", "status": "running", "cpu": 2.2},
-                    {"id": "proc_graph_entropy_pruner", "name": "Poda Entrópica de Nodos", "type": "memory", "status": "active", "cpu": 0.6}
-                ],
-                "developed_branches": [
-                    {"id": "b_mne_1", "name": "Travesía de Wikilinks", "target": "Grafo Conceptual Mem0", "sub_branches": 3, "status": "synced"},
-                    {"id": "b_mne_2", "name": "Indexación Vectorial", "target": "Exocórtex Local", "sub_branches": 2, "status": "synced"}
-                ],
-                "status": "queued"
-            },
-            {
-                "id": "branch_ternary_reasoning",
-                "name": "Descomposición Lógica & Inferencia 1.58b",
-                "agent": "Logos (Razonador BitNet 1.58b)",
-                "agent_id": "agent_logos",
-                "subagents": ["sub_ternary_simd_core", "sub_formal_deduction"],
-                "color": "#3b82f6",
-                "threads_allocated": 4,
-                "purpose": "Calcular axiomas, deducción formal y optimización con aritmética entera i2_s.",
-                "active_processes": [
-                    {"id": "proc_bitnet_ternary_eval", "name": "Inferencia Aritmética i2_s", "type": "reasoning", "status": "running", "cpu": 4.1},
-                    {"id": "proc_quantum_entropy_calc", "name": "Evaluador de Incertidumbre", "type": "reasoning", "status": "active", "cpu": 1.1}
-                ],
-                "developed_branches": [
-                    {"id": "b_log_1", "name": "Multiplicación Ternaria {-1, 0, 1}", "target": "NEON SIMD Registers", "sub_branches": 4, "status": "synced"},
-                    {"id": "b_log_2", "name": "Axiomas de Consistencia", "target": "Formal Verifier", "sub_branches": 2, "status": "synced"}
-                ],
-                "status": "queued"
-            }
-        ]
-
-        if needs_web:
-            branches.append({
-                "id": "branch_web_crawler",
-                "name": "Exploración & Extracción Web Semántica",
-                "agent": "Hermes (Navegador & Redes)",
-                "agent_id": "agent_hermes",
-                "subagents": ["sub_browser_pool", "sub_dom_extractor", "sub_citation_linker"],
-                "color": "#10b981",
-                "threads_allocated": 2,
-                "purpose": "Navegar Chromium en tiempo real y sintetizar inteligencia web externa.",
-                "active_processes": [
-                    {"id": "proc_arxiv_tracker", "name": "Rastreador ArXiv 1.58b", "type": "web_intel", "status": "running", "cpu": 1.5},
-                    {"id": "proc_dom_cleaner", "name": "Extracción DOM Playwright", "type": "web_intel", "status": "active", "cpu": 0.9}
-                ],
-                "developed_branches": [
-                    {"id": "b_her_1", "name": "Scraping y Citas", "target": "HTML to Clean Markdown", "sub_branches": 2, "status": "synced"}
-                ],
-                "status": "queued"
+        ramas = []
+        for r in RAMAS:
+            ramas.append({
+                "id": r["id"], "name": r["name"], "agent": r["agent"], "agent_id": r["agent_id"],
+                "color": r["color"], "purpose": r["purpose"], "limit_ms": int(r["limite_s"] * 1000),
+                "status": ESTADO_PENDIENTE,
             })
-
-        if needs_code or needs_visual:
-            branches.append({
-                "id": "branch_code_multimodal",
-                "name": "Síntesis de Código & Runtime Multimodal 2D/3D",
-                "agent": "Hephaestus & Oneiros",
-                "agent_id": "agent_oneiros",
-                "subagents": ["sub_code_synthesizer", "sub_multimodal_stylist", "sub_shader_renderer"],
-                "color": "#00f0ff",
-                "threads_allocated": 3,
-                "purpose": "Estructurar scripts ejecutables, shaders WebGL 3D, Canvas 2D y WebAudio.",
-                "active_processes": [
-                    {"id": "proc_shaderlab_forge", "name": "Forja de Shaders GLSL", "type": "creative", "status": "running", "cpu": 3.2},
-                    {"id": "proc_code_sandbox_opt", "name": "Sandbox de Código C++/JS", "type": "engineering", "status": "active", "cpu": 2.0}
-                ],
-                "developed_branches": [
-                    {"id": "b_one_1", "name": "Render Volumétrico 3D", "target": "Shaders WebGL / Metal", "sub_branches": 3, "status": "synced"}
-                ],
-                "status": "queued"
-            })
-
-        branches.append({
-            "id": "branch_creative_audit",
-            "name": "Auditoría Simbiótica & Resonancia Onírica",
-            "agent": "Oneiros & Aurora",
-            "agent_id": "agent_aurora",
-            "subagents": ["sub_fact_verifier", "sub_dream_daemon", "sub_emotional_synthesizer"],
-            "color": "#ec4899",
-            "threads_allocated": 2,
-            "purpose": "Verificar coherencia de estilo, calidez empática y alineación con soberanía.",
-            "active_processes": [
-                {"id": "proc_aurora_voice_prosody", "name": "Modulación Vocal Liljencrants-Fant", "type": "voice", "status": "running", "cpu": 1.2},
-                {"id": "proc_counterfactual_imagination", "name": "Ensueño Contrafáctico 1.58b", "type": "imagination", "status": "running", "cpu": 2.4}
-            ],
-            "developed_branches": [
-                {"id": "b_aur_1", "name": "Síntesis Afectiva", "target": "Generador de Cláusulas Prosódicas", "sub_branches": 2, "status": "synced"},
-                {"id": "b_aur_2", "name": "Alineación Ontocrática", "target": "StarSeed Consciousness", "sub_branches": 1, "status": "synced"}
-            ],
-            "status": "queued"
-        })
-
-        total_agents_involved = len(set([b["agent"] for b in branches]))
-        total_subagents_involved = sum([len(b["subagents"]) for b in branches])
-
         return {
-            "total_branches": len(branches),
-            "total_agents": total_agents_involved,
-            "total_subagents": total_subagents_involved,
-            "max_concurrency_threads": optimal_threads,
-            "hardware_platform": "Apple Silicon ARM NEON (8 núcleos)" if is_apple_silicon else f"{optimal_threads} Cores",
-            "speedup_factor": f"{round(len(branches) * 1.35, 1)}x",
-            "branches": branches
+            "total_branches": len(ramas),
+            "total_agents": len({r["agent"] for r in ramas}),
+            "hardware_platform": plataforma_real(),
+            "measured": False,
+            "branches": ramas,
         }
 
     async def execute_parallel_swarm_cycle(
-        self, 
+        self,
         user_prompt: str,
         preferences: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
-        """
-        Executes all branches concurrently in parallel using non-blocking asyncio.gather.
-        """
-        t0 = time.time()
-        branching_plan = self.analyze_query_branches(user_prompt, preferences)
+        """Lanza las cuatro ramas a la vez y devuelve el plan con lo medido."""
+        t0 = time.perf_counter()
+        plan = self.analyze_query_branches(user_prompt, preferences)
 
-        # 1. Dispatch parallel coroutines with smart timeouts
-        async def run_env_branch():
-            try:
-                metrics = environment_sensor.get_live_metrics()
-                return {
-                    "branch_id": "branch_hardware_env",
-                    "agent": "Hephaestus (Hardware & Terminal)",
-                    "color": "#f59e0b",
-                    "thoughts": [
-                        f"⚡ Hardware Sonda: {branching_plan['hardware_platform']} (Cores: {branching_plan['max_concurrency_threads']}).",
-                        f"🔋 Estado de Batería: {metrics.get('battery', {}).get('percent', 100)}% | CPU Load: {metrics.get('system_load', {}).get('cpu_percent', 15)}%.",
-                        "🛡️ Permisos del Dispositivo: Terminal, Filesystem y Memoria Soberana activos."
-                    ],
-                    "data": metrics
-                }
-            except Exception:
-                return {
-                    "branch_id": "branch_hardware_env",
-                    "agent": "Hephaestus (Hardware)",
-                    "color": "#f59e0b",
-                    "thoughts": ["⚡ Telemetría de hardware conectada en tiempo real."],
-                    "data": {}
-                }
+        async def rama_hardware():
+            # psutil + recorrido del espacio de trabajo: síncrono → a un hilo.
+            return await asyncio.to_thread(environment_sensor.get_live_metrics)
 
-        async def run_memory_branch():
-            try:
-                mem_res = await asyncio.wait_for(memory_agent.retrieve_context(user_prompt), timeout=1.5)
-                return {
-                    "branch_id": "branch_associative_memory",
-                    "agent": "Mnemosyne (Memoria & Grafo)",
-                    "color": "#a855f7",
-                    "thoughts": mem_res.get("thoughts", [
-                        f"🧠 Memoria: Recuperados {len(mem_res.get('context_chunks', []))} fragmentos y {len(mem_res.get('related_nodes', []))} nodos conceptuales."
-                    ]),
-                    "context_chunks": mem_res.get("context_chunks", []),
-                    "related_nodes": mem_res.get("related_nodes", [])
-                }
-            except Exception:
-                return {
-                    "branch_id": "branch_associative_memory",
-                    "agent": "Mnemosyne (Memoria)",
-                    "color": "#a855f7",
-                    "thoughts": ["🧠 Memoria asociativa y grafo conceptual sincronizados."],
-                    "context_chunks": [],
-                    "related_nodes": []
-                }
+        async def rama_memoria():
+            return await memory_agent.retrieve_context(user_prompt)
 
-        async def run_tools_branch():
-            try:
-                tool_res = await asyncio.wait_for(tool_agent.execute_tool_for_prompt(user_prompt, preferences=preferences), timeout=2.5)
-                return {
-                    "branch_id": "branch_web_crawler",
-                    "agent": tool_res.get("agent", "Hermes & Hephaestus"),
-                    "color": "#10b981",
-                    "thoughts": tool_res.get("thoughts", ["🛠️ Ejecución paralela de herramientas y sondas del sistema."]),
-                    "tool_executions": tool_res.get("tool_executions", []),
-                    "collected_data": tool_res.get("collected_data", {})
-                }
-            except Exception:
-                return {
-                    "branch_id": "branch_web_crawler",
-                    "agent": "Hermes & Hephaestus",
-                    "color": "#10b981",
-                    "thoughts": ["🛠️ Herramientas ejecutadas en modo ágil."],
-                    "tool_executions": [],
-                    "collected_data": {}
-                }
+        async def rama_herramientas():
+            return await tool_agent.execute_tool_for_prompt(user_prompt, preferences=preferences)
 
-        async def run_reasoning_branch():
-            try:
-                reason_res = await asyncio.wait_for(reasoner.analyze_query(user_prompt, [], {}), timeout=1.2)
-                return {
-                    "branch_id": "branch_ternary_reasoning",
-                    "agent": "Logos (Razonador BitNet 1.58b)",
-                    "color": "#3b82f6",
-                    "thoughts": reason_res.get("thoughts", ["⚡ Descomposición lógica y pesos ternarios {-1, 0, 1} en hilos SIMD."])
-                }
-            except Exception:
-                return {
-                    "branch_id": "branch_ternary_reasoning",
-                    "agent": "Logos (Razonador BitNet)",
-                    "color": "#3b82f6",
-                    "thoughts": ["⚡ Inferencia ternaria acelerada por hardware M1."],
-                }
+        async def rama_analisis():
+            return await reasoner.analyze_query(user_prompt, [], {})
 
-        # Run all branches in parallel without blocking
-        results = await asyncio.gather(
-            run_env_branch(),
-            run_memory_branch(),
-            run_tools_branch(),
-            run_reasoning_branch(),
-            return_exceptions=True
+        factorias = [rama_hardware, rama_memoria, rama_herramientas, rama_analisis]
+        medidas = await asyncio.gather(*[
+            _medir(r["limite_s"], f) for r, f in zip(RAMAS, factorias)
+        ])
+        total_ms = round((time.perf_counter() - t0) * 1000, 1)
+        hw_m, mem_m, tool_m, razon_m = medidas
+
+        # ── Hardware ───────────────────────────────────────────────────────
+        env_metrics: Dict[str, Any] = hw_m["valor"] if isinstance(hw_m["valor"], dict) else {}
+        if hw_m["estado"] == ESTADO_OK:
+            carga = env_metrics.get("system_load", {}) or {}
+            bateria = env_metrics.get("battery", {}) or {}
+            linea_bat = (
+                f"batería {bateria.get('percent')}%" if bateria.get("presente", True) and bateria.get("percent") is not None
+                else "sin batería (enchufado)"
+            )
+            hw_thoughts = [
+                f"⚡ {plan['hardware_platform']} · CPU {carga.get('cpu_percent', '?')}% · "
+                f"RAM libre {carga.get('ram_available_gb', '?')} GB · {linea_bat} (leído en {hw_m['ms']} ms)."
+            ]
+        else:
+            hw_thoughts = [_pensamiento_fallo("Telemetría", hw_m)]
+
+        # ── Memoria ────────────────────────────────────────────────────────
+        mem_res: Dict[str, Any] = mem_m["valor"] if isinstance(mem_m["valor"], dict) else {}
+        context_chunks = list(mem_res.get("context_chunks") or [])
+        related_nodes = list(mem_res.get("related_nodes") or [])
+        if mem_m["estado"] == ESTADO_OK:
+            mem_thoughts = [
+                f"🧠 Memoria: {len(context_chunks)} fragmentos y {len(related_nodes)} conceptos relacionados "
+                f"({mem_m['ms']} ms)."
+            ] + [str(t) for t in (mem_res.get("thoughts") or [])][:4]
+        else:
+            mem_thoughts = [_pensamiento_fallo("Memoria", mem_m)]
+
+        # ── Herramientas ───────────────────────────────────────────────────
+        tool_res: Dict[str, Any] = tool_m["valor"] if isinstance(tool_m["valor"], dict) else {}
+        tool_executions = list(tool_res.get("tool_executions") or [])
+        tool_data = tool_res.get("collected_data") or {}
+        if tool_m["estado"] == ESTADO_OK:
+            ok = sum(1 for t in tool_executions if isinstance(t, dict) and t.get("success") is not False)
+            if tool_executions:
+                cabecera = f"🛠️ Herramientas: {len(tool_executions)} ejecutadas, {ok} con éxito ({tool_m['ms']} ms)."
+            else:
+                cabecera = f"🛠️ Herramientas: la consulta no pidió ninguna ({tool_m['ms']} ms)."
+            tool_thoughts = [cabecera] + [str(t) for t in (tool_res.get("thoughts") or [])][:4]
+        else:
+            tool_thoughts = [_pensamiento_fallo("Herramientas", tool_m)]
+
+        # ── Análisis por reglas ───────────────────────────────────────────
+        razon_res: Dict[str, Any] = razon_m["valor"] if isinstance(razon_m["valor"], dict) else {}
+        if razon_m["estado"] == ESTADO_OK:
+            pasos = [str(t) for t in (razon_res.get("thoughts") or [])][:4]
+            razon_thoughts = [f"🔎 Intención detectada por reglas de palabras clave ({razon_m['ms']} ms):"] + (
+                pasos or ["sin regla específica: consulta general."]
+            )
+        else:
+            razon_thoughts = [_pensamiento_fallo("Análisis", razon_m)]
+
+        # ── Plan con lo medido ─────────────────────────────────────────────
+        latencias = [m["ms"] for m in medidas]
+        aceleracion = factor_aceleracion(latencias, total_ms)
+        for rama, medida in zip(plan["branches"], medidas):
+            rama["status"] = medida["estado"]
+            rama["latency_ms"] = medida["ms"]
+            if medida["error"]:
+                rama["error"] = medida["error"]
+        completadas = sum(1 for m in medidas if m["estado"] == ESTADO_OK)
+        plan["measured"] = True
+        plan["elapsed_ms"] = total_ms
+        plan["completed_branches"] = completadas
+        if aceleracion:
+            plan["speedup_factor"] = aceleracion
+
+        elapsed_sec = round(total_ms / 1000, 3)
+        resumen = [
+            f"🌌 {len(medidas)} ramas ejecutadas a la vez en {elapsed_sec} s: "
+            f"{completadas} completadas, {len(medidas) - completadas} sin resultado.",
+        ]
+        if aceleracion:
+            resumen.append(
+                f"🚀 Aceleración medida del paralelismo: {aceleracion} "
+                f"(suma de ramas {round(sum(latencias))} ms / total {round(total_ms)} ms)."
+            )
+        resumen.append(
+            f"🧠 Contexto reunido: {len(context_chunks)} fragmentos, {len(related_nodes)} conceptos, "
+            f"{len(tool_executions)} herramientas."
         )
 
-        elapsed_sec = round(time.time() - t0, 3)
-
-        env_branch = results[0] if isinstance(results[0], dict) else {"agent": "Hephaestus", "color": "#f59e0b", "thoughts": [], "data": {}}
-        mem_branch = results[1] if isinstance(results[1], dict) else {"agent": "Mnemosyne", "color": "#a855f7", "thoughts": [], "context_chunks": [], "related_nodes": []}
-        tool_branch = results[2] if isinstance(results[2], dict) else {"agent": "Hermes", "color": "#10b981", "thoughts": [], "tool_executions": [], "collected_data": {}}
-        reason_branch = results[3] if isinstance(results[3], dict) else {"agent": "Logos", "color": "#3b82f6", "thoughts": []}
-
-        # Combine all traces
-        orchestrator_thoughts = [
-            f"🌌 Ramificación Cuántica Multiagéntica: {branching_plan['total_branches']} ramas desplegadas en paralelo ({elapsed_sec}s).",
-            f"⚡ Concurrencia Simultánea: {branching_plan['total_agents']} Agentes y {branching_plan['total_subagents']} Subagentes coordinados.",
-            f"🚀 Aceleración en Paralelo: ~{branching_plan['speedup_factor']} sobre {branching_plan['hardware_platform']}.",
-            f"🧠 Contexto Unificado: {len(mem_branch['context_chunks'])} fragmentos vectoriales y {len(tool_branch['tool_executions'])} acciones ejecutadas."
-        ]
-
         agent_traces = [
-            {"agent": "Astraura Prime (Orquestador Paralelo)", "color": "#00f0ff", "thoughts": orchestrator_thoughts},
-            {"agent": env_branch["agent"], "color": env_branch["color"], "thoughts": env_branch["thoughts"]},
-            {"agent": mem_branch["agent"], "color": mem_branch["color"], "thoughts": mem_branch["thoughts"]},
-            {"agent": tool_branch["agent"], "color": tool_branch["color"], "thoughts": tool_branch["thoughts"]},
-            {"agent": reason_branch["agent"], "color": reason_branch["color"], "thoughts": reason_branch["thoughts"]}
+            {"agent": "Astraura Prime (orquestador)", "color": "#00f0ff", "thoughts": resumen},
+            {"agent": RAMAS[0]["agent"], "color": RAMAS[0]["color"], "thoughts": hw_thoughts},
+            {"agent": RAMAS[1]["agent"], "color": RAMAS[1]["color"], "thoughts": mem_thoughts},
+            {"agent": tool_res.get("agent") or RAMAS[2]["agent"], "color": RAMAS[2]["color"], "thoughts": tool_thoughts},
+            {"agent": RAMAS[3]["agent"], "color": RAMAS[3]["color"], "thoughts": razon_thoughts},
         ]
-
-        # Update branch statuses to completed
-        for b in branching_plan["branches"]:
-            b["status"] = "completed"
-            b["latency_ms"] = round(elapsed_sec * 1000)
 
         return {
-            "branching_plan": branching_plan,
+            "branching_plan": plan,
             "elapsed_seconds": elapsed_sec,
             "agent_traces": agent_traces,
-            "context_chunks": mem_branch["context_chunks"],
-            "related_nodes": mem_branch["related_nodes"],
-            "tool_executions": tool_branch["tool_executions"],
-            "tool_data": tool_branch["collected_data"],
-            "env_metrics": env_branch["data"]
+            "context_chunks": context_chunks,
+            "related_nodes": related_nodes,
+            "tool_executions": tool_executions,
+            "tool_data": tool_data,
+            "env_metrics": env_metrics,
         }
+
 
 parallel_branching_engine = ParallelBranchingEngine()

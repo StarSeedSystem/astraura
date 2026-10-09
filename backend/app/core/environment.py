@@ -38,19 +38,31 @@ class EnvironmentSensor:
         mem = psutil.virtual_memory()
         
         # 3. Workspace File & Storage Context
-        active_files = 0
-        total_size_mb = 0.0
-        try:
-            for root, _, files in os.walk(self.workspace_path):
-                if ".venv" in root or ".git" in root or "node_modules" in root:
-                    continue
-                for f in files:
-                    fp = os.path.join(root, f)
-                    if os.path.exists(fp):
-                        active_files += 1
-                        total_size_mb += os.path.getsize(fp) / (1024 * 1024)
-        except Exception:
-            pass
+        # (2026-10-09) Recorrer el espacio de trabajo costaba ~0,7 s POR LLAMADA
+        # (medido en la rama de telemetría del chat: 728 ms de 728 ms totales).
+        # El recuento cambia poco: se cachea 120 s y se podan .venv/.git/
+        # node_modules ANTES de bajar a ellos (antes se recorrían enteros y solo
+        # se ignoraban sus archivos).
+        ahora = time.time()
+        cache = getattr(self, "_ws_cache", None)
+        if cache and ahora - cache[0] < 120:
+            active_files, total_size_mb = cache[1], cache[2]
+        else:
+            active_files = 0
+            total_size_mb = 0.0
+            try:
+                for root, dirs, files in os.walk(self.workspace_path):
+                    dirs[:] = [d for d in dirs if d not in (".venv", ".git", "node_modules")]
+                    for f in files:
+                        fp = os.path.join(root, f)
+                        try:
+                            total_size_mb += os.path.getsize(fp) / (1024 * 1024)
+                            active_files += 1
+                        except OSError:
+                            pass
+            except Exception:
+                pass
+            self._ws_cache = (ahora, active_files, total_size_mb)
 
         # 4. Contextual Persona Modulation (Astraura Behavioral Directives)
         if battery_percent <= 20 and not power_plugged:
@@ -69,6 +81,9 @@ class EnvironmentSensor:
             "timestamp": current_time.isoformat(),
             "time_formatted": current_time.strftime("%Y-%m-%d %H:%M:%S"),
             "battery": {
+                # (2026-10-09) `presente` distingue una batería real del valor de
+                # respaldo (100 %) que se usa en equipos sin batería.
+                "presente": battery is not None,
                 "percent": battery_percent,
                 "is_charging": power_plugged,
                 "seconds_left": secs_left

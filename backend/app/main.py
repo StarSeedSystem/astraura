@@ -378,6 +378,9 @@ async def get_ping():
         "dormido": bool(turno.get("dormido", False)),
         "cedido_hasta_s": int(turno.get("cedido_hasta_s", 0)),
         "vivo": bool(turno.get("vivo", False)),
+        # (2026-10-09) True = el guardia de memoria lo tiene en pausa (SIGSTOP)
+        # mientras el enjambre escribe: no está caído, vuelve solo.
+        "congelado": bool(turno.get("congelado", False)),
         "version": STARSEED_BRIDGE_VERSION,
         "t": time.time(),
     }
@@ -1895,8 +1898,9 @@ async def _collect_invoke_response(prompt: str, preferences: Dict[str, Any]) -> 
     try:
         async for event in orchestrator.generate_response_stream(prompt, "", preferences=preferences):
             et = event.get("type")
-            if et == "branching_plan" and branching_plan is None:
-                branching_plan = event.get("plan")
+            if et == "branching_plan":
+                # El último plan es el medido (estado y latencia reales por rama).
+                branching_plan = event.get("plan") or branching_plan
             elif et == "token":
                 full += event.get("token", "")
             elif et == "done" and not full:
