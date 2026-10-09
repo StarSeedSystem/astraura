@@ -70,7 +70,8 @@
       ],
       "category": "public.app-category.developer-tools",
       "hardenedRuntime": false,
-      "gatekeeperAssess": false
+      "gatekeeperAssess": false,
+      "icon": "assets/icon.png"
     },
     "dmg": {
       "title": "Astraura 1.58-Bit Installer"
@@ -104,7 +105,8 @@
           "Comment": "Sovereign Multi-Agent Cognitive Engine",
           "Categories": "Development;Science;Education;"
         }
-      }
+      },
+      "icon": "assets/icon.png"
     },
     "win": {
       "target": [
@@ -115,7 +117,8 @@
           ]
         }
       ],
-      "verifyUpdateCodeSignature": false
+      "verifyUpdateCodeSignature": false,
+      "icon": "assets/icon.ico"
     },
     "nsis": {
       "oneClick": false,
@@ -130,5 +133,6 @@
     },
     "artifactName": "Astraura-${version}-${arch}-${os}.${ext}",
     "publish": null
-  }
+  },
+  "homepage": "https://github.com/StarSeedSystem/astraura"
 }
