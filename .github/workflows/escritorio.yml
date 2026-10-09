@@ -1,0 +1,102 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Astraura 1.58-Bit · app de escritorio (Electron) — compilar y publicar
+# ---------------------------------------------------------------------------
+# Al empujar una etiqueta vX.Y.Z compila la app para macOS (Apple Silicon e
+# Intel), Windows x64 y Linux x64, y sube todo a un Release EN BORRADOR con un
+# SHA256SUMS.txt. La app instalada (desktop-app/actualizador.js) lee el último
+# Release publicado, descarga su archivo, comprueba el SHA-256 y se instala.
+#
+# Sin firma de pago: macOS pedirá «clic derecho → Abrir» la primera vez y
+# Windows mostrará SmartScreen. La actualización funciona igual (no usa
+# Squirrel.Mac, que exige Developer ID).
+# ═══════════════════════════════════════════════════════════════════════════
+name: Astraura escritorio · compilar y publicar
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      etiqueta:
+        description: "Release donde subir (p. ej. v1.6.0)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  compilar:
+    name: ${{ matrix.nombre }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - nombre: macOS
+            runner: macos-latest
+            args: --mac --arm64 --x64
+          - nombre: Windows
+            runner: windows-latest
+            args: --win --x64
+          - nombre: Linux
+            runner: ubuntu-22.04
+            args: --linux --x64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Herramientas de empaquetado (Linux · .rpm)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y rpm
+      - name: Interfaz (frontend/dist)
+        working-directory: frontend
+        run: npm ci && npm run build
+      - name: Pruebas del actualizador
+        working-directory: desktop-app
+        run: npm ci && npm test
+      - name: Compilar la app
+        working-directory: desktop-app
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx electron-builder ${{ matrix.args }} --publish never
+      - name: Guardar los instaladores
+        uses: actions/upload-artifact@v4
+        with:
+          name: astraura-${{ matrix.nombre }}
+          if-no-files-found: error
+          path: |
+            desktop-app/dist/Astraura-*.dmg
+            desktop-app/dist/Astraura-*.zip
+            desktop-app/dist/Astraura-*.exe
+            desktop-app/dist/Astraura-*.AppImage
+            desktop-app/dist/Astraura-*.deb
+            desktop-app/dist/Astraura-*.rpm
+
+  release:
+    name: Release en borrador + SHA256SUMS
+    needs: compilar
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artefactos
+          merge-multiple: true
+      - name: SHA256SUMS.txt
+        working-directory: artefactos
+        run: |
+          ls -la
+          sha256sum Astraura-* > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+      - name: Subir al Release (borrador)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.etiqueta || github.ref_name }}
+          name: "Astraura 1.58-Bit ${{ inputs.etiqueta || github.ref_name }} · escritorio"
+          draft: true
+          body: |
+            App de escritorio de Astraura 1.58-Bit para macOS (Apple Silicon e Intel), Windows y Linux.
+            La app instalada se actualiza sola desde este Release (comprueba el SHA-256 de SHA256SUMS.txt).
+            Sin firma de pago: en macOS, la primera vez «clic derecho → Abrir»; en Windows, «Más información → Ejecutar de todas formas».
+          files: artefactos/*

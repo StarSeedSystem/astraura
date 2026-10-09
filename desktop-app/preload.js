@@ -24,6 +24,9 @@ contextBridge.exposeInMainWorld('astraura', {
   saveFile: (options) => ipcRenderer.invoke('dialog:saveFile', options),
   openFile: (options) => ipcRenderer.invoke('dialog:openFile', options),
   
+  // Actualizaciones
+  checkUpdates: () => ipcRenderer.invoke('app:check-updates'),
+
   // Store
   getStore: (key) => ipcRenderer.invoke('store:get', key),
   setStore: (key, value) => ipcRenderer.invoke('store:set', key, value),

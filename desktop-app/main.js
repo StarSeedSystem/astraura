@@ -8,7 +8,7 @@
  * - Custom PNG icon for all platforms
  * - Cross-platform: macOS, Linux, Windows
  * - Secure IPC with preload script
- * - Auto-update checks
+ * - Actualización automática real (actualizador.js: GitHub Releases + SHA-256)
  * - Deep linking support
  */
 
@@ -17,6 +17,7 @@ const { spawn, execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const Store = require('electron-store');
+const actualizador = require('./actualizador');
 
 // Configuration store
 const store = new Store({
@@ -31,7 +32,7 @@ const store = new Store({
     showTray: true,
     minimizeToTray: true,
     checkUpdates: true,
-    lastVersion: '1.5.8'
+    lastVersion: '1.6.0'
   }
 });
 
@@ -364,6 +365,10 @@ function createAppMenu() {
         },
         { type: 'separator' },
         {
+          label: 'Buscar actualizaciones…',
+          click: () => actualizador.comprobar(mainWindow, { manual: true })
+        },
+        {
           label: 'Preferencias',
           accelerator: 'CmdOrCtrl+,',
           click: () => {
@@ -513,6 +518,9 @@ function setupIpcHandlers() {
     }
   });
 
+  // Actualizaciones (la web puede pedir una comprobación manual)
+  ipcMain.handle('app:check-updates', () => actualizador.comprobar(mainWindow, { manual: true }));
+
   // Quit app
   ipcMain.handle('app:quit', () => {
     isQuitting = true;
@@ -560,6 +568,11 @@ app.whenReady().then(async () => {
 
   // Create main window
   createMainWindow();
+
+  // Actualización automática: 30 s tras arrancar y cada 6 h (preferencia checkUpdates).
+  if (app.isPackaged) {
+    actualizador.vigilar(() => mainWindow, () => store.get('checkUpdates') !== false);
+  }
 });
 
 app.on('window-all-closed', () => {

@@ -1,6 +1,6 @@
 {
   "name": "astraura-158bit-desktop",
-  "version": "1.5.9",
+  "version": "1.6.0",
   "description": "Astraura 1.58-Bit Cognitive Engine // StarSeed OS - Sovereign Multi-Agent Desktop App",
   "main": "main.js",
   "scripts": {
@@ -10,7 +10,8 @@
     "build:mac": "electron-builder --mac",
     "build:linux": "electron-builder --linux",
     "build:win": "electron-builder --win",
-    "install:all": "npm install && cd ../frontend && npm install"
+    "install:all": "npm install && cd ../frontend && npm install",
+    "test": "node --test test/actualizador.test.js"
   },
   "keywords": [
     "astraura",
@@ -41,6 +42,7 @@
     "files": [
       "main.js",
       "preload.js",
+      "actualizador.js",
       "assets/**/*"
     ],
     "extraResources": [
@@ -51,8 +53,20 @@
     ],
     "mac": {
       "target": [
-        "dmg",
-        "zip"
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
       ],
       "category": "public.app-category.developer-tools",
       "hardenedRuntime": false,
@@ -63,9 +77,24 @@
     },
     "linux": {
       "target": [
-        "AppImage",
-        "deb",
-        "rpm"
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "rpm",
+          "arch": [
+            "x64"
+          ]
+        }
       ],
       "category": "Development",
       "maintainer": "StarSeed System <alexbordongarrigos@gmail.com>",
@@ -79,8 +108,12 @@
     },
     "win": {
       "target": [
-        "nsis",
-        "portable"
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
       ],
       "verifyUpdateCodeSignature": false
     },
@@ -94,6 +127,8 @@
       "installerIcon": "assets/icon.ico",
       "uninstallerIcon": "assets/icon.ico",
       "installerHeaderIcon": "assets/icon.ico"
-    }
+    },
+    "artifactName": "Astraura-${version}-${arch}-${os}.${ext}",
+    "publish": null
   }
 }
