@@ -205,7 +205,17 @@ async def lifespan(app: FastAPI):
         print("🌐 Túnel HTTPS Soberano & Enlace Multi-Dispositivo (Cloudflare/LAN): ACTIVO")
     except Exception as e:
         print(f"⚠️ No se pudo iniciar el túnel automático: {e}")
-        
+
+    # 6b. (2026-10-09) Nodo de la malla: latido + descubrimiento. Vivía en
+    # @app.on_event("startup"), que FastAPI NO llama cuando la app usa `lifespan`:
+    # el nodo nunca latía (started=false, «dead») y `astraura_mesh_nodes` seguía vacía.
+    try:
+        from .core.mesh_network import mesh_network as _malla
+        _malla.start()
+        print(f"🕸️ Nodo de la malla Astraura: ACTIVO ({_malla.node_id[:8]}…)")
+    except Exception as e:
+        print(f"⚠️ No se pudo arrancar la malla (modo local): {e}")
+
     # 7. Agentes de aprendizaje 1.58 (Ola 270, 2026-09-07): Curador, Evaluador,
     # Cronista, Entrenador y Desplegador sobre el corpus vivo. El Evaluador
     # respeta el turno de memoria del BitNet (jamás lo despierta). Se

@@ -137,6 +137,24 @@ def test_motor_no_listo_sin_logits_utilizables(monkeypatch) -> None:
 
 # ──────────────────────────────────────── puntuación ────────────────────────────────────────
 
+def _letra_de(prompt: str, opcion: str) -> str:
+    """La letra que lleva `opcion` en ESTE prompt («B. sí» → «B»)."""
+    for linea in prompt.splitlines():
+        if linea.endswith(f". {opcion}"):
+            return linea.split(".", 1)[0]
+    raise AssertionError(f"{opcion} no está en el prompt")
+
+
+def test_un_sesgo_de_posicion_no_decide(monkeypatch) -> None:
+    """(2026-10-09) Un modelo que SIEMPRE elige la última letra empata: no decide nada."""
+    monkeypatch.setattr(jev_mod.bitnet_cpp_manager, "ensure_server",
+                         lambda *a, **k: "http://127.0.0.1:8790")
+    monkeypatch.setattr(jev_mod, "_completar",
+                         lambda base, prompt, timeout: _respuesta_completion("B", ["A", "B"]))
+    r = _correr(jev_mod.decidir(_peticion(opciones=["sí", "no"])))
+    assert math.isclose(r["probabilidades"]["sí"], r["probabilidades"]["no"], abs_tol=1e-9)
+
+
 def test_decide_la_opcion_con_mayor_logit(monkeypatch) -> None:
     monkeypatch.setattr(jev_mod.bitnet_cpp_manager, "ensure_server",
                          lambda *a, **k: "http://127.0.0.1:8790")
@@ -144,7 +162,9 @@ def test_decide_la_opcion_con_mayor_logit(monkeypatch) -> None:
 
     def _falso(base, prompt, timeout):
         llamadas.append((base, prompt, timeout))
-        return _respuesta_completion("A", ["A", "B"])  # "A" = "sí" gana
+        # (2026-10-09) El modelo prefiere «sí» esté en la posición que esté (se pregunta en
+        # los dos órdenes y se promedia).
+        return _respuesta_completion(_letra_de(prompt, "sí"), ["A", "B"])
 
     monkeypatch.setattr(jev_mod, "_completar", _falso)
 
@@ -165,7 +185,7 @@ def test_decide_con_mas_de_dos_opciones_y_contexto(monkeypatch) -> None:
 
     def _falso(base, prompt, timeout):
         assert "hace frío" in prompt  # el contexto viaja dentro del prompt
-        return _respuesta_completion("C", ["A", "B", "C"])
+        return _respuesta_completion(_letra_de(prompt, "chocolate caliente"), ["A", "B", "C"])
 
     monkeypatch.setattr(jev_mod, "_completar", _falso)
 

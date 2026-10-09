@@ -17,6 +17,7 @@ from __future__ import annotations
 import asyncio
 import json
 import math
+import os
 import time
 import urllib.request
 from typing import Any, Dict, List, Optional
@@ -127,6 +128,31 @@ def _probabilidades(respuesta: Any, letras: List[str]) -> Optional[Dict[str, flo
     return {l: p for l, p in zip(letras_validas, normalizadas)}
 
 
+#: (2026-10-09) Se pregunta en los DOS órdenes de opciones y se promedia por opción. Medido en
+#: la Mac: «¿es urgente que producción no responda?» daba «no» (0,82) con [sí, no] y «sí» (0,97)
+#: con [no, sí] — BitNet b1.58-2B favorece la última opción. Con el promedio, 10 preguntas de
+#: sí/no dan la MISMA respuesta en cualquier orden. Cuesta un segundo paso de un token.
+#: ASTRAURA_JEV_SIMETRICO=0 lo quita.
+SIMETRICO = os.environ.get("ASTRAURA_JEV_SIMETRICO", "1").strip().lower() not in ("0", "no", "false")
+
+
+def probabilidades_simetricas(por_orden: List[Any]) -> Optional[Dict[str, float]]:
+    """PURA. `por_orden` = [(opciones_en_ese_orden, {letra: prob})] → {opción: prob media}."""
+    sumas: Dict[str, float] = {}
+    cuentas: Dict[str, int] = {}
+    for opciones, probs in por_orden:
+        if not probs:
+            return None
+        for letra, opcion in zip(_letras(len(opciones)), opciones):
+            sumas[opcion] = sumas.get(opcion, 0.0) + float(probs.get(letra, 0.0))
+            cuentas[opcion] = cuentas.get(opcion, 0) + 1
+    if not sumas:
+        return None
+    medias = {o: sumas[o] / cuentas[o] for o in sumas}
+    total = sum(medias.values())
+    return {o: v / total for o, v in medias.items()} if total else None
+
+
 def _completar(base: str, prompt: str, timeout: float) -> Dict[str, Any]:
     """POST síncrono a `/completion` (se llama vía `asyncio.to_thread`: es
     bloqueante y no debe congelar el bucle de eventos compartido con el chat)."""
@@ -183,23 +209,27 @@ async def decidir(req: DecidirRequest, response: Response = None):
                 return _motor_no_listo("llama-server sin binario/modelo o no arrancó")
 
             letras = _letras(len(opciones))
-            prompt = _prompt(pregunta, opciones, contexto)
+            ordenes = [list(opciones)]
+            if SIMETRICO:
+                ordenes.append(list(reversed(opciones)))
             t0 = time.monotonic()
-            try:
-                cruda = await asyncio.to_thread(_completar, base, prompt, TIMEOUT_S)
-            except Exception as exc:
-                return _motor_no_listo(f"{type(exc).__name__}: {exc}")
+            por_orden = []
+            for orden in ordenes:
+                try:
+                    cruda = await asyncio.to_thread(
+                        _completar, base, _prompt(pregunta, orden, contexto), TIMEOUT_S)
+                except Exception as exc:
+                    return _motor_no_listo(f"{type(exc).__name__}: {exc}")
+                probabilidades = _probabilidades(cruda, letras)
+                if not probabilidades:
+                    return _motor_no_listo("sin logits utilizables en la respuesta")
+                por_orden.append((orden, probabilidades))
             ms = int(round((time.monotonic() - t0) * 1000))
 
-            probabilidades = _probabilidades(cruda, letras)
-            if not probabilidades:
+            probabilidades_por_opcion = probabilidades_simetricas(por_orden)
+            if not probabilidades_por_opcion:
                 return _motor_no_listo("sin logits utilizables en la respuesta")
-            maxima = max(probabilidades, key=probabilidades.get)
-            indice = letras.index(maxima)
-            probabilidades_por_opcion = {
-                opcion: probabilidades.get(letra, 0.0)
-                for letra, opcion in zip(letras, opciones)
-            }
+            indice = max(range(len(opciones)), key=lambda i: probabilidades_por_opcion.get(opciones[i], 0.0))
     except Ocupado as oc:
         return turnero.respuesta_ocupada(oc)
 

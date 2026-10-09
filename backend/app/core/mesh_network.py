@@ -52,6 +52,8 @@ NODE_ID_FILE = MESH_DIR / "node_id.txt"
 FED_DELTAS_FILE = MESH_DIR / "federated_deltas.json"
 
 HEARTBEAT_INTERVAL_S = 30
+#: Latido a Supabase: menor que STALE_AFTER_S (90) para que los demás no lo vean «stale».
+SUPABASE_LATIDO_S = 60
 
 
 def cabeceras_malla() -> Dict[str, str]:
@@ -75,6 +77,20 @@ DEAD_AFTER_S = 300
 LAN_PING_TIMEOUT_S = 0.35
 
 CRED_FILE = os.path.expanduser("~/.astraura/supabase_astraura.json")
+
+def _cabeceras_supabase(creds: Dict[str, Any], extra: Optional[List[str]] = None) -> str:
+    """(2026-10-09) Escribe las cabeceras con la clave en un archivo temporal 0600 para
+    `curl -H @archivo`: en los argumentos de la orden la clave se veía con `ps`.
+    Quien llama borra el archivo."""
+    clave = creds.get("service_role_key", "")
+    lineas = [f"apikey: {clave}", f"Authorization: Bearer {clave}"] + list(extra or [])
+    fd, ruta = tempfile.mkstemp(suffix=".hdr")
+    with os.fdopen(fd, "w", encoding="utf-8") as f:
+        f.write("\n".join(lineas) + "\n")
+    os.chmod(ruta, 0o600)
+    return ruta
+
+
 BREW_CURL = "/opt/homebrew/opt/curl/bin/curl"
 SUPABASE_TABLE = "astraura_mesh_nodes"
 
@@ -241,19 +257,23 @@ class MeshNetwork:
         with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as tmp:
             tmp.write(payload)
             tmp_path = tmp.name
+        # return=minimal: Supabase no devuelve la fila (cero tráfico de salida por latido).
+        hdr = _cabeceras_supabase(creds, ["Content-Type: application/json",
+                                          "Prefer: resolution=merge-duplicates,return=minimal"])
         cmd = [
             _curl_bin(), "-sS", "-m", "15", "--tlsv1.2", "-X", "POST", url,
-            "-H", f"apikey: {creds.get('service_role_key', '')}",
-            "-H", f"Authorization: Bearer {creds.get('service_role_key', '')}",
-            "-H", "Content-Type: application/json",
-            "-H", "Prefer: resolution=merge-duplicates",
+            "-H", f"@{hdr}",
             "--data-binary", f"@{tmp_path}",
+            "-o", "/dev/null", "-w", "%{http_code}",
         ]
         try:
             proc = subprocess.run(cmd, capture_output=True, timeout=25)
-            ok = proc.returncode == 0
+            # (2026-10-09) curl sale con 0 también ante un 400/401 de Supabase: se mira el código.
+            codigo = (proc.stdout or b"").decode("utf-8", "replace").strip()
+            ok = proc.returncode == 0 and codigo.startswith("2")
+            self._ultimo_upsert_codigo = codigo or None
             if not ok:
-                logger.debug(f"🕸️ [MESH] upsert Supabase falló: {proc.stderr[:200]}")
+                logger.warning(f"🕸️ [MESH] upsert Supabase falló (HTTP {codigo or '?'}): {proc.stderr[:200]}")
             return ok
         except Exception as e:
             logger.debug(f"🕸️ [MESH] upsert Supabase exception: {e}")
@@ -263,17 +283,18 @@ class MeshNetwork:
                 os.unlink(tmp_path)
             except Exception:
                 pass
+            try:
+                os.unlink(hdr)
+            except Exception:
+                pass
 
     def _supabase_fetch_nodes(self) -> List[Dict[str, Any]]:
         creds = _load_creds()
         if not creds:
             return []
         url = f"{creds['supabase_url'].rstrip('/')}/rest/v1/{SUPABASE_TABLE}?select=*&updated_at=gte.{time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(time.time() - DEAD_AFTER_S))}"
-        cmd = [
-            _curl_bin(), "-sS", "-m", "15", "--tlsv1.2", url,
-            "-H", f"apikey: {creds.get('service_role_key', '')}",
-            "-H", f"Authorization: Bearer {creds.get('service_role_key', '')}",
-        ]
+        hdr = _cabeceras_supabase(creds)
+        cmd = [_curl_bin(), "-sS", "-m", "15", "--tlsv1.2", url, "-H", f"@{hdr}"]
         try:
             proc = subprocess.run(cmd, capture_output=True, text=True, timeout=25)
             data = json.loads(proc.stdout or "[]")
@@ -281,6 +302,11 @@ class MeshNetwork:
         except Exception as e:
             logger.debug(f"🕸️ [MESH] fetch nodos Supabase falló: {e}")
             return []
+        finally:
+            try:
+                os.unlink(hdr)
+            except Exception:
+                pass
 
     # ------------------------------------------------------------------
     # Registro / heartbeat de peers
@@ -692,6 +718,9 @@ class MeshNetwork:
                 "started": self.started,
                 "heartbeat_interval_s": HEARTBEAT_INTERVAL_S,
                 "supabase": _load_creds() is not None,
+                # (2026-10-09) Si el último latido llegó de verdad a Supabase, y cuándo.
+                "supabase_ultimo_latido": getattr(self, "_ultimo_upsert", None),
+                "supabase_ultimo_codigo": getattr(self, "_ultimo_upsert_codigo", None),
                 "nodes_total": len(self.nodes),
                 "nodes_by_status": by_status,
                 "nodes": list(self.nodes.values()),
@@ -721,7 +750,12 @@ class MeshNetwork:
                 await asyncio.sleep(HEARTBEAT_INTERVAL_S)
                 me = self.get_self()
                 self.register_node(me)  # guarda localmente
-                await asyncio.to_thread(self._supabase_upsert_node, me)
+                # (2026-10-09) A Supabase como mucho cada SUPABASE_LATIDO_S: con 30 s eran
+                # 2.880 escrituras al día por nodo (11 % del presupuesto diario de 25.000).
+                ahora = time.time()
+                if ahora - getattr(self, "_ultimo_upsert", 0.0) >= SUPABASE_LATIDO_S:
+                    if await asyncio.to_thread(self._supabase_upsert_node, me):
+                        self._ultimo_upsert = ahora
                 # Heartbeat HTTP a peers activos conocidos
                 self.update_statuses()
                 for n in list(self.nodes.values()):
