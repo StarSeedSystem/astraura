@@ -45,6 +45,9 @@ from typing import Dict, Any, List, Optional
 
 logger = logging.getLogger("astraura.mesh")
 
+# (PDA1011) La malla va por la puerta de datos del A1 con Supabase de respaldo automático.
+from app.core.puerta_datos import puerta as puerta_datos
+
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 MESH_DIR = BASE_DIR / "data" / "mesh"
 NODES_FILE = MESH_DIR / "nodes.json"
@@ -307,6 +310,35 @@ class MeshNetwork:
             except Exception:
                 pass
 
+    def _subir_fila(self, row: Dict[str, Any]) -> bool:
+        """(PDA1011) Sube una fila de la malla: puerta de datos del A1 primero, Supabase si no.
+        `ASTRAURA_PUERTA_DATOS=apagada` (o sin URL/ficha) → solo Supabase, como antes."""
+        if puerta_datos.activa():
+            fila = dict(row)
+            for k in ("last_heartbeat", "created_at", "updated_at"):
+                v = fila.get(k)
+                if isinstance(v, (int, float)):
+                    fila[k] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(v))
+            if puerta_datos.malla_registrar(fila):
+                self._ultimo_via = "puerta"
+                return True
+            puerta_datos.respaldo()
+        ok = self._supabase_upsert_node(row)
+        if ok:
+            self._ultimo_via = "supabase"
+        return ok
+
+    def _filas_remotas(self) -> List[Dict[str, Any]]:
+        """(PDA1011) Nodos vistos en la puerta; si no responde, en Supabase (respaldo)."""
+        if puerta_datos.activa():
+            filas = puerta_datos.malla_nodos(DEAD_SUPABASE_S)
+            if filas is not None:
+                self._descubre_via = "puerta"
+                return filas
+            puerta_datos.respaldo()
+        self._descubre_via = "supabase"
+        return self._supabase_fetch_nodes()
+
     def _supabase_fetch_nodes(self) -> List[Dict[str, Any]]:
         creds = _load_creds()
         if not creds:
@@ -372,7 +404,7 @@ class MeshNetwork:
                 return False
             # Se reserva el turno ANTES de subir: dos llamadas casi a la vez no suben dos veces.
             self._turno_upsert = ahora
-            ok = self._supabase_upsert_node(node)
+            ok = self._subir_fila(node)
             if ok:
                 self._ultimo_upsert = ahora  # lo que enseña get_status: el último que LLEGÓ
             else:
@@ -403,7 +435,7 @@ class MeshNetwork:
     def discover_remote_nodes(self) -> int:
         """Fusiona nodos vistos en Supabase. Devuelve nº de nodos conocidos."""
         try:
-            for raw in self._supabase_fetch_nodes():
+            for raw in self._filas_remotas():
                 nid = raw.get("node_id")
                 if not nid or nid == self.node_id:
                     continue
@@ -412,7 +444,8 @@ class MeshNetwork:
                 if isinstance(ts, str):
                     try:
                         import calendar
-                        hb = calendar.timegm(time.strptime(ts.replace("Z", ""), "%Y-%m-%dT%H:%M:%S"))
+                        # (PDA1011) La puerta da milisegundos («…:44.123Z») y Supabase «+00:00»: 19 caracteres bastan.
+                        hb = calendar.timegm(time.strptime(ts.replace(" ", "T")[:19], "%Y-%m-%dT%H:%M:%S"))
                     except Exception:
                         pass
                 existing = self.nodes.get(nid)
@@ -686,7 +719,7 @@ class MeshNetwork:
                 "status": "active",
                 "updated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             }
-            self._supabase_upsert_node(row)
+            self._subir_fila(row)
         except Exception as e:
             logger.debug(f"🕸️ [MESH] upsert federado falló: {e}")
 
@@ -762,6 +795,10 @@ class MeshNetwork:
                 # (2026-10-09) Si el último latido llegó de verdad a Supabase, y cuándo.
                 "supabase_ultimo_latido": getattr(self, "_ultimo_upsert", None),
                 "supabase_ultimo_codigo": getattr(self, "_ultimo_upsert_codigo", None),
+                # (PDA1011) Por dónde fue la última subida y el último descubrimiento, y la puerta.
+                "malla_via": getattr(self, "_ultimo_via", None),
+                "descubre_via": getattr(self, "_descubre_via", None),
+                "puerta_datos": puerta_datos.resumen(),
                 "nodes_total": len(self.nodes),
                 "nodes_by_status": by_status,
                 "nodes": list(self.nodes.values()),

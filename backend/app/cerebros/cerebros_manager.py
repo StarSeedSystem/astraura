@@ -1434,8 +1434,16 @@ class CerebrosManager:
             from app.core import supabase_sync
             if not supabase_sync.is_available():
                 return {"success": False, "reason": "no-credentials"}
+            # (PDA1011) La puerta de datos del A1 guarda el ESTADO del registro (su huella y cuándo
+            # cambió; nunca el contenido). Si la huella es la que ya fusionamos, Supabase ni se toca;
+            # una vez por hora se mira Supabase igualmente por si otro medio subió sin la puerta.
+            if self._cerebros_sin_cambios_en_puerta():
+                return {"success": True, "linked_count": 0, "linked": [], "updated": [], "conflicts": [],
+                        "changed": False, "via": "puerta"}
             print("🧪 [SB] Intentando sincronizar cerebros desde Supabase...")
             remote = supabase_sync.pull_state(SUPABASE_CEREBROS_KEY)
+            if remote and "cerebros" in remote:
+                self._publicar_estado_cerebros(remote)
             if not remote or "cerebros" not in remote:
                 print("🧪 [SB] Sin registry remoto aún en Supabase (primer uso). Se subirá el local.")
                 try:
@@ -1467,7 +1475,47 @@ class CerebrosManager:
             if not supabase_sync.is_available():
                 return False
             data = {"active_brain_id": self.active_brain_id, "cerebros": self.cerebros}
-            return supabase_sync.push_state(SUPABASE_CEREBROS_KEY, data)
+            ok = supabase_sync.push_state(SUPABASE_CEREBROS_KEY, data)
+            if ok:
+                self._publicar_estado_cerebros(data)
+            return ok
+        except Exception:
+            return False
+
+    # ── (PDA1011) estado de los cerebros en la puerta de datos del A1 ──
+    @staticmethod
+    def _huella_cerebros(data: Dict[str, Any]) -> str:
+        import hashlib
+        crudo = json.dumps(data, ensure_ascii=False, sort_keys=True, default=str).encode("utf-8")
+        return hashlib.sha256(crudo).hexdigest()
+
+    def _publicar_estado_cerebros(self, data: Dict[str, Any]) -> None:
+        """Deja en la puerta la huella de lo que hay en Supabase (cuántos cerebros y cuándo), sin contenido."""
+        try:
+            from app.core.puerta_datos import puerta
+            huella = self._huella_cerebros(data)
+            self._cerebros_huella_vista = huella
+            self._cerebros_mirado_supabase = time.time()
+            if puerta.activa():
+                puerta.estado_poner("cerebros", {"huella": huella, "cerebros": len(data.get("cerebros") or {}),
+                                                 "sincronizado": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())})
+        except Exception:
+            pass
+
+    def _cerebros_sin_cambios_en_puerta(self) -> bool:
+        """True solo si la puerta responde, su huella es la que ya fusionamos y Supabase se miró hace < 1 h."""
+        try:
+            from app.core.puerta_datos import puerta
+            if not puerta.activa() or not getattr(self, "_cerebros_huella_vista", None):
+                return False
+            if time.time() - float(getattr(self, "_cerebros_mirado_supabase", 0) or 0) >= float(
+                    os.environ.get("ASTRAURA_CEREBROS_SEGURO_S", "3600")):
+                return False
+            e = puerta.estado_leer("cerebros")
+            if e is None:
+                puerta.respaldo()
+                return False
+            return ((e.get("data") or {}).get("huella")) == self._cerebros_huella_vista
         except Exception:
             return False
 

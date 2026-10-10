@@ -1,5 +1,8 @@
 """CON1010: sincronía espaciada del backend de Astraura (fallan con el código anterior)."""
-import asyncio, json, threading, time, unittest
+import asyncio, json, os, threading, time, unittest
+
+# (PDA1011) Estas pruebas miden la subida a Supabase: la puerta de datos queda apagada aquí.
+os.environ.setdefault("ASTRAURA_PUERTA_DATOS", "apagada")
 from unittest import mock
 
 from app.core import mesh_network as mn
