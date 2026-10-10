@@ -150,6 +150,19 @@ def pull_all(verbose: bool = False) -> dict:
 # vectores cada 2 min aunque nada hubiera cambiado, y una sección de 24 MB
 # habría roto el upsert.
 _last_hashes: dict = {}
+#: (2026-10-10 · CON1010) Cuándo se subió cada sección por última vez. Cinco secciones cambian cada
+#: pocos minutos aunque nadie haga nada (enrutado de almacenamiento, enjambre, notificaciones,
+#: bóveda del director, memoria): 1.464 escrituras a `astraura_state` en 20 h. Una sección que
+#: cambia se sube como mucho cada ASTRAURA_SYNC_MIN_S (15 min por defecto) con su ÚLTIMO contenido;
+#: `force=True` (el botón «sincronizar ahora») no espera.
+_last_push_at: dict = {}
+
+
+def _min_intervalo_s() -> float:
+    try:
+        return max(0.0, float(os.environ.get("ASTRAURA_SYNC_MIN_S", "900")))
+    except Exception:
+        return 900.0
 
 
 def _section_payload(local_rel):
@@ -189,6 +202,10 @@ def push_all(verbose: bool = False, force: bool = False) -> dict:
             continue
         if not force and _last_hashes.get(r2_key) == h:
             continue
+        if not force and time.time() - _last_push_at.get(r2_key, 0.0) < _min_intervalo_s():
+            # Cambió, pero se subió hace poco: espera a su turno (se sube lo último que haya entonces).
+            skipped.setdefault(r2_key, "esperando su turno (sincronía espaciada)")
+            continue
         changed_sections[r2_key] = (data, h)
     if skipped:
         results["skipped"] = skipped
@@ -221,8 +238,10 @@ def push_all(verbose: bool = False, force: bool = False) -> dict:
         results["r2"] = r2_results
     # Recordar qué se subió (solo si hubo al menos un destino disponible).
     if supabase_sync.is_available() or r2_storage.is_available():
+        ahora = time.time()
         for r2_key, (_data, h) in changed_sections.items():
             _last_hashes[r2_key] = h
+            _last_push_at[r2_key] = ahora
     # (OS · Ola 3) Estado honesto del último push para el OS.
     last_push_info.update({
         "at": time.time(),

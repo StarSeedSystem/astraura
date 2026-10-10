@@ -52,8 +52,23 @@ NODE_ID_FILE = MESH_DIR / "node_id.txt"
 FED_DELTAS_FILE = MESH_DIR / "federated_deltas.json"
 
 HEARTBEAT_INTERVAL_S = 30
-#: Latido a Supabase: menor que STALE_AFTER_S (90) para que los demás no lo vean «stale».
-SUPABASE_LATIDO_S = 60
+
+
+def _segundos_env(nombre: str, defecto: int, minimo: int) -> int:
+    try:
+        return max(minimo, int(float(os.environ.get(nombre, "") or defecto)))
+    except Exception:
+        return defecto
+
+
+#: (2026-10-10 · CON1010) Latido a Supabase cada 5 min (antes 60 s… y en la práctica cada 30 s:
+#: `register_node` del propio nodo subía la fila en CADA latido local, saltándose el tope).
+#: Medido el 10-10: 3.313 escrituras a `astraura_mesh_nodes` en 20 h desde este nodo — el 13 % del
+#: presupuesto diario del proyecto. Los pares que llegan por HTTP siguen latiendo cada 30 s entre sí;
+#: Supabase solo sirve para DESCUBRIR nodos, y para eso 5 min sobran.
+SUPABASE_LATIDO_S = _segundos_env("ASTRAURA_MALLA_LATIDO_S", 300, 60)
+#: Descubrimiento por Supabase + sondeo de la LAN (antes cada 120 s: 551 lecturas al día).
+DESCUBRIMIENTO_S = _segundos_env("ASTRAURA_MALLA_DESCUBRIR_S", 300, 60)
 
 
 def cabeceras_malla() -> Dict[str, str]:
@@ -74,6 +89,10 @@ def cabeceras_malla() -> Dict[str, str]:
 
 STALE_AFTER_S = 90
 DEAD_AFTER_S = 300
+#: Un nodo que solo conocemos por Supabase late allí cada SUPABASE_LATIDO_S: se le juzga con esa
+#: vara (si no, entre dos latidos parecería «stale» o «dead» sin estarlo).
+STALE_SUPABASE_S = max(STALE_AFTER_S, SUPABASE_LATIDO_S + 60)
+DEAD_SUPABASE_S = max(DEAD_AFTER_S, 2 * SUPABASE_LATIDO_S + 60)
 LAN_PING_TIMEOUT_S = 0.35
 
 CRED_FILE = os.path.expanduser("~/.astraura/supabase_astraura.json")
@@ -292,7 +311,7 @@ class MeshNetwork:
         creds = _load_creds()
         if not creds:
             return []
-        url = f"{creds['supabase_url'].rstrip('/')}/rest/v1/{SUPABASE_TABLE}?select=*&updated_at=gte.{time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(time.time() - DEAD_AFTER_S))}"
+        url = f"{creds['supabase_url'].rstrip('/')}/rest/v1/{SUPABASE_TABLE}?select=*&updated_at=gte.{time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(time.time() - DEAD_SUPABASE_S))}"
         hdr = _cabeceras_supabase(creds)
         cmd = [_curl_bin(), "-sS", "-m", "15", "--tlsv1.2", url, "-H", f"@{hdr}"]
         try:
@@ -329,11 +348,11 @@ class MeshNetwork:
             self.nodes[nid] = node
             self._save_nodes()
             if nid == self.node_id:
-                # Upsert a Supabase en background SOLO si hay loop corriendo
-                # (desde contexto sync puro, se hará en el próximo heartbeat).
+                # (CON1010) El propio nodo sube su fila por la MISMA puerta con tope que el latido
+                # (`_latido_supabase`): antes se subía aquí en cada latido local de 30 s.
                 try:
                     asyncio.get_running_loop()
-                    asyncio.ensure_future(asyncio.to_thread(self._supabase_upsert_node, dict(node)))
+                    asyncio.ensure_future(asyncio.to_thread(self._latido_supabase, dict(node)))
                 except RuntimeError:
                     pass
             self.rebalance_shards()
@@ -345,14 +364,35 @@ class MeshNetwork:
     def receive_heartbeat(self, info: Dict[str, Any]) -> Dict[str, Any]:
         return self.register_node(info)
 
+    def _latido_supabase(self, node: Dict[str, Any], forzar: bool = False) -> bool:
+        """(CON1010) Sube la fila del propio nodo como mucho cada SUPABASE_LATIDO_S. Nunca lanza."""
+        try:
+            ahora = time.time()
+            if not forzar and ahora - getattr(self, "_turno_upsert", 0.0) < SUPABASE_LATIDO_S:
+                return False
+            # Se reserva el turno ANTES de subir: dos llamadas casi a la vez no suben dos veces.
+            self._turno_upsert = ahora
+            ok = self._supabase_upsert_node(node)
+            if ok:
+                self._ultimo_upsert = ahora  # lo que enseña get_status: el último que LLEGÓ
+            else:
+                # Falló: se permite reintentar en el próximo latido local, no a los 5 min.
+                self._turno_upsert = ahora - SUPABASE_LATIDO_S + HEARTBEAT_INTERVAL_S
+            return ok
+        except Exception:
+            return False
+
     def update_statuses(self):
-        """Marca stale/dead según antigüedad del heartbeat."""
+        """Marca stale/dead según antigüedad del heartbeat (con la vara de Supabase si vino de allí)."""
         now = time.time()
         for n in self.nodes.values():
             age = now - n.get("last_heartbeat", 0)
-            if age > DEAD_AFTER_S:
+            por_supabase = n.get("via") == "supabase"
+            dead = DEAD_SUPABASE_S if por_supabase else DEAD_AFTER_S
+            stale = STALE_SUPABASE_S if por_supabase else STALE_AFTER_S
+            if age > dead:
                 n["status"] = "dead"
-            elif age > STALE_AFTER_S:
+            elif age > stale:
                 n["status"] = "stale"
             else:
                 n["status"] = "active"
@@ -380,6 +420,7 @@ class MeshNetwork:
                 if existing and existing.get("last_heartbeat", 0) >= hb:
                     continue
                 raw["last_heartbeat"] = hb
+                raw["via"] = "supabase"
                 self.nodes[nid] = raw
             self.update_statuses()
             self._save_nodes()
@@ -749,13 +790,9 @@ class MeshNetwork:
             try:
                 await asyncio.sleep(HEARTBEAT_INTERVAL_S)
                 me = self.get_self()
-                self.register_node(me)  # guarda localmente
-                # (2026-10-09) A Supabase como mucho cada SUPABASE_LATIDO_S: con 30 s eran
-                # 2.880 escrituras al día por nodo (11 % del presupuesto diario de 25.000).
-                ahora = time.time()
-                if ahora - getattr(self, "_ultimo_upsert", 0.0) >= SUPABASE_LATIDO_S:
-                    if await asyncio.to_thread(self._supabase_upsert_node, me):
-                        self._ultimo_upsert = ahora
+                # Guarda localmente; la subida a Supabase (con su tope) la hace register_node por
+                # `_latido_supabase`: una sola puerta, un solo tope (CON1010).
+                self.register_node(me)
                 # Heartbeat HTTP a peers activos conocidos
                 self.update_statuses()
                 for n in list(self.nodes.values()):
@@ -784,7 +821,7 @@ class MeshNetwork:
     async def _discovery_loop(self):
         while True:
             try:
-                await asyncio.sleep(120)
+                await asyncio.sleep(DESCUBRIMIENTO_S)
                 await asyncio.to_thread(self.discover_remote_nodes)
                 await self.lan_broadcast_probe()
                 # Rebalanceo automático cuando cambia el conjunto activo

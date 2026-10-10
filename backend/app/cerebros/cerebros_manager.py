@@ -1177,13 +1177,23 @@ class CerebrosManager:
         conectados periódicamente y vincula nuevos cerebros automáticamente."""
         def _loop():
             import time as _t
+            # (2026-10-10 · CON1010) El re-escaneo LOCAL sigue cada 2 min; la sincronía con la nube
+            # (que pregunta a Supabase la fecha del registro) cada ASTRAURA_CEREBROS_SYNC_S (10 min):
+            # eran 720 lecturas de `astraura_state` al día solo para saber que nada había cambiado.
+            try:
+                cada_nube = max(120.0, float(os.environ.get("ASTRAURA_CEREBROS_SYNC_S", "600")))
+            except Exception:
+                cada_nube = 600.0
+            ultima_nube = float("-inf")  # la primera vuelta sincroniza ya, como antes
             while True:
                 try:
                     self.auto_link_detected_brains()
-                    self.sync_with_best_available()
+                    if _t.time() - ultima_nube >= cada_nube:
+                        ultima_nube = _t.time()
+                        self.sync_with_best_available()
                 except Exception:
                     pass
-                _t.sleep(120)  # re-escaneo cada 2 min
+                _t.sleep(120)  # re-escaneo local cada 2 min
         t = threading.Thread(target=_loop, daemon=True)
         t.start()
 
